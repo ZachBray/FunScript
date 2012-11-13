@@ -158,3 +158,11 @@ let ``the ignore function works``() =
       <@@ 
          ignore 11.
       @@>
+
+[<Fact(Skip = "Need to figure out Sequences first")>]
+let ``the op_Range operator works``() =
+   check
+      <@@
+         let xs = [10..20]
+         xs.Head
+       @@>

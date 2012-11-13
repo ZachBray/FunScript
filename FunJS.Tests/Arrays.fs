@@ -35,6 +35,50 @@ let ``Array.Length works``() =
          xs.Length |> float
       @@>
 
+[<Fact(Skip = "length doesn't seem to work properly in Jint")>]
+let ``Array.zeroCreate works``() =
+   check  
+      <@@ 
+         let xs = Array.zeroCreate 2
+         float xs.Length
+      @@>
+
+[<Fact>]
+let ``Array.blit works``() =
+   check  
+      <@@ 
+         let xs = [|1.; 2.; 3.; 4.|]
+         let ys = Array.zeroCreate 2
+         Array.blit xs 2 ys 0 2
+         ys.[0] + ys.[1]
+      @@>
+
+[<Fact>]
+let ``Array.copy works``() =
+   check  
+      <@@ 
+         let xs = [|1.; 2.; 3.; 4.|]
+         let ys = Array.copy xs
+         ys.[0] + ys.[1]
+      @@>
+
+[<Fact>]
+let ``Array.sub works``() =
+   check  
+      <@@ 
+         let xs = [|1.; 2.; 3.; 4.|]
+         let ys = Array.sub xs 2 2
+         ys.[0] + ys.[1]
+      @@>
+
+[<Fact>]
+let ``Array.fill works``() =
+   check  
+      <@@ 
+         let xs = Array.zeroCreate 2
+         Array.fill xs 0 2 2.
+         xs.[0] + xs.[1]
+      @@>
 
 [<Fact>]
 let ``Array.empty works``() =
@@ -546,3 +590,4 @@ let ``Array.zip3 works``() =
          let x, y, z = ks.[0]
          x + y + z
       @@>
+

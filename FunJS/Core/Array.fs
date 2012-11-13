@@ -21,12 +21,26 @@ module Array =
    let SortInPlaceWith (f:'a -> 'a -> int) (xs:'a[]): unit =
       failwith "never"
 
+   [<JSEmit("return {0}.slice({1}, {1} + {2});")>]
+   let GetSubArray (xs:'a[]) (offset:int) (length:int): 'a[] =
+      failwith "never"
+      
    [<JSEmit("return {0}.slice(0);")>]
    let Copy (xs:'a[]): 'a[] =
       failwith "never"
-      
-   let ZeroCreate (size:int) : 'a[] =
-      [||]
+
+   [<JSEmit("return new Array({0});")>]
+   let ZeroCreate (size:int) : 'a[] = failwith "never"
+
+   let Fill (xs:'a []) offset count value =
+      for i = offset to offset + count - 1 do
+         xs.[i] <- value
+
+   let CopyTo (xs:'a []) fromOffset (ys:'a []) toOffset count =
+      let diff = toOffset - fromOffset
+      for i = fromOffset to fromOffset + count - 1 do
+         ys.[i + diff] <- xs.[i]
+      ys
 
    let IsEmpty xs = 
       Length xs = 0
