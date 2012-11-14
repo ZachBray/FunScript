@@ -5,7 +5,7 @@ open Microsoft.FSharp.Quotations
 open System.Reflection
 
 let private sanitize(str:string) =
-   str.Replace('.', '_').Replace('+', '_')
+   str.Replace('.', '_').Replace('+', '_').Replace('`', '_')
 
 let private getJSTypeName(t:System.Type) =
    sanitize t.Name
@@ -22,10 +22,12 @@ let private (|NonNull|_|) x =
    if obj.ReferenceEquals(x, null) then None
    else Some x
 
-let private (|ReflectedDefinition|_|) mi = 
-   match Expr.TryGetReflectedDefinition mi with
-   | Some _ -> Some(getJSName mi)
-   | _ -> None
+let private (|ReflectedDefinition|_|) (mi:MethodBase) =
+   if mi.DeclaringType.IsInterface then Some mi.Name
+   else
+      match Expr.TryGetReflectedDefinition mi with
+      | Some _ -> Some(getJSName mi)
+      | _ -> None
 
 let private rootInterfaceName = typeof<IJSRoot>.Name
 let private mappingInterfaceName = typeof<IJSMapping>.Name
@@ -60,6 +62,19 @@ let private (|JSMapping|_|) (mi:MethodBase) =
             Some (sprintf "%s.%s" prefix name, isStatic, isProperty)
    | _ -> None
 
+let private createConstruction (|Split|) (returnStategy:InternalCompiler.IReturnStrategy) exprs ci =
+   let exprs = exprs |> List.concat
+   let decls, refs = 
+      exprs 
+      |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
+      |> List.unzip
+   match ci, refs with
+   | JSMapping(name, true, false), _
+   | ReflectedDefinition name, _ ->
+      [ yield! decls |> List.concat
+        yield returnStategy.Return <| New(Reference (Var.Global(name, typeof<obj>)), refs) ]
+   | _ -> []
+
 let private createCall (|Split|) (returnStategy:InternalCompiler.IReturnStrategy) exprs mi =
    let exprs = exprs |> List.concat
    let decls, refs = 
@@ -69,8 +84,14 @@ let private createCall (|Split|) (returnStategy:InternalCompiler.IReturnStrategy
    match mi, refs with
    | JSMapping(name, true, false), _
    | ReflectedDefinition name, _ ->
-      [ yield! decls |> List.concat
-        yield returnStategy.Return <| Apply(Reference (Var.Global(name, typeof<obj>)), refs) ]
+      match mi.IsStatic, refs with
+      | false, objRef::argRefs ->
+         [ yield! decls |> List.concat
+           yield returnStategy.Return <| Apply(PropertyGet(objRef, mi.Name), argRefs) ]
+      | true, exprs ->
+         [ yield! decls |> List.concat
+           yield returnStategy.Return <| Apply(Reference (Var.Global(name, typeof<obj>)), refs) ]
+      | _ -> failwith "never"
    | JSMapping(name, true, true), [] ->
       [ yield! decls |> List.concat
         yield returnStategy.Return <| Reference (Var.Global(name, typeof<obj>)) ]
@@ -138,7 +159,7 @@ let private constructingInstances =
          if ci.DeclaringType.GUID = objectGuid then
             [ Scope <| Block [] ]
          else
-            createCall split returnStategy [exprs] ci
+            createConstruction split returnStategy [exprs] ci
       | _ -> []
 
 open System.Collections.Generic
@@ -156,6 +177,30 @@ module private Expr =
 
 
 open Microsoft.FSharp.Reflection
+
+let private localized (name:string) =
+   let sections = name.Split '-'
+   sections.[sections.Length - 1]
+
+let private getInstanceMethods (t:System.Type) =
+   t.GetMethods(
+      BindingFlags.Public ||| 
+      BindingFlags.NonPublic ||| 
+      BindingFlags.FlattenHierarchy ||| 
+      BindingFlags.Instance)
+   |> Array.choose (fun mi ->
+      Expr.TryGetReflectedDefinition mi 
+      |> Option.map (fun expr ->
+         match expr with
+         | Patterns.Lambda(var, DerivedPatterns.Lambdas(vars, bodyExpr)) ->
+            let replacementThis = Var("this", var.Type, var.IsMutable)
+            let updatedBodyExpr = bodyExpr.Substitute(function
+               | v when v = var -> Some <| Expr.Var replacementThis
+               | _ -> None)
+            localized mi.Name, vars |> List.concat, updatedBodyExpr
+         | _ -> failwith "expected a lambda"))
+   |> Seq.distinctBy (fun (name, _, _) -> name)
+   |> Seq.toArray
 
 let private findUsedMethods expr (compiler:InternalCompiler.ICompiler) =
    let found = Dictionary()
@@ -175,12 +220,14 @@ let private findUsedMethods expr (compiler:InternalCompiler.ICompiler) =
          | HasDefinition(mi, DerivedPatterns.Lambdas(vars, bodyExpr)) ->
             let name = getJSName mi
             if not <| found.ContainsKey name then
-               found.Add(name, (mi, vars |> List.concat, bodyExpr))
+               if mi.IsStatic || mi.IsConstructor then
+                  found.Add(name, (mi, vars |> List.concat, bodyExpr))
                find bodyExpr
          | HasDefinition(mi, unitLambdaBodyExpr) ->
             let name = getJSName mi
             if not <| found.ContainsKey name then
-               found.Add(name, (mi, [], unitLambdaBodyExpr))
+               if mi.IsStatic || mi.IsConstructor then
+                  found.Add(name, (mi, [], unitLambdaBodyExpr))
                find unitLambdaBodyExpr
          | _ -> () //TODO: throw? or is this for expression replacer stuff?
       
@@ -194,10 +241,16 @@ let private findUsedMethods expr (compiler:InternalCompiler.ICompiler) =
             match pi.SetMethod with
             | NonNull mi -> add mi
             | _ -> invalidOp ""
-         | Patterns.NewObject(ci, _) -> add ci
+         | Patterns.NewObject(ci, _) -> 
+            add ci
+            let methods = getInstanceMethods ci.DeclaringType
+            for _, _, expr in methods do
+               find expr
          | _ -> ())
    find expr
    found
+
+let private thisVar = Var("this", typeof<obj>, false)
 
 let private genMethod (mb:MethodBase) (vars:Var list) bodyExpr (compiler:InternalCompiler.ICompiler) =
    let block =
@@ -210,6 +263,14 @@ let private genMethod (mb:MethodBase) (vars:Var list) bodyExpr (compiler:Interna
                acc.Replace(sprintf "{%i}" i, v.Name)
                ) meth.Emit
          EmitBlock code
+      | _ when mb.IsConstructor ->
+         [  yield! compiler.Compile ReturnStrategies.inplace bodyExpr
+            let methods = getInstanceMethods mb.DeclaringType
+            for name, vars, bodyExpr in methods do
+               let methodRef = PropertyGet(Reference thisVar, name) 
+               let body = compiler.Compile ReturnStrategies.returnFrom bodyExpr
+               yield Assign(methodRef, Lambda(vars, Block body))
+         ] |> Block
       | _ -> Block(compiler.Compile ReturnStrategies.returnFrom bodyExpr)
    Lambda(vars, block)
 

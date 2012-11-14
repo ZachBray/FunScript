@@ -67,6 +67,7 @@
     <Compile Include="CommonOperators.fs" />
     <Compile Include="Arrays.fs" />
     <Compile Include="Lists.fs" />
+    <Compile Include="Seqs.fs" />
     <Compile Include="Options.fs" />
     <Compile Include="ReflectedDefinitions.fs" />
     <Compile Include="Compiler.fs" />

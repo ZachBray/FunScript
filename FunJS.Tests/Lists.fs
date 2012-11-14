@@ -545,6 +545,15 @@ let ``List.toArray works``() =
       @@>
 
 [<Fact>]
+let ``List.toSeq works``() =
+   check  
+      <@@ 
+         let xs = [1.; 2.]
+         let ys = xs |> List.toSeq
+         ys.GetEnumerator().MoveNext()
+      @@>
+
+[<Fact>]
 let ``List.tryFind works``() =
    check  
       <@@ 

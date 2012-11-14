@@ -61,8 +61,8 @@ let mostGeneric(mi:MethodInfo)  =
 module Quote =
    let toPropertyInfo = function
       | Patterns.PropertyGet(_,pi,_)
-      | Patterns.PropertySet(_,pi,_,_)
       | DerivedPatterns.Lambdas(_,Patterns.PropertyGet(_,pi,_))
+      | Patterns.PropertySet(_,pi,_,_)
       | DerivedPatterns.Lambdas(_,Patterns.PropertySet(_,pi,_,_)) -> pi
       | _ -> failwith "Expected a property call wrapped in a lambda"
 
@@ -70,11 +70,18 @@ module Quote =
       | Patterns.Call(_,mi,_)
       | DerivedPatterns.Lambdas(_,Patterns.Call(_,mi,_)) -> mostGeneric mi
       | _ -> failwith "Expected a method call wrapped in a lambda"
-   
+
+   let toGetterOrCallerReplacer = function
+      | Patterns.PropertyGet(_,pi,_)
+      | DerivedPatterns.Lambdas(_,Patterns.PropertyGet(_,pi,_)) ->
+         createGetterReplacer pi None
+      | Patterns.Call(_,mi,_)
+      | DerivedPatterns.Lambdas(_,Patterns.Call(_,mi,_)) -> 
+         createCallerReplacer (mostGeneric mi) None
+      | _ -> failwith "Expected a method call or property get wrapped in a lambda"
 
 let private generateArity quote (|ArgMatch|_|) =
-   let mi = Quote.toMethodInfo quote
-   createCallerReplacer mi None <| fun split (|Return|) returnStategy ->
+   Quote.toGetterOrCallerReplacer quote <| fun split (|Return|) returnStategy ->
       function
       | None, _, ArgMatch split (decls, code) ->
          [ yield! decls |> List.concat

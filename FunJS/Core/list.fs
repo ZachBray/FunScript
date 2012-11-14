@@ -281,3 +281,36 @@ module List =
       |> Array.Permute f 
       |> OfArray
 
+   
+
+   open System.Collections
+   open System.Collections.Generic
+
+   type 'a ListEnumerator(xs:'a list) =
+      let mutable current = Unchecked.defaultof<_> :: xs
+      
+      interface IEnumerator<'a> with
+
+         member __.Reset() = current <- Unchecked.defaultof<_> :: xs
+
+         member __.Current: 'a = current.Head
+
+         member __.Current: obj = current.Head :> obj
+
+         member __.MoveNext() =
+            match current with
+            | [] -> false
+            | x::xs -> 
+               current <- xs
+               true
+         
+         member __.Dispose() = ()
+            
+
+   type 'a ListEnumerable(xs:'a list) =
+      interface IEnumerable<'a> with
+         member __.GetEnumerator() = new ListEnumerator<'a>(xs) :> 'a IEnumerator
+         member __.GetEnumerator() = new ListEnumerator<'a>(xs) :> IEnumerator
+
+   let ToSeq xs =
+      ListEnumerable(xs)

@@ -30,6 +30,7 @@ type JSExpr =
    | IndexGet of JSExpr * JSExpr
    | Array of JSExpr list
    | Apply of JSExpr * JSExpr list
+   | New of JSExpr * JSExpr list
    | Lambda of Var list * JSBlock
    | UnaryOp of string * JSExpr
    | BinaryOp of JSExpr * string * JSExpr
@@ -62,6 +63,12 @@ type JSExpr =
                argExpr.Print(padding, scope))
             |> String.concat ", "
          sprintf "%s(%s)" (lambdaExpr.Print(padding, scope)) filling
+      | New(lambdaExpr, argExprs) ->
+         let filling =
+            argExprs |> List.map (fun argExpr -> 
+               argExpr.Print(padding, scope))
+            |> String.concat ", "
+         sprintf "(new %s(%s))" (lambdaExpr.Print(padding, scope)) filling
       | Lambda(vars, block) ->
          let oldScope = !scope
          let newScope, names = 
@@ -95,6 +102,7 @@ and JSStatement =
    | Scope of JSBlock
    | Return of JSExpr
    | Do of JSExpr
+   | Empty
    member statement.Print((Newline newL) as padding, scope) =
       match statement with
       | Declare vars ->
@@ -140,6 +148,7 @@ and JSStatement =
       | Return expr ->
          sprintf "return %s" (expr.Print(padding, scope))
       | Do expr -> expr.Print(padding, scope)
+      | Empty -> ""
 
 and JSBlock = 
    | Block of JSStatement list

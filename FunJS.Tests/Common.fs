@@ -11,7 +11,7 @@ let checkAreEqual expectedResult quote =
    printfn "// Code:\n%s" code
    try
       let engine = JintEngine()
-      let result = engine.Run(code)
+      let result = engine.Run(code + "\nreturn null;")
       result |> should equal expectedResult
    // Wrap xUnit exceptions to stop pauses.
    with ex ->
@@ -26,15 +26,13 @@ let check (quote:Quotations.Expr) =
    checkAreEqual expectedResult quote
 
 // TODO:
-// Add array closure test.
-// Add support for get_Zero and get_One in custom classes.
+// Fix TypeScript provider for case where interface and class have overlapping properties.
+// Add support for seq module.
+// Add support for interfaces on union and record types.
 // Add support for exceptions.
-// Add support for list/set equality.
-// Add support for variable name re-use (list problem).
-// Add support for array/seq/list modules.
+// Add support for list/set equality (through IComparable?).
 // Add support for events/observables.
 // Add support for computation expressions.
 // Add support for custom operators.
-// Add support for mapped javascript methods. JavaScript<string -> unit>("console.log")? Or Attribute?
 // Add support for tail recursive transformations into while loops.
 // Add support for type checks?

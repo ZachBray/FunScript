@@ -12,3 +12,5 @@ let returnFrom = returnStategy Return
 let inplace = returnStategy Do
 
 let assignVar varName = returnStategy (fun expr -> Assign(Reference varName, expr))
+
+let assignTo expr = returnStategy (fun valExpr -> Assign(expr, valExpr))

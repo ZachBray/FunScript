@@ -6,7 +6,7 @@ open FunJS.TypeScript
 
 // TODO: constructors, op_Apply, param arrays, optional arguments...
 type j = FunJS.TypeScript.Api< @"C:\src\FunScript\Examples\Typings\jquery.d.ts" >
-type jui = FunJS.TypeScript.Api< @"C:\src\FunScript\Examples\Typings\lib.d.ts" >
+// type jui = FunJS.TypeScript.Api< @"C:\src\FunScript\Examples\Typings\lib.d.ts" >
 
 [<JSEmit("return $(document);")>]
 let document() = Unchecked.defaultof<j.JQuery>

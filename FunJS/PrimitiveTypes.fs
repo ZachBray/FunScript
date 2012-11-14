@@ -6,7 +6,7 @@ open Microsoft.FSharp.Quotations
 let private primitiveValues =
    CompilerComponent.create <| fun _ _ returnStategy ->
       function
-      | DerivedPatterns.Unit x -> [ yield returnStategy.Return <| Null ]
+      | DerivedPatterns.Unit x -> [ Empty ]
       | DerivedPatterns.Bool x -> [ yield returnStategy.Return <| Boolean x ]
       | DerivedPatterns.String x -> [ yield returnStategy.Return <| String x ]
       | DerivedPatterns.SByte x -> [ yield returnStategy.Return <| Number(float x) ]

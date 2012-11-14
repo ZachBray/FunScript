@@ -1,10 +1,5 @@
 ﻿module internal FunJS.Lists
 
-open AST
-open Microsoft.FSharp.Quotations
-open System
-
-
 let components = 
    [
       [

@@ -12,15 +12,23 @@ module Calculator =
    let subtract(x, y) = x - y
 
 [<Fact>]
-let ``Curried methods can be generated from modules``() =
+let ``application of a curried module method works``() =
    check  <@@ Calculator.add 1. 2. @@>
 
 [<Fact>]
-let ``Tupled methods can be generated from modules``() =
+let ``partial application of a curried module method works``() =
+   check  
+      <@@ 
+         let f = Calculator.add 1. 
+         f 2. 
+      @@>
+
+[<Fact>]
+let ``application of a tupled module method works``() =
    check  <@@ Calculator.subtract(1., 2.) @@>
 
 [<Fact>]
-let ``Property getters can be generated from modules``() =
+let ``getting a module property works``() =
    check  <@@ Calculator.zero @@>
 
 
@@ -34,19 +42,27 @@ type StaticCalculator() =
       and set (value:int) = ()
 
 [<Fact>]
-let ``Curried methods can be generated from static types``() =
+let ``application of a static curried method works``() =
    check  <@@ StaticCalculator.add 1. 2. @@>
 
 [<Fact>]
-let ``Tupled methods can be generated from static types``() =
+let ``partial application of a static method works``() =
+   check  
+      <@@ 
+         let f = StaticCalculator.add 1. 
+         f 2. 
+      @@>
+
+[<Fact>]
+let ``application of a static tupled method works``() =
    check  <@@ StaticCalculator.subtract(1., 2.) @@>
 
 [<Fact>]
-let ``Property getters can be generated from static types``() =
+let ``getting a static property works``() =
    check  <@@ StaticCalculator.zero @@>
 
 [<Fact>]
-let ``Property setters can be generated from static types``() =
+let ``setting a static property works``() =
    check  <@@ StaticCalculator.current <- 1 @@>
 
 
@@ -59,7 +75,7 @@ type InstanceCalculator(x) =
    member __.genericIdentity x = x
 
 [<Fact>]
-let ``Instance types can be generated``() =
+let ``constructing instances works``() =
    check
       <@@
          let calc = new InstanceCalculator(10.)
@@ -67,35 +83,44 @@ let ``Instance types can be generated``() =
       
 
 [<Fact>]
-let ``Curried methods can be generated from instance types``() =
+let ``application of a curried instance method works``() =
    check  
       <@@ 
          let calc = InstanceCalculator(10.)
          calc.add 1. 2. @@>
 
 [<Fact>]
-let ``Tupled methods can be generated from instance types``() =
+let ``partial application of a curried instance method works``() =
+   check  
+      <@@ 
+         let calc = InstanceCalculator(10.)
+         let f = calc.add 1. 
+         f 2. 
+      @@>
+
+[<Fact>]
+let ``application of a tupled instance method works``() =
    check  
       <@@ 
          let calc = InstanceCalculator(10.)
          calc.subtract(1., 2.) @@>
 
 [<Fact>]
-let ``Property getters can be generated from instance types``() =
+let ``getting an instance property works``() =
    check  
       <@@ 
          let calc = InstanceCalculator(10.)
          calc.zero @@>
 
 [<Fact>]
-let ``Property setters can be generated from instance types``() =
+let ``setting an instance property works``() =
    check  
       <@@ 
          let calc = InstanceCalculator(10.)
          calc.current <- calc.current + 1. @@>
 
 [<Fact>]
-let ``Generic methods can be generated from instance types``() =
+let ``generic methods on instances work``() =
    check  
       <@@ 
          let calc = InstanceCalculator(10.)

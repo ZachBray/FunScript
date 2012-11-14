@@ -7,6 +7,7 @@ let private allComponents =
    [  //NOTE: ORDER MATTERS!
       CommonOperators.components
       Options.components
+      Seqs.components
       Lists.components
       ReflectedDefinitions.components
       Arrays.components
