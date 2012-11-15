@@ -68,7 +68,9 @@ let ``setting a static property works``() =
 
 [<ReflectedDefinition>]
 type InstanceCalculator(x) =
+   let y = x * 2.
    member val current = x with get, set
+   member __.getY = y
    member __.zero = 0.
    member __.add x y = x + y
    member __.subtract(x, y) = x - y
@@ -118,6 +120,13 @@ let ``setting an instance property works``() =
       <@@ 
          let calc = InstanceCalculator(10.)
          calc.current <- calc.current + 1. @@>
+
+[<Fact>]
+let ``let bound fields on instances work``() =
+   check  
+      <@@ 
+         let calc = InstanceCalculator(10.)
+         calc.getY @@>
 
 [<Fact>]
 let ``generic methods on instances work``() =
