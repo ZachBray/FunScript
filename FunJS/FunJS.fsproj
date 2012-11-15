@@ -48,6 +48,8 @@
     <Compile Include="Core\Array.fs" />
     <Compile Include="Core\List.fs" />
     <Compile Include="Core\Option.fs" />
+    <Compile Include="Core\Seq.fs" />
+    <Compile Include="Core\Range.fs" />
     <Compile Include="AST.fs" />
     <Compile Include="InternalCompiler.fs" />
     <Compile Include="ReturnStrategies.fs" />

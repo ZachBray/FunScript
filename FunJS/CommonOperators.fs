@@ -56,10 +56,7 @@ let components = [
    ExpressionReplacer.create <@ ref @> <@ Replacements.ref @>
    ExpressionReplacer.create <@ (!) @> <@ Replacements.op_Bang @>
    ExpressionReplacer.create <@ (:=) @> <@ Replacements.assign @>
-
-   // Options
    
-
    // Piping
    ExpressionReplacer.create <@ (|>) @> <@ Replacements.pipe @>
    ExpressionReplacer.create <@ (||>) @> <@ Replacements.pipe2 @>
@@ -90,6 +87,12 @@ let components = [
    CompilerComponent.unary <@ float32 @> id
    CompilerComponent.unary <@ double @> id
    CompilerComponent.unary <@ fun x -> x.ToString() @> (fun expr -> Apply(PropertyGet(expr, "toString"),[])) 
+   
+   // Seq + ranges
+   ExpressionReplacer.create <@ seq @> <@ Replacements.id @>
+   ExpressionReplacer.create <@ op_Range @> <@ FunJS.Core.Range.oneStep @>
+   ExpressionReplacer.create <@ op_RangeStep @> <@ FunJS.Core.Range.customStep @>
+
    // Casting
    coerce
 
