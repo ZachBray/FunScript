@@ -116,7 +116,6 @@ let ``List.collect works``() =
          ys.Head  + ys.Tail.Head
       @@>
 
-[<Fact(Skip="Need to think about IEnumerable")>]
 let ``List.concat works``() =
    check  
       <@@ 
@@ -399,6 +398,15 @@ let ``List.ofArray works``() =
       <@@ 
          let xs = [|1.; 2.|]
          let ys = List.ofArray xs
+         ys.Head
+      @@>
+
+[<Fact>]
+let ``List.ofSeq works``() =
+   check  
+      <@@ 
+         let xs = [|1.; 2.|] :> _ seq
+         let ys = List.ofSeq xs
          ys.Head
       @@>
 

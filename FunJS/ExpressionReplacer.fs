@@ -111,3 +111,4 @@ let createGetter (quoteTemplate:Expr<'a>) (quoteReplacement:Expr<'a>) =
          compiler.Compile retStrategy <|
             if isInlined then buildInlineReplacement mi (obj::exprs)
             else Expr.Call(mi, obj::exprs)
+

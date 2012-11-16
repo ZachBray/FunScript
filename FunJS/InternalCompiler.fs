@@ -12,6 +12,7 @@ type ICompiler =
    abstract Compile: returnStategy:IReturnStrategy -> expr:Expr -> JSStatement list
    abstract ReplacementFor: MethodBase -> MethodInfo option
    abstract NextTempVar: unit -> Var
+   abstract UsedMethods: MethodBase list
 
 type ICompilerComponent =
    abstract TryCompile: compiler:ICompiler -> returnStategy:IReturnStrategy -> expr:Expr -> JSStatement list
@@ -100,6 +101,11 @@ type Compiler(components) as this =
          (mi.DeclaringType.GetGenericArguments())
          (mi.GetGenericArguments())
 
+   let mutable usedMethods = []
+
+   let remember (methodBase:MethodBase) =
+      usedMethods <- methodBase :: usedMethods
+
    let compile returnStategy expr =
       let replacementResult =
          let this = this :> ICompiler
@@ -107,16 +113,19 @@ type Compiler(components) as this =
          | Patterns.PropertyGet(obj,pi,exprs) -> 
             match getterReplacers.TryFind (pi.Name, pi.MetadataToken) with
             | Some r -> 
+               remember pi.GetMethod
                let typeArgs = getTypeArgs pi.GetMethod
                r.TryReplace this returnStategy (obj, typeArgs, exprs)
             | None -> []
          | Patterns.PropertySet(obj,pi,exprs,v) ->
             match setterReplacers.TryFind (pi.Name, pi.MetadataToken) with
             | Some r -> 
+               remember pi.SetMethod
                let typeArgs = getTypeArgs pi.SetMethod
                r.TryReplace this returnStategy (obj, typeArgs, exprs, v)
             | None -> []
          | Patterns.Call(obj,mi,exprs) ->
+            remember mi
             let typeArgs = getTypeArgs mi
             match callerReplacers.TryFind (mi.Name, mi.MetadataToken) with
             | Some r -> r.TryReplace this returnStategy (obj, typeArgs, exprs)
@@ -157,4 +166,6 @@ type Compiler(components) as this =
       member __.NextTempVar() = 
          incr nextId
          Var(sprintf "_temp%i" !nextId, typeof<obj>, false) 
+
+      member __.UsedMethods = usedMethods
 

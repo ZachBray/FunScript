@@ -214,23 +214,23 @@ let private findUsedMethods expr (compiler:InternalCompiler.ICompiler) =
       | DerivedPatterns.MethodWithReflectedDefinition expr -> Some(finalMi, expr)
       | _ -> None
 
-   let rec find expr =
-      let add mi =
-         match mi with
-         | HasDefinition(mi, DerivedPatterns.Lambdas(vars, bodyExpr)) ->
-            let name = getJSName mi
-            if not <| found.ContainsKey name then
-               if mi.IsStatic || mi.IsConstructor then
-                  found.Add(name, (mi, vars |> List.concat, bodyExpr))
-               find bodyExpr
-         | HasDefinition(mi, unitLambdaBodyExpr) ->
-            let name = getJSName mi
-            if not <| found.ContainsKey name then
-               if mi.IsStatic || mi.IsConstructor then
-                  found.Add(name, (mi, [], unitLambdaBodyExpr))
-               find unitLambdaBodyExpr
-         | _ -> () //TODO: throw? or is this for expression replacer stuff?
-      
+   let rec add mi =
+      match mi with
+      | HasDefinition(mi, DerivedPatterns.Lambdas(vars, bodyExpr)) ->
+         let name = getJSName mi
+         if not <| found.ContainsKey name then
+            if mi.IsStatic || mi.IsConstructor then
+               found.Add(name, (mi, vars |> List.concat, bodyExpr))
+            find bodyExpr
+      | HasDefinition(mi, unitLambdaBodyExpr) ->
+         let name = getJSName mi
+         if not <| found.ContainsKey name then
+            if mi.IsStatic || mi.IsConstructor then
+               found.Add(name, (mi, [], unitLambdaBodyExpr))
+            find unitLambdaBodyExpr
+      | _ -> () //TODO: throw? or is this for expression replacer stuff?
+
+   and find expr =
       expr |> Expr.iter (function
          | Patterns.Call(_, mi, _) -> add mi
          | Patterns.PropertyGet(_, pi, _) -> 
@@ -247,6 +247,12 @@ let private findUsedMethods expr (compiler:InternalCompiler.ICompiler) =
             for _, _, expr in methods do
                find expr
          | _ -> ())
+
+   //TODO: Factor all this searching for used methods into its own class
+   // that can be used by the compiler. This is pretty ugly at the moment with
+   // the compiler and here knowing and collecting the used methods.
+   for meth in compiler.UsedMethods do
+      add meth
    find expr
    found
 

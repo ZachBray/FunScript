@@ -4,7 +4,7 @@ open AST
 open Microsoft.FSharp.Quotations
 
 let private creation =
-   CompilerComponent.create <| fun (|Split|) _ returnStategy ->
+   CompilerComponent.create <| fun (|Split|) _ returnStrategy ->
       function
       | Patterns.NewArray(arrayType, exprs) ->
          let decls, refs = 
@@ -12,7 +12,7 @@ let private creation =
             |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
             |> List.unzip
          [ yield! decls |> Seq.concat 
-           yield returnStategy.Return <| Array refs
+           yield returnStrategy.Return <| Array refs
          ]
       | _ -> []
 
@@ -35,6 +35,8 @@ let components =
          ExpressionReplacer.createGetter <@ fun (xs:_ []) -> xs.Length @> <@ Core.Array.BoxedLength @>
          ExpressionReplacer.create <@ Array.toList @> <@ Core.List.OfArray @>
          ExpressionReplacer.create <@ Array.ofList @> <@ Core.List.ToArray @>
+         ExpressionReplacer.create <@ Array.toSeq @> <@ Core.Seq.OfArray @>
+         ExpressionReplacer.create <@ Array.ofSeq @> <@ Core.Seq.ToArray @>
       ]
       ExpressionReplacer.createModuleMapping 
             "FSharp.Core" "Microsoft.FSharp.Collections.ArrayModule"

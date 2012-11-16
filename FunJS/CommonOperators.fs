@@ -94,6 +94,7 @@ let components = [
    ExpressionReplacer.create <@ op_RangeStep @> <@ FunJS.Core.Range.customStep @>
 
    // Casting
+   // TODO: Is this safe? Can we do better about guarantees?
    coerce
 
    // Exns 

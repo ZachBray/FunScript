@@ -28,6 +28,7 @@ let check (quote:Quotations.Expr) =
 // TODO:
 // Fix TypeScript provider for case where interface and class have overlapping properties.
 // Add support for seq module.
+// Add support for renaming reserved words.
 // Add support for interfaces on union and record types.
 // Add support for exceptions.
 // Add support for list/set equality (through IComparable?).

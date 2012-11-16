@@ -5,7 +5,6 @@ open FunJS
 //TODO: Use IoC here. MiniIoC perhaps? 
 let private allComponents =
    [  //NOTE: ORDER MATTERS!
-      CommonOperators.components
       Options.components
       Seqs.components
       Lists.components
@@ -22,14 +21,15 @@ let private allComponents =
       Comparison.components
       PrimitiveTypes.components
       ControlFlow.components
+      CommonOperators.components
    ] |> List.concat
 
 
 
 let compile expr =
    let compiler = InternalCompiler.Compiler(allComponents)
-   let reflectedDefs = compiler |> ReflectedDefinitions.preCompile expr
    let program = compiler.Compile ReturnStrategies.returnFrom expr
+   let reflectedDefs = compiler |> ReflectedDefinitions.preCompile expr
    let block = List.append reflectedDefs program 
-   (AST.Block block).Print(0, ref Map.empty)
+   (AST.Block block).Print()
 

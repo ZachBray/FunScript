@@ -167,3 +167,11 @@ and JSBlock =
             sprintf "{%s%s;%s}" paddedNewL filling newL
       | EmitBlock code ->
          sprintf "{%s%s%s}" paddedNewL code newL
+
+   member block.Print() =
+      let keyword = Var.Global("__keyword__", typeof<obj>)
+      let reservedWords =
+         Map [
+            "enum", keyword
+         ]
+      block.Print(0, ref reservedWords)

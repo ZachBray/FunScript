@@ -73,8 +73,8 @@ let Length xs =
 let Append xs ys =
    Fold (fun acc x -> x::acc) ys (Reverse xs)
 
-let Concat xss =
-   Fold (fun acc xs -> Append xs acc) [] (Reverse xss)
+let Concat (xss: 'b seq list) : 'b list =
+   Fold (fun acc xs -> Append (List.ofSeq xs) acc) [] (Reverse xss)
 
 let Collect f xs =
    Fold (fun acc x -> Append (f x) acc) [] (Reverse xs)
@@ -163,9 +163,6 @@ let FindIndexed f xs =
 let Find f xs =
    FindIndexed (fun _ x -> f x) xs
 
-let Get xs n =
-   FindIndexed (fun i _ -> n = i) xs
-      
 let TryFindIndex f xs =
    TryPickIndexed (fun i x -> if f x then Some i else None) xs
 
@@ -174,6 +171,9 @@ let FindIndex f xs =
    | None -> invalidOp "List did not contain any matching elements"
    | Some x -> x
 
+let Get xs n =
+   FindIndexed (fun i _ -> n = i) xs
+      
 let Filter f xs =
    Fold (fun acc x ->
       if f x then x::acc
@@ -279,37 +279,3 @@ let Permute f xs =
    |> ToArray
    |> Array.Permute f 
    |> OfArray
-
-   
-
-open System.Collections
-open System.Collections.Generic
-
-type 'a ListEnumerator(xs:'a list) =
-   let mutable current = Unchecked.defaultof<_> :: xs
-      
-   interface IEnumerator<'a> with
-
-      member __.Reset() = current <- Unchecked.defaultof<_> :: xs
-
-      member __.Current: 'a = current.Head
-
-      member __.Current: obj = current.Head :> obj
-
-      member __.MoveNext() =
-         match current with
-         | [] -> false
-         | x::xs -> 
-            current <- xs
-            true
-         
-      member __.Dispose() = ()
-            
-
-type 'a ListEnumerable(xs:'a list) =
-   interface IEnumerable<'a> with
-      member __.GetEnumerator() = new ListEnumerator<'a>(xs) :> 'a IEnumerator
-      member __.GetEnumerator() = new ListEnumerator<'a>(xs) :> IEnumerator
-
-let ToSeq xs =
-   ListEnumerable(xs)

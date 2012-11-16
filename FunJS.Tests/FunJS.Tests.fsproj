@@ -51,9 +51,10 @@
     <Compile Include="ReflectedDefinitions.fs" />
     <Compile Include="CommonOperators.fs" />
     <Compile Include="Options.fs" />
-    <Compile Include="Lists.fs" />
     <None Include="app.config" />
     <None Include="packages.config" />
+    <Compile Include="Lists.fs" />
+    <Compile Include="Seqs.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />

@@ -144,7 +144,7 @@ let Append (xs:'a []) (ys:'a []) : 'a [] =
    failwith "never"
 
 [<JSEmit("return [].concat.apply([], {0});")>]
-let Concat (xss: 'a [][]) : 'a [] = failwith "never"
+let ConcatImpl (xss: 'a [][]) : 'a [] = failwith "never"
 
 let MapIndexed f (xs:'a []) =
    let ys = ZeroCreate (Length xs)
@@ -175,9 +175,13 @@ let MapIndexed3 f (xs:'a []) (ys:'b []) (zs:'c []) =
 let Map3 f xs ys zs =
    MapIndexed3 (fun _ x y z -> f x y z) xs ys zs
 
+let Concat (xs:'a seq []) : 'a[] =
+   Map Array.ofSeq xs 
+   |> ConcatImpl
+
 let Collect f xs =
    Map f xs
-   |> Concat
+   |> ConcatImpl
 
 let Iterate2 f xs ys =
    Fold2 (fun () x y -> f x y) () xs ys

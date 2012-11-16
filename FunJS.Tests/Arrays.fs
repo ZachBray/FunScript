@@ -134,7 +134,6 @@ let ``Array.collect works``() =
          ys.[0]  + ys.[1]
       @@>
 
-[<Fact(Skip="Need to think about IEnumerable")>]
 let ``Array.concat works``() =
    check  
       <@@ 
@@ -394,6 +393,15 @@ let ``Array.ofList works``() =
       @@>
 
 [<Fact>]
+let ``Array.ofSeq works``() =
+   check  
+      <@@ 
+         let xs = [1.; 2.] :> _ seq
+         let ys = Array.ofSeq xs
+         ys.[0]
+      @@>
+
+[<Fact>]
 let ``Array.partition works``() =
    check  
       <@@ 
@@ -516,6 +524,15 @@ let ``Array.toList works``() =
          let xs = [|1.; 2.|]
          let ys = xs |> Array.toList
          ys.[0] + ys.[1]
+      @@>
+
+[<Fact>]
+let ``Array.toSeq works``() =
+   check  
+      <@@ 
+         let xs = [|1.; 2.|]
+         let ys = xs |> Array.toSeq
+         ys |> Seq.head
       @@>
 
 [<Fact>]
