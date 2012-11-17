@@ -2,6 +2,7 @@
 
 open AST
 open InternalCompiler
+open Microsoft.FSharp.Quotations
 
 /// This is to cope with nested stuff that is supported in F#
 /// but not JS. For example, f(if x then y else z)
@@ -31,57 +32,22 @@ let create compile =
             |> Seq.toList
    } |> CompilerComponent
 
-
-let createGetterReplacer propInfo replacement replace =
-   { PropertyGetReplacer.Target = propInfo
-     PropertyGetReplacer.Replacement = replacement
-     PropertyGetReplacer.TryReplace = makeFriendly replace
-   } |> PropertyGetReplacer
-
-let createSetterReplacer propInfo replacement replace =
-   { PropertySetReplacer.Target = propInfo
-     PropertySetReplacer.Replacement = replacement
-     PropertySetReplacer.TryReplace = makeFriendly replace
-   } |> PropertySetReplacer
-
-let createCallerReplacer methodInfo replacement replace =
+let createCallerReplacer methodInfo callType replacement replace =
+   match replacement with
+   | None | Some(DerivedPatterns.MethodWithReflectedDefinition _) -> ()
+   | Some _ -> failwith "Replacement had no reflected definition"
    { Target = methodInfo
+     TargetType = callType
      Replacement = replacement
      TryReplace = makeFriendly replace
-   } |> MethodCallReplacer
-
+   } |> CallReplacer
 
 open Microsoft.FSharp.Quotations
 open System.Reflection
 
-let mostGeneric(mi:MethodInfo)  = 
-   if mi.IsGenericMethod then mi.GetGenericMethodDefinition()
-   else mi
-
-module Quote =
-   let toPropertyInfo = function
-      | Patterns.PropertyGet(_,pi,_)
-      | DerivedPatterns.Lambdas(_,Patterns.PropertyGet(_,pi,_))
-      | Patterns.PropertySet(_,pi,_,_)
-      | DerivedPatterns.Lambdas(_,Patterns.PropertySet(_,pi,_,_)) -> pi
-      | _ -> failwith "Expected a property call wrapped in a lambda"
-
-   let toMethodInfo = function
-      | Patterns.Call(_,mi,_)
-      | DerivedPatterns.Lambdas(_,Patterns.Call(_,mi,_)) -> mostGeneric mi
-      | _ -> failwith "Expected a method call wrapped in a lambda"
-
-   let toGetterOrCallerReplacer = function
-      | Patterns.PropertyGet(_,pi,_)
-      | DerivedPatterns.Lambdas(_,Patterns.PropertyGet(_,pi,_)) ->
-         createGetterReplacer pi None
-      | Patterns.Call(_,mi,_)
-      | DerivedPatterns.Lambdas(_,Patterns.Call(_,mi,_)) -> 
-         createCallerReplacer (mostGeneric mi) None
-      | _ -> failwith "Expected a method call or property get wrapped in a lambda"
-
 let private generateArity quote (|ArgMatch|_|) =
-   Quote.toGetterOrCallerReplacer quote <| fun split (|Return|) returnStategy ->
+   let mi, callType = Quote.toMethodBaseFromLambdas quote
+   createCallerReplacer mi callType None <| fun split (|Return|) returnStategy ->
       function
       | None, _, ArgMatch split (decls, code) ->
          [ yield! decls |> List.concat

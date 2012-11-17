@@ -129,6 +129,15 @@ let Filter f xs =
       Enumerator xs
       |> Unfold trySkipToNext
 
+let SkipWhile f xs =
+   Delay <| fun () ->
+      let hasPassed = ref false
+      xs |> Filter (fun x ->
+         !hasPassed || (
+            hasPassed := not (f x)
+            !hasPassed
+         ))
+
 let Choose f xs =
    let rec trySkipToNext(enum:_ IEnumerator) =
       if enum.MoveNext() then
@@ -320,3 +329,66 @@ let Concat (xs: seq<'a :> seq<'b>>) =
 
 let Collect f xs =
    Map f xs |> Concat
+
+let Cast<'a> (xs:IEnumerable) =
+   xs :?> 'a seq
+
+let CompareWith f (xs:'a seq) (ys:'a seq) =
+   let nonZero =
+      Map2 (fun x y -> f x y) xs ys
+      |> TryFind (fun i -> i <> 0)
+   match nonZero with
+   | Some diff -> diff
+   | None -> Length xs - Length ys
+
+let ExactlyOne xs =
+   let xs = Enumerator xs
+   if not <| xs.MoveNext() then failwith "Sequence was empty"
+   let result = xs.Current
+   if xs.MoveNext() then failwith "Sequence had multiple items"
+   result
+
+let InitializeInfinite f =
+   Delay <| fun () ->
+      0 |> Unfold (fun i ->
+         Some(f i, i+1))
+
+let Where f xs = 
+   Filter f xs
+
+let Take n xs =
+   Delay <| fun () ->
+      let xs = Enumerator xs
+      0 |> Unfold (fun i ->
+         if i < n && xs.MoveNext() then
+            Some(xs.Current, i+1)
+         else None)
+
+let Truncate n xs =
+   Take n xs
+
+let TakeWhile f xs =
+   Delay <| fun () ->
+      let xs = Enumerator xs
+      () |> Unfold (fun () ->
+         if xs.MoveNext() && f xs.Current then Some(xs.Current, ())
+         else None)
+
+let Last xs =
+   Reduce (fun _ x -> x) xs
+
+let Pairwise xs =
+   Scan 
+      (fun (_, last) next -> last, next) 
+      (Unchecked.defaultof<_>, Unchecked.defaultof<_>)
+      xs
+   |> Skip 1
+
+let ReadOnly xs =
+   Map id xs
+
+let Singleton x =
+   Some x |> Unfold (function
+      | Some x -> Some(x, None)
+      | None -> None)
+

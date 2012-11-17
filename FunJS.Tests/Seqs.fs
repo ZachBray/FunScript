@@ -307,6 +307,15 @@ let ``Seq.ofArray works``() =
       @@>
 
 [<Fact>]
+let ``Seq.ofList works``() =
+   check  
+      <@@ 
+         let xs = [1.; 2.]
+         let ys = Seq.ofList xs
+         ys |> Seq.head
+      @@>
+
+[<Fact>]
 let ``Seq.pick works``() =
    check  
       <@@ 
@@ -448,4 +457,171 @@ let ``Seq.zip3 works``() =
          let ks = Seq.zip3 xs ys zs
          let x, y, z = ks |> Seq.head
          x + y + z
+      @@>
+
+let ``Seq.cache works``() =
+   check
+      <@@
+         let count = ref 0
+         let xs = 
+            1 |> Seq.unfold(fun i -> 
+               count := !count + 1
+               if i <= 10 then Some(i, i+1)
+               else None)
+         xs |> Seq.length |> ignore
+         xs |> Seq.length |> ignore
+         !count
+      @@>
+
+[<Fact>]
+let ``Seq.cast works``() =
+   check  
+      <@@ 
+         let xs = [1; 2; 3; 4]
+         let ys = Seq.cast<int> xs
+         ys |> Seq.head |> float
+      @@>
+
+[<Fact>]
+let ``Seq.compareWith works``() =
+   check  
+      <@@ 
+         let xs = [1; 2; 3; 4]
+         let ys = [1; 2; 3; 4]
+         let diff = Seq.compareWith (fun x y -> x - y) xs ys 
+         float diff
+      @@>
+
+[<Fact(Skip="Need to figure out comparing")>]
+let ``Seq.countBy works``() =
+   check  
+      <@@ 
+         let xs = [1; 2; 3; 4]
+         let ys = xs |> Seq.countBy (fun x -> x % 2)
+         ys |> Seq.length |> float
+      @@>
+
+[<Fact(Skip="Need to figure out comparing")>]
+let ``Seq.distinct works``() =
+   check  
+      <@@ 
+         let xs = [1; 1; 1; 2; 2; 3; 3]
+         let ys = xs |> Seq.distinct
+         ys |> Seq.length |> float
+      @@>
+
+[<Fact(Skip="Need to figure out comparing")>]
+let ``Seq.distinctBy works``() =
+   check  
+      <@@ 
+         let xs = [1; 1; 1; 2; 2; 3; 3]
+         let ys = xs |> Seq.distinctBy (fun x -> x % 2)
+         ys |> Seq.length |> float
+      @@>
+
+[<Fact>]
+let ``Seq.exactlyOne works``() =
+   check  
+      <@@ 
+         let xs = [1.]
+         xs |> Seq.exactlyOne
+      @@>
+
+[<Fact(Skip="Need to figure out comparing")>]
+let ``Seq.groupBy works``() =
+   check  
+      <@@ 
+         let xs = [1; 2; 3; 4]
+         let ys = xs |> Seq.groupBy (fun x -> x % 2)
+         ys |> Seq.length |> float
+      @@>
+
+[<Fact>]
+let ``Seq.initInfinite works``() =
+   check  
+      <@@ 
+         Seq.initInfinite (fun i -> 2. * float i)
+         |> Seq.take 10
+         |> Seq.sum
+      @@>
+
+[<Fact>]
+let ``Seq.last works``() =
+   check  
+      <@@ 
+         let xs = [1.; 2.; 3.; 4.]
+         xs |> Seq.last
+      @@>
+
+[<Fact>]
+let ``Seq.pairwise works``() =
+   check  
+      <@@ 
+         let xs = [1.; 2.; 3.; 4.]
+         xs |> Seq.pairwise
+         |> Seq.map (fun (x, y) -> x * y)
+         |> Seq.sum
+      @@>
+
+[<Fact>]
+let ``Seq.readonly works``() =
+   check  
+      <@@ 
+         let xs = [1.; 2.; 3.; 4.]
+         xs |> Seq.readonly
+         |> Seq.head
+      @@>
+
+[<Fact>]
+let ``Seq.singleton works``() =
+   check  
+      <@@ 
+         let xs = Seq.singleton 1.
+         xs |> Seq.head
+      @@>
+
+[<Fact>]
+let ``Seq.skipWhile works``() =
+   check  
+      <@@ 
+         let xs = [1.; 2.; 3.; 4.; 5.]
+         xs |> Seq.skipWhile (fun i -> i <= 3.)
+         |> Seq.head
+      @@>
+
+[<Fact>]
+let ``Seq.take works``() =
+   check  
+      <@@ 
+         let xs = [1.; 2.; 3.; 4.; 5.]
+         xs |> Seq.take 2
+         |> Seq.last
+      @@>
+
+[<Fact>]
+let ``Seq.takeWhile works``() =
+   check  
+      <@@ 
+         let xs = [1.; 2.; 3.; 4.; 5.]
+         xs |> Seq.takeWhile (fun i -> i < 3.)
+         |> Seq.last
+      @@>
+
+[<Fact>]
+let ``Seq.truncate works``() =
+   check  
+      <@@ 
+         let xs = [1.; 2.; 3.; 4.; 5.]
+         xs |> Seq.truncate 2
+         |> Seq.last
+      @@>
+
+[<Fact>]
+let ``Seq.where works``() =
+   check  
+      <@@ 
+         let xs = [1.; 2.; 3.; 4.; 5.]
+         xs |> Seq.where (fun i -> i <= 3.)
+         |> Seq.length 
+         |> float
       @@>

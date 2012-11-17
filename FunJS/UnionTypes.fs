@@ -16,17 +16,9 @@ let private getCaseConsVars (caseType:System.Type) =
    |> Seq.toList
 
 let private getCaseVars (uci:UnionCaseInfo) =
-   let unionType = uci.DeclaringType
-   match unionType.GetMember uci.Name with
-   | [| :? System.Type as caseType |] -> getCaseConsVars caseType
-   | [| :? MethodInfo |] -> getCaseConsVars uci.DeclaringType
-   | [| :? PropertyInfo |] -> []
-   | _ ->
-      match unionType.GetMember <| "New" + uci.Name with
-      | [| :? System.Type as caseType |] -> getCaseConsVars caseType
-      | [| :? MethodInfo |] -> getCaseConsVars uci.DeclaringType
-      | [| :? PropertyInfo |] -> []
-      | _ -> failwith "never"
+   let mi, t = Quote.getCaseMethodInfo uci
+   if mi.GetParameters().Length = 0 then []
+   else getCaseConsVars t
 
 let private ignoredUnions =
    set [

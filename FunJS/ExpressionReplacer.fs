@@ -24,7 +24,9 @@ let private buildInlineReplacement (mi:MethodBase) (args:_ list) =
       buildLambda inlinedBody unappliedVars
    | _ -> failwith "Expected a method"
    
-let inline (!=) x y = not <| obj.ReferenceEquals(x, y)
+
+let inline (==) x y = obj.ReferenceEquals(x, y)
+let inline (!=) x y = not (x == y)
 
 let private getReplacementMethod (replacementMi:MethodInfo) args =
    if replacementMi.IsGenericMethodDefinition then
@@ -34,26 +36,41 @@ let private getReplacementMethod (replacementMi:MethodInfo) args =
    else replacementMi
 
 let private isInlined (replacementMi:MethodInfo) = 
-   replacementMi.GetCustomAttribute<InlineAttribute>() != null ||
-   replacementMi.DeclaringType.GetCustomAttribute<InlineAttribute>() != null
+   (replacementMi.GetCustomAttribute<InlineAttribute>() != null ||
+    replacementMi.DeclaringType.GetCustomAttribute<InlineAttribute>() != null) &&
+   (replacementMi.GetCustomAttribute<JSEmitAttribute>() == null)
 
-let createMethodMap mi replacementMi =
+let private castMi =
+   typeof<Helpers>
+      .GetMethod("Cast", BindingFlags.NonPublic ||| BindingFlags.Static)
+      .GetGenericMethodDefinition()
+
+let buildCall (mi:MethodInfo) exprs =
+   let castArgs = 
+      mi.GetParameters() |> Array.toList
+      |> List.map2 (fun expr p ->
+         let castArg = castMi.MakeGenericMethod p.ParameterType
+         Expr.Call(castArg, [expr])
+      ) exprs
+   Expr.Call(mi, castArgs)
+
+let createMethodMap mi callType replacementMi =
    let isInlined = isInlined replacementMi
    let replacementRegistration =
       if isInlined then None
       else Some replacementMi
-   createCallerReplacer mi replacementRegistration <| fun split compiler retStrategy ->
+   createCallerReplacer mi callType replacementRegistration <| fun split compiler retStrategy ->
       function
       | None, args, exprs -> 
          let mi = getReplacementMethod replacementMi args
          compiler.Compile retStrategy <|
             if isInlined then buildInlineReplacement mi exprs
-            else Expr.Call(mi, exprs)
+            else buildCall mi exprs
       | Some obj, args, exprs -> 
          let mi = getReplacementMethod replacementMi args
          compiler.Compile retStrategy <|
             if isInlined then buildInlineReplacement mi (obj::exprs)
-            else Expr.Call(mi, obj::exprs)
+            else buildCall mi (obj::exprs)
 
 let createTypeMethodMappings (fromType:Type) (toType:Type) =
    let methodLookup = 
@@ -71,44 +88,35 @@ let createTypeMethodMappings (fromType:Type) (toType:Type) =
                   if mi.IsGenericMethod then
                      replacementMi.MakeGenericMethod(mi.GetGenericArguments())
                   else replacementMi
-               Some <| createMethodMap mi replacementMi
+               Some <| createMethodMap mi Quote.MethodCall replacementMi
             | None -> None
          | None -> None)
       |> Array.toList
    availableMethods
 
-let private getModule assembly name =
+let private getModule assembly (name:string) =
    let ass =
       AppDomain.CurrentDomain.GetAssemblies()
       |> Seq.find (fun ass -> ass.GetName().Name = assembly)
-   ass.GetType name
+   let split (name:string) =
+      let i = name.LastIndexOf '.'
+      if i >= 0 then Some(name.Substring(0, i), name.Substring (i+1))
+      else None
+   let rec getType n =
+      let t = ass.GetType n
+      if obj.ReferenceEquals(t, null) then
+         match split n with
+         | Some(parentType, typeName) ->
+            let parentT: System.Type = getType parentType
+            parentT.GetMember(typeName).[0] :?> System.Type
+         | None -> failwithf "Could not find type: %s" name
+      else t
+   getType name
 
 let createModuleMapping fromAss fromType toAss toType =
    createTypeMethodMappings (getModule fromAss fromType) (getModule toAss toType)
 
 let create (quoteTemplate:Expr<'a>) (quoteReplacement:Expr<'a>) =
-   let replacementMi = Quote.toMethodInfo quoteReplacement
-   let mi = Quote.toMethodInfo quoteTemplate
-   createMethodMap mi replacementMi
-
-
-let createGetter (quoteTemplate:Expr<'a>) (quoteReplacement:Expr<'a>) =
-   let replacementMi = Quote.toMethodInfo quoteReplacement
-   let mi = Quote.toPropertyInfo quoteTemplate
-   let isInlined = isInlined replacementMi
-   let replacementRegistration =
-      if isInlined then None
-      else Some replacementMi
-   createGetterReplacer mi replacementRegistration <| fun split compiler retStrategy ->
-      function
-      | None, args, exprs -> 
-         let mi = getReplacementMethod replacementMi args
-         compiler.Compile retStrategy <|
-            if isInlined then buildInlineReplacement replacementMi exprs
-            else Expr.Call(replacementMi, exprs)
-      | Some obj, args, exprs -> 
-         let mi = getReplacementMethod replacementMi args
-         compiler.Compile retStrategy <|
-            if isInlined then buildInlineReplacement mi (obj::exprs)
-            else Expr.Call(mi, obj::exprs)
-
+   let replacementMi, _ = Quote.toMethodInfoFromLambdas quoteReplacement
+   let mi, callType = Quote.toMethodBaseFromLambdas quoteTemplate
+   createMethodMap mi callType replacementMi

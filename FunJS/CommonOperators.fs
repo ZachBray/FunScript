@@ -27,6 +27,12 @@ module private Replacements =
 
    let id = fun x -> x
 
+//   [<JSEmit("return {0};")>]
+//   let box (x:'a) : obj = failwith "never"
+//
+//   [<JSEmit("return {0};")>]
+//   let unbox (x:obj) : 'a = failwith "never"
+
    let applyCurried2 curriedFunc arg1 arg2 =
       Apply(Apply(curriedFunc, 
                   [arg1]),
@@ -51,70 +57,81 @@ let private coerce =
       | Patterns.Coerce(Return returnStategy statements, _) -> statements
       | _ -> []
 
-let components = [
-   // Refs
-   ExpressionReplacer.create <@ ref @> <@ Replacements.ref @>
-   ExpressionReplacer.create <@ (!) @> <@ Replacements.op_Bang @>
-   ExpressionReplacer.create <@ (:=) @> <@ Replacements.assign @>
+let components = 
+   [
+      [
+         // Refs
+         ExpressionReplacer.create <@ ref @> <@ Replacements.ref @>
+         ExpressionReplacer.create <@ (!) @> <@ Replacements.op_Bang @>
+         ExpressionReplacer.create <@ (:=) @> <@ Replacements.assign @>
    
-   // Piping
-   ExpressionReplacer.create <@ (|>) @> <@ Replacements.pipe @>
-   ExpressionReplacer.create <@ (||>) @> <@ Replacements.pipe2 @>
-   ExpressionReplacer.create <@ (|||>) @> <@ Replacements.pipe3 @>
-   ExpressionReplacer.create <@ (<|) @> <@ Replacements.pipeBack @>
-   ExpressionReplacer.create <@ (<||) @> <@ Replacements.pipeBack2 @>
-   ExpressionReplacer.create <@ (<|||) @> <@ Replacements.pipeBack3 @>
-   ExpressionReplacer.create <@ (>>) @> <@ Replacements.compose @>
-   ExpressionReplacer.create <@ (<<) @> <@ Replacements.composeBack @>
+         // Piping
+         ExpressionReplacer.create <@ (|>) @> <@ Replacements.pipe @>
+         ExpressionReplacer.create <@ (||>) @> <@ Replacements.pipe2 @>
+         ExpressionReplacer.create <@ (|||>) @> <@ Replacements.pipe3 @>
+         ExpressionReplacer.create <@ (<|) @> <@ Replacements.pipeBack @>
+         ExpressionReplacer.create <@ (<||) @> <@ Replacements.pipeBack2 @>
+         ExpressionReplacer.create <@ (<|||) @> <@ Replacements.pipeBack3 @>
+         ExpressionReplacer.create <@ (>>) @> <@ Replacements.compose @>
+         ExpressionReplacer.create <@ (<<) @> <@ Replacements.composeBack @>
 
-   // Funcs
-   ExpressionReplacer.create <@ ignore @> <@ Replacements.ignore @>
-   ExpressionReplacer.create <@ defaultArg @> <@ Replacements.defaultArg @>
-   ExpressionReplacer.create <@ id @> <@ Replacements.id @>
+         // Funcs
+         ExpressionReplacer.create <@ ignore @> <@ Replacements.ignore @>
+         ExpressionReplacer.create <@ defaultArg @> <@ Replacements.defaultArg @>
+         ExpressionReplacer.create <@ id @> <@ Replacements.id @>
 
-   // Conversions
-   CompilerComponent.unary <@ sbyte @> id
-   CompilerComponent.unary <@ byte @> id
-   CompilerComponent.unary <@ int16 @> id
-   CompilerComponent.unary <@ uint16 @> id
-   CompilerComponent.unary <@ int @> id
-   CompilerComponent.unary <@ int32 @> id
-   CompilerComponent.unary <@ uint32 @> id
-   CompilerComponent.unary <@ int64 @> id
-   CompilerComponent.unary <@ uint64 @> id
-   CompilerComponent.unary <@ float @> id
-   CompilerComponent.unary <@ single @> id
-   CompilerComponent.unary <@ float32 @> id
-   CompilerComponent.unary <@ double @> id
-   CompilerComponent.unary <@ fun x -> x.ToString() @> (fun expr -> Apply(PropertyGet(expr, "toString"),[])) 
+         // Conversions
+         CompilerComponent.unary <@ sbyte @> id
+         CompilerComponent.unary <@ byte @> id
+         CompilerComponent.unary <@ int16 @> id
+         CompilerComponent.unary <@ uint16 @> id
+         CompilerComponent.unary <@ int @> id
+         CompilerComponent.unary <@ int32 @> id
+         CompilerComponent.unary <@ uint32 @> id
+         CompilerComponent.unary <@ int64 @> id
+         CompilerComponent.unary <@ uint64 @> id
+         CompilerComponent.unary <@ float @> id
+         CompilerComponent.unary <@ single @> id
+         CompilerComponent.unary <@ float32 @> id
+         CompilerComponent.unary <@ double @> id
+         CompilerComponent.unary <@ fun x -> x.ToString() @> (fun expr -> Apply(PropertyGet(expr, "toString"),[])) 
    
-   // Seq + ranges
-   ExpressionReplacer.create <@ seq @> <@ Replacements.id @>
-   ExpressionReplacer.create <@ op_Range @> <@ FunJS.Core.Range.oneStep @>
-   ExpressionReplacer.create <@ op_RangeStep @> <@ FunJS.Core.Range.customStep @>
+         // Seq + ranges
+         ExpressionReplacer.create <@ seq @> <@ Replacements.id @>
+         ExpressionReplacer.create <@ op_Range @> <@ FunJS.Core.Range.oneStep @>
+         ExpressionReplacer.create <@ op_RangeStep @> <@ FunJS.Core.Range.customStep @>
 
-   // Casting
-   // TODO: Is this safe? Can we do better about guarantees?
-   coerce
+         // Casting
+         coerce
+         // TODO: Does id work here or will there be a type args problem?
+         ExpressionReplacer.create <@ box @> <@ Replacements.id @>
+         ExpressionReplacer.create <@ unbox @> <@ Replacements.id @>
+         ExpressionReplacer.create <@ InternalCompiler.Helpers.Cast @> <@ Replacements.id @>
 
-   // Exns 
-   CompilerComponent.unaryStatement <@ raise @> Throw
-   CompilerComponent.unaryStatement <@ invalidOp @> Throw
-   CompilerComponent.unaryStatement <@ failwith @> Throw
-   CompilerComponent.binaryStatement <@ invalidArg @> (fun field msg -> Throw msg)
-   CompilerComponent.nullary <@ Unchecked.defaultof<_> @> Null
-   defaultValue
+         // Exns 
+         CompilerComponent.unaryStatement <@ raise @> Throw
+         CompilerComponent.unaryStatement <@ invalidOp @> Throw
+         CompilerComponent.unaryStatement <@ failwith @> Throw
+         CompilerComponent.binaryStatement <@ invalidArg @> (fun field msg -> Throw msg)
+         CompilerComponent.nullary <@ Unchecked.defaultof<_> @> Null
+         defaultValue
 
-   // OptimizedClosures
-   CompilerComponent.unary 
-      <@ OptimizedClosures.FSharpFunc<_,_,_>.Adapt @> id
-   CompilerComponent.ternary 
-      <@ fun (f:OptimizedClosures.FSharpFunc<_,_,_>) x y -> f.Invoke(x,y) @> 
-      Replacements.applyCurried2
+         // OptimizedClosures
+         CompilerComponent.unary 
+            <@ OptimizedClosures.FSharpFunc<_,_,_>.Adapt @> id
+         CompilerComponent.ternary 
+            <@ fun (f:OptimizedClosures.FSharpFunc<_,_,_>) x y -> f.Invoke(x,y) @> 
+            Replacements.applyCurried2
 
-   CompilerComponent.unary 
-      <@ OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt @> id 
-   CompilerComponent.nary4
-      <@ fun (f:OptimizedClosures.FSharpFunc<_,_,_,_>) x y z -> f.Invoke(x,y,z) @> 
-      Replacements.applyCurried3
-]
+         CompilerComponent.unary 
+            <@ OptimizedClosures.FSharpFunc<_,_,_,_>.Adapt @> id 
+         CompilerComponent.nary4
+            <@ fun (f:OptimizedClosures.FSharpFunc<_,_,_,_>) x y z -> f.Invoke(x,y,z) @> 
+            Replacements.applyCurried3
+      ] 
+      
+      ExpressionReplacer.createModuleMapping 
+         "FSharp.Core" "Microsoft.FSharp.Core.LanguagePrimitives.IntrinsicFunctions"
+         "FunJS" "FunJS.Core.IntrinsicFunctions"
+
+   ] |> List.concat

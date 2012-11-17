@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes.fs" />
+    <Compile Include="Core\IntrinsicFunctions.fs" />
     <Compile Include="Core\GenericConstants.fs" />
     <Compile Include="Core\Array.fs" />
     <Compile Include="Core\List.fs" />
@@ -51,6 +52,7 @@
     <Compile Include="Core\Seq.fs" />
     <Compile Include="Core\Range.fs" />
     <Compile Include="AST.fs" />
+    <Compile Include="QuoteExtensions.fs" />
     <Compile Include="InternalCompiler.fs" />
     <Compile Include="ReturnStrategies.fs" />
     <Compile Include="CompilerComponent.fs" />

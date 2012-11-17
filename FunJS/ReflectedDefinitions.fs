@@ -51,9 +51,9 @@ let private (|JSMapping|_|) (mi:MethodBase) =
             Some (sprintf "%s.%s" prefix name, isStatic, isProperty)
    | _ -> None
 
-let private genMethod (mb:MethodBase) (vars:Var list) bodyExpr (compiler:InternalCompiler.ICompiler) =
+let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list) bodyExpr (compiler:InternalCompiler.ICompiler) =
    let block =
-      match mb.GetCustomAttribute<JSEmitAttribute>() with
+      match replacementMi.GetCustomAttribute<JSEmitAttribute>() with
       | meth when meth <> Unchecked.defaultof<_> ->
          let code =
             vars 
@@ -70,22 +70,22 @@ let private genMethod (mb:MethodBase) (vars:Var list) bodyExpr (compiler:Interna
       | _ -> Block(compiler.Compile ReturnStrategies.returnFrom bodyExpr)
    vars, block
 
-let private (|HasDefinition|_|) (compiler:InternalCompiler.ICompiler) (mb:MethodBase)  =
+let private (|HasDefinition|_|) (compiler:InternalCompiler.ICompiler) (mb:MethodBase, callType) =
    let finalMi = 
-      match compiler.ReplacementFor mb with
+      match compiler.ReplacementFor mb callType with
       | None -> mb
       | Some mi -> mi :> MethodBase
    match finalMi with
    | DerivedPatterns.MethodWithReflectedDefinition expr -> Some(finalMi, expr)
    | _ -> None
 
-let private createGlobalMethod compiler mb =
-   match mb with
-   | HasDefinition compiler (mi, DerivedPatterns.Lambdas(vars, bodyExpr)) ->
-      genMethod mb (vars |> List.concat) bodyExpr compiler
-   | HasDefinition compiler (mi, unitLambdaBodyExpr) ->
-      genMethod mb [] unitLambdaBodyExpr compiler
-   | mb -> failwithf "No reflected definition for method: %s" mb.Name
+let private createGlobalMethod compiler mb callType =
+   match mb, callType with
+   | HasDefinition compiler (replacementMi, DerivedPatterns.Lambdas(vars, bodyExpr)) ->
+      genMethod mb replacementMi (vars |> List.concat) bodyExpr compiler
+   | HasDefinition compiler (replacementMi, unitLambdaBodyExpr) ->
+      genMethod mb replacementMi [] unitLambdaBodyExpr compiler
+   | _ -> failwithf "No reflected definition for method: %s" mb.Name
 
 let private createConstruction
       (|Split|) 
@@ -102,7 +102,9 @@ let private createConstruction
       [ yield! decls |> List.concat
         yield returnStategy.Return <| New(Reference (Var.Global(name, typeof<obj>)), refs) ]
    | ReflectedDefinition name ->
-      let consRef = compiler.DefineGlobal name (fun () -> createGlobalMethod compiler ci)
+      let consRef = 
+         compiler.DefineGlobal name (fun () -> 
+            createGlobalMethod compiler ci Quote.ConstructorCall)
       [ yield! decls |> List.concat
         yield returnStategy.Return <| New(Reference consRef, refs) ]
    | _ -> []
@@ -125,7 +127,9 @@ let private createCall
          [ yield! decls |> List.concat
            yield returnStategy.Return <| Apply(PropertyGet(objRef, mi.Name), argRefs) ]
       | true, exprs ->
-         let methRef = compiler.DefineGlobal name (fun () -> createGlobalMethod compiler mi)
+         let methRef = 
+            compiler.DefineGlobal name (fun () -> 
+               createGlobalMethod compiler mi Quote.MethodCall)
          [ yield! decls |> List.concat
            yield returnStategy.Return <| Apply(Reference methRef, refs) ]
       | _ -> failwith "never"

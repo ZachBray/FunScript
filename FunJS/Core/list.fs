@@ -73,8 +73,8 @@ let Length xs =
 let Append xs ys =
    Fold (fun acc x -> x::acc) ys (Reverse xs)
 
-let Concat (xss: 'b seq list) : 'b list =
-   Fold (fun acc xs -> Append (List.ofSeq xs) acc) [] (Reverse xss)
+//let Concat (xss: 'b seq list) : 'b list =
+//   Fold (fun acc xs -> Append (List.ofSeq xs) acc) [] (Reverse xss)
 
 let Collect f xs =
    Fold (fun acc x -> Append (f x) acc) [] (Reverse xs)

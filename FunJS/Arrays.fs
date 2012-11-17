@@ -32,7 +32,7 @@ let components =
          creation
          getIndex
          setIndex
-         ExpressionReplacer.createGetter <@ fun (xs:_ []) -> xs.Length @> <@ Core.Array.BoxedLength @>
+         ExpressionReplacer.create <@ fun (xs:_ []) -> xs.Length @> <@ Core.Array.BoxedLength @>
          ExpressionReplacer.create <@ Array.toList @> <@ Core.List.OfArray @>
          ExpressionReplacer.create <@ Array.ofList @> <@ Core.List.ToArray @>
          ExpressionReplacer.create <@ Array.toSeq @> <@ Core.Seq.OfArray @>

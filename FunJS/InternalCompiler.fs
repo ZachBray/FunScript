@@ -5,12 +5,19 @@ open System
 open System.Reflection
 open Microsoft.FSharp.Quotations
 
+type Helpers =
+   static member Cast(x:obj) : 'a = failwith "never"
+
 type IReturnStrategy =
    abstract Return: JSExpr -> JSStatement
 
 type ICompiler = 
    abstract Compile: returnStategy:IReturnStrategy -> expr:Expr -> JSStatement list
-   abstract ReplacementFor: MethodBase -> MethodInfo option
+//   abstract CompileCall: 
+//      returnStategy:IReturnStrategy -> 
+//      MethodBase -> Expr option -> Expr list ->
+//      JSStatement list
+   abstract ReplacementFor: MethodBase -> Quote.CallType -> MethodInfo option
    abstract NextTempVar: unit -> Var
    abstract UsedMethods: MethodBase list
    abstract DefineGlobal: string -> (unit -> Var list * JSBlock) -> Var
@@ -18,67 +25,27 @@ type ICompiler =
 
 type ICompilerComponent =
    abstract TryCompile: compiler:ICompiler -> returnStategy:IReturnStrategy -> expr:Expr -> JSStatement list
-   
-type token = int
 
-type MethodIdentifier = 
-   | Getter of token
-   | Setter of token
-   | Method of token
-
-type PropertyGetReplacer = 
-  { Target: PropertyInfo
-    Replacement: MethodInfo option
-    TryReplace: ICompiler -> IReturnStrategy -> Expr option * Type [] * Expr list -> JSStatement list }
-
-type PropertySetReplacer = 
-  { Target: PropertyInfo
-    Replacement: MethodInfo option
-    TryReplace: ICompiler -> IReturnStrategy -> Expr option * Type [] * Expr list * Expr -> JSStatement list }
-
-type MethodCallReplacer = 
-  { Target: MethodInfo
+type CallReplacer = 
+  { Target: MethodBase
+    TargetType: Quote.CallType
     Replacement: MethodInfo option
     TryReplace: ICompiler -> IReturnStrategy -> Expr option * Type [] * Expr list -> JSStatement list }
 
 type CompilerComponent =
-   | PropertyGetReplacer of PropertyGetReplacer
-   | PropertySetReplacer of PropertySetReplacer
-   | MethodCallReplacer of MethodCallReplacer
+   | CallReplacer of CallReplacer
    | CompilerComponent of ICompilerComponent
 
-type Compiler(components) as this =
-   let getterReplacers = 
-      components |> Seq.choose (function
-         | PropertyGetReplacer r -> Some ((r.Target.Name, r.Target.MetadataToken), r)
-         | _ -> None) |> Map.ofSeq
-
-   let getterReplacements =
-      getterReplacers |> Seq.choose (fun (KeyValue(id, r)) -> 
-         r.Replacement |> Option.map (fun replacement ->
-            (r.Target.GetMethod.Name, r.Target.GetMethod.MetadataToken), replacement))
-      |> Map.ofSeq
-
-   let setterReplacers =
-      components |> Seq.choose (function
-         | PropertySetReplacer r -> Some ((r.Target.Name, r.Target.MetadataToken), r)
-         | _ -> None) |> Map.ofSeq
-
-   let setterReplacements =
-      setterReplacers |> Seq.choose (fun (KeyValue(id, r)) -> 
-         r.Replacement |> Option.map (fun replacement ->
-            (r.Target.SetMethod.Name, r.Target.SetMethod.MetadataToken), replacement))
-      |> Map.ofSeq
-   
+type Compiler(components) as this =  
    let callerReplacers =
       components |> Seq.choose (function
-         | MethodCallReplacer r -> Some ((r.Target.Name, r.Target.MetadataToken), r)
+         | CallReplacer r -> Some ((r.Target.Name, r.Target.MetadataToken, r.TargetType), r)
          | _ -> None) |> Map.ofSeq
 
    let callerReplacements =
       callerReplacers |> Seq.choose (fun (KeyValue(id, r)) -> 
          r.Replacement |> Option.map (fun replacement ->
-            (r.Target.Name, r.Target.MetadataToken), replacement))
+            (r.Target.Name, r.Target.MetadataToken, r.TargetType), replacement))
       |> Map.ofSeq
 
    let rest = 
@@ -98,7 +65,7 @@ type Compiler(components) as this =
       | None -> []
       | Some statements -> statements
 
-   let getTypeArgs(mi:MethodInfo) =
+   let getTypeArgs(mi:MethodBase) =
       Array.append
          (mi.DeclaringType.GetGenericArguments())
          (mi.GetGenericArguments())
@@ -108,34 +75,21 @@ type Compiler(components) as this =
    let remember (methodBase:MethodBase) =
       usedMethods <- methodBase :: usedMethods
 
+   let tryCompileCall callType returnStategy mi obj exprs  =
+      let this = this :> ICompiler
+      remember mi
+      match callerReplacers.TryFind (mi.Name, mi.MetadataToken, callType) with
+      | Some r ->
+         let typeArgs = getTypeArgs mi
+         r.TryReplace this returnStategy (obj, typeArgs, exprs)
+      | None -> []
+
    let compile returnStategy expr =
       let replacementResult =
-         let this = this :> ICompiler
-         match expr with
-         | Patterns.PropertyGet(obj,pi,exprs) -> 
-            remember pi.GetMethod
-            match getterReplacers.TryFind (pi.Name, pi.MetadataToken) with
-            | Some r -> 
-               let typeArgs = getTypeArgs pi.GetMethod
-               r.TryReplace this returnStategy (obj, typeArgs, exprs)
-            | None -> []
-         | Patterns.PropertySet(obj,pi,exprs,v) ->
-            remember pi.SetMethod
-            match setterReplacers.TryFind (pi.Name, pi.MetadataToken) with
-            | Some r -> 
-               let typeArgs = getTypeArgs pi.SetMethod
-               r.TryReplace this returnStategy (obj, typeArgs, exprs, v)
-            | None -> []
-         | Patterns.Call(obj,mi,exprs) ->
-            remember mi
-            let typeArgs = getTypeArgs mi
-            match callerReplacers.TryFind (mi.Name, mi.MetadataToken) with
-            | Some r -> r.TryReplace this returnStategy (obj, typeArgs, exprs)
-            | None -> []
-         | Patterns.NewObject(ci, _) ->
-            remember ci
-            []
-         | _ -> []
+         match Quote.tryToMethodBase expr with
+         | Some (obj, mi, exprs, callType) ->
+            tryCompileCall callType returnStategy mi obj exprs
+         | None -> []
       let result =
          match replacementResult with
          | [] -> tryAllComponents returnStategy expr
@@ -182,19 +136,9 @@ type Compiler(components) as this =
       member __.Compile returnStategy expr = 
          compile returnStategy expr
 
-      member __.ReplacementFor (pi:MethodBase) =
-         let orElse f x =
-            match x with 
-            | Some x -> Some x
-            | None -> f()
-         let key = pi.Name, pi.MetadataToken
-         getterReplacements.TryFind key
-         |> orElse (fun () ->
-            setterReplacements.TryFind key
-            |> orElse (fun () ->
-               callerReplacements.TryFind key
-            )
-         )
+      member __.ReplacementFor (pi:MethodBase) targetType =
+         let key = pi.Name, pi.MetadataToken, targetType
+         callerReplacements.TryFind key
 
       member __.NextTempVar() = 
          incr nextId
