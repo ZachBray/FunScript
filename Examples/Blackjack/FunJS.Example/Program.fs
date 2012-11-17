@@ -8,14 +8,19 @@ open FunJS.TypeScript
 type j = FunJS.TypeScript.Api< @"C:\src\FunScript\Examples\Typings\jquery.d.ts" >
 // type jui = FunJS.TypeScript.Api< @"C:\src\FunScript\Examples\Typings\lib.d.ts" >
 
+let (!) (str:string) = j.jQuery.Invoke(str)
+
 [<JSEmit("return $(document);")>]
 let document() = Unchecked.defaultof<j.JQuery>
 
 [<JSEmit("alert({0});")>]
 let alert(msg:string) = ()
 
-[<JSEmit("console.log({0});")>]
-let log(msg:string) = ()
+//[<JSEmit("console.log({0});")>]
+let log(msg:string) =
+   let tag = "<p>" + msg + "</p>"
+   (!"body").append tag
+   |> ignore
 
 [<JSEmit("return Math.floor((Math.random()*{1})+{0});")>]
 let random(lowerInclusive:int, upperInclusive:int) = 0

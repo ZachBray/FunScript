@@ -36,11 +36,10 @@ let private ignoredUnions =
 
 let private createConstructor uci compiler =
    let vars = getCaseVars uci
-   vars, Block [  
-      for var in vars do
-         yield Assign(PropertyGet(This, "Tag"), String uci.Name)
-         yield Assign(PropertyGet(This, var.Name), Reference var)
-         yield! compiler |> Objects.genInstanceMethods uci.DeclaringType
+   vars, Block [
+      yield Assign(PropertyGet(This, "Tag"), String uci.Name)
+      for var in vars do yield Assign(PropertyGet(This, var.Name), Reference var)
+      yield! compiler |> Objects.genInstanceMethods uci.DeclaringType
    ]
 
 let private creation =

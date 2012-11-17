@@ -18,9 +18,8 @@ let private getRecordVars (recType:System.Type) =
 let private createConstructor recType compiler =
    let vars = getRecordVars recType
    vars, Block [  
-      for var in vars do
-         yield Assign(PropertyGet(This, var.Name), Reference var)
-         yield! compiler |> Objects.genInstanceMethods recType
+      for var in vars do yield Assign(PropertyGet(This, var.Name), Reference var)
+      yield! compiler |> Objects.genInstanceMethods recType
    ]
 
 let private creation =
