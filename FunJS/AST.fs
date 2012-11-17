@@ -25,6 +25,7 @@ type JSExpr =
    | Number of float
    | String of string
    | Reference of Var
+   | This
    | Object of (JSRef * JSExpr) list
    | PropertyGet of JSExpr * JSRef
    | IndexGet of JSExpr * JSExpr
@@ -41,6 +42,7 @@ type JSExpr =
       | Number f -> sprintf "%f" f
       | String str -> sprintf @"""%s""" str
       | Reference ref -> getNameScope ref !scope |> fst
+      | This -> "this"
       | Object propExprs ->
          let filling =
             propExprs |> List.map (fun (name, expr) ->

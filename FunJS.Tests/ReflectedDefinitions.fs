@@ -1,9 +1,9 @@
-﻿module FunJS.Tests.ReflectedDefinitions
+﻿[<FunJS.JS>]
+module FunJS.Tests.ReflectedDefinitions
 
 open Xunit
 open FsUnit.Xunit
 
-[<ReflectedDefinition>]
 module Calculator =
    let zero = 0.
 
@@ -65,8 +65,6 @@ let ``getting a static property works``() =
 let ``setting a static property works``() =
    check  <@@ StaticCalculator.current <- 1 @@>
 
-
-[<ReflectedDefinition>]
 type InstanceCalculator(x) =
    let y = x * 2.
    member val current = x with get, set
@@ -133,4 +131,119 @@ let ``generic methods on instances work``() =
    check  
       <@@ 
          let calc = InstanceCalculator(10.)
+         calc.genericIdentity 11. @@>
+
+
+type CalculatorUnion =
+   | Calculator of float
+        
+   member calc.getSeed =
+      match calc with Calculator seed -> seed
+   member __.zero = 0.
+   member __.add x y = x + y
+   member __.subtract(x, y) = x - y
+   member __.genericIdentity x = x
+
+[<Fact>]
+let ``application of a curried union method works``() =
+   check  
+      <@@ 
+         let calc = Calculator(10.)
+         calc.add 1. 2. @@>
+
+[<Fact>]
+let ``partial application of a curried union method works``() =
+   check  
+      <@@ 
+         let calc = Calculator(10.)
+         let f = calc.add 1. 
+         f 2. 
+      @@>
+
+[<Fact>]
+let ``application of a tupled union method works``() =
+   check  
+      <@@ 
+         let calc = Calculator(10.)
+         calc.subtract(1., 2.) @@>
+
+[<Fact>]
+let ``getting an union property works``() =
+   check  
+      <@@ 
+         let calc = Calculator(10.)
+         calc.zero @@>
+
+[<Fact>]
+let ``let bound fields on unions work``() =
+   check  
+      <@@ 
+         let calc = Calculator(10.)
+         calc.getSeed @@>
+
+[<Fact>]
+let ``generic methods on unions work``() =
+   check  
+      <@@ 
+         let calc = Calculator(10.)
+         calc.genericIdentity 11. @@>
+
+type RecordCalculator =
+ { mutable y: float }
+   member r.getY = r.y
+   member __.zero = 0.
+   member __.add x y = x + y
+   member __.subtract(x, y) = x - y
+   member __.genericIdentity x = x
+     
+[<Fact>]
+let ``application of a curried record method works``() =
+   check  
+      <@@ 
+         let calc = { y = 10. }
+         calc.add 1. 2. @@>
+
+[<Fact>]
+let ``partial application of a curried record method works``() =
+   check  
+      <@@ 
+         let calc = { y = 10. }
+         let f = calc.add 1. 
+         f 2. 
+      @@>
+
+[<Fact>]
+let ``application of a tupled record method works``() =
+   check  
+      <@@ 
+         let calc = { y = 10. }
+         calc.subtract(1., 2.) @@>
+
+[<Fact>]
+let ``getting an record property works``() =
+   check  
+      <@@ 
+         let calc = { y = 10. }
+         calc.zero @@>
+
+[<Fact>]
+let ``setting an record property works``() =
+   check  
+      <@@ 
+         let calc = { y = 10. }
+         calc.y <- calc.y + 1.
+         calc.y @@>
+
+[<Fact>]
+let ``let bound fields on records work``() =
+   check  
+      <@@ 
+         let calc = { y = 10. }
+         calc.getY @@>
+
+[<Fact>]
+let ``generic methods on records work``() =
+   check  
+      <@@ 
+         let calc = { y = 10. }
          calc.genericIdentity 11. @@>

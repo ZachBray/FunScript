@@ -13,6 +13,8 @@ type ICompiler =
    abstract ReplacementFor: MethodBase -> MethodInfo option
    abstract NextTempVar: unit -> Var
    abstract UsedMethods: MethodBase list
+   abstract DefineGlobal: string -> (unit -> Var list * JSBlock) -> Var
+   abstract Globals: JSStatement list
 
 type ICompilerComponent =
    abstract TryCompile: compiler:ICompiler -> returnStategy:IReturnStrategy -> expr:Expr -> JSStatement list
@@ -111,16 +113,16 @@ type Compiler(components) as this =
          let this = this :> ICompiler
          match expr with
          | Patterns.PropertyGet(obj,pi,exprs) -> 
+            remember pi.GetMethod
             match getterReplacers.TryFind (pi.Name, pi.MetadataToken) with
             | Some r -> 
-               remember pi.GetMethod
                let typeArgs = getTypeArgs pi.GetMethod
                r.TryReplace this returnStategy (obj, typeArgs, exprs)
             | None -> []
          | Patterns.PropertySet(obj,pi,exprs,v) ->
+            remember pi.SetMethod
             match setterReplacers.TryFind (pi.Name, pi.MetadataToken) with
             | Some r -> 
-               remember pi.SetMethod
                let typeArgs = getTypeArgs pi.SetMethod
                r.TryReplace this returnStategy (obj, typeArgs, exprs, v)
             | None -> []
@@ -130,6 +132,9 @@ type Compiler(components) as this =
             match callerReplacers.TryFind (mi.Name, mi.MetadataToken) with
             | Some r -> r.TryReplace this returnStategy (obj, typeArgs, exprs)
             | None -> []
+         | Patterns.NewObject(ci, _) ->
+            remember ci
+            []
          | _ -> []
       let result =
          match replacementResult with
@@ -141,8 +146,36 @@ type Compiler(components) as this =
 
    let nextId = ref 0
 
+   let mutable globals = Map.empty
+
+   let define name cons =
+      match globals |> Map.tryFind name with
+      | Some (var, _, _) -> var
+      | None -> 
+         // Define upfront to avoid problems with mutually recursive methods
+         let var = Var.Global(name, typeof<obj>)
+         globals <- globals |> Map.add name (var, [], Block [])
+         let argVars, bodyExpr = cons()
+         globals <- globals |> Map.add name (var, argVars, bodyExpr)
+         var
+
+   let getGlobals() =
+      let globals = globals |> Map.toList |> List.map snd
+
+      let declarations = 
+         match globals with
+         | [] -> []
+         | _ -> [Declare (globals |> List.map (fun (var, _,_) -> var))]
+
+      let assignments =
+         globals |> List.map (fun (var, argVars, bodyExpr) ->
+            Assign(Reference var, Lambda(argVars, bodyExpr)))
+      List.append declarations assignments
+
    member __.Compile returnStategy expr  = 
       compile returnStategy expr
+
+   member __.Globals = getGlobals()
 
    interface ICompiler with
 
@@ -169,3 +202,8 @@ type Compiler(components) as this =
 
       member __.UsedMethods = usedMethods
 
+      member __.DefineGlobal name cons =
+         define name cons
+
+      member __.Globals = getGlobals()
+         

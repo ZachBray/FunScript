@@ -62,15 +62,17 @@
     <Compile Include="LetBindings.fs" />
     <Compile Include="LambdaApplication.fs" />
     <Compile Include="ControlFlow.fs" />
-    <Compile Include="Objects.fs" />
     <Compile Include="Tuples.fs" />
-    <Compile Include="UnionTypes.fs" />
-    <Compile Include="RecordTypes.fs" />
     <Compile Include="CommonOperators.fs" />
     <Compile Include="Arrays.fs" />
     <Compile Include="Lists.fs" />
     <Compile Include="Seqs.fs" />
     <Compile Include="Options.fs" />
+    <Compile Include="JavaScriptNameMapper.fs" />
+    <Compile Include="Objects.fs" />
+    <Compile Include="ExprExtensions.fs" />
+    <Compile Include="UnionTypes.fs" />
+    <Compile Include="RecordTypes.fs" />
     <Compile Include="ReflectedDefinitions.fs" />
     <Compile Include="Compiler.fs" />
   </ItemGroup>

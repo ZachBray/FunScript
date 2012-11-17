@@ -29,7 +29,7 @@ let private allComponents =
 let compile expr =
    let compiler = InternalCompiler.Compiler(allComponents)
    let program = compiler.Compile ReturnStrategies.returnFrom expr
-   let reflectedDefs = compiler |> ReflectedDefinitions.preCompile expr
+   let reflectedDefs = compiler.Globals
    let block = List.append reflectedDefs program 
    (AST.Block block).Print()
 
