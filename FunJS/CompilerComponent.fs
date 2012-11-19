@@ -83,12 +83,16 @@ let unaryStatement quote genCode =
 let unaryOp quote symbol =
    unary quote (fun refArg -> UnaryOp(symbol, refArg))
 
-let binary quote genCode =
+let binaryTyped quote genCode =
    generateArity quote (fun (|Split|) ->
       function
-      | [Split(declLHS, refLHS); Split(declRHS, refRHS)] ->
-         Some ([declLHS; declRHS], genCode refLHS refRHS)         
+      | [Split(declLHS, refLHS) as exprA; Split(declRHS, refRHS) as exprB] ->
+         match genCode exprA.Type refLHS exprB.Type refRHS with
+         | Some code -> Some ([declLHS; declRHS], code)   
+         | None -> None      
       | _ -> None)
+
+let binary quote genCode = binaryTyped quote (fun _ a _ b -> Some(genCode a b))
 
 let binaryStatement quote genCode =
    generateArity quote (fun (|Split|) ->

@@ -1,6 +1,7 @@
 [<FunJS.JS>]
 module FunJS.Core.Seq
 
+open System
 open System.Collections
 open System.Collections.Generic
 
@@ -64,20 +65,22 @@ type UnfoldEnumerator<'acc, 'a>(seed:'acc, unfold) =
       member __.Dispose() = ()
 
 type CreateEnumerable<'a>(factory) =
+
+   interface System.IComparable<'a seq> with 
+      member this.CompareTo ys =
+         let xs = this :> IEnumerable<'a>
+         Seq.compareWith (fun x y -> (x :> obj :?> IComparable<'a>).CompareTo y) 
+            xs ys
+
    interface IEnumerable<'a> with
       member __.GetEnumerator() = factory() :> 'a IEnumerator
       member __.GetEnumerator() = factory() :> IEnumerator
 
-type DelayedEnumerable<'a>(factory) =
-   interface IEnumerable<'a> with
-      member __.GetEnumerator() = Enumerator(factory()) : 'a IEnumerator
-      member __.GetEnumerator() = Enumerator(factory()) :> IEnumerator
-
 let FromFactory f =
    CreateEnumerable(f) :> _ IEnumerable
 
-let Delay f =
-   DelayedEnumerable(f) :> _ IEnumerable
+let Delay (f:unit -> 'a seq): 'a seq =
+   FromFactory(fun () -> Enumerator(f()))
 
 let Unfold f seed =
    FromFactory(fun () -> upcast new UnfoldEnumerator<'acc, 'a>(seed, f))
@@ -300,7 +303,7 @@ let Scan f seed xs =
 
 let ToList xs =
    Fold (fun acc x -> x::acc) [] xs
-   |> List.Reverse
+   |> List.rev
 
 let OfList xs =
    xs |> Unfold (function
@@ -392,3 +395,6 @@ let Singleton x =
       | Some x -> Some(x, None)
       | None -> None)
 
+let Compare xs ys =
+   CompareWith (fun (x:'a) (y:'a) ->
+      (x :> obj :?> IComparable<'a>).CompareTo y) xs ys

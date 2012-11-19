@@ -3,19 +3,23 @@ module FunJS.Core.List
 
 open FunJS
 
-let Cons(x,xs) = x::xs
+type 'a list =
+   | Nil
+   | Cons of 'a * 'a list
 
-[<JSEmit("return {0}.HeadOrDefault;")>]
-let Head(xs:'a list) : 'a =
-   failwith "never"
+let CreateCons x xs = Cons(x, xs)
 
-[<JSEmit("return {0}.TailOrNull;")>]
-let Tail(xs:'a list) : 'a list =
-   failwith "never"
+let Head = function
+   | Nil -> failwith "List was empty"
+   | Cons(x,xs) -> x
+
+let Tail = function
+   | Nil -> failwith "List was empty"
+   | Cons(x,xs) -> xs
 
 let rec FoldIndexedAux f i acc = function
-   | [] -> acc
-   | x::xs -> FoldIndexedAux f (i+1) (f i acc x) xs
+   | Nil -> acc
+   | Cons(x,xs) -> FoldIndexedAux f (i+1) (f i acc x) xs
 
 let FoldIndexed<'a,'acc> f (seed:'acc) (xs: 'a list) = 
    FoldIndexedAux f 0 seed xs
@@ -24,15 +28,15 @@ let Fold<'a,'acc> f (seed:'acc) (xs: 'a list) =
    FoldIndexed (fun _ acc x -> f acc x) seed xs
 
 let Reverse xs =
-   Fold (fun acc x -> x::acc) [] xs
+   Fold (fun acc x -> Cons(x,acc)) Nil xs
 
 let FoldBack<'a,'acc> f (xs: 'a list) (seed:'acc) = 
    Fold (fun acc x -> f x acc) seed (Reverse xs)
 
 let rec FoldIndexed2Aux f i acc bs cs =
    match bs, cs with
-   | [], [] -> acc
-   | x::xs, y::ys -> FoldIndexed2Aux f (i+1) (f i acc x y) xs ys
+   | Nil, Nil -> acc
+   | Cons(x,xs), Cons(y,ys) -> FoldIndexed2Aux f (i+1) (f i acc x y) xs ys
    | _ -> invalidOp "Lists had different lengths"
 
 let FoldIndexed2<'a, 'b, 'acc> f (seed:'acc) (xs: 'a list) (ys: 'b list) = 
@@ -46,8 +50,8 @@ let FoldBack2<'a, 'b, 'acc> f (xs: 'a list) (ys: 'b list) (seed:'acc) =
 
 let rec FoldIndexed3Aux f i acc bs cs ds =
    match bs, cs, ds with
-   | [], [], [] -> acc
-   | x::xs, y::ys, z::zs -> FoldIndexed3Aux f (i+1) (f i acc x y z) xs ys zs
+   | Nil, Nil, Nil -> acc
+   | Cons(x,xs), Cons(y,ys), Cons(z,zs) -> FoldIndexed3Aux f (i+1) (f i acc x y z) xs ys zs
    | _ -> invalidOp "Lists had different lengths"
 
 let FoldIndexed3<'a, 'b, 'c, 'acc> f (seed:'acc) (xs: 'a list) (ys: 'b list) (zs: 'c list) = 
@@ -59,8 +63,8 @@ let Fold3<'a, 'b, 'c, 'acc> f (seed:'acc) (xs: 'a list) (ys: 'b list) (zs: 'c li
 let Scan<'a, 'acc> f (seed:'acc) (xs: 'a list) =
    Fold (fun acc x ->
       match acc with
-      | [] -> failwith "never"
-      | y::ys -> (f y x)::acc) [seed] xs
+      | Nil -> failwith "never"
+      | Cons(y,ys) -> Cons(f y x, acc)) (Cons(seed,Nil)) xs
    |> Reverse
 
 let ScanBack<'a, 'acc> f (xs: 'a list) (seed:'acc) =
@@ -71,36 +75,33 @@ let Length xs =
    Fold (fun acc _ -> acc + 1) 0 xs
 
 let Append xs ys =
-   Fold (fun acc x -> x::acc) ys (Reverse xs)
-
-//let Concat (xss: 'b seq list) : 'b list =
-//   Fold (fun acc xs -> Append (List.ofSeq xs) acc) [] (Reverse xss)
+   Fold (fun acc x -> Cons(x,acc)) ys (Reverse xs)
 
 let Collect f xs =
-   Fold (fun acc x -> Append (f x) acc) [] (Reverse xs)
+   Fold (fun acc x -> Append (f x) acc) Nil (Reverse xs)
 
 let Map f xs =
-   Fold (fun acc x -> f x::acc) [] xs
+   Fold (fun acc x -> (Cons(f x,acc))) Nil xs
    |> Reverse
 
 let MapIndexed f xs =
-   FoldIndexed (fun i acc x -> (f i x)::acc) [] xs
+   FoldIndexed (fun i acc x -> Cons(f i x,acc)) Nil xs
    |> Reverse
 
 let Map2 f xs ys =
-   Fold2 (fun acc x y -> f x y::acc) [] xs ys
+   Fold2 (fun acc x y -> Cons(f x y,acc)) Nil xs ys
    |> Reverse
 
 let MapIndexed2 f xs ys =
-   FoldIndexed2 (fun i acc x y  -> (f i x y)::acc) [] xs ys
+   FoldIndexed2 (fun i acc x y  -> Cons(f i x y, acc)) Nil xs ys
    |> Reverse
 
 let Map3 f xs ys zs =
-   Fold3 (fun acc x y z -> f x y z::acc) [] xs ys zs
+   Fold3 (fun acc x y z -> Cons(f x y z,acc)) Nil xs ys zs
    |> Reverse
 
 let MapIndexed3 f xs ys zs =
-   FoldIndexed3 (fun i acc x y z -> (f i x y z)::acc) [] xs ys zs
+   FoldIndexed3 (fun i acc x y z -> Cons(f i x y z, acc)) Nil xs ys zs
    |> Reverse
 
 let Iterate f xs =
@@ -116,7 +117,7 @@ let IterateIndexed2 f xs ys =
    FoldIndexed2 (fun i () x y -> f i x y) () xs ys
 
 let OfArray xs =
-   Array.FoldBack (fun x acc -> x::acc) xs []
+   Array.FoldBack (fun x acc -> Cons(x,acc)) xs Nil
 
 let ToArray xs =
    let size = Length xs
@@ -124,15 +125,15 @@ let ToArray xs =
    IterateIndexed (fun i x -> ys.[i] <- x) xs
    ys
 
-let Empty<'a> : 'a list = []
+let Empty<'a> : 'a list = Nil
 
 let IsEmpty = function
-   | [] -> true
+   | Nil -> true
    | _ -> false
 
 let rec TryPickIndexedAux f i = function
-   | [] -> None
-   | x::xs -> 
+   | Nil -> None
+   | Cons(x,xs) -> 
       let result = f i x
       match result with
       | Some _ -> result
@@ -176,35 +177,35 @@ let Get xs n =
       
 let Filter f xs =
    Fold (fun acc x ->
-      if f x then x::acc
-      else acc) [] xs
+      if f x then Cons(x,acc)
+      else acc) Nil xs
 
 let Partition f xs =
    Fold (fun (lacc, racc) x ->
-      if f x then x::lacc, racc
-      else lacc,x::racc) ([],[]) xs
+      if f x then Cons(x, lacc), racc
+      else lacc,Cons(x,racc)) (Nil,Nil) xs
 
 let Choose f xs =
    Fold (fun acc x ->
       match f x with
-      | Some y -> y::acc
-      | None -> acc) [] xs
+      | Some y -> Cons(y, acc)
+      | None -> acc) Nil xs
 
 let Initialize n f =
-   let mutable xs = []
-   for i = 1 to n do xs <- f (n - i) :: xs
+   let mutable xs = Nil
+   for i = 1 to n do xs <- Cons(f (n - i), xs)
    xs
 
 let Replicate n x =
    Initialize n (fun _ -> x)
 
 let Reduce f = function
-   | [] -> invalidOp "List was empty"
-   | h::t -> Fold f h t
+   | Nil -> invalidOp "List was empty"
+   | Cons(h,t) -> Fold f h t
 
 let ReduceBack f = function
-   | [] -> invalidOp "List was empty"
-   | h::t -> FoldBack f t h
+   | Nil -> invalidOp "List was empty"
+   | Cons(h,t) -> FoldBack f t h
    
 let ForAll f xs =
    Fold (fun acc x -> acc && f x) true xs
@@ -213,20 +214,20 @@ let ForAll2 f xs ys =
    Fold2 (fun acc x y -> acc && f x y) true xs ys
 
 let rec Exists f = function
-   | [] -> false
-   | x::xs -> f x || Exists f xs
+   | Nil -> false
+   | Cons(x,xs) -> f x || Exists f xs
 
 let rec Exists2 f bs cs =
    match bs, cs with
-   | [], [] -> false
-   | x::xs, y::ys -> f x y || Exists2 f xs ys
+   | Nil, Nil -> false
+   | Cons(x,xs), Cons(y,ys) -> f x y || Exists2 f xs ys
    | _ -> invalidOp "Lists had different lengths"
 
 let Unzip xs =
-   Fold (fun (lacc, racc) (x, y) -> x::lacc, y::racc) ([],[]) xs
+   Fold (fun (lacc, racc) (x, y) -> Cons(x,lacc), Cons(y,racc)) (Nil,Nil) xs
 
 let Unzip3 xs =
-   Fold (fun (lacc, macc, racc) (x, y, z) -> x::lacc, y::macc, z::racc) ([],[],[]) xs
+   Fold (fun (lacc, macc, racc) (x, y, z) -> Cons(x,lacc), Cons(y,macc), Cons(z,racc)) (Nil,Nil,Nil) xs
 
 let Zip xs ys =
    Map2 (fun x y -> x, y) xs ys

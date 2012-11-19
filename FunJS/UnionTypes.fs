@@ -5,12 +5,8 @@ open System.Reflection
 open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Reflection
 
-let private getCaseConsVars (caseType:System.Type) = 
-   caseType.GetProperties()
-   |> Seq.map (fun p -> p.Name, p.GetCustomAttribute<CompilationMappingAttribute>())
-   |> Seq.filter (fun (name, attr) -> not <| obj.ReferenceEquals(null, attr)) 
-   |> Seq.filter (fun (name, attr) -> SourceConstructFlags.Field = attr.SourceConstructFlags)
-   |> Seq.sortBy (fun (name, attr) -> attr.SequenceNumber)
+let private getCaseConsVars caseType = 
+   Objects.getFields caseType
    |> Seq.map fst
    |> Seq.map (fun name -> Var(name, typeof<obj>))
    |> Seq.toList
@@ -22,7 +18,7 @@ let private getCaseVars (uci:UnionCaseInfo) =
 
 let private ignoredUnions =
    set [
-      typeof<obj list>.Name
+      //typeof<obj list>.Name
       typeof<obj option>.Name
    ]
 

@@ -46,13 +46,24 @@ let private castMi =
       .GetGenericMethodDefinition()
 
 let buildCall (mi:MethodInfo) exprs =
+   let obj, argExprs =
+      match exprs with
+      | objExpr::argExprs when not mi.IsStatic ->
+         Some objExpr, argExprs
+      | exprs -> None, exprs
    let castArgs = 
       mi.GetParameters() |> Array.toList
       |> List.map2 (fun expr p ->
          let castArg = castMi.MakeGenericMethod p.ParameterType
          Expr.Call(castArg, [expr])
-      ) exprs
-   Expr.Call(mi, castArgs)
+      ) argExprs
+   match obj with
+   | None -> Expr.Call(mi, castArgs)
+   | Some objExpr ->
+      let objType = mi.DeclaringType
+      let castArg = castMi.MakeGenericMethod objType
+      let castObjExpr = Expr.Call(castArg, [objExpr])
+      Expr.Call(castObjExpr, mi, castArgs)
 
 let createMethodMap mi callType replacementMi =
    let isInlined = isInlined replacementMi
@@ -116,7 +127,13 @@ let private getModule assembly (name:string) =
 let createModuleMapping fromAss fromType toAss toType =
    createTypeMethodMappings (getModule fromAss fromType) (getModule toAss toType)
 
-let create (quoteTemplate:Expr<'a>) (quoteReplacement:Expr<'a>) =
+let private createImpl (quoteTemplate:Expr) (quoteReplacement:Expr) =
    let replacementMi, _ = Quote.toMethodInfoFromLambdas quoteReplacement
    let mi, callType = Quote.toMethodBaseFromLambdas quoteTemplate
    createMethodMap mi callType replacementMi
+
+let createUnsafe (quoteTemplate:Expr) (quoteReplacement:Expr) =
+   createImpl quoteTemplate quoteReplacement
+
+let create (quoteTemplate:Expr<'a>) (quoteReplacement:Expr<'a>) =
+   createImpl quoteTemplate quoteReplacement

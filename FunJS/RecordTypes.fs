@@ -2,16 +2,11 @@
 
 open AST
 open Microsoft.FSharp.Quotations
+open System.Reflection
 
-let private getRecordVars (recType:System.Type) =
-   let props = 
-      recType.GetProperties() 
-      |> Seq.map (fun pi -> (pi.Name.ToLower(), pi.PropertyType.GUID), pi)
-      |> Map.ofSeq
-   recType.GetConstructors().[0].GetParameters()
-   |> Seq.choose (fun pi ->
-      props |> Map.tryFind (pi.Name.ToLower(), pi.ParameterType.GUID))
-   |> Seq.map (fun pi -> pi.Name)
+let private getRecordVars recType =
+   Objects.getFields recType
+   |> Seq.map fst
    |> Seq.map (fun name -> Var(name, typeof<obj>))
    |> Seq.toList
 
@@ -40,7 +35,11 @@ let private creation =
             exprs 
             |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
             |> List.unzip
-         let ci = recType.GetConstructors().[0]
+         let ci = 
+            recType.GetConstructors(
+               BindingFlags.Public ||| 
+               BindingFlags.NonPublic ||| 
+               BindingFlags.Instance).[0]
          let name = JavaScriptNameMapper.mapMethod ci
          let cons = compiler.DefineGlobal name (fun () -> createConstructor recType compiler)
          [ yield! decls |> Seq.concat 

@@ -13,13 +13,8 @@ type IReturnStrategy =
 
 type ICompiler = 
    abstract Compile: returnStategy:IReturnStrategy -> expr:Expr -> JSStatement list
-//   abstract CompileCall: 
-//      returnStategy:IReturnStrategy -> 
-//      MethodBase -> Expr option -> Expr list ->
-//      JSStatement list
    abstract ReplacementFor: MethodBase -> Quote.CallType -> MethodInfo option
    abstract NextTempVar: unit -> Var
-   abstract UsedMethods: MethodBase list
    abstract DefineGlobal: string -> (unit -> Var list * JSBlock) -> Var
    abstract Globals: JSStatement list
 
@@ -36,16 +31,19 @@ type CompilerComponent =
    | CallReplacer of CallReplacer
    | CompilerComponent of ICompilerComponent
 
-type Compiler(components) as this =  
+type Compiler(components) as this = 
+   let key (mb:MethodBase) tt =
+      mb.Name, mb.DeclaringType.Name, mb.DeclaringType.Namespace, tt
+ 
    let callerReplacers =
       components |> Seq.choose (function
-         | CallReplacer r -> Some ((r.Target.Name, r.Target.MetadataToken, r.TargetType), r)
+         | CallReplacer r -> Some (key r.Target r.TargetType, r)
          | _ -> None) |> Map.ofSeq
 
    let callerReplacements =
       callerReplacers |> Seq.choose (fun (KeyValue(id, r)) -> 
          r.Replacement |> Option.map (fun replacement ->
-            (r.Target.Name, r.Target.MetadataToken, r.TargetType), replacement))
+            key r.Target r.TargetType, replacement))
       |> Map.ofSeq
 
    let rest = 
@@ -75,20 +73,25 @@ type Compiler(components) as this =
    let remember (methodBase:MethodBase) =
       usedMethods <- methodBase :: usedMethods
 
-   let tryCompileCall callType returnStategy mi obj exprs  =
+   let tryCompileCall callType returnStrategy mi obj exprs  =
       let this = this :> ICompiler
       remember mi
-      match callerReplacers.TryFind (mi.Name, mi.MetadataToken, callType) with
+      match callerReplacers.TryFind (key mi callType) with
       | Some r ->
          let typeArgs = getTypeArgs mi
-         r.TryReplace this returnStategy (obj, typeArgs, exprs)
+         r.TryReplace this returnStrategy (obj, typeArgs, exprs)
       | None -> []
-
+         
    let compile returnStategy expr =
       let replacementResult =
          match Quote.tryToMethodBase expr with
          | Some (obj, mi, exprs, callType) ->
-            tryCompileCall callType returnStategy mi obj exprs
+            match Quote.specialOp mi with
+            | Some opMi -> 
+               match tryCompileCall callType returnStategy opMi obj exprs with
+               | [] -> tryCompileCall callType returnStategy mi obj exprs
+               | stmts -> stmts
+            | None -> tryCompileCall callType returnStategy mi obj exprs
          | None -> []
       let result =
          match replacementResult with
@@ -137,15 +140,12 @@ type Compiler(components) as this =
          compile returnStategy expr
 
       member __.ReplacementFor (pi:MethodBase) targetType =
-         let key = pi.Name, pi.MetadataToken, targetType
-         callerReplacements.TryFind key
+         callerReplacements.TryFind (key pi targetType)
 
       member __.NextTempVar() = 
          incr nextId
          Var(sprintf "_temp%i" !nextId, typeof<obj>, false) 
-
-      member __.UsedMethods = usedMethods
-
+         
       member __.DefineGlobal name cons =
          define name cons
 

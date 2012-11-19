@@ -2,22 +2,29 @@
 
 open AST
 open Microsoft.FSharp.Quotations
+open System
 
-[<JS>]
+[<JS; Inline>]
 module Replacements =
-   [<Inline>]
+   
    let min x y = if y < x then y else x
 
-   [<Inline>]
    let max x y = if y > x then y else x
 
+let compareCall exprA exprB =
+   Apply(PropertyGet(exprA, "CompareTo"), [exprB])
+
+let compareOp op exprA exprB =
+   BinaryOp(compareCall exprA exprB, op, Number 0.)
+
 let components = [ 
-   CompilerComponent.binaryOp <@ (=) @> "=="
-   CompilerComponent.binaryOp <@ (<>) @> "!="
-   CompilerComponent.binaryOp <@ (>) @> ">"
-   CompilerComponent.binaryOp <@ (>=) @> ">="
-   CompilerComponent.binaryOp <@ (<) @> "<"
-   CompilerComponent.binaryOp <@ (<=) @> "<="
+   CompilerComponent.binary <@ (=) @> (compareOp "==")
+   CompilerComponent.binary <@ (<>) @> (compareOp "!=")
+   CompilerComponent.binary <@ (>) @> (compareOp ">")
+   CompilerComponent.binary <@ (>=) @> (compareOp ">=")
+   CompilerComponent.binary <@ (<) @> (compareOp "<")
+   CompilerComponent.binary <@ (<=) @> (compareOp "<=")
+   CompilerComponent.binary <@ compare @> compareCall
    ExpressionReplacer.create <@ min @> <@ Replacements.min @>
    ExpressionReplacer.create <@ max @> <@ Replacements.max @>
 ]

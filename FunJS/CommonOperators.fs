@@ -27,12 +27,6 @@ module private Replacements =
 
    let id = fun x -> x
 
-//   [<JSEmit("return {0};")>]
-//   let box (x:'a) : obj = failwith "never"
-//
-//   [<JSEmit("return {0};")>]
-//   let unbox (x:obj) : 'a = failwith "never"
-
    let applyCurried2 curriedFunc arg1 arg2 =
       Apply(Apply(curriedFunc, 
                   [arg1]),
@@ -56,6 +50,23 @@ let private coerce =
       function
       | Patterns.Coerce(Return returnStategy statements, _) -> statements
       | _ -> []
+
+let private tryCatch =
+   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+   function
+   | Patterns.TryFinally(tryExpr, finallyExpr) ->
+      let tryStmts = compiler.Compile returnStategy tryExpr
+      let finallyStmts = compiler.Compile ReturnStrategies.inplace finallyExpr
+      [ TryFinally(Block tryStmts, Block finallyStmts) ]
+   | _ -> []
+ 
+// TODO: Implement this properly. Through type property?
+let private typeTest =
+   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+   function
+   | Patterns.TypeTest(_, _) ->
+      [ returnStategy.Return <| Boolean false ]
+   | _ -> []
 
 let components = 
    [
@@ -103,7 +114,7 @@ let components =
 
          // Casting
          coerce
-         // TODO: Does id work here or will there be a type args problem?
+         typeTest
          ExpressionReplacer.create <@ box @> <@ Replacements.id @>
          ExpressionReplacer.create <@ unbox @> <@ Replacements.id @>
          ExpressionReplacer.create <@ InternalCompiler.Helpers.Cast @> <@ Replacements.id @>
@@ -113,8 +124,12 @@ let components =
          CompilerComponent.unaryStatement <@ invalidOp @> Throw
          CompilerComponent.unaryStatement <@ failwith @> Throw
          CompilerComponent.binaryStatement <@ invalidArg @> (fun field msg -> Throw msg)
+         tryCatch
+
+         // Default values
          CompilerComponent.nullary <@ Unchecked.defaultof<_> @> Null
          defaultValue
+
 
          // OptimizedClosures
          CompilerComponent.unary 

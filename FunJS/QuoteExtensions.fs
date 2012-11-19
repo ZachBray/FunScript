@@ -29,8 +29,16 @@ let getCaseMethodInfo (uci:UnionCaseInfo) =
       | [| :? PropertyInfo as pi |] -> pi.GetMethod :> MethodBase, unionType
       | _ -> failwith "never"
 
+let specialOp (mb:MethodBase) =
+  if mb.IsStatic && mb.IsGenericMethod && mb.Name.StartsWith "op_" then
+      let declaringType = mb.GetGenericArguments().[0]
+      let flags = BindingFlags.Public ||| BindingFlags.NonPublic ||| BindingFlags.Static
+      let methods = declaringType.GetMethods(flags)
+      methods |> Array.tryFind(fun mi -> mi.Name = mb.Name) 
+   else None
+
 let tryToMethodBase = function
-   | Patterns.Call(obj,mi,args) -> 
+   | Patterns.Call(obj,mi,args) ->
       Some(obj, mi :> MethodBase, args, MethodCall)
    | Patterns.PropertyGet(obj,pi,args) -> 
       Some(obj, pi.GetMethod :> MethodBase, args, MethodCall) 
@@ -61,5 +69,6 @@ let toMethodInfoFromLambdas expr =
 
 let toMethodBaseFromLambdas expr =
    match tryToMethodBaseFromLambdas expr with
+   //| Some (_, (:? MethodInfo as mi), _, callType) -> mostGeneric mi :> MethodBase, callType
    | Some (_, mi, _, callType) -> mi, callType
    | None -> failwith "Expected a method/property call/get/set wrapped in a lambda"

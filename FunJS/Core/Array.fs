@@ -148,7 +148,7 @@ let ConcatImpl (xss: 'a [][]) : 'a [] = failwith "never"
 
 let MapIndexed f (xs:'a []) =
    let ys = ZeroCreate (Length xs)
-   for i = 0 to Length xs do
+   for i = 0 to Length xs - 1 do
       ys.[i] <- f i xs.[i]
    ys
 
@@ -158,7 +158,7 @@ let Map f xs =
 let MapIndexed2 f (xs:'a []) (ys:'b []) =
    if Length xs <> Length ys then failwith "Arrays had different lengths"
    let zs = ZeroCreate(Length xs)
-   for i = 0 to Length xs do
+   for i = 0 to Length xs - 1 do
       zs.[i] <- f i xs.[i] ys.[i]
    zs
 
@@ -168,7 +168,7 @@ let Map2 f xs ys =
 let MapIndexed3 f (xs:'a []) (ys:'b []) (zs:'c []) =
    if Length xs <> Length ys || Length ys <> Length zs then failwith "Arrays had different lengths"
    let rs = ZeroCreate(Length xs)
-   for i = 0 to Length xs do
+   for i = 0 to Length xs - 1 do
       rs.[i] <- f i xs.[i] ys.[i] zs.[i]
    rs
 
@@ -238,7 +238,7 @@ let FindIndex f xs =
 let Filter f xs =
    let ys = ZeroCreate 0
    let mutable j = 0
-   for i = 0 to Length xs do
+   for i = 0 to Length xs - 1 do
       if f xs.[i] then 
          ys.[j] <- xs.[i]
          j <- j + 1
@@ -249,7 +249,7 @@ let Partition f xs =
    let zs = ZeroCreate 0
    let mutable j = 0
    let mutable k = 0
-   for i = 0 to Length xs do
+   for i = 0 to Length xs - 1 do
       if f xs.[i] then 
          ys.[j] <- xs.[i]
          j <- j + 1
@@ -261,7 +261,7 @@ let Partition f xs =
 let Choose f xs =
    let ys = ZeroCreate 0
    let mutable j = 0
-   for i = 0 to Length xs do
+   for i = 0 to Length xs - 1 do
       match f xs.[i] with
       | Some y -> 
          ys.[j] <- y

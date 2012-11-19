@@ -10,7 +10,7 @@ let (|Newline|) padding =
 
 let getNameScope (var:Var) scope =
    let rec getNameScope prefix =
-      let name = prefix + var.Name
+      let name = prefix + (JavaScriptNameMapper.sanitize var.Name)
       match scope |> Map.tryFind name with
       | Some v when v = var -> name, scope
       | Some _ -> getNameScope (prefix + "_")
@@ -35,6 +35,7 @@ type JSExpr =
    | Lambda of Var list * JSBlock
    | UnaryOp of string * JSExpr
    | BinaryOp of JSExpr * string * JSExpr
+   | TernaryOp of JSExpr * string * JSExpr * string * JSExpr
    member value.Print((Newline newL) as padding, scope:_ ref) =
       match value with
       | Null -> "null"
@@ -91,6 +92,11 @@ type JSExpr =
          sprintf "(%s%s)" symbol (expr.Print(padding, scope))
       | BinaryOp(lhsExpr, symbol, rhsExpr) ->
          sprintf "(%s %s %s)" (lhsExpr.Print(padding, scope)) symbol (rhsExpr.Print(padding, scope))
+      | TernaryOp(lhsExpr, lSymbol, midExpr, rSymbol, rhsExpr) ->
+         sprintf "(%s %s %s %s %s)" 
+            (lhsExpr.Print(padding, scope)) lSymbol 
+            (midExpr.Print(padding, scope)) rSymbol 
+            (rhsExpr.Print(padding, scope))
 
 and JSStatement =
    | Declare of Var list
@@ -101,6 +107,8 @@ and JSStatement =
    | WhileLoop of JSExpr * JSBlock
    | ForLoop of Var * JSExpr * JSExpr * JSBlock
    | TryCatch of JSBlock * JSRef * JSBlock
+   | TryCatchFinally of JSBlock * JSRef * JSBlock * JSBlock
+   | TryFinally of JSBlock * JSBlock
    | Scope of JSBlock
    | Return of JSExpr
    | Do of JSExpr
@@ -146,6 +154,23 @@ and JSStatement =
          + newL
          + sprintf "catch(%s)" var
          + catchExpr.Print(padding, scope)
+      | TryCatchFinally(tryExpr, var, catchExpr, finallyExpr) ->
+         sprintf "try"
+         + newL
+         + tryExpr.Print(padding, scope)
+         + newL
+         + sprintf "catch(%s)" var
+         + catchExpr.Print(padding, scope)
+         + newL
+         + "finally"
+         + finallyExpr.Print(padding, scope)
+      | TryFinally(tryExpr, finallyExpr) ->
+         sprintf "try"
+         + newL
+         + tryExpr.Print(padding, scope)
+         + newL
+         + "finally"
+         + finallyExpr.Print(padding, scope)
       | Scope block -> block.Print(padding, scope)
       | Return expr ->
          sprintf "return %s" (expr.Print(padding, scope))

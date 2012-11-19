@@ -1,4 +1,5 @@
-﻿module FunJS.Tests.RecordTypes
+﻿[<FunJS.JS>]
+module FunJS.Tests.RecordTypes
 
 open Xunit
 open FsUnit.Xunit

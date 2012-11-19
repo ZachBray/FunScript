@@ -27,13 +27,12 @@ let check (quote:Quotations.Expr) =
 
 // TODO:
 // Fix TypeScript provider for case where interface and class have overlapping properties.
-// Add support for seq module.
+// Add support for type checks. How would you differentiate between ints and floats though?
+// Add support for multiple constructors.
+// Add support for array equality.
 // Add support for renaming reserved words.
-// Add support for interfaces on union and record types.
 // Add support for exceptions.
-// Add support for list/set equality (through IComparable?).
 // Add support for events/observables.
 // Add support for computation expressions.
 // Add support for custom operators.
 // Add support for tail recursive transformations into while loops.
-// Add support for type checks?

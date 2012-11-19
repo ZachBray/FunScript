@@ -109,6 +109,8 @@ let private createConstruction
         yield returnStategy.Return <| New(Reference consRef, refs) ]
    | _ -> []
 
+let private (|SpecialOp|_|) = Quote.specialOp
+
 let private createCall 
       (|Split|) 
       (returnStategy:InternalCompiler.IReturnStrategy)
@@ -120,8 +122,9 @@ let private createCall
       |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
       |> List.unzip
    match mi, refs with
-   | JSMapping(name, true, false), _
-   | ReflectedDefinition name, _ ->
+   | (JSMapping(name, true, false) as mi), _
+   | SpecialOp((ReflectedDefinition name) as mi), _
+   | (ReflectedDefinition name as mi), _ ->
       match mi.IsStatic, refs with
       | false, objRef::argRefs ->
          [ yield! decls |> List.concat
@@ -173,10 +176,10 @@ let private fieldGetting =
       function
       | Patterns.FieldGet(Some(Split(objDecl, objRef)), fi) ->
          [ yield! objDecl
-           yield returnStategy.Return <| PropertyGet(objRef, fi.Name) ]
+           yield returnStategy.Return <| PropertyGet(objRef, JavaScriptNameMapper.sanitize fi.Name) ]
       | Patterns.FieldGet(None, fi) ->
          let name = JavaScriptNameMapper.mapType fi.DeclaringType
-         [ yield returnStategy.Return <| PropertyGet(Reference (Var.Global(name, typeof<obj>)), fi.Name) ]
+         [ yield returnStategy.Return <| PropertyGet(Reference (Var.Global(name, typeof<obj>)), JavaScriptNameMapper.sanitize fi.Name) ]
       | _ -> []
 
 let private fieldSetting =
@@ -185,11 +188,11 @@ let private fieldSetting =
       | Patterns.FieldSet(Some(Split(objDecl, objRef)), fi, Split(valDecl, valRef)) ->
          [ yield! objDecl
            yield! valDecl
-           yield Assign(PropertyGet(objRef, fi.Name), valRef) ]
+           yield Assign(PropertyGet(objRef, JavaScriptNameMapper.sanitize fi.Name), valRef) ]
       | Patterns.FieldSet(None, fi, Split(valDecl, valRef)) ->
          let name = JavaScriptNameMapper.mapType fi.DeclaringType
          [ yield! valDecl
-           yield Assign(PropertyGet(Reference (Var.Global(name, typeof<obj>)), fi.Name), valRef) ]
+           yield Assign(PropertyGet(Reference (Var.Global(name, typeof<obj>)), JavaScriptNameMapper.sanitize fi.Name), valRef) ]
       | _ -> []
 
 let private objectGuid = typeof<obj>.GUID

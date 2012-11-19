@@ -2,8 +2,12 @@
 
 open System.Reflection
 
-let private sanitize(str:string) =
-   str.Replace('.', '_').Replace('+', '_').Replace('`', '_')
+let sanitize(str:string) =
+   str.Replace('.', '_')
+      .Replace('+', '_')
+      .Replace('`', '_')
+      .Replace('@', '_')
+      .Replace(''', '_')
 
 let internal mapType(t:System.Type) =
    sanitize t.Name

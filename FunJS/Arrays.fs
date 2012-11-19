@@ -33,8 +33,8 @@ let components =
          getIndex
          setIndex
          ExpressionReplacer.create <@ fun (xs:_ []) -> xs.Length @> <@ Core.Array.BoxedLength @>
-         ExpressionReplacer.create <@ Array.toList @> <@ Core.List.OfArray @>
-         ExpressionReplacer.create <@ Array.ofList @> <@ Core.List.ToArray @>
+         ExpressionReplacer.createUnsafe <@ Array.toList @> <@ Core.List.OfArray @>
+         ExpressionReplacer.createUnsafe <@ Array.ofList @> <@ Core.List.ToArray @>
          ExpressionReplacer.create <@ Array.toSeq @> <@ Core.Seq.OfArray @>
          ExpressionReplacer.create <@ Array.ofSeq @> <@ Core.Seq.ToArray @>
       ]

@@ -51,6 +51,8 @@
     <Compile Include="Core\Option.fs" />
     <Compile Include="Core\Seq.fs" />
     <Compile Include="Core\Range.fs" />
+    <Compile Include="Core\Set.fs" />
+    <Compile Include="JavaScriptNameMapper.fs" />
     <Compile Include="AST.fs" />
     <Compile Include="QuoteExtensions.fs" />
     <Compile Include="InternalCompiler.fs" />
@@ -70,7 +72,7 @@
     <Compile Include="Lists.fs" />
     <Compile Include="Seqs.fs" />
     <Compile Include="Options.fs" />
-    <Compile Include="JavaScriptNameMapper.fs" />
+    <Compile Include="Sets.fs" />
     <Compile Include="Objects.fs" />
     <Compile Include="ExprExtensions.fs" />
     <Compile Include="UnionTypes.fs" />
