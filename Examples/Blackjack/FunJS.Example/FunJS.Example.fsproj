@@ -37,10 +37,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="FunJS">
-      <HintPath>..\..\ThirdParty\FunJS.dll</HintPath>
+      <HintPath>..\..\..\FunJS.TypeScript\bin\Debug\FunJS.dll</HintPath>
     </Reference>
     <Reference Include="FunJS.TypeScript">
-      <HintPath>..\..\ThirdParty\FunJS.TypeScript.dll</HintPath>
+      <HintPath>..\..\..\FunJS.TypeScript\bin\Debug\FunJS.TypeScript.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

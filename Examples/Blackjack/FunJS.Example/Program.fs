@@ -4,26 +4,20 @@ module Program
 open FunJS
 open FunJS.TypeScript
 
-// TODO: constructors, op_Apply, param arrays, optional arguments...
 type j = FunJS.TypeScript.Api< @"C:\src\FunScript\Examples\Typings\jquery.d.ts" >
-// type jui = FunJS.TypeScript.Api< @"C:\src\FunScript\Examples\Typings\lib.d.ts" >
+type lib = FunJS.TypeScript.Api< @"C:\src\FunScript\Examples\Typings\lib.d.ts" >
 
 let (!) (str:string) = j.jQuery.Invoke(str)
 
-[<JSEmit("return $(document);")>]
-let document() = Unchecked.defaultof<j.JQuery>
-
-[<JSEmit("alert({0});")>]
-let alert(msg:string) = ()
-
-//[<JSEmit("console.log({0});")>]
 let log(msg:string) =
    let tag = "<p>" + msg + "</p>"
    (!"body").append tag
    |> ignore
 
-[<JSEmit("return Math.floor((Math.random()*{1})+{0});")>]
-let random(lowerInclusive:int, upperInclusive:int) = 0
+let random(lo:int, hi:int) =
+   let hi = float hi
+   let lo = float lo
+   int (lib.Math.floor(lo + lib.Math.random() * hi))
 
 type SuitType =
    | Clubs
@@ -112,11 +106,11 @@ let createGame() =
    printDeck deck
 
 let main() =
-   document().ready(fun () -> createGame())
+   j.jQuery.Invoke(lib.document :> obj :?> j._Element).ready(fun () -> createGame())
 
 // Compile
 let source = <@@ main() @@> |> Compiler.compile 
-let sourceWrapped = sprintf "(function () %s)()" source
+let sourceWrapped = sprintf "(function () {\n%s\n})()" source
 let filename = "blackjack.js"
 System.IO.File.Delete filename
 System.IO.File.WriteAllText(filename, sourceWrapped)

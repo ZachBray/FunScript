@@ -105,7 +105,7 @@ let parse(stream:StreamReader) =
       | "number" -> Number
       | "string" -> String
       | "any" -> Any
-      | name -> Other name
+      | name -> Interface name
 
    let rec (|Type|_|) pos =
       let x = 10
@@ -332,7 +332,7 @@ let parse(stream:StreamReader) =
          let obj =
            { TSObject.Name = name
              TSObject.Members = props 
-             TSObject.SuperTypes = superTypes |> List.map Other }
+             TSObject.SuperTypes = superTypes |> List.map Interface }
          Some(DeclareInterface obj, p)
       | Take alphaNumeric (name, ObjectPropertyList false (props, p)) ->
          let obj =

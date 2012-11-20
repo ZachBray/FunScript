@@ -8,7 +8,9 @@ type TSType =
    | Boolean
    | String
    | Void
-   | Other of name
+   | GlobalObject of name
+   | Enumeration of name
+   | Interface of name
    | Array of TSType
    | Lambda of TSParameter list * TSType
    | Structural of TSObjectMember list

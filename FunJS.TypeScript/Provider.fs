@@ -168,16 +168,16 @@ module TypeGenerator =
                root.AddMember meth
             next()
          | DeclareEnum(name, names) ->
-            let t = obtainDef root (Other name)
+            let t = obtainDef root (Enumeration name)
             genEnum t names
             next()
          | DeclareObject o ->
-            let tsT = Other o.Name
+            let tsT = GlobalObject o.Name
             let t = obtainDef root tsT
             addMembers t (obtainDef root) Global o.Members
             next()
          | DeclareInterface o ->
-            let tsT = Other o.Name
+            let tsT = Interface o.Name
             let t = obtainDef root tsT
             addMembers t (obtainDef root) Local o.Members            
             next()
@@ -186,10 +186,10 @@ module TypeGenerator =
             match path with
             | [] -> failwith "never"
             | name::[] -> 
-               let t = obtainDef root (Other name)
+               let t = obtainDef root (Interface name)
                addTypes t obtainDef declarations
             | name::names ->
-               let t = obtainDef root (Other name)
+               let t = obtainDef root (Interface name)
                let path = names |> String.concat "."
                addTypes t obtainDef [DeclareModule(path, declarations)]
             next()
@@ -200,9 +200,12 @@ module TypeGenerator =
       let count = ref 0
 
       let rec makeType parentT = function
-         | Other name ->
+         | GlobalObject name | Enumeration name ->
             let actualName = name.Split '.' |> Seq.last
             ProvidedTypeDefinition(name, None)
+         | Interface name ->
+            let actualName = name.Split '.' |> Seq.last
+            ProvidedTypeDefinition("_" + name, None)
          | Structural ps -> 
             incr count
             let t = ProvidedTypeDefinition(sprintf "TempType%i" !count, None)
@@ -222,6 +225,12 @@ module TypeGenerator =
             t.AddMember cons
             t.AddInterfaceImplementation typeof<FunJS.IJSMapping>
             created.Add(tsT, t)
+            // Enums can be referenced in other types but their
+            // names cannot be changed or it will break the FunScript
+            // integration.
+            match tsT with
+            | Enumeration name -> created.Add(Interface name, t)
+            | _ -> () 
             parentT.AddMember t
             t
       
