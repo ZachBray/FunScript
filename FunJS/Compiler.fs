@@ -8,6 +8,7 @@ let private allComponents =
       Options.components
       Seqs.components
       Sets.components
+      Maps.components
       Lists.components
       ReflectedDefinitions.components
       Arrays.components

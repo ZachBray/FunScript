@@ -14,9 +14,7 @@ let private isUnionOrRecord t =
          t.IsGenericType && 
          isUnionOrRecord <| t.GetGenericTypeDefinition()
       )
-   result
-      
-   
+   result  
 
 let private propertyGetter =
    CompilerComponent.create <| fun (|Split|) _ returnStategy ->
@@ -54,8 +52,6 @@ let private getAllMethods (t:System.Type) =
       BindingFlags.NonPublic ||| 
       BindingFlags.FlattenHierarchy ||| 
       BindingFlags.Instance)
-
-
 
 let methodCallPattern (mb:MethodBase) =
    let argCounts = mb.GetCustomAttribute<CompilationArgumentCountsAttribute>()
@@ -127,35 +123,36 @@ let getFields (t:Type) =
    |> Seq.map (fun (p, attr) -> JavaScriptNameMapper.sanitize p.Name, p.PropertyType)
    |> Seq.toList
 
+let genComparisonFunc t =
+   let fields = getFields t
+   let that = Var("that", typeof<obj>)
+   let diff = Var("diff", typeof<obj>)
+      
+   let body =
+      List.foldBack (fun (name, t) acc ->
+         let thisField = PropertyGet(This, name)
+         let thatField = PropertyGet(Reference that, name)
+         let compareExpr = Comparison.compareCall thisField thatField
+         [  Assign(Reference diff, compareExpr)
+            IfThenElse(
+               BinaryOp(Reference diff, "!=", Number 0.),
+               Block [ Return <| Reference diff ],
+               Block acc)
+         ]) fields [ Return <| Number 0. ]
+      
+   Lambda(
+      [that],
+      Block <| Declare [diff] :: body
+   )
+
 let genComparisonMethods t =
    let isGeneratedCompareRequired = 
       isUnionOrRecord t && hasIComparableImplementation t
    if not isGeneratedCompareRequired then []
    else
-      let fields = getFields t
-      let that = Var("that", typeof<obj>)
-      let diff = Var("diff", typeof<obj>)
+      let func = genComparisonFunc t
+      [ Assign(PropertyGet(This, "CompareTo"), func) ]
       
-      let body =
-         List.foldBack (fun (name, t) acc ->
-            let thisField = PropertyGet(This, name)
-            let thatField = PropertyGet(Reference that, name)
-            let compareExpr = Comparison.compareCall thisField thatField
-            [  Assign(Reference diff, compareExpr)
-               IfThenElse(
-                  BinaryOp(Reference diff, "!=", Number 0.),
-                  Block [ Return <| Reference diff ],
-                  Block acc)
-            ]) fields [ Return <| Number 0. ]
-      [
-         Assign(
-            PropertyGet(This, "CompareTo"), 
-            Lambda(
-               [that],
-               Block <| Declare [diff] :: body
-            ))
-      ]
-
 let genInstanceMethods t (compiler:InternalCompiler.ICompiler) =
    let methods = getInstanceMethods t
    let comparisonMethods = genComparisonMethods t

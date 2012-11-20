@@ -2,6 +2,7 @@
 
 open AST
 open Microsoft.FSharp.Quotations
+open Microsoft.FSharp.Reflection
 
 let private creation =
    CompilerComponent.create <| fun (|Split|) _ returnStategy ->
@@ -16,8 +17,12 @@ let private creation =
             | 1 -> [ "Value" ]
             | n -> refs |> List.mapi (fun i _ -> sprintf "Item%i" (i + 1))
          let fields = List.zip propNames refs
-         [ yield! decls |> Seq.concat 
-           yield returnStategy.Return <| Object fields
+         let fieldTypes = exprs |> List.map (fun e -> e.Type) |> List.toArray
+         let tupleType = FSharpType.MakeTupleType fieldTypes
+         let compareFunc = Objects.genComparisonFunc tupleType
+         let fields = ("CompareTo", compareFunc)::fields
+         [  yield! decls |> Seq.concat 
+            yield returnStategy.Return <| Object fields
          ]
       | _ -> []
 

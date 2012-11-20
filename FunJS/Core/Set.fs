@@ -17,6 +17,7 @@ module FunJS.Core.Set
 
 open System.Collections
 open System.Collections.Generic
+open FunJS.Core.LanguagePrimitives
 
 (* A classic functional language implementation of binary trees *)
 
@@ -30,10 +31,6 @@ type SetTree<'T> when 'T : comparison =
       // REVIEW: performance rumour has it that the data held in SetNode and SetOne should be
       // exactly one cache line on typical architectures. They are currently 
       // ~6 and 3 words respectively. 
-
-type GenericComparer<'a when 'a: comparison>() =
-   interface IComparer<'a> with
-      member __.Compare(x, y) = compare x y
 
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module internal SetTree = 

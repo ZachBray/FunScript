@@ -54,6 +54,7 @@
     <Compile Include="Lists.fs" />
     <Compile Include="Seqs.fs" />
     <Compile Include="Sets.fs" />
+    <Compile Include="Maps.fs" />
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>

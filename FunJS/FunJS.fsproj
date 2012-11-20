@@ -44,7 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes.fs" />
-    <Compile Include="Core\IntrinsicFunctions.fs" />
+    <Compile Include="Core\LanguagePrimitives.fs" />
     <Compile Include="Core\GenericConstants.fs" />
     <Compile Include="Core\Array.fs" />
     <Compile Include="Core\List.fs" />
@@ -52,6 +52,7 @@
     <Compile Include="Core\Seq.fs" />
     <Compile Include="Core\Range.fs" />
     <Compile Include="Core\Set.fs" />
+    <Compile Include="Core\Map.fs" />
     <Compile Include="JavaScriptNameMapper.fs" />
     <Compile Include="AST.fs" />
     <Compile Include="QuoteExtensions.fs" />
@@ -66,14 +67,15 @@
     <Compile Include="LetBindings.fs" />
     <Compile Include="LambdaApplication.fs" />
     <Compile Include="ControlFlow.fs" />
-    <Compile Include="Tuples.fs" />
     <Compile Include="CommonOperators.fs" />
     <Compile Include="Arrays.fs" />
     <Compile Include="Lists.fs" />
     <Compile Include="Seqs.fs" />
     <Compile Include="Options.fs" />
     <Compile Include="Sets.fs" />
+    <Compile Include="Maps.fs" />
     <Compile Include="Objects.fs" />
+    <Compile Include="Tuples.fs" />
     <Compile Include="ExprExtensions.fs" />
     <Compile Include="UnionTypes.fs" />
     <Compile Include="RecordTypes.fs" />

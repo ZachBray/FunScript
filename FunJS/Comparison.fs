@@ -25,6 +25,7 @@ let components = [
    CompilerComponent.binary <@ (<) @> (compareOp "<")
    CompilerComponent.binary <@ (<=) @> (compareOp "<=")
    CompilerComponent.binary <@ compare @> compareCall
+   CompilerComponent.binary <@ Unchecked.compare @> compareCall
    ExpressionReplacer.create <@ min @> <@ Replacements.min @>
    ExpressionReplacer.create <@ max @> <@ Replacements.max @>
 ]

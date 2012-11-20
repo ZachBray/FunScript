@@ -64,9 +64,11 @@ type Compiler(components) as this =
       | Some statements -> statements
 
    let getTypeArgs(mi:MethodBase) =
-      Array.append
-         (mi.DeclaringType.GetGenericArguments())
-         (mi.GetGenericArguments())
+      if mi.IsConstructor then mi.DeclaringType.GetGenericArguments()
+      else
+         Array.append
+            (mi.DeclaringType.GetGenericArguments())
+            (mi.GetGenericArguments())
 
    let mutable usedMethods = []
 

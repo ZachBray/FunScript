@@ -147,6 +147,6 @@ let components =
       
       ExpressionReplacer.createModuleMapping 
          "FSharp.Core" "Microsoft.FSharp.Core.LanguagePrimitives.IntrinsicFunctions"
-         "FunJS" "FunJS.Core.IntrinsicFunctions"
+         "FunJS" "FunJS.Core.LanguagePrimitives"
 
    ] |> List.concat

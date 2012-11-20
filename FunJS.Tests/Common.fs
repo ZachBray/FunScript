@@ -26,14 +26,11 @@ let check (quote:Quotations.Expr) =
    checkAreEqual expectedResult quote
 
 // TODO:
-// Looks like list equality is broken. Add a test.
-// Add tests for union equality.
+// Add tests for union/array/list/seq/map/set equality/comparison.
+// Add support for multiple constructors.
 // Add support for method name overloading. DefineGlobal to take MethodBase? What about instances?
-// Add support for tuple comparison. Map to records?
 // Fix TypeScript provider for case where interface and class have overlapping properties.
 // Add support for type checks. How would you differentiate between ints and floats though?
-// Add support for multiple constructors.
-// Add support for array equality.
 // Add support for renaming reserved words.
 // Add support for exceptions.
 // Add support for events/observables.
