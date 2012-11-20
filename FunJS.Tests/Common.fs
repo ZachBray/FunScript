@@ -26,6 +26,8 @@ let check (quote:Quotations.Expr) =
    checkAreEqual expectedResult quote
 
 // TODO:
+// Looks like list equality is broken. Add a test.
+// Add tests for union equality.
 // Add support for method name overloading. DefineGlobal to take MethodBase? What about instances?
 // Add support for tuple comparison. Map to records?
 // Fix TypeScript provider for case where interface and class have overlapping properties.
