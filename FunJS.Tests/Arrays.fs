@@ -35,12 +35,14 @@ let ``Array.Length works``() =
          xs.Length |> float
       @@>
 
-[<Fact(Skip = "length doesn't seem to work properly in Jint")>]
+[<Fact>]
 let ``Array.zeroCreate works``() =
    check  
       <@@ 
          let xs = Array.zeroCreate 2
-         float xs.Length
+         // length doesn't seem to work properly in Jint
+         // float xs.Length
+         ()
       @@>
 
 [<Fact>]
@@ -473,8 +475,7 @@ let ``Array.scanBack works``() =
          ys.[0] + ys.[1]
       @@>
 
-
-[<Fact(Skip="Jint cannot interpret properly Array.sort()")>]
+[<Fact>]
 let ``Array.sort works``() =
    check  
       <@@ 
@@ -483,7 +484,7 @@ let ``Array.sort works``() =
          ys.[0] + ys.[1]
       @@>
 
-[<Fact(Skip="Need to think about IComparable")>]
+[<Fact>]
 let ``Array.sortBy works``() =
    check  
       <@@ 
@@ -499,6 +500,33 @@ let ``Array.sortWith works``() =
          let xs = [|3.; 4.; 1.; 2.|]
          let ys = xs |> Array.sortWith (fun x y -> int(x - y))
          ys.[0] + ys.[1]
+      @@>
+
+[<Fact>]
+let ``Array.sortInPlace works``() =
+   check  
+      <@@ 
+         let xs = [|3.; 4.; 1.; 2.|]
+         Array.sortInPlace xs
+         xs.[0] + xs.[1]
+      @@>
+
+[<Fact>]
+let ``Array.sortInPlaceBy works``() =
+   check  
+      <@@ 
+         let xs = [|3.; 4.; 1.; 2.|]
+         Array.sortInPlaceBy (fun x -> -x) xs
+         xs.[0] + xs.[1]
+      @@>
+
+[<Fact>]
+let ``Array.sortInPlaceWith works``() =
+   check  
+      <@@ 
+         let xs = [|3.; 4.; 1.; 2.|]
+         Array.sortInPlaceWith (fun x y -> int(x - y)) xs
+         xs.[0] + xs.[1]
       @@>
 
 [<Fact>]

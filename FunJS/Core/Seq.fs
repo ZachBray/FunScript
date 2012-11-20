@@ -398,3 +398,34 @@ let Singleton x =
 let Compare xs ys =
    CompareWith (fun (x:'a) (y:'a) ->
       (x :> obj :?> IComparable<'a>).CompareTo y) xs ys
+
+let SortBy f xs =
+   let ys = xs |> ToArray
+   Array.sortInPlaceBy f ys
+   ys |> OfArray
+
+let DistinctBy f xs =
+   Scan (fun (_, acc) x ->
+      let y = f x
+      if acc |> Set.contains y then
+         None, acc
+      else Some x, acc |> Set.add y) 
+      (None, Set.empty) xs
+   |> Choose fst
+
+let Distinct xs =
+   DistinctBy id xs
+
+let GroupBy f xs =
+   Fold (fun (acc:Map<_,_>) x ->
+      let k = f x
+      match acc.TryFind k with
+      | Some vs -> acc.Add(k, x::vs)
+      | None -> acc.Add(k, [x])) Collections.Map.empty xs
+   |> Collections.Map.toSeq
+   |> Map (fun (k, vs) -> k, vs :> _ seq)
+
+let CountBy f xs =
+   GroupBy f xs
+   |> Map (fun (k, vs) -> k, Length vs)
+

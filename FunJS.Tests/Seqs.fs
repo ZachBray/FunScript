@@ -343,7 +343,6 @@ let ``Seq.scan works``() =
          sumFirstTwo ys
       @@>
 
-[<Fact(Skip="Jint cannot interpret properly Array.sort()")>]
 let ``Seq.sort works``() =
    check  
       <@@ 
@@ -352,11 +351,11 @@ let ``Seq.sort works``() =
          sumFirstTwo ys
       @@>
 
-[<Fact(Skip="Need to think about IComparable")>]
+[<Fact>]
 let ``Seq.sortBy works``() =
    check  
       <@@ 
-         let xs = [3.; 4.; 1.; 2.]
+         let xs = [3.; 1.; 4.; 2.]
          let ys = xs |> Seq.sortBy (fun x -> -x)
          sumFirstTwo ys
       @@>
@@ -492,7 +491,7 @@ let ``Seq.compareWith works``() =
          float diff
       @@>
 
-[<Fact(Skip="Need to figure out comparing")>]
+[<Fact>]
 let ``Seq.countBy works``() =
    check  
       <@@ 
@@ -501,7 +500,7 @@ let ``Seq.countBy works``() =
          ys |> Seq.length |> float
       @@>
 
-[<Fact(Skip="Need to figure out comparing")>]
+[<Fact>]
 let ``Seq.distinct works``() =
    check  
       <@@ 
@@ -510,7 +509,7 @@ let ``Seq.distinct works``() =
          ys |> Seq.length |> float
       @@>
 
-[<Fact(Skip="Need to figure out comparing")>]
+[<Fact>]
 let ``Seq.distinctBy works``() =
    check  
       <@@ 
@@ -527,7 +526,7 @@ let ``Seq.exactlyOne works``() =
          xs |> Seq.exactlyOne
       @@>
 
-[<Fact(Skip="Need to figure out comparing")>]
+[<Fact>]
 let ``Seq.groupBy works``() =
    check  
       <@@ 

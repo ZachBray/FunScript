@@ -280,3 +280,8 @@ let Permute f xs =
    |> ToArray
    |> Array.Permute f 
    |> OfArray
+
+let SortBy f xs =
+   let ys = xs |> ToArray
+   Array.sortInPlaceBy f ys
+   ys |> OfArray

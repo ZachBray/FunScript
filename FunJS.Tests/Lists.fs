@@ -490,8 +490,7 @@ let ``List.scanBack works``() =
          ys.Head + ys.Tail.Head
       @@>
 
-
-[<Fact(Skip="Jint cannot interpret properly Array.sort()")>]
+[<Fact>]
 let ``List.sort works``() =
    check  
       <@@ 
@@ -500,11 +499,11 @@ let ``List.sort works``() =
          ys.Head + ys.Tail.Head
       @@>
 
-[<Fact(Skip="Need to think about IComparable")>]
+[<Fact>]
 let ``List.sortBy works``() =
    check  
       <@@ 
-         let xs = [3.; 4.; 1.; 2.]
+         let xs = [3.; 1.; 4.; 2.]
          let ys = xs |> List.sortBy (fun x -> -x)
          ys.Head + ys.Tail.Head
       @@>

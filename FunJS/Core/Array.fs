@@ -2,6 +2,7 @@
 module FunJS.Core.Array
 
 open FunJS
+open System
    
 [<JSEmit("return {0}.length;")>]
 let BoxedLength (xs:System.Array): int =
@@ -11,14 +12,6 @@ let BoxedLength (xs:System.Array): int =
 let Length (xs:'a[]): int =
    failwith "never"
 
-[<JSEmit("{0}.sort();")>]
-let SortInPlace (xs:'a[]): unit =
-   failwith "never"
-
-[<JSEmit("{1}.sort(function(a,b) { return {0}(a)(b); });")>]
-let SortInPlaceWith (f:'a -> 'a -> int) (xs:'a[]): unit =
-   failwith "never"
-
 [<JSEmit("return {0}.slice({1}, {1} + {2});")>]
 let GetSubArray (xs:'a[]) (offset:int) (length:int): 'a[] =
    failwith "never"
@@ -26,6 +19,37 @@ let GetSubArray (xs:'a[]) (offset:int) (length:int): 'a[] =
 [<JSEmit("return {0}.slice(0);")>]
 let Copy (xs:'a[]): 'a[] =
    failwith "never"
+
+[<JSEmit("{1}.sort(function(a,b) { return {0}(a)(b); });")>]
+let SortInPlaceWith (f:'a -> 'a -> int) (xs:'a[]): unit =
+   failwith "never"
+
+let SortInPlaceBy f xs =
+   SortInPlaceWith (fun (x:'a) (y:'a) -> 
+      let x = f x
+      let y = f y
+      let x = x :> obj :?> IComparable<'b>
+      x.CompareTo y) xs
+
+let SortInPlace xs =
+   SortInPlaceWith (fun (x:'a) (y:'a) -> 
+      let comparable = x :> obj :?> IComparable<'a>
+      comparable.CompareTo y) xs
+
+let SortBy f xs =
+   let ys = Copy xs
+   SortInPlaceBy f ys
+   ys
+
+let Sort xs =
+   let ys = Copy xs
+   SortInPlace ys
+   ys
+
+let SortWith f xs =
+   let ys = Copy xs
+   SortInPlaceWith f ys
+   ys
 
 [<JSEmit("return new Array({0});")>]
 let ZeroCreate (size:int) : 'a[] = failwith "never"
@@ -112,16 +136,6 @@ let Reverse xs =
    let ys = ZeroCreate size
    for i = 0 to size - 1 do
       ys.[i] <- xs.[size - 1 - i]
-   ys
-
-let Sort xs =
-   let ys = Copy xs
-   SortInPlace ys
-   ys
-
-let SortWith f xs =
-   let ys = Copy xs
-   SortInPlaceWith f ys
    ys
 
 let Scan<'a, 'acc> f (seed:'acc) (xs: 'a []) =
