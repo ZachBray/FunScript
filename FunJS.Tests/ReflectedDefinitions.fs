@@ -11,6 +11,10 @@ module Calculator =
 
    let subtract(x, y) = x - y
 
+   let addSub x yz = x + subtract yz
+
+   let addSub2(x, yz) = x + subtract yz
+
 [<Fact>]
 let ``application of a curried module method works``() =
    check  <@@ Calculator.add 1. 2. @@>
@@ -26,6 +30,14 @@ let ``partial application of a curried module method works``() =
 [<Fact>]
 let ``application of a tupled module method works``() =
    check  <@@ Calculator.subtract(1., 2.) @@>
+
+[<Fact>]
+let ``application of a partially tupled curried module method works``() =
+   check  <@@ Calculator.addSub 1. (2., 3.) @@>
+
+[<Fact>]
+let ``application of a partially tupled tupled module method works``() =
+   check  <@@ Calculator.addSub2(1., (2., 3.)) @@>
 
 [<Fact>]
 let ``getting a module property works``() =
@@ -73,6 +85,8 @@ type InstanceCalculator(x) =
    member __.add x y = x + y
    member __.subtract(x, y) = x - y
    member __.genericIdentity x = x
+   member __.addSub x yz = x + __.subtract yz
+   member __.addSub2(x, yz) = x + __.subtract yz
 
 [<Fact>]
 let ``constructing instances works``() =
@@ -104,6 +118,20 @@ let ``application of a tupled instance method works``() =
       <@@ 
          let calc = InstanceCalculator(10.)
          calc.subtract(1., 2.) @@>
+
+[<Fact>]
+let ``application of a partially tupled curried instance method works``() =
+   check  
+      <@@ 
+         let calc = InstanceCalculator(10.)
+         calc.addSub 1. (2., 3.) @@>
+
+[<Fact>]
+let ``application of a partially tupled tupled instance method works``() =
+   check  
+      <@@ 
+         let calc = InstanceCalculator(10.)
+         calc.addSub2(1., (2., 3.)) @@>
 
 [<Fact>]
 let ``getting an instance property works``() =

@@ -55,20 +55,62 @@ let private getAllMethods (t:System.Type) =
       BindingFlags.FlattenHierarchy ||| 
       BindingFlags.Instance)
 
+
+
+let methodCallPattern (mb:MethodBase) =
+   let argCounts = mb.GetCustomAttribute<CompilationArgumentCountsAttribute>()
+   match Expr.TryGetReflectedDefinition mb with
+   | Some (DerivedPatterns.Lambdas(vars, bodyExpr)) 
+      when argCounts <> Unchecked.defaultof<_>
+           && mb.IsStatic ->
+      let argCounts = argCounts.Counts |> Seq.toList
+      let varsAndConstructors =
+         List.map2 (fun (vars:Var list) count ->
+            if vars.Length = count then
+               vars, None
+            elif vars.Length = 1 then
+               let var = vars.Head
+               let genericArgs = var.Type.GetGenericArguments()
+               let subVars =
+                  [  for i = 0 to count - 1 do
+                        yield Var(sprintf "%s_%i" var.Name i, genericArgs.[i], var.IsMutable)
+                  ]
+               let refs = subVars |> List.map Expr.Var
+               let construction = Expr.NewTuple(refs)
+               subVars, Some (var, construction) 
+            else failwith "Unexpected argument format"               
+            ) vars argCounts
+      let vars  = varsAndConstructors |> List.collect fst
+      let constructions = varsAndConstructors |> List.choose snd
+      let bodyExpr =
+         constructions |> List.fold (fun acc (var, value) ->
+            Expr.Let(var, value, acc)) bodyExpr
+      Some(vars, bodyExpr)
+   | Some (DerivedPatterns.Lambdas(vars, bodyExpr)) ->
+      Some(vars |> List.concat, bodyExpr)
+   | Some expr ->
+      Some([], expr)
+   | None -> None
+
+let (|CallPattern|_|) = methodCallPattern
+
 let getInstanceMethods t =
    getAllMethods t
    |> Array.choose (fun mi ->
-      let reflectedDef = Expr.TryGetReflectedDefinition mi 
-      reflectedDef
-      |> Option.map (fun expr ->
-         match expr with
-         | Patterns.Lambda(var, DerivedPatterns.Lambdas(vars, bodyExpr)) ->
-            let replacementThis = Var("this", var.Type, var.IsMutable)
-            let updatedBodyExpr = bodyExpr.Substitute(function
-               | v when v = var -> Some <| Expr.Var replacementThis
-               | _ -> None)
-            localized mi.Name, vars |> List.concat, updatedBodyExpr
-         | _ -> failwith "expected a lambda"))
+      match mi with
+      | CallPattern(objVar::vars, bodyExpr) ->
+         let this = Var("this", objVar.Type, objVar.IsMutable)
+         let objVar, exprWithoutThis =
+            if objVar.Name = "this" then
+               let replacementThis = Var("__", objVar.Type, objVar.IsMutable)
+               replacementThis, bodyExpr.Substitute(function
+                  | v when v = objVar -> Some <| Expr.Var replacementThis
+                  | _ -> None)
+            else objVar, bodyExpr
+         let updatedBodyExpr = 
+            Expr.Let(objVar, Expr.Var this, exprWithoutThis)
+         Some(localized mi.Name, vars, updatedBodyExpr)
+      | _ -> None)
    |> Seq.distinctBy (fun (name, _, _) -> name)
    |> Seq.toArray
 

@@ -568,7 +568,7 @@ type Set<[<EqualityConditionalOn>]'T when 'T : comparison >(comparer:IComparer<'
    static member Union(sets:seq<Set<'T>>) : Set<'T>  = 
       Seq.fold (fun s1 s2 -> s1 + s2) Set<'T>.Empty sets
 
-   static member Intersection(sets:seq<Set<'T>>) : Set<'T>  = 
+   static member IntersectionMany(sets:seq<Set<'T>>) : Set<'T>  = 
       Seq.reduce (fun s1 s2 -> Set<_>.Intersection(s1,s2)) sets
 
    static member Equality(a: Set<'T>, b: Set<'T>) = (SetTree.compare a.Comparer  a.Tree b.Tree = 0)
@@ -655,7 +655,7 @@ let unionMany sets  = Set<_>.Union(sets)
 let intersect (s1 : Set<'T>)  (s2 : Set<'T>)  = Set<'T>.Intersection(s1,s2)
 
 [<CompiledName("IntersectMany")>]
-let intersectMany sets  = Set<_>.Intersection(sets)
+let intersectMany sets  = Set<_>.IntersectionMany(sets)
 
 
 [<CompiledName("Iterate")>]

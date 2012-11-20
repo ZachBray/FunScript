@@ -70,21 +70,17 @@ let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list)
       | _ -> Block(compiler.Compile ReturnStrategies.returnFrom bodyExpr)
    vars, block
 
-let private (|HasDefinition|_|) (compiler:InternalCompiler.ICompiler) (mb:MethodBase, callType) =
-   let finalMi = 
-      match compiler.ReplacementFor mb callType with
-      | None -> mb
-      | Some mi -> mi :> MethodBase
-   match finalMi with
-   | DerivedPatterns.MethodWithReflectedDefinition expr -> Some(finalMi, expr)
-   | _ -> None
+let private replaceIfAvailable (compiler:InternalCompiler.ICompiler) mb callType =
+   match compiler.ReplacementFor mb callType with
+   | None -> mb
+   | Some mi -> mi :> MethodBase
+
+let private (|CallPattern|_|) = Objects.methodCallPattern
 
 let private createGlobalMethod compiler mb callType =
-   match mb, callType with
-   | HasDefinition compiler (replacementMi, DerivedPatterns.Lambdas(vars, bodyExpr)) ->
-      genMethod mb replacementMi (vars |> List.concat) bodyExpr compiler
-   | HasDefinition compiler (replacementMi, unitLambdaBodyExpr) ->
-      genMethod mb replacementMi [] unitLambdaBodyExpr compiler
+   match replaceIfAvailable compiler mb callType with
+   | CallPattern(vars, bodyExpr) as replacementMi ->
+      genMethod mb replacementMi vars bodyExpr compiler
    | _ -> failwithf "No reflected definition for method: %s" mb.Name
 
 let private createConstruction

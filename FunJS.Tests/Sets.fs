@@ -150,7 +150,7 @@ let ``Set.intersect works``() =
          zs.Contains 2 && not(zs.Contains 1)
       @@>
 
-[<Fact(Skip="Need to get mixed tuple/curried methods to compile first")>]
+[<Fact>]
 let ``Set.intersectMany works``() =
    check  
       <@@ 
@@ -197,7 +197,7 @@ let ``Set.filter works``() =
          |> Set.count |> float
       @@>
 
-[<Fact(Skip="Need to get mixed tuple/curried methods to compile first")>]
+[<Fact>]
 let ``Set.partition works``() =
    check  
       <@@ 
