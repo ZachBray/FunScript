@@ -11,7 +11,7 @@ let (!) (str:string) = j.jQuery.Invoke(str)
 
 let log(msg:string) =
    let tag = "<p>" + msg + "</p>"
-   (!"body").append tag
+   (!"body").append [| tag :> obj |]
    |> ignore
 
 let random(lo:int, hi:int) =
@@ -106,7 +106,7 @@ let createGame() =
    printDeck deck
 
 let main() =
-   j.jQuery.Invoke(lib.document :> obj :?> j._Element).ready(fun () -> createGame())
+   lib.window.onload <- fun _ -> createGame()
 
 // Compile
 let source = <@@ main() @@> |> Compiler.compile 
