@@ -118,7 +118,9 @@ let private createCall
       |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
       |> List.unzip
    match mi, refs with
-   | (JSMapping(name, true, false) as mi), _
+   | (JSMapping(name, true, false) as mi), _ ->
+      [ yield! decls |> List.concat
+        yield returnStategy.Return <| Apply(Reference (Var.Global(name, typeof<obj>)), refs) ]
    | SpecialOp((ReflectedDefinition name) as mi), _
    | (ReflectedDefinition name as mi), _ ->
       match mi.IsStatic, refs with
