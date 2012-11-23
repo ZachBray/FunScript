@@ -590,6 +590,9 @@ type ProvidedTypeDefinition(container:TypeContainer,className : string, baseType
         | _ -> ()
 
     let customAttributesImpl = CustomAttributesImpl()
+
+    static let mutable cache = Map.empty
+
     member this.AddXmlDocComputed xmlDoc                    = customAttributesImpl.AddXmlDocComputed xmlDoc
     member this.AddXmlDocDelayed xmlDoc                     = customAttributesImpl.AddXmlDocDelayed xmlDoc
     member this.AddXmlDoc xmlDoc                            = customAttributesImpl.AddXmlDoc xmlDoc
@@ -662,10 +665,17 @@ type ProvidedTypeDefinition(container:TypeContainer,className : string, baseType
         if staticParams.Length>0 then
             if staticParams.Length <> args.Length then
                 failwith (sprintf "ProvidedTypeDefinition: expecting %d static parameters but given %d for type %s" staticParams.Length args.Length (fullName.Force()))
-            match staticParamsApply with
-            | None -> failwith "ProvidedTypeDefinition: DefineStaticParameters was not called"
-            | Some f -> f name args
-
+            let comparableArgs = args |> Array.map (fun o -> o :?> IComparable)
+            let typeKey = name, comparableArgs
+            match cache.TryFind typeKey with
+            | None ->
+               match staticParamsApply with
+               | None -> failwith "ProvidedTypeDefinition: DefineStaticParameters was not called"
+               | Some f -> 
+                  let t = f name args
+                  cache <- cache |> Map.add typeKey t
+                  t
+            | Some t -> t
         else
             failwith (sprintf "ProvidedTypeDefinition: static parameters supplied but not expected for %s" (fullName.Force()))
 
