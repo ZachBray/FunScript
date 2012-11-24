@@ -1,13 +1,4 @@
-﻿namespace FunJS
-
-exception JSEmitException of string
-
-[<ReflectedDefinition>]
-module Emit =
-   let Inline str =
-      failwith "never"
-
-namespace FunJS.TypeScript
+﻿namespace FunJS.TypeScript
 
 open AST
 open Microsoft.FSharp.Core.CompilerServices
@@ -91,7 +82,6 @@ module TypeGenerator =
             getActualType obtainDef var.Type, 
             [])
       prop.IsStatic <- (memType = Global)
-      prop.AddXmlDoc "ABCDEF"
       prop.SetterCode <- fun _ -> <@@ failwithf "" @@>
       prop.GetterCode <- fun _ -> <@@ failwithf "" @@>
       prop
@@ -227,7 +217,7 @@ module TypeGenerator =
             ProvidedTypeDefinition(name, None)
          | Interface name ->
             let actualName = name.Split '.' |> Seq.last
-            ProvidedTypeDefinition("_" + name, None)
+            ProvidedTypeDefinition(name + "'", None)
          | Structural ps -> 
             incr count
             let t = ProvidedTypeDefinition(sprintf "TempType%i" !count, None)
