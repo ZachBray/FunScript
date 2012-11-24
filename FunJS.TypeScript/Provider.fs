@@ -205,9 +205,23 @@ module TypeGenerator =
                let path = names |> String.concat "."
                addTypes t obtainDef [DeclareModule(path, declarations)]
             next()
-            
 
-   let generateFrom (typeScriptFile:string) (root:ProvidedTypeDefinition) =
+              
+   /// Open a file from file system or from the web in a type provider context
+   /// (File may be relative to the type provider resolution folder and web
+   /// resources must start with 'http://' prefix)
+   let openFileOrUri resolutionFolder (fileName:string) =
+      if fileName.StartsWith("http://", StringComparison.InvariantCultureIgnoreCase) then
+         let req = System.Net.WebRequest.Create(Uri(fileName))
+         let resp = req.GetResponse() 
+         new StreamReader(resp.GetResponseStream())
+      else
+         // If the second path is absolute, Path.Combine returns it without change
+         let file = Path.Combine(resolutionFolder, fileName)
+         new StreamReader(file)
+       
+
+   let generateFrom (resolutionFolder:string) (typeScriptFile:string) (root:ProvidedTypeDefinition) =
       let created = Dictionary()
       let count = ref 0
 
@@ -246,13 +260,13 @@ module TypeGenerator =
             parentT.AddMember t
             t
       
-      use reader = new StreamReader(typeScriptFile)
+      use reader = openFileOrUri resolutionFolder typeScriptFile
       let types = Parser.parse reader
       reader.Close()             
       addTypes root obtainTypeDef types
       
 [<TypeProvider>]
-type TypeScriptProvider() as this =
+type TypeScriptProvider(cfg:TypeProviderConfig) as this =
    inherit TypeProviderForNamespaces()
 
    let thisAssembly = Assembly.GetExecutingAssembly()
@@ -263,7 +277,7 @@ type TypeScriptProvider() as this =
 
    let apiType = 
       ProvidedTypeDefinition(thisAssembly, rootNamespace, "Api", None)
-       
+
    do apiType.IsErased <- false
    do apiType.DefineStaticParameters(
          staticParameters = staticParams,
@@ -280,7 +294,7 @@ type TypeScriptProvider() as this =
                rootType.AddInterfaceImplementation typeof<FunJS.IJSRoot>
                rootType.AddInterfaceImplementation typeof<FunJS.IJSMapping>
                //System.Diagnostics.Debugger.Break()
-               try TypeGenerator.generateFrom typeScriptFile rootType
+               try TypeGenerator.generateFrom cfg.ResolutionFolder typeScriptFile rootType
                with ex -> failwithf "Failed to generate TypeScript mapping: %s\n%s" ex.Message ex.StackTrace
                let path = System.IO.Path.GetTempFileName() + ".dll"
                rootType.ConvertToGenerated path
