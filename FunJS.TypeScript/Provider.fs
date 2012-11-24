@@ -22,41 +22,63 @@ open System
 
 module TypeGenerator =
 
+   let makeTupleType ts =
+      let tupleType =
+         match ts |> List.length with
+         | 2 -> typedefof<_ * _>
+         | 3 -> typedefof<_ * _ * _>
+         | 4 -> typedefof<_ * _ * _ * _>
+         | 5 -> typedefof<_ * _ * _ * _ * _>
+         | 6 -> typedefof<_ * _ * _ * _ * _ * _>
+         | 7 -> typedefof<_ * _ * _ * _ * _ * _ * _>
+         | _ -> failwith "Unsupported tuple size"
+      ProvidedSymbolType(Generic tupleType, ts) :> Type
+
    let rec getActualType obtainDef = function
       | Any -> typeof<obj>
       | Boolean -> typeof<bool>
       | String -> typeof<string>
       | Number -> typeof<float>
       | Void -> typeof<unit>
-      | Array (Array t) ->
+      | TSType.Array (TSType.Array t) ->
          let actualT: System.Type = getActualType obtainDef t
          try actualT.MakeArrayType(2)
          with _ -> failwithf "Could not make array from Type: %A" t
-      | Array t -> 
+      | TSType.Array t -> 
          let actualT: System.Type = getActualType obtainDef t
          try actualT.MakeArrayType()
          with _ -> failwithf "Could not make array from Type: %A" t
       //TODO: Param arrays
-      | Lambda(_, _) -> typeof<obj>
-//      | Lambda([], retT) ->
-//         let domain = typeof<unit>
-//         let range = getActualType obtainDef retT
-//         FSharpType.MakeFunctionType(domain, range)
-//      | Lambda([p], retT) ->
-//         let domain = getActualType obtainDef p.Var.Type
-//         let range = getActualType obtainDef retT
-//         FSharpType.MakeFunctionType(domain, range)
-//      | Lambda(ps, retT) ->
-//         try
-//            let domain = 
-//               ps 
-//               |> Seq.map (fun p -> getActualType obtainDef p.Var.Type) 
-//               |> Seq.toArray
-//               |> FSharpType.MakeTupleType
-//            let range = getActualType obtainDef retT
-//            FSharpType.MakeFunctionType(domain, range)
-//         with ex ->
-//            failwithf "Failed to make function type. %s For: %A => %A" ex.Message ps retT
+      | Lambda([], retT) ->
+         //let domain = typeof<unit>
+         let range = getActualType obtainDef retT
+         // NOTE:
+         // You would think that it would be ok to do this here:
+         //    FSharpType.MakeFunctionType(domain, range)
+         // It isn't because if the domain/range includes a ProvidedType
+         // (which is _not_ a runtime type) it creates a TypeBuilderInstance
+         // rather than a runtime type. TypeBuilderInstance does not implement
+         // IsAssignableFrom. This means that calls to the method that takes
+         // or returns the lambda fail the checkArgs test when creating a Call 
+         // quotation Expr.
+         let genericType = typedefof<_ -> _>
+         ProvidedSymbolType(SymbolKind.Generic genericType, [typeof<unit>; range]) :> Type
+      | Lambda([p], retT) ->
+         let domain = getActualType obtainDef p.Var.Type
+         let range = getActualType obtainDef retT
+         let genericType = typedefof<_ -> _>
+         ProvidedSymbolType(SymbolKind.Generic genericType, [domain; range]) :> Type
+      | Lambda(ps, retT) ->
+         try
+            let domain = 
+               ps 
+               |> List.map (fun p -> getActualType obtainDef p.Var.Type)
+               |> makeTupleType
+            let range = getActualType obtainDef retT
+            let genericType = typedefof<_ -> _>
+            ProvidedSymbolType(SymbolKind.Generic genericType, [domain; range]) :> Type
+         with ex ->
+            failwithf "Failed to make function type. %s For: %A => %A" ex.Message ps retT
       | t -> obtainDef t :> System.Type   
 
    type MemberType = Global | Local
@@ -254,8 +276,8 @@ type TypeScriptProvider() as this =
        
    do apiType.IsErased <- false
    do apiType.DefineStaticParameters(
-         parameters = staticParams,
-         instantiationFunction = fun typeName ->
+         staticParameters = staticParams,
+         apply = fun typeName ->
             function
             | [| :? string as typeScriptFile |] ->
                let rootType =

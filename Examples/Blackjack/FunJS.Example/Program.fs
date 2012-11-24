@@ -106,7 +106,7 @@ let createGame() =
    printDeck deck
 
 let main() =
-   lib.window.onload <- fun _ -> createGame()
+   lib.window.onload <- fun _ -> createGame() :> obj
 
 // Compile
 let source = <@@ main() @@> |> Compiler.compile 
