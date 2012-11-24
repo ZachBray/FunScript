@@ -483,7 +483,10 @@ type ProvidedSymbolType(kind: SymbolKind, args: Type list) =
       | Generic gty, (:? Type as that) ->
          gty.Name = that.Name &&
          Array.forall2 (fun (x:Type) (y:Type) ->
-            x.Name = y.Name
+            match x.IsGenericType, y.IsGenericType with
+            | true, true -> x.GetGenericTypeDefinition().Name = y.GetGenericTypeDefinition().Name
+            | false, false -> x.Name = y.Name
+            | _ -> false
          )  (this.GetGenericArguments())
             (that.GetGenericArguments())
       | _ -> notRequired "Equals" this.Name
@@ -528,7 +531,7 @@ type ProvidedTypeDefinition(container:TypeContainer,className : string, baseType
     let mutable attributes   = 
         TypeAttributes.Public ||| 
         TypeAttributes.Class ||| 
-        TypeAttributes.Sealed |||
+        //TypeAttributes.Sealed |||
         enum (int32 TypeProviderTypeAttributes.IsErased)
 
 

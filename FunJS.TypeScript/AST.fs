@@ -14,11 +14,6 @@ type TSType =
    | Array of TSType
    | Lambda of TSParameter list * TSType
    | Structural of TSObjectMember list
-   //TODO: this is a work around for the FSharpFunc bug.
-   member t.Representation =
-      match t with
-      | Lambda _ -> Any
-      | _ -> t
 
 and TSVariable =
  { Name: name

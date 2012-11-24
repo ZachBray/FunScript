@@ -114,24 +114,30 @@ module TypeGenerator =
       let createMethod parameters =
          let parameters = 
             parameters |> List.map (genParameter obtainDef)
+         let retType =
+            match f.Type with
+            | Void -> typeof<System.Void>
+            | _ -> getActualType obtainDef f.Type
          let meth =
             ProvidedMethod(
                name,
                parameters,
-               getActualType obtainDef f.Type)
-         meth.IsStaticMethod <- (memType = Global || f.IsStatic)
+               retType)
+         match memType with
+         | Global -> meth.IsStaticMethod <- true
+         | Local -> meth.AddMethodAttrs MethodAttributes.Virtual
          meth.InvokeCode <- fun _ -> <@@ failwith "never" @@>
          meth
       let genSet = getGeneratedSet t
-      [  let allParamTypes = f.Parameters |> List.map (fun p -> p.Var.Type.Representation)         
+      [  let allParamTypes = f.Parameters |> List.map (fun p -> p.Var.Type)         
          if not(!genSet |> Set.contains (name, allParamTypes)) then
             genSet := !genSet |> Set.add (name, allParamTypes)
-            yield createMethod f.Parameters
+            yield createMethod f.Parameters :> MemberInfo
          let reqParams = f.Parameters |> List.filter (fun p -> not p.Var.IsOptional)
-         let reqParamTypes = reqParams |> List.map (fun p -> p.Var.Type.Representation)
+         let reqParamTypes = reqParams |> List.map (fun p -> p.Var.Type)
          if not(!genSet |> Set.contains (name, reqParamTypes)) then
             genSet := !genSet |> Set.add (name, reqParamTypes)
-            yield createMethod reqParams
+            yield createMethod reqParams :> MemberInfo
       ]
          
    let genEnum (enumT:ProvidedTypeDefinition) caseNames =
@@ -279,7 +285,7 @@ type TypeScriptProvider() as this =
                rootType.IsErased <- false
                rootType.AddInterfaceImplementation typeof<FunJS.IJSRoot>
                rootType.AddInterfaceImplementation typeof<FunJS.IJSMapping>
-               //System.Diagnostics.Debugger.Break()
+               System.Diagnostics.Debugger.Break()
                try TypeGenerator.generateFrom typeScriptFile rootType
                with ex -> failwithf "Failed to generate TypeScript mapping: %s\n%s" ex.Message ex.StackTrace
                let path = System.IO.Path.GetTempFileName() + ".dll"
