@@ -41,7 +41,7 @@ type JSExpr =
       | Null -> "null"
       | Boolean b -> b.ToString().ToLower()
       | Number f -> sprintf "%f" f
-      | String str -> sprintf @"""%s""" str
+      | String str -> sprintf @"""%s""" (System.Web.HttpUtility.JavaScriptStringEncode(str))
       | Reference ref -> getNameScope ref !scope |> fst
       | This -> "this"
       | Object propExprs ->
