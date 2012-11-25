@@ -136,6 +136,7 @@ let ``Array.collect works``() =
          ys.[0]  + ys.[1]
       @@>
 
+[<Fact>]
 let ``Array.concat works``() =
    check  
       <@@ 
