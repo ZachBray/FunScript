@@ -1,13 +1,4 @@
-﻿namespace FunJS
-
-exception JSEmitException of string
-
-[<ReflectedDefinition>]
-module Emit =
-   let Inline str =
-      failwith "never"
-
-namespace FunJS.TypeScript
+﻿namespace FunJS.TypeScript
 
 open AST
 open Microsoft.FSharp.Core.CompilerServices
@@ -22,41 +13,63 @@ open System
 
 module TypeGenerator =
 
+   let makeTupleType ts =
+      let tupleType =
+         match ts |> List.length with
+         | 2 -> typedefof<_ * _>
+         | 3 -> typedefof<_ * _ * _>
+         | 4 -> typedefof<_ * _ * _ * _>
+         | 5 -> typedefof<_ * _ * _ * _ * _>
+         | 6 -> typedefof<_ * _ * _ * _ * _ * _>
+         | 7 -> typedefof<_ * _ * _ * _ * _ * _ * _>
+         | _ -> failwith "Unsupported tuple size"
+      ProvidedSymbolType(Generic tupleType, ts) :> Type
+
    let rec getActualType obtainDef = function
       | Any -> typeof<obj>
       | Boolean -> typeof<bool>
       | String -> typeof<string>
       | Number -> typeof<float>
       | Void -> typeof<unit>
-      | Array (Array t) ->
+      | TSType.Array (TSType.Array t) ->
          let actualT: System.Type = getActualType obtainDef t
          try actualT.MakeArrayType(2)
          with _ -> failwithf "Could not make array from Type: %A" t
-      | Array t -> 
+      | TSType.Array t -> 
          let actualT: System.Type = getActualType obtainDef t
          try actualT.MakeArrayType()
          with _ -> failwithf "Could not make array from Type: %A" t
       //TODO: Param arrays
-      | Lambda(_, _) -> typeof<obj>
-//      | Lambda([], retT) ->
-//         let domain = typeof<unit>
-//         let range = getActualType obtainDef retT
-//         FSharpType.MakeFunctionType(domain, range)
-//      | Lambda([p], retT) ->
-//         let domain = getActualType obtainDef p.Var.Type
-//         let range = getActualType obtainDef retT
-//         FSharpType.MakeFunctionType(domain, range)
-//      | Lambda(ps, retT) ->
-//         try
-//            let domain = 
-//               ps 
-//               |> Seq.map (fun p -> getActualType obtainDef p.Var.Type) 
-//               |> Seq.toArray
-//               |> FSharpType.MakeTupleType
-//            let range = getActualType obtainDef retT
-//            FSharpType.MakeFunctionType(domain, range)
-//         with ex ->
-//            failwithf "Failed to make function type. %s For: %A => %A" ex.Message ps retT
+      | Lambda([], retT) ->
+         //let domain = typeof<unit>
+         let range = getActualType obtainDef retT
+         // NOTE:
+         // You would think that it would be ok to do this here:
+         //    FSharpType.MakeFunctionType(domain, range)
+         // It isn't because if the domain/range includes a ProvidedType
+         // (which is _not_ a runtime type) it creates a TypeBuilderInstance
+         // rather than a runtime type. TypeBuilderInstance does not implement
+         // IsAssignableFrom. This means that calls to the method that takes
+         // or returns the lambda fail the checkArgs test when creating a Call 
+         // quotation Expr.
+         let genericType = typedefof<_ -> _>
+         ProvidedSymbolType(SymbolKind.Generic genericType, [typeof<unit>; range]) :> Type
+      | Lambda([p], retT) ->
+         let domain = getActualType obtainDef p.Var.Type
+         let range = getActualType obtainDef retT
+         let genericType = typedefof<_ -> _>
+         ProvidedSymbolType(SymbolKind.Generic genericType, [domain; range]) :> Type
+      | Lambda(ps, retT) ->
+         try
+            let domain = 
+               ps 
+               |> List.map (fun p -> getActualType obtainDef p.Var.Type)
+               |> makeTupleType
+            let range = getActualType obtainDef retT
+            let genericType = typedefof<_ -> _>
+            ProvidedSymbolType(SymbolKind.Generic genericType, [domain; range]) :> Type
+         with ex ->
+            failwithf "Failed to make function type. %s For: %A => %A" ex.Message ps retT
       | t -> obtainDef t :> System.Type   
 
    type MemberType = Global | Local
@@ -69,7 +82,6 @@ module TypeGenerator =
             getActualType obtainDef var.Type, 
             [])
       prop.IsStatic <- (memType = Global)
-      prop.AddXmlDoc "ABCDEF"
       prop.SetterCode <- fun _ -> <@@ failwithf "" @@>
       prop.GetterCode <- fun _ -> <@@ failwithf "" @@>
       prop
@@ -102,24 +114,30 @@ module TypeGenerator =
       let createMethod parameters =
          let parameters = 
             parameters |> List.map (genParameter obtainDef)
+         let retType =
+            match f.Type with
+            | Void -> typeof<System.Void>
+            | _ -> getActualType obtainDef f.Type
          let meth =
             ProvidedMethod(
                name,
                parameters,
-               getActualType obtainDef f.Type)
-         meth.IsStaticMethod <- (memType = Global || f.IsStatic)
+               retType)
+         match memType with
+         | Global -> meth.IsStaticMethod <- true
+         | Local -> meth.AddMethodAttrs MethodAttributes.Virtual
          meth.InvokeCode <- fun _ -> <@@ failwith "never" @@>
          meth
       let genSet = getGeneratedSet t
-      [  let allParamTypes = f.Parameters |> List.map (fun p -> p.Var.Type.Representation)         
+      [  let allParamTypes = f.Parameters |> List.map (fun p -> p.Var.Type)         
          if not(!genSet |> Set.contains (name, allParamTypes)) then
             genSet := !genSet |> Set.add (name, allParamTypes)
-            yield createMethod f.Parameters
+            yield createMethod f.Parameters :> MemberInfo
          let reqParams = f.Parameters |> List.filter (fun p -> not p.Var.IsOptional)
-         let reqParamTypes = reqParams |> List.map (fun p -> p.Var.Type.Representation)
+         let reqParamTypes = reqParams |> List.map (fun p -> p.Var.Type)
          if not(!genSet |> Set.contains (name, reqParamTypes)) then
             genSet := !genSet |> Set.add (name, reqParamTypes)
-            yield createMethod reqParams
+            yield createMethod reqParams :> MemberInfo
       ]
          
    let genEnum (enumT:ProvidedTypeDefinition) caseNames =
@@ -194,7 +212,6 @@ module TypeGenerator =
                addTypes t obtainDef [DeclareModule(path, declarations)]
             next()
 
-              
    /// Open a file from file system or from the web in a type provider context
    /// (File may be relative to the type provider resolution folder and web
    /// resources must start with 'http://' prefix)
@@ -219,7 +236,7 @@ module TypeGenerator =
             ProvidedTypeDefinition(name, None)
          | Interface name ->
             let actualName = name.Split '.' |> Seq.last
-            ProvidedTypeDefinition("_" + name, None)
+            ProvidedTypeDefinition(name + "'", None)
          | Structural ps -> 
             incr count
             let t = ProvidedTypeDefinition(sprintf "TempType%i" !count, None)
@@ -268,8 +285,8 @@ type TypeScriptProvider(cfg:TypeProviderConfig) as this =
 
    do apiType.IsErased <- false
    do apiType.DefineStaticParameters(
-         parameters = staticParams,
-         instantiationFunction = fun typeName ->
+         staticParameters = staticParams,
+         apply = fun typeName ->
             function
             | [| :? string as typeScriptFile |] ->
                let rootType =

@@ -470,11 +470,26 @@ type ProvidedSymbolType(kind: SymbolKind, args: Type list) =
     override this.GetNestedTypes _bindingAttr                                                       = notRequired "GetNestedTypes" this.Name
     override this.GetNestedType(_name, _bindingAttr)                                                 = notRequired "GetNestedType" this.Name
     override this.GetAttributeFlagsImpl()                                                          = notRequired "GetAttributeFlagsImpl" this.Name
-    override this.UnderlyingSystemType                                                             = notRequired "UnderlyingSystemType" this.Name
+    override this.UnderlyingSystemType = 
+      match kind with
+      | Generic gty -> gty.UnderlyingSystemType
+      | _ -> notRequired "UnderlyingSystemType" this.Name
     override this.GetCustomAttributesData()                                                        = notRequired "GetCustomAttributesData" this.Name
     override this.MemberType                                                                       = notRequired "MemberType" this.Name
     override this.GetHashCode()                                                                    = notRequired "GetHashCode" this.Name
-    override this.Equals(_that:obj) : bool                                                          = notRequired "Equals" this.Name
+    override this.Equals(_that:obj) : bool                                                        = 
+      // TODO: There must be a better way of doing this!
+      match kind, _that with
+      | Generic gty, (:? Type as that) ->
+         gty.Name = that.Name &&
+         Array.forall2 (fun (x:Type) (y:Type) ->
+            match x.IsGenericType, y.IsGenericType with
+            | true, true -> x.GetGenericTypeDefinition().Name = y.GetGenericTypeDefinition().Name
+            | false, false -> x.Name = y.Name
+            | _ -> false
+         )  (this.GetGenericArguments())
+            (that.GetGenericArguments())
+      | _ -> notRequired "Equals" this.Name
     override this.GetMember(_name,_mt,_bindingAttr)                                                   = notRequired "GetMember" this.Name
     override this.GUID                                                                             = notRequired "GUID" this.Name
     override this.InvokeMember(_name, _invokeAttr, _binder, _target, _args, _modifiers, _culture, _namedParameters) = notRequired "InvokeMember" this.Name
@@ -516,7 +531,7 @@ type ProvidedTypeDefinition(container:TypeContainer,className : string, baseType
     let mutable attributes   = 
         TypeAttributes.Public ||| 
         TypeAttributes.Class ||| 
-        TypeAttributes.Sealed |||
+        //TypeAttributes.Sealed |||
         enum (int32 TypeProviderTypeAttributes.IsErased)
 
 
@@ -695,7 +710,7 @@ type ProvidedTypeDefinition(container:TypeContainer,className : string, baseType
         [| for m in this.GetMembers bindingAttr do                
                 if m.MemberType = MemberTypes.Constructor then
                     yield (m :?> ConstructorInfo) |]
-    // Methods
+    // Methods    
     override this.GetMethodImpl(name, _bindingAttr, _binderBinder, _callConvention, _types, _modifiers) : MethodInfo = 
         let membersWithName = 
             [ for m in getMembers() do                

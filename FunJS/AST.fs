@@ -66,12 +66,12 @@ type JSExpr =
                argExpr.Print(padding, scope))
             |> String.concat ", "
          sprintf "%s(%s)" (lambdaExpr.Print(padding, scope)) filling
-      | New(lambdaExpr, argExprs) ->
+      | New(expr, argExprs) ->
          let filling =
             argExprs |> List.map (fun argExpr -> 
                argExpr.Print(padding, scope))
             |> String.concat ", "
-         sprintf "(new %s(%s))" (lambdaExpr.Print(padding, scope)) filling
+         sprintf "(new %s(%s))" (expr.Print(padding, scope)) filling
       | Lambda(vars, block) ->
          let oldScope = !scope
          let newScope, names = 

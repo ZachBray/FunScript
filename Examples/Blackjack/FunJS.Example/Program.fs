@@ -7,7 +7,7 @@ open FunJS.TypeScript
 type j = FunJS.TypeScript.Api< @"C:\src\FunScript\Examples\Typings\jquery.d.ts" >
 type lib = FunJS.TypeScript.Api< @"C:\src\FunScript\Examples\Typings\lib.d.ts" >
 
-let (!) (str:string) = j.jQuery.Invoke(str)
+let (!) (str:string) = j.jQuery.Invoke str
 
 let log(msg:string) =
    let tag = "<p>" + msg + "</p>"
@@ -105,8 +105,19 @@ let createGame() =
          printDeck rest
    printDeck deck
 
+type AjaxSettings(onSuccess) =
+   // TODO: this does not work:
+   //    inherit j.JQueryAjaxSettings'(async = true, context = null)
+   // so we have to manually set the fields.
+   // Need to implement parasitic inheritance in FunJS.
+   inherit j.JQueryAjaxSettings'() 
+   override __.success (_,data,_) = onSuccess data
+
 let main() =
-   lib.window.onload <- fun _ -> createGame()
+   let settings = AjaxSettings(fun data -> lib.console.log data)
+   settings.async <- true
+   j.jQuery.ajax("http://search.twitter.com/search.json?q=%23fsharp", settings)
+   lib.window.onload <- fun _ -> createGame() :> obj
 
 // Compile
 let source = <@@ main() @@> |> Compiler.compile 

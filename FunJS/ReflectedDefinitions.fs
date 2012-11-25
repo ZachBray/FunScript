@@ -94,15 +94,16 @@ let private createConstruction
       |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
       |> List.unzip
    match ci with
-   | JSMapping(name, true, false) ->
-      [ yield! decls |> List.concat
-        yield returnStategy.Return <| New(Reference (Var.Global(name, typeof<obj>)), refs) ]
    | ReflectedDefinition name ->
       let consRef = 
          compiler.DefineGlobal name (fun () -> 
             createGlobalMethod compiler ci Quote.ConstructorCall)
       [ yield! decls |> List.concat
         yield returnStategy.Return <| New(Reference consRef, refs) ]
+   | JSMapping(name, false, false) ->
+      let objectVar = Var.Global("Object", typeof<obj>)
+      [ yield! decls |> List.concat
+        yield returnStategy.Return <| New(Reference objectVar, []) ]
    | _ -> []
 
 let private (|SpecialOp|_|) = Quote.specialOp
