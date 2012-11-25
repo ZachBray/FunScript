@@ -4,8 +4,8 @@ module Program
 open FunJS
 open FunJS.TypeScript
 
-type j = FunJS.TypeScript.Api< @"C:\src\FunScript\Examples\Typings\jquery.d.ts" >
-type lib = FunJS.TypeScript.Api< @"C:\src\FunScript\Examples\Typings\lib.d.ts" >
+type j = FunJS.TypeScript.Api< @"..\..\Typings\jquery.d.ts" >
+type lib = FunJS.TypeScript.Api< @"..\..\Typings\lib.d.ts" >
 
 let (!) (str:string) = j.jQuery.Invoke(str)
 
@@ -106,7 +106,11 @@ let createGame() =
    printDeck deck
 
 let main() =
-   lib.window.onload <- fun _ -> createGame()
+   lib.window.onload <- fun _ -> 
+    (!"#test").click(fun _ ->
+      lib.window.alert("works")
+    ) |> ignore
+    createGame()
 
 // Compile
 let source = <@@ main() @@> |> Compiler.compile 
