@@ -8,6 +8,7 @@ let private primitiveValues =
       function
       | DerivedPatterns.Unit x -> [ Empty ]
       | DerivedPatterns.Bool x -> [ yield returnStategy.Return <| Boolean x ]
+      | DerivedPatterns.Char x -> [ yield returnStategy.Return <| String (string x) ]
       | DerivedPatterns.String x -> [ yield returnStategy.Return <| String x ]
       | DerivedPatterns.SByte x -> [ yield returnStategy.Return <| Number(float x) ]
       | DerivedPatterns.Byte x -> [ yield returnStategy.Return <| Number(float x) ]

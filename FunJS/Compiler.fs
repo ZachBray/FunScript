@@ -10,6 +10,7 @@ let private allComponents =
       Sets.components
       Maps.components
       Lists.components
+      Strings.components
       ReflectedDefinitions.components
       Arrays.components
       RecordTypes.components

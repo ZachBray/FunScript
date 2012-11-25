@@ -189,8 +189,9 @@ let MapIndexed3 f (xs:'a []) (ys:'b []) (zs:'c []) =
 let Map3 f xs ys zs =
    MapIndexed3 (fun _ x y z -> f x y z) xs ys zs
 
-let Concat (xs:'a seq []) : 'a[] =
-   Map Array.ofSeq xs 
+let Concat (xs:'a [] seq) : 'a[] =
+   xs 
+   |> Array.ofSeq
    |> ConcatImpl
 
 let Collect f xs =
