@@ -10,6 +10,7 @@ type TSType =
    | Void
    | GlobalObject of name
    | Enumeration of name
+   | Class of name
    | Interface of name
    | Array of TSType
    | Lambda of TSParameter list * TSType
@@ -45,6 +46,7 @@ type TSGlobal =
    | DeclareVar of TSVariable
    | DeclareFunction of TSFunction
    | DeclareInterface of TSObject
+   | DeclareClass of TSObject
    | DeclareObject of TSObject
    | DeclareModule of name * TSGlobal list
    | DeclareEnum of name * name list

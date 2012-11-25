@@ -26,10 +26,13 @@ let check (quote:Quotations.Expr) =
    checkAreEqual expectedResult quote
 
 // TODO:
+// Add support for inheritance.
+// Add support for TypeScript inheritance.
+// Add support for TypeScript param arrays.
+// Add support for TypeScript optional members/params.
 // Add tests for union/array/list/seq/map/set equality/comparison.
 // Add support for multiple constructors.
 // Add support for method name overloading. DefineGlobal to take MethodBase? What about instances?
-// Fix TypeScript provider for case where interface and class have overlapping properties.
 // Add support for type checks. How would you differentiate between ints and floats though?
 // Add support for renaming reserved words.
 // Add support for exceptions.
