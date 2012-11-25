@@ -60,7 +60,7 @@ Array.prototype.CompareTo = function(that) {
 """
 
 let compileWithExtensions components expr =
-   let compiler = InternalCompiler.Compiler(components @ allComponents)
+   let compiler = InternalCompiler.Compiler(allComponents @ components)
    let program = compiler.Compile ReturnStrategies.returnFrom expr
    let reflectedDefs = compiler.Globals
    let block = List.append reflectedDefs program 
