@@ -4,8 +4,8 @@ module Program
 open FunJS
 open FunJS.TypeScript
 
-type j = FunJS.TypeScript.Api< @"C:\src\FunScript\Examples\Typings\jquery.d.ts" >
-type lib = FunJS.TypeScript.Api< @"C:\src\FunScript\Examples\Typings\lib.d.ts" >
+type j = FunJS.TypeScript.Api< @"..\..\Typings\jquery.d.ts" >
+type lib = FunJS.TypeScript.Api< @"..\..\Typings\lib.d.ts" >
 
 let (!) (str:string) = j.jQuery.Invoke str
 
@@ -114,10 +114,13 @@ type AjaxSettings(onSuccess) =
    override __.success (_,data,_) = onSuccess data
 
 let main() =
-   let settings = AjaxSettings(fun data -> lib.console.log data)
-   settings.async <- true
-   j.jQuery.ajax("http://search.twitter.com/search.json?q=%23fsharp", settings)
-   lib.window.onload <- fun _ -> createGame() :> obj
+   // let settings = AjaxSettings(fun data -> lib.console.log data)
+   // settings.async <- true
+   // j.jQuery.ajax("http://search.twitter.com/search.json?q=%23fsharp", settings)
+
+   lib.window.onload <- fun _ -> 
+     (!"#test").click(fun _ -> lib.window.alert("click!")) |> ignore
+     createGame() :> obj
 
 // Compile
 let source = <@@ main() @@> |> Compiler.compile 
