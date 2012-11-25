@@ -1,4 +1,4 @@
-﻿module private FunJS.JavaScriptNameMapper
+﻿module (*private*) FunJS.JavaScriptNameMapper
 
 open System.Reflection
 
@@ -9,10 +9,10 @@ let sanitize(str:string) =
       .Replace('@', '_')
       .Replace(''', '_')
 
-let internal mapType(t:System.Type) =
+let (*internal*) mapType(t:System.Type) =
    sanitize t.Name
 
-let internal mapMethod(mi:MethodBase) =
+let (*internal*) mapMethod(mi:MethodBase) =
    let prefix = 
       if mi.IsStatic then ""
       else "i_"

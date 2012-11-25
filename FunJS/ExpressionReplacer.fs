@@ -1,4 +1,4 @@
-﻿module internal FunJS.ExpressionReplacer
+﻿module (*internal*) FunJS.ExpressionReplacer
 
 open InternalCompiler
 open CompilerComponent
@@ -42,7 +42,7 @@ let private isInlined (replacementMi:MethodInfo) =
 
 let private castMi =
    typeof<Helpers>
-      .GetMethod("Cast", BindingFlags.NonPublic ||| BindingFlags.Static)
+      .GetMethod("Cast", BindingFlags.Public ||| BindingFlags.NonPublic ||| BindingFlags.Static)
       .GetGenericMethodDefinition()
 
 let buildCall (mi:MethodInfo) exprs =
@@ -84,6 +84,16 @@ let createMethodMap mi callType replacementMi =
             else buildCall mi (obj::exprs)
 
 let createTypeMethodMappings (fromType:Type) (toType:Type) =
+   // REVIEW: Tomas: I first tried to use this method to create mapping that
+   // translates instance methods (of an F# type) to JS-specific static methods 
+   // of a different F# type (with JS attributes). To do that, I had to change
+   // BindingFlags below ('toType' needs Static|NonPublic|Public in order to support
+   // static types, 'fromType' needs Instance|Static|NonPublic|Public).
+   //
+   // .. but then I found I can just use 'ExpressionReplacer.createUnsafe'
+   // so I did not include the change. But I think it might be useful to make this
+   // more general - if you could map one type to another, it could simplify
+   // the mapping code in e.g. 'Maps.fs' which explicitly creates such mapping.
    let methodLookup = 
       toType.GetMethods() 
       |> Array.map (fun mi -> mi.Name, mi)

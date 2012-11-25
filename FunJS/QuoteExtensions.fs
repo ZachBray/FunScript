@@ -1,4 +1,4 @@
-﻿module internal FunJS.Quote
+﻿module (*internal*) FunJS.Quote
 
 open System.Reflection
 open Microsoft.FSharp.Quotations
