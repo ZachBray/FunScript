@@ -5,6 +5,7 @@ open Xunit
 open FsUnit.Xunit
 
 module Calculator =
+
    let zero = 0.
 
    let add x y = x + y
@@ -14,6 +15,8 @@ module Calculator =
    let addSub x yz = x + subtract yz
 
    let addSub2(x, yz) = x + subtract yz
+
+   let mutable workings = 1.
 
 [<Fact>]
 let ``application of a curried module method works``() =
@@ -41,8 +44,15 @@ let ``application of a partially tupled tupled module method works``() =
 
 [<Fact>]
 let ``getting a module property works``() =
-   check  <@@ Calculator.zero @@>
+   check <@@ Calculator.zero @@>
 
+[<Fact>]
+let ``setting a mutable module property works``() =
+   check  
+      <@@ 
+         Calculator.workings <- 10. + Calculator.workings 
+         Calculator.workings
+      @@>
 
 [<ReflectedDefinition>]
 type StaticCalculator() =

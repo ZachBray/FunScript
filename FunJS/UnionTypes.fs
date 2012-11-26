@@ -51,9 +51,12 @@ let private creation =
             |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
             |> List.unzip
          let name = JavaScriptNameMapper.mapType uci.DeclaringType + "_" + uci.Name
-         let cons = compiler.DefineGlobal name (fun () -> createConstructor uci compiler)
+         let cons = 
+            compiler.DefineGlobal name (fun var -> 
+               [ Assign(Reference var, Lambda <| createConstructor uci compiler) ]
+            )
          [ yield! decls |> Seq.concat 
-           yield returnStategy.Return <| New(Reference(cons), refs)
+           yield returnStategy.Return <| New(cons.Name, refs)
          ]
       | _ -> []
 

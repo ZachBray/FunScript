@@ -27,6 +27,7 @@ type Tweet =
 type TwitterSearch =
  { results: Tweet[] }
 
+let mutable map = Unchecked.defaultof<goo.google.maps.Map>
 let markers = ref List.empty
 
 let showTweets (map:goo.google.maps.Map) (search:TwitterSearch) =
@@ -53,23 +54,33 @@ let updateTweets map =
 
 let createMap() =
    let options = goo.google.maps.MapOptions'()
-   goo.google.maps.Map(unbox (!"#map"), options)
+   options.mapTypeId <- goo.google.maps.MapTypeId.ROADMAP
+   options.zoom <- 3.
+   let element = lib.document.getElementById "map"
+   goo.google.maps.Map(unbox element, options)
 
 let setup() =
-   let map = createMap()
+   //Doesn't work under localhost... might work when hosted?
+   map <- createMap()
+   map.setCenter(goo.google.maps.LatLng(51.5171,0.1026))
+   
    let initialQuery = "%23fsharp"
    (!"searchText").``val``(initialQuery) |> ignore
-   (!"searchButton").click (fun _ -> updateTweets map) |> ignore
+   // Odd stuff is going on here! The expression the reflected
+   // definition seems to be generating is incorrect. Unless there
+   // is some weird expression replacement going on.
+   let searchButton = !"searchButton"
+   let result = searchButton.click (fun _ -> updateTweets map)
+   ignore result
    updateTweets map   
 
 let main() =
    lib.window.onload <- fun _ -> setup() :> obj
 
 // Compile
-let source = <@@ main() @@> |> Compiler.compile 
-let sourceWrapped = sprintf "(function () {\n%s\n})()" source
+let source = <@@ main() @@> |> Compiler.compileWithoutReturn 
 let filename = "twitter-example.js"
 System.IO.File.Delete filename
-System.IO.File.WriteAllText(filename, sourceWrapped)
+System.IO.File.WriteAllText(filename, source)
 source|> printfn "%A"
 System.Console.ReadLine() |> ignore

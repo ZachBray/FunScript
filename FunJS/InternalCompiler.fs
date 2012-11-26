@@ -15,7 +15,8 @@ type ICompiler =
    abstract Compile: returnStategy:IReturnStrategy -> expr:Expr -> JSStatement list
    abstract ReplacementFor: MethodBase -> Quote.CallType -> MethodInfo option
    abstract NextTempVar: unit -> Var
-   abstract DefineGlobal: string -> (unit -> Var list * JSBlock) -> Var
+   abstract DefineGlobal: string -> (Var -> JSStatement list) -> Var
+   abstract DefineGlobalInitialization: JSStatement list -> unit
    abstract Globals: JSStatement list
 
 type ICompilerComponent =
@@ -109,14 +110,16 @@ type Compiler(components) as this =
 
    let define name cons =
       match globals |> Map.tryFind name with
-      | Some (var, _, _) -> var
+      | Some (var, _) -> var
       | None -> 
          // Define upfront to avoid problems with mutually recursive methods
          let var = Var.Global(name, typeof<obj>)
-         globals <- globals |> Map.add name (var, [], Block [])
-         let argVars, bodyExpr = cons()
-         globals <- globals |> Map.add name (var, argVars, bodyExpr)
+         globals <- globals |> Map.add name (var, [])
+         let assignment = cons var
+         globals <- globals |> Map.add name (var, assignment)
          var
+
+   let mutable initialization = List.empty
 
    let getGlobals() =
       let globals = globals |> Map.toList |> List.map snd
@@ -124,12 +127,13 @@ type Compiler(components) as this =
       let declarations = 
          match globals with
          | [] -> []
-         | _ -> [Declare (globals |> List.map (fun (var, _,_) -> var))]
+         | _ -> [Declare (globals |> List.map (fun (var, _) -> var))]
 
-      let assignments =
-         globals |> List.map (fun (var, argVars, bodyExpr) ->
-            Assign(Reference var, Lambda(argVars, bodyExpr)))
-      List.append declarations assignments
+      let assignments = globals |> List.collect snd
+
+      List.append
+         (List.append declarations assignments)
+         initialization
 
    member __.Compile returnStategy expr  = 
       compile returnStategy expr
@@ -150,6 +154,9 @@ type Compiler(components) as this =
          
       member __.DefineGlobal name cons =
          define name cons
+
+      member __.DefineGlobalInitialization stmts =
+         initialization <- List.append initialization stmts
 
       member __.Globals = getGlobals()
          

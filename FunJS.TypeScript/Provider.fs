@@ -193,6 +193,7 @@ module TypeGenerator =
          | DeclareEnum(name, names) ->
             let t = obtainDef root (Enumeration name)
             genEnum t names
+            t.AddInterfaceImplementation typeof<FunJS.IJSConservativeMapping>
             next()
          | DeclareObject o ->
             let tsT = GlobalObject o.Name
@@ -207,6 +208,7 @@ module TypeGenerator =
          | DeclareClass o ->
             let tsT = Class o.Name
             let t = obtainDef root tsT
+            t.AddInterfaceImplementation typeof<FunJS.IJSConservativeMapping>
             let constructors, members = 
                o.Members |> List.partition (function
                   | Property _ | Indexer _ -> false
@@ -338,7 +340,7 @@ type TypeScriptProvider(cfg:TypeProviderConfig) as this =
                rootType.IsErased <- false
                rootType.AddInterfaceImplementation typeof<FunJS.IJSRoot>
                rootType.AddInterfaceImplementation typeof<FunJS.IJSMapping>
-               System.Diagnostics.Debugger.Break()
+               //System.Diagnostics.Debugger.Break()
                try TypeGenerator.generateFrom cfg.ResolutionFolder typeScriptFile rootType
                with ex -> failwithf "Failed to generate TypeScript mapping: %s\n%s" ex.Message ex.StackTrace
                let path = System.IO.Path.GetTempFileName() + ".dll"

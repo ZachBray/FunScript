@@ -66,3 +66,9 @@ let compile expr =
    let block = List.append reflectedDefs program 
    comparerPrototypes + (AST.Block block).Print()
 
+let compileWithoutReturn expr =
+   let compiler = InternalCompiler.Compiler(allComponents)
+   let program = compiler.Compile ReturnStrategies.inplace expr
+   let reflectedDefs = compiler.Globals
+   let block = List.append reflectedDefs program 
+   comparerPrototypes + (AST.Block block).Print()
