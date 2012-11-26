@@ -55,13 +55,10 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FunJS">
-      <HintPath>..\References\FunJS.dll</HintPath>
+      <HintPath>..\..\FunJS.TypeScript\bin\Debug\FunJS.dll</HintPath>
     </Reference>
     <Reference Include="FunJS.TypeScript">
-      <HintPath>..\References\FunJS.TypeScript.dll</HintPath>
-    </Reference>
-    <Reference Include="Json.TypeProvider">
-      <HintPath>..\JsonProvider\bin\Debug\Json.TypeProvider.dll</HintPath>
+      <HintPath>..\..\FunJS.TypeScript\bin\Debug\FunJS.TypeScript.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

@@ -8,10 +8,8 @@ open FSharp.Http
 type j = FunJS.TypeScript.Api<"..\\Typings\\jquery.d.ts">
 type lib = FunJS.TypeScript.Api<"..\\Typings\\lib.d.ts">
 
-let log(msg:string) =
-   let tag = "<p>" + msg + "</p>"
-   (j.jQuery.Invoke "#results").append [| tag :> obj |]
-   |> ignore
+// ----------------------------------------------------------------------------
+// Mini implementation of some F# async primitives
 
 module FSharpAsync = 
 
@@ -89,33 +87,49 @@ module FSharpAsync =
 
     static member AwaitJQueryEvent(f : ('T -> unit) -> j._JQuery) : Async<'T> = 
       Async.FromContinuations(fun (cont, econt, ccont) ->
-        (f (fun v -> cont v)) |> ignore)
+        let named = ref None
+        named := Some (f (fun v -> 
+          (!named).Value.off() |> ignore
+          cont v)))
       
 open FSharpAsync
 
-let asyncFoo() = async {
+// ----------------------------------------------------------------------------
+// Demo using mini F# async
+
+let (?) (jq:j._JQueryStatic) name = jq.Invoke(name:string)
+
+let log(msg:string) =
+   let tag = "<p>" + msg + "</p>"
+   (j.jQuery.Invoke "#results").append [| tag :> obj |]
+   |> ignore
+
+let increment(n) = 
+  async {
     do! Async.Sleep(1000)
-    return "hi" 
-  }
-let asyncMain() = async { 
-    while true do 
-      let! msg = asyncFoo()
-      let! v = Async.AwaitJQueryEvent((j.jQuery.Invoke "#next").click)
-      do log msg
+    return n + 1 
   }
 
-let main() =   
-   (j.jQuery.Invoke "document").ready(fun _ -> 
-      let cts = new CancellationTokenSource()
-      let work = asyncMain()
-      Async.StartImmediate(work, cts.Token)
+let rec worker(n) = 
+  async { 
+    let! v = Async.AwaitJQueryEvent(j.jQuery?``#next``.click)
+    let! n = increment(n)
+    do log ("Count: " + n.ToString())
+    return! worker(n)
+  }
 
-      (j.jQuery.Invoke "#stop").click(fun _ ->
-        cts.Cancel() )
-    )
+let main() = 
+  async {
+    let! x = Async.AwaitJQueryEvent(fun o -> j.jQuery?document.ready o)
+    let cts = new CancellationTokenSource()
+    Async.StartImmediate(worker 0, cts.Token)
+    j.jQuery?``#stop``.click(fun _ -> cts.Cancel()) |> ignore
+  } |> Async.StartImmediate
+
+// ----------------------------------------------------------------------------
+// Translate & compile (and host at http://localhost:8081 for easy testing)
 
 do
-  // Compile
   let source = <@@ main() @@> |> Compiler.compile
   let sourceWrapped = sprintf "(function () {\n%s\n})()" source
   let filename = "blackjack.js"
