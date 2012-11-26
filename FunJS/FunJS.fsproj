@@ -55,6 +55,7 @@
     <Compile Include="Core\Set.fs" />
     <Compile Include="Core\Map.fs" />
     <Compile Include="Core\String.fs" />
+    <Compile Include="Core\Async.fs" />
     <Compile Include="JavaScriptNameMapper.fs" />
     <Compile Include="AST.fs" />
     <Compile Include="QuoteExtensions.fs" />
@@ -79,6 +80,7 @@
     <Compile Include="Objects.fs" />
     <Compile Include="Tuples.fs" />
     <Compile Include="Strings.fs" />
+    <Compile Include="Asyncs.fs" />
     <Compile Include="ExprExtensions.fs" />
     <Compile Include="UnionTypes.fs" />
     <Compile Include="RecordTypes.fs" />
