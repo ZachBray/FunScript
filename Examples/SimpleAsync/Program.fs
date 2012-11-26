@@ -130,6 +130,10 @@ let main() =
 // Translate & compile (and host at http://localhost:8081 for easy testing)
 
 do
+  let test = <@@ j.jQuery?``#next``.click(fun _ -> lib.window.alert("click!")) @@>
+  printfn "%A" test
+  System.Console.ReadLine() |> ignore
+
   let source = <@@ main() @@> |> Compiler.compile
   let sourceWrapped = sprintf "(function () {\n%s\n})()" source
   let filename = "blackjack.js"
