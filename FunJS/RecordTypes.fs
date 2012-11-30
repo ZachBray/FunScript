@@ -1,6 +1,7 @@
 ﻿module internal FunJS.RecordTypes
 
 open AST
+open Quote
 open Microsoft.FSharp.Quotations
 open System.Reflection
 
@@ -30,7 +31,7 @@ let private creation =
          [  yield! decls |> Seq.concat 
             yield returnStategy.Return <| Object fields
          ]
-      | Patterns.NewRecord(recType, exprs) ->
+      | PatternsExt.NewRecord(recType, exprs) ->
          let decls, refs = 
             exprs 
             |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)

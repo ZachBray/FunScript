@@ -8,11 +8,10 @@ open Xunit
 open Xunit.Extensions
 open FsUnit.Xunit
 
-// [<Fact>]
+[<Fact>]
 let ``Simple async translates without exception``() =
    check 
       <@@ 
-         let test = async {  
-           return 10 }
-         0         
+         async { return () }
+         |> Async.StartImmediate
       @@>
