@@ -111,7 +111,8 @@ let components =
          CompilerComponent.unary <@ float32 @> id
          CompilerComponent.unary <@ double @> id
          CompilerComponent.unary <@ fun x -> x.ToString() @> (fun expr -> Apply(PropertyGet(expr, "toString"),[])) 
-
+         ExpressionReplacer.create <@ char @> <@ FunJS.Core.String.FromCharCode @>
+          
          // Seq + ranges
          ExpressionReplacer.create <@ seq @> <@ Replacements.id @>
          ExpressionReplacer.create <@ op_Range @> <@ FunJS.Core.Range.oneStep @>
