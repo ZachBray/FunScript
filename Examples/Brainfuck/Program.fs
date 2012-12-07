@@ -5,13 +5,10 @@ open FunJS
 
 [<JSEmit("alert({0});")>]
 let alert (x:obj): unit = failwith "never"
-[<JSEmit("return String.fromCharCode({0});")>]
-let char (x:byte) : char = char x
 
 let run (program:string) =
     let s = ref ""
     let b = Array.create 30000 0uy
-    for i = 0 to 1000 do b.[i] <- 0uy
     let p, pc = ref 0, ref 0
     let execute () =
         match program.[!pc] with
