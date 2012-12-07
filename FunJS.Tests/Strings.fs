@@ -37,3 +37,17 @@ let ``String.ToUpper and String.ToLower work``() =
       <@@ 
          "AbC".ToUpper() + "aBc".ToLower()
       @@>
+
+[<Fact>]
+let ``String.Length works``() =
+   check 
+      <@@ 
+         "AbC".Length
+      @@>
+
+[<Fact>]
+let ``String item works``() =
+   check 
+      <@@ 
+         "AbC".[1]
+      @@>
