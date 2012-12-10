@@ -3,8 +3,17 @@ module Program
 
 open FunJS
 
+type Dom = FunJS.TypeScript.Api< @"..\..\Examples\Typings\lib.d.ts" >
+
 [<JSEmit("alert({0});")>]
 let alert (x:obj): unit = failwith "never"
+
+// Manual overrides until the typescript type provider supports inheritance
+[<JSEmit("return {0}.value;")>]
+let getValue element = failwith "never"
+
+[<JSEmit("{0}.value += {1};")>]
+let output element value : unit = failwith "never"  
 
 let run (program:string) =
     let s = ref ""
@@ -28,11 +37,19 @@ let run (program:string) =
     while !pc < program.Length do execute ()
     !s
 
+
+
 let main() =
-    // Hello World
-    "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>." 
-    |> run
-    |> alert
+
+    let txtCode = Dom.document.getElementById("code")    
+    let submit = Dom.document.getElementById("execute_code")
+    let console = Dom.document.getElementById("output")
+
+    let executeCode (e:Dom.MouseEvent') =        
+        txtCode |> getValue |> run |> output console
+        ignore |> box
+
+    submit.onclick <- executeCode
 
 // Compile
 let source = <@@ main() @@> |> Compiler.compileWithoutReturn 

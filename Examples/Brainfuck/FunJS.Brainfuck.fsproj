@@ -37,6 +37,12 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FunJS">
+      <HintPath>..\..\FunJS.TypeScript\bin\Debug\FunJS.dll</HintPath>
+    </Reference>
+    <Reference Include="FunJS.TypeScript">
+      <HintPath>..\..\FunJS.TypeScript\bin\Debug\FunJS.TypeScript.dll</HintPath>
+    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <Private>True</Private>
@@ -51,13 +57,6 @@
     <None Include="index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\FunJS\FunJS.fsproj">
-      <Name>FunJS</Name>
-      <Project>{e0916e67-d3b0-4c3a-ad18-4146882fcedd}</Project>
-      <Private>True</Private>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
