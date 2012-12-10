@@ -190,7 +190,7 @@ let private getPropertyField split (compiler:InternalCompiler.ICompiler) (pi:Pro
    compiler.DefineGlobal name (fun var ->
       // TODO: wrap in function scope?
       compiler.DefineGlobalInitialization <|
-         createCall split (ReturnStrategies.assignVar var) compiler [objExpr; exprs] pi.GetMethod
+         createCall split (ReturnStrategies.assignVar var) compiler [objExpr; exprs] (pi.GetGetMethod())
       []
    )
 
@@ -206,7 +206,7 @@ let private propertyGetting =
          | true, [], [] ->
             let property = getPropertyField split compiler pi objExpr exprs
             [ returnStategy.Return <| Reference property ]
-         | _ -> createCall split returnStategy compiler [objExpr; exprs] pi.GetMethod
+         | _ -> createCall split returnStategy compiler [objExpr; exprs] (pi.GetGetMethod())
       | _ -> []
       
 let private propertySetting =
@@ -223,7 +223,7 @@ let private propertySetting =
             [  yield! valDecl
                yield Assign(Reference property, valRef) 
             ]
-         | _ -> createCall (|Split|) returnStategy compiler [objExpr; exprs; [valExpr]] pi.SetMethod
+         | _ -> createCall (|Split|) returnStategy compiler [objExpr; exprs; [valExpr]] (pi.GetSetMethod())
       | _ -> []
 
 let private fieldGetting =
