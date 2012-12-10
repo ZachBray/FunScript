@@ -22,11 +22,11 @@ let getCaseMethodInfo (uci:UnionCaseInfo) =
       caseType.GetConstructors(flags).[0]
       :> MethodBase, caseType
    | [| :? MethodInfo as mi |] -> mi :> MethodBase, unionType
-   | [| :? PropertyInfo as pi |] -> pi.GetGetMethod() :> MethodBase, unionType
+   | [| :? PropertyInfo as pi |] -> pi.GetGetMethod(true) :> MethodBase, unionType
    | _ ->
       match unionType.GetMember("New" + uci.Name, flags) with
       | [| :? MethodInfo as mi |] -> mi :> MethodBase, unionType
-      | [| :? PropertyInfo as pi |] -> pi.GetGetMethod() :> MethodBase, unionType
+      | [| :? PropertyInfo as pi |] -> pi.GetGetMethod(true) :> MethodBase, unionType
       | _ -> failwith "never"
 
 let specialOp (mb:MethodBase) =
@@ -41,9 +41,9 @@ let tryToMethodBase = function
    | Patterns.Call(obj,mi,args) ->
       Some(obj, mi :> MethodBase, args, MethodCall)
    | Patterns.PropertyGet(obj,pi,args) -> 
-      Some(obj, pi.GetGetMethod() :> MethodBase, args, MethodCall) 
+      Some(obj, pi.GetGetMethod(true) :> MethodBase, args, MethodCall) 
    | Patterns.PropertySet(obj,pi,args,v) -> 
-      Some(obj, pi.GetSetMethod() :> MethodBase, List.append args [v], MethodCall)
+      Some(obj, pi.GetSetMethod(true) :> MethodBase, List.append args [v], MethodCall)
    | Patterns.NewUnionCase(uci, exprs) -> 
       Some(None, fst <| getCaseMethodInfo uci, exprs, UnionCaseConstructorCall)
    | Patterns.NewObject(ci, exprs) ->
