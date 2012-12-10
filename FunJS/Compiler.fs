@@ -11,6 +11,7 @@ let private allComponents =
       Maps.components
       Lists.components
       Strings.components
+      Asyncs.components
       ReflectedDefinitions.components
       Arrays.components
       RecordTypes.components
@@ -59,16 +60,21 @@ Array.prototype.CompareTo = function(that) {
 
 """
 
-let compile expr =
-   let compiler = InternalCompiler.Compiler(allComponents)
+let compileWithExtensions components expr =
+   let compiler = InternalCompiler.Compiler(components @ allComponents)
    let program = compiler.Compile ReturnStrategies.returnFrom expr
    let reflectedDefs = compiler.Globals
    let block = List.append reflectedDefs program 
    comparerPrototypes + (AST.Block block).Print()
 
+let compile expr = 
+  compileWithExtensions [] expr
+
+//TODO: refactor     
 let compileWithoutReturn expr =
    let compiler = InternalCompiler.Compiler(allComponents)
    let program = compiler.Compile ReturnStrategies.inplace expr
    let reflectedDefs = compiler.Globals
    let block = List.append reflectedDefs program 
    comparerPrototypes + (AST.Block block).Print()
+
