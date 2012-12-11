@@ -75,12 +75,3 @@ type Async =
    static member Sleep(milliseconds:int) = 
       Async.FromContinuations(fun (cont, econt, ccont) ->
          setTimeout((fun _ -> cont()), float milliseconds) |> ignore )
-
-(*
-   static member AwaitJQueryEvent(f : ('T -> unit) -> j._JQuery) : Async<'T> = 
-      Async.FromContinuations(fun (cont, econt, ccont) ->
-         let named = ref None
-         named := Some (f (fun v -> 
-            (!named).Value.off() |> ignore
-            cont v)))
-*)

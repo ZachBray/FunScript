@@ -13,7 +13,7 @@ type lib = FunJS.TypeScript.Api<"..\\Typings\\lib.d.ts">
 // Mini implementation of some F# async primitives
 
 type Async =
-  static member AwaitJQueryEvent(f : ('T -> unit) -> j._JQuery) : Async<'T> = 
+  static member AwaitJQueryEvent(f : ('T -> unit) -> j.JQuery') : Async<'T> = 
     Async.FromContinuations(fun (cont, econt, ccont) ->
       let named = ref None
       named := Some (f (fun v -> 
@@ -23,7 +23,7 @@ type Async =
 // ----------------------------------------------------------------------------
 // Demo using mini F# async
 
-let (?) (jq:j._JQueryStatic) name = jq.Invoke(name:string)
+let (?) (jq:j.JQueryStatic') name = jq.Invoke(name:string)
 
 let log(msg:string) =
    let tag = "<p>" + msg + "</p>"
