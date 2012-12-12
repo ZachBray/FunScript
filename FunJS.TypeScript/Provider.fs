@@ -111,7 +111,22 @@ module TypeGenerator =
          f.Parameters |> List.map (genParameter obtainDef)
       ProvidedConstructor(parameters, InvokeCode = fun _ -> <@@ failwithf "" @@>)
 
-   let genMethods t obtainDef memType (f:TSFunction) =
+// Note: We could move to something like this here where all permutations of optional 
+//       arguments are allowed. At the moment it is all or none (in terms of optional params).
+//       However, this would be rubbish with the current overloading problems because
+//       the method names would be ridiculous. E.g., "Foo''''''''''''()".
+//   let rec createOptionalPermutations parameters =
+//      seq {
+//         match parameters with
+//         | [] -> yield []
+//         | (p:TSParameter)::ps ->
+//            for ps in createOptionalPermutations ps do
+//               if p.Var.IsOptional then
+//                  yield ps
+//               yield p::ps
+//      }
+
+   let genMethods (t:ProvidedTypeDefinition) obtainDef memType (f:TSFunction) =
       let name =
          match f.Name with
          | "" -> "Invoke"
@@ -123,27 +138,30 @@ module TypeGenerator =
             match f.Type with
             | Void -> typeof<System.Void>
             | _ -> getActualType obtainDef f.Type
+         let rec safeName suggestion = 
+            if t.GetMember(suggestion) |> Array.isEmpty then suggestion
+            else safeName (suggestion + "'")
          let meth =
             ProvidedMethod(
-               name,
+               safeName name,
                parameters,
                retType)
          match memType with
          | Global -> meth.IsStaticMethod <- true
          | Local -> meth.AddMethodAttrs MethodAttributes.Virtual
          meth.InvokeCode <- fun _ -> <@@ failwith "never" @@>
-         meth :> MemberInfo
+         meth
+     
       let genSet = getGeneratedSet t
-      [  let allParamTypes = f.Parameters |> List.map (fun p -> p.Var.Type)         
-         if not(!genSet |> Set.contains (name, allParamTypes)) then
-            genSet := !genSet |> Set.add (name, allParamTypes)
-            yield createMethod f.Parameters
-         let reqParams = f.Parameters |> List.filter (fun p -> not p.Var.IsOptional)
-         let reqParamTypes = reqParams |> List.map (fun p -> p.Var.Type)
-         if not(!genSet |> Set.contains (name, reqParamTypes)) then
-            genSet := !genSet |> Set.add (name, reqParamTypes)
-            yield createMethod reqParams
-      ]
+      let allParamTypes = f.Parameters |> List.map (fun p -> p.Var.Type)         
+      if not(!genSet |> Set.contains (name, allParamTypes)) then
+         genSet := !genSet |> Set.add (name, allParamTypes)
+         t.AddMember <| createMethod f.Parameters
+      let reqParams = f.Parameters |> List.filter (fun p -> not p.Var.IsOptional)
+      let reqParamTypes = reqParams |> List.map (fun p -> p.Var.Type)
+      if not(!genSet |> Set.contains (name, reqParamTypes)) then
+         genSet := !genSet |> Set.add (name, reqParamTypes)
+         t.AddMember <| createMethod reqParams
          
    let genEnum (enumT:ProvidedTypeDefinition) caseNames =
       let rec addCases = function
@@ -167,9 +185,7 @@ module TypeGenerator =
             root.AddMember property
             next()
          | Method f ->
-            let meths = genMethods root obtainDef memType f
-            for meth in meths do
-               root.AddMember meth
+            genMethods root obtainDef memType f
             next()
          | _ -> 
             // TODO: indexers
@@ -186,9 +202,7 @@ module TypeGenerator =
             root.AddMember property
             next()  
          | DeclareFunction f ->
-            let meths = genMethods root (obtainDef root) Global f
-            for meth in meths do
-               root.AddMember meth
+            genMethods root (obtainDef root) Global f
             next()
          | DeclareEnum(name, names) ->
             let t = obtainDef root (Enumeration name)
@@ -340,7 +354,7 @@ type TypeScriptProvider(cfg:TypeProviderConfig) as this =
                rootType.IsErased <- false
                rootType.AddInterfaceImplementation typeof<FunJS.IJSRoot>
                rootType.AddInterfaceImplementation typeof<FunJS.IJSMapping>
-               //System.Diagnostics.Debugger.Break()
+               System.Diagnostics.Debugger.Break()
                try TypeGenerator.generateFrom cfg.ResolutionFolder typeScriptFile rootType
                with ex -> failwithf "Failed to generate TypeScript mapping: %s\n%s" ex.Message ex.StackTrace
                let path = System.IO.Path.GetTempFileName() + ".dll"

@@ -7,10 +7,11 @@ open FunJS.TypeScript
 // See https://github.com/borisyankov/DefinitelyTyped for more
 type j = FunJS.TypeScript.Api< @"..\..\Typings\jquery.d.ts" >
 type lib = FunJS.TypeScript.Api< @"..\..\Typings\lib.d.ts" >
+
 type goo = FunJS.TypeScript.Api< @"..\..\Typings\google.maps.d.ts" >
 
 // Selector operator
-let (!) (str:string) = j.jQuery.Invoke str
+let (!) (str:string) = j.jQuery.Invoke' str
 
 type AjaxSettings(onSuccess) =
    // TODO: this does not work:
@@ -35,7 +36,7 @@ let showTweets (map:goo.google.maps.Map) (search:TwitterSearch) =
       search.results |> Array.map (fun tweet ->
          "<p><b>" + tweet.from_user + "</b>&nbsp;" + tweet.text + "</p>")
       |> Array.map box
-   (!"#tweets").children().remove() |> ignore
+   (!"#tweets").children'().remove'() |> ignore
    (!"#tweets").append tweetList |> ignore
    
 let clearMap() =
@@ -50,7 +51,7 @@ let query searchText (callback:'a -> unit) =
    
 let updateTweets map =
    clearMap()
-   query (unbox <| (!"searchText").``val``()) (showTweets map)
+   query (unbox <| (!"#searchText").``val``()) (showTweets map)
 
 let createMap() =
    let options = goo.google.maps.MapOptions'()
@@ -65,12 +66,12 @@ let setup() =
    map.setCenter(goo.google.maps.LatLng(51.5171,0.1026))
    
    let initialQuery = "%23fsharp"
-   (!"searchText").``val``(initialQuery) |> ignore
+   (!"#searchText").val'' initialQuery |> ignore
    // Odd stuff is going on here! The expression the reflected
    // definition seems to be generating is incorrect. Unless there
    // is some weird expression replacement going on.
-   let searchButton = !"searchButton"
-   let result = searchButton.click (fun _ -> updateTweets map)
+   let searchButton = !"#searchButton"
+   let result = searchButton.click'' (fun _ -> updateTweets map; null)
    ignore result
    updateTweets map   
 

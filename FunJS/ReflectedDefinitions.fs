@@ -30,7 +30,10 @@ let rec private buildRootWalk acc (t:System.Type) =
       | _ -> buildRootWalk (t.Name :: acc) t.DeclaringType
    | _ -> failwith "An IJSMapping interface had no root"
 
-let private removePropertyPrefixes(name:string) =
+let fixOverloads (name:string) = name.Replace("'", "")
+
+let private removePropertyPrefixes name =
+   let name = fixOverloads name
    if name.StartsWith "get_" || name.StartsWith "set_" then 
       name.Substring(4), true
    else name, false
