@@ -289,6 +289,11 @@ let Initialize n f =
    for i = 0 to n - 1 do xs.[i] <- f i
    xs
 
+let Create n x =
+   let mutable xs = ZeroCreate 0
+   for i = 0 to n - 1 do xs.[i] <- x
+   xs    
+
 let Replicate n x =
    Initialize n (fun _ -> x)
 

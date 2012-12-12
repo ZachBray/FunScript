@@ -27,6 +27,9 @@ module private Replacements =
 
    let id = fun x -> x
 
+   let incr (x:int ref): unit = x := !x + 1
+   let decr (x:int ref): unit = x := !x - 1
+
    let applyCurried2 curriedFunc arg1 arg2 =
       Apply(Apply(curriedFunc, 
                   [arg1]),
@@ -90,6 +93,8 @@ let components =
          ExpressionReplacer.create <@ ignore @> <@ Replacements.ignore @>
          ExpressionReplacer.create <@ defaultArg @> <@ Replacements.defaultArg @>
          ExpressionReplacer.create <@ id @> <@ Replacements.id @>
+         ExpressionReplacer.create <@ incr @> <@ Replacements.incr @>
+         ExpressionReplacer.create <@ decr @> <@ Replacements.decr @>
 
          // Conversions
          CompilerComponent.unary <@ sbyte @> id
@@ -106,7 +111,8 @@ let components =
          CompilerComponent.unary <@ float32 @> id
          CompilerComponent.unary <@ double @> id
          CompilerComponent.unary <@ fun x -> x.ToString() @> (fun expr -> Apply(PropertyGet(expr, "toString"),[])) 
-   
+         ExpressionReplacer.create <@ char @> <@ FunJS.Core.String.FromCharCode @>
+          
          // Seq + ranges
          ExpressionReplacer.create <@ seq @> <@ Replacements.id @>
          ExpressionReplacer.create <@ op_Range @> <@ FunJS.Core.Range.oneStep @>

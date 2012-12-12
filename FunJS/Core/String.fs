@@ -19,6 +19,15 @@ let ToUpperCase(s:string) : string = failwith "never"
 [<FunJS.JSEmit("return ({0}==null)||({0}==\"\");")>]
 let IsNullOrEmpty(s:string) : string = failwith "never"
 
+[<FunJS.JSEmit("return {0}.length;")>]
+let Length(s:string) : int = failwith "never"
+
+[<FunJS.JSEmit("return {0}.charAt({1});")>]
+let CharAt(s:string, length:int) : char = failwith "never"
+
+[<FunJS.JSEmit("return String.fromCharCode({0});")>]
+let inline FromCharCode x = char x
+
 let Split(s:string, delimiters:string[]) : string[] = 
    delimiters |> Array.fold (fun inputs delimiter ->
       inputs |> Array.map (fun inp -> splitSingle(inp, delimiter))
