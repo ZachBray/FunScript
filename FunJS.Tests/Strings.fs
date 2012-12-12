@@ -42,12 +42,13 @@ let ``String.ToUpper and String.ToLower work``() =
 let ``String.Length works``() =
    check 
       <@@ 
-         "AbC".Length
+         "AbC".Length |> float
       @@>
 
 [<Fact>]
 let ``String item works``() =
-   check 
+   checkAreEqual
+      "b"
       <@@ 
          "AbC".[1]
       @@>
