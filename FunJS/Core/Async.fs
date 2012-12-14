@@ -57,6 +57,17 @@ type AsyncBuilder() =
          else x.Zero()
       loop()
 
+   member this.Combine(work1, work2) = 
+      this.Bind(work1, fun () -> work2)
+
+   member this.For(seq:seq<_>, body) = 
+      let en = seq.GetEnumerator()
+      let x = this
+      let rec loop() = 
+         if en.MoveNext() then x.Bind(body en.Current, loop)
+         else x.Zero()
+      loop()
+
 let async = AsyncBuilder()
 
 [<FunJS.JSEmit("return setTimeout({0}, {1});")>]

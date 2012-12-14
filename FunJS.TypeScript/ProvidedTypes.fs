@@ -402,6 +402,9 @@ type SymbolKind = SDArray | Array of int | Pointer | ByRef | Generic of System.T
 type ProvidedSymbolType(kind: SymbolKind, args: Type list) =
     inherit Type()
 
+    member private x.kind = kind
+    member private x.args = args
+
     override this.FullName =   
         match kind,args with 
         | SymbolKind.SDArray,[arg] -> arg.FullName + "[]" 
@@ -470,11 +473,16 @@ type ProvidedSymbolType(kind: SymbolKind, args: Type list) =
     override this.GetNestedTypes _bindingAttr                                                       = notRequired "GetNestedTypes" this.Name
     override this.GetNestedType(_name, _bindingAttr)                                                 = notRequired "GetNestedType" this.Name
     override this.GetAttributeFlagsImpl()                                                          = notRequired "GetAttributeFlagsImpl" this.Name
-    override this.UnderlyingSystemType                                                             = notRequired "UnderlyingSystemType" this.Name
+    override this.UnderlyingSystemType = this :> System.Type
     override this.GetCustomAttributesData()                                                        = notRequired "GetCustomAttributesData" this.Name
     override this.MemberType                                                                       = notRequired "MemberType" this.Name
     override this.GetHashCode()                                                                    = notRequired "GetHashCode" this.Name
-    override this.Equals(_that:obj) : bool                                                          = notRequired "Equals" this.Name
+    override this.Equals(_that:obj) : bool                                                          = 
+        match _that with 
+        | :? ProvidedSymbolType as that -> 
+            that.kind = kind && (List.map2 (=) args that.args |> List.forall id)
+        | _ -> false
+      //notRequired "Equals" this.Name
     override this.GetMember(_name,_mt,_bindingAttr)                                                   = notRequired "GetMember" this.Name
     override this.GUID                                                                             = notRequired "GUID" this.Name
     override this.InvokeMember(_name, _invokeAttr, _binder, _target, _args, _modifiers, _culture, _namedParameters) = notRequired "InvokeMember" this.Name

@@ -20,6 +20,8 @@ let components =
          ExpressionReplacer.createUnsafe <@ fun (a:AsyncBuilder) -> a.Return @> <@ fun (a:FunAsyncBuilder) -> a.Return @>
          ExpressionReplacer.createUnsafe <@ fun (a:AsyncBuilder) -> a.ReturnFrom @> <@ fun (a:FunAsyncBuilder) -> a.ReturnFrom @>
          ExpressionReplacer.createUnsafe <@ fun (a:AsyncBuilder) -> a.While @> <@ fun (a:FunAsyncBuilder) -> a.While @>
+         ExpressionReplacer.createUnsafe <@ fun (a:AsyncBuilder) -> a.For @> <@ fun (a:FunAsyncBuilder) -> a.For @>
+         ExpressionReplacer.createUnsafe <@ fun (a:AsyncBuilder) -> a.Combine @> <@ fun (a:FunAsyncBuilder) -> a.Combine @>
          ExpressionReplacer.createUnsafe <@ fun (a:AsyncBuilder) -> a.Zero @> <@ fun (a:FunAsyncBuilder) -> a.Zero @>
          ExpressionReplacer.createUnsafe <@ fun (a:CancellationToken) -> a.ThrowIfCancellationRequested @> <@ fun (a:FunCancelTok) -> a.ThrowIfCancellationRequested @>
          ExpressionReplacer.createUnsafe <@ fun (a:CancellationTokenSource) -> a.Cancel @> <@ fun (a:FunCancelSrc) -> a.Cancel @>
