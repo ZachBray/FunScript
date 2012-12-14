@@ -157,9 +157,14 @@ let private createCall
       |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
       |> List.unzip
    match mi, refs with
+(*
+
+TODO
+
    | (JSMapping("new", _, false) as mi), instance::arguments ->
       [ yield! decls |> List.concat
         yield returnStategy.Return <| New(instance, arguments) ]
+*)
    | (JSMapping(name, true, false) as mi), _ ->
       [ yield! decls |> List.concat
         yield returnStategy.Return <| Apply(Reference (Var.Global(name, typeof<obj>)), refs) ]
