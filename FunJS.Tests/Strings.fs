@@ -10,6 +10,14 @@ open FsUnit.Xunit
 
 // System.String - instance methods
 
+[<Theory>]
+[<InlineData(null:string); InlineData(""); InlineData("test")>]
+let ``String.IsNullOrEmpty works``(str:string) =
+   check  
+      <@@ 
+         System.String.IsNullOrEmpty(str)
+      @@>
+
 [<Fact>]
 let ``String.Split works``() =
    check 
