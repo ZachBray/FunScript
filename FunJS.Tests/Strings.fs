@@ -10,14 +10,6 @@ open FsUnit.Xunit
 
 // System.String - instance methods
 
-[<Theory>]
-[<InlineData(null:string); InlineData(""); InlineData("test")>]
-let ``String.IsNullOrEmpty works``(str:string) =
-   check  
-      <@@ 
-         System.String.IsNullOrEmpty(str)
-      @@>
-
 [<Fact>]
 let ``String.Split works``() =
    check 
@@ -45,13 +37,6 @@ let ``String.ToUpper and String.ToLower work``() =
    check 
       <@@ 
          "AbC".ToUpper() + "aBc".ToLower()
-      @@>
-
-[<Fact>]
-let ``String.Length works``() =
-   check 
-      <@@ 
-         "AbC".Length |> float
       @@>
 
 [<Fact>]

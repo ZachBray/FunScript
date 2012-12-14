@@ -48,9 +48,6 @@ let ToCharArray(str:string) : char[] = failwith "never"
 [<FunJS.JSEmit("return {0}[{1}];")>]
 let GetString(str:string, index:int) : char = failwith "never"
 
-[<FunJS.JSEmit("return {0}.length;")>]
-let Length(str:string) : int = failwith "never"
-
 // Re-implementation of functions from Microsoft.FSharp.Core.StringModule
 module FSharpString = 
    [<FunJS.JSEmit("return {0}==null?\"\":{0};")>]
