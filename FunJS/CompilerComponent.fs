@@ -1,4 +1,4 @@
-﻿module internal FunJS.CompilerComponent
+﻿module (*internal*) FunJS.CompilerComponent
 
 open AST
 open InternalCompiler
