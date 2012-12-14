@@ -20,6 +20,7 @@ let private (|ReflectedDefinition|_|) (mi:MethodBase) =
 
 let private rootInterfaceName = typeof<IJSRoot>.Name
 let private mappingInterfaceName = typeof<IJSMapping>.Name
+let private conserveMappingInterfaceName = typeof<IJSConservativeMapping>.Name
 
 let rec private buildRootWalk acc (t:System.Type) =
    match t with
@@ -29,7 +30,10 @@ let rec private buildRootWalk acc (t:System.Type) =
       | _ -> buildRootWalk (t.Name :: acc) t.DeclaringType
    | _ -> failwith "An IJSMapping interface had no root"
 
-let private removePropertyPrefixes(name:string) =
+let fixOverloads (name:string) = name.Replace("'", "")
+
+let private removePropertyPrefixes name =
+   let name = fixOverloads name
    if name.StartsWith "get_" || name.StartsWith "set_" then 
       name.Substring(4), true
    else name, false
@@ -50,6 +54,25 @@ let private (|JSMapping|_|) (mi:MethodBase) =
             let prefix = rootWalk |> String.concat "."
             Some (sprintf "%s.%s" prefix name, isStatic, isProperty)
    | _ -> None
+
+
+let private (|JSConservativeMapping|_|) (t:System.Type) =
+   let interfaceDef = t.GetInterface conserveMappingInterfaceName
+   let hasInterface = interfaceDef <> Unchecked.defaultof<_>
+   if hasInterface then
+      let rootWalk = buildRootWalk [] t
+      Some(rootWalk |> String.concat ".")
+   else None
+
+let private (|JSConservativeCtorMapping|_|) (mi:MethodBase) =
+   match mi.DeclaringType with
+   | JSConservativeMapping name -> Some <| name
+   | _  -> None
+
+let private (|JSConservativeMethodMapping|_|) (mi:MethodBase) =
+   match mi.DeclaringType with
+   | JSConservativeMapping name -> Some <| name + "." + mi.Name
+   | _  -> None
 
 let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list) bodyExpr (compiler:InternalCompiler.ICompiler) =
    let block =
@@ -96,14 +119,17 @@ let private createConstruction
    match ci with
    | ReflectedDefinition name ->
       let consRef = 
-         compiler.DefineGlobal name (fun () -> 
-            createGlobalMethod compiler ci Quote.ConstructorCall)
+         compiler.DefineGlobal name (fun var -> 
+            [ Assign(Reference var, Lambda <| createGlobalMethod compiler ci Quote.ConstructorCall) ]
+         )
       [ yield! decls |> List.concat
-        yield returnStategy.Return <| New(Reference consRef, refs) ]
+        yield returnStategy.Return <| New(consRef.Name, refs) ]
+   | JSConservativeCtorMapping name ->
+      [ yield! decls |> List.concat
+        yield returnStategy.Return <| New(name, refs) ]
    | JSMapping(name, false, false) ->
-      let objectVar = Var.Global("Object", typeof<obj>)
       [ yield! decls |> List.concat
-        yield returnStategy.Return <| New(Reference objectVar, []) ]
+        yield returnStategy.Return <| New("Object", []) ]
    | _ -> []
 
 let private (|SpecialOp|_|) = Quote.specialOp
@@ -130,11 +156,15 @@ let private createCall
            yield returnStategy.Return <| Apply(PropertyGet(objRef, mi.Name), argRefs) ]
       | true, exprs ->
          let methRef = 
-            compiler.DefineGlobal name (fun () -> 
-               createGlobalMethod compiler mi Quote.MethodCall)
+            compiler.DefineGlobal name (fun var -> 
+               [ Assign(Reference var, Lambda <| createGlobalMethod compiler mi Quote.MethodCall) ]
+            )
          [ yield! decls |> List.concat
            yield returnStategy.Return <| Apply(Reference methRef, refs) ]
       | _ -> failwith "never"
+   | JSConservativeMethodMapping name, [] ->
+      [ yield! decls |> List.concat
+        yield returnStategy.Return <| Reference (Var.Global("!!!" + name, typeof<obj>)) ]
    | JSMapping(name, true, true), [] ->
       [ yield! decls |> List.concat
         yield returnStategy.Return <| Reference (Var.Global(name, typeof<obj>)) ]
@@ -156,18 +186,47 @@ let private methodCalling =
          createCall split returnStategy compiler [objExpr; exprs] mi
       | _ -> []
 
+let private getPropertyField split (compiler:InternalCompiler.ICompiler) (pi:PropertyInfo) objExpr exprs =
+   let name = 
+      JavaScriptNameMapper.sanitize 
+         (JavaScriptNameMapper.mapType pi.DeclaringType + "_" + pi.Name)
+   compiler.DefineGlobal name (fun var ->
+      // TODO: wrap in function scope?
+      compiler.DefineGlobalInitialization <|
+         createCall split (ReturnStrategies.assignVar var) compiler [objExpr; exprs] (pi.GetGetMethod(true))
+      []
+   )
+
 let private propertyGetting =
    CompilerComponent.create <| fun split compiler returnStategy ->
       function
       | Patterns.PropertyGet(List objExpr, pi, exprs) ->
-         createCall split returnStategy compiler [objExpr; exprs] pi.GetMethod
+         let mapping = pi.GetCustomAttribute<CompilationMappingAttribute>()
+         let isField = 
+            mapping <> Unchecked.defaultof<_> &&
+            mapping.SourceConstructFlags = SourceConstructFlags.Value
+         match isField, objExpr, exprs with
+         | true, [], [] ->
+            let property = getPropertyField split compiler pi objExpr exprs
+            [ returnStategy.Return <| Reference property ]
+         | _ -> createCall split returnStategy compiler [objExpr; exprs] (pi.GetGetMethod(true))
       | _ -> []
       
 let private propertySetting =
-   CompilerComponent.create <| fun split compiler returnStategy ->
+   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
       function
       | Patterns.PropertySet(List objExpr, pi, exprs, valExpr) ->
-         createCall split returnStategy compiler [objExpr; exprs; [valExpr]] pi.SetMethod
+         let mapping = pi.GetCustomAttribute<CompilationMappingAttribute>()
+         let isField = 
+            mapping <> Unchecked.defaultof<_> &&
+            mapping.SourceConstructFlags = SourceConstructFlags.Value
+         match isField, objExpr, exprs, valExpr with
+         | true, [], [], Split(valDecl, valRef) ->
+            let property = getPropertyField (|Split|) compiler pi objExpr exprs
+            [  yield! valDecl
+               yield Assign(Reference property, valRef) 
+            ]
+         | _ -> createCall (|Split|) returnStategy compiler [objExpr; exprs; [valExpr]] (pi.GetSetMethod(true))
       | _ -> []
 
 let private fieldGetting =

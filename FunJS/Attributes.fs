@@ -20,3 +20,4 @@ type JSCastAttribute(emit:string) =
 
 type IJSMapping = interface end
 type IJSRoot = interface end
+type IJSConservativeMapping = interface end

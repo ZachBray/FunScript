@@ -367,11 +367,12 @@ let parse(stream:StreamReader) =
          | _ -> None
       | Consume "export" p ->
          match p with
+         | Consume "class" (GlobalInterface (DeclareInterface obj,p)) ->
+            Some(DeclareClass obj, p)
          | GlobalVar (v, p)
          | GlobalFunc (v, p)
          | GlobalEnum (v, p)
          | Consume "interface" (GlobalInterface (v, p))
-         | Consume "class" (GlobalInterface (v,p))
          | GlobalModule (v, p)
             -> Some(v, p)
          | _ -> None

@@ -1158,7 +1158,7 @@ declare module google.maps {
 
     /***** Base *****/
     export class LatLng {
-        constructor (lat: number, lng: number, noWrap?: bool);
+        constructor (lat: number, lng: number);
         equals(other: LatLng): bool;
         lat(): number;
         lng(): number;

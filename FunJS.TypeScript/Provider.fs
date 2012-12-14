@@ -106,7 +106,27 @@ module TypeGenerator =
          genSet
       | true, genSet -> genSet
 
-   let genMethods t obtainDef memType (f:TSFunction) =
+   let genCons t obtainDef memType (f:TSFunction) =
+      let parameters = 
+         f.Parameters |> List.map (genParameter obtainDef)
+      ProvidedConstructor(parameters, InvokeCode = fun _ -> <@@ failwithf "" @@>)
+
+// Note: We could move to something like this here where all permutations of optional 
+//       arguments are allowed. At the moment it is all or none (in terms of optional params).
+//       However, this would be rubbish with the current overloading problems because
+//       the method names would be ridiculous. E.g., "Foo''''''''''''()".
+//   let rec createOptionalPermutations parameters =
+//      seq {
+//         match parameters with
+//         | [] -> yield []
+//         | (p:TSParameter)::ps ->
+//            for ps in createOptionalPermutations ps do
+//               if p.Var.IsOptional then
+//                  yield ps
+//               yield p::ps
+//      }
+
+   let genMethods (t:ProvidedTypeDefinition) obtainDef memType (f:TSFunction) =
       let name =
          match f.Name with
          | "" -> "Invoke"
@@ -118,9 +138,12 @@ module TypeGenerator =
             match f.Type with
             | Void -> typeof<System.Void>
             | _ -> getActualType obtainDef f.Type
+         let rec safeName suggestion = 
+            if t.GetMember(suggestion) |> Array.isEmpty then suggestion
+            else safeName (suggestion + "'")
          let meth =
             ProvidedMethod(
-               name,
+               safeName name,
                parameters,
                retType)
          match memType with
@@ -128,17 +151,17 @@ module TypeGenerator =
          | Local -> meth.AddMethodAttrs MethodAttributes.Virtual
          meth.InvokeCode <- fun _ -> <@@ failwith "never" @@>
          meth
+     
       let genSet = getGeneratedSet t
-      [  let allParamTypes = f.Parameters |> List.map (fun p -> p.Var.Type)         
-         if not(!genSet |> Set.contains (name, allParamTypes)) then
-            genSet := !genSet |> Set.add (name, allParamTypes)
-            yield createMethod f.Parameters :> MemberInfo
-         let reqParams = f.Parameters |> List.filter (fun p -> not p.Var.IsOptional)
-         let reqParamTypes = reqParams |> List.map (fun p -> p.Var.Type)
-         if not(!genSet |> Set.contains (name, reqParamTypes)) then
-            genSet := !genSet |> Set.add (name, reqParamTypes)
-            yield createMethod reqParams :> MemberInfo
-      ]
+      let allParamTypes = f.Parameters |> List.map (fun p -> p.Var.Type)         
+      if not(!genSet |> Set.contains (name, allParamTypes)) then
+         genSet := !genSet |> Set.add (name, allParamTypes)
+         t.AddMember <| createMethod f.Parameters
+      let reqParams = f.Parameters |> List.filter (fun p -> not p.Var.IsOptional)
+      let reqParamTypes = reqParams |> List.map (fun p -> p.Var.Type)
+      if not(!genSet |> Set.contains (name, reqParamTypes)) then
+         genSet := !genSet |> Set.add (name, reqParamTypes)
+         t.AddMember <| createMethod reqParams
          
    let genEnum (enumT:ProvidedTypeDefinition) caseNames =
       let rec addCases = function
@@ -162,9 +185,7 @@ module TypeGenerator =
             root.AddMember property
             next()
          | Method f ->
-            let meths = genMethods root obtainDef memType f
-            for meth in meths do
-               root.AddMember meth
+            genMethods root obtainDef memType f
             next()
          | _ -> 
             // TODO: indexers
@@ -181,13 +202,12 @@ module TypeGenerator =
             root.AddMember property
             next()  
          | DeclareFunction f ->
-            let meths = genMethods root (obtainDef root) Global f
-            for meth in meths do
-               root.AddMember meth
+            genMethods root (obtainDef root) Global f
             next()
          | DeclareEnum(name, names) ->
             let t = obtainDef root (Enumeration name)
             genEnum t names
+            t.AddInterfaceImplementation typeof<FunJS.IJSConservativeMapping>
             next()
          | DeclareObject o ->
             let tsT = GlobalObject o.Name
@@ -199,18 +219,52 @@ module TypeGenerator =
             let t = obtainDef root tsT
             addMembers t (obtainDef root) Local o.Members            
             next()
+         | DeclareClass o ->
+            let tsT = Class o.Name
+            let t = obtainDef root tsT
+            t.AddInterfaceImplementation typeof<FunJS.IJSConservativeMapping>
+            let constructors, members = 
+               o.Members |> List.partition (function
+                  | Property _ | Indexer _ -> false
+                  | Method f -> f.Name = "constructor")
+            match constructors with
+            | [] ->
+               let cons = ProvidedConstructor []
+               cons.InvokeCode <- fun _ -> <@@ failwithf "" @@>
+               t.AddMember cons
+            | _ -> 
+               let bestCons = 
+                  constructors
+                  |> List.choose (function
+                     | Method f -> Some f
+                     | _ -> None)
+                  |> List.maxBy (fun f -> f.Parameters.Length)
+               let cons = genCons t (obtainDef root) Local bestCons
+               t.AddMember cons
+            addMembers t (obtainDef root) Local members        
+            next()
          | DeclareModule(typePath, declarations) ->
             let path = typePath.Split '.' |> Array.toList
             match path with
             | [] -> failwith "never"
             | name::[] -> 
-               let t = obtainDef root (Interface name)
-               addTypes t obtainDef declarations
+               let t = obtainDef root (GlobalObject name)
+               addTypesSorted t obtainDef declarations
             | name::names ->
-               let t = obtainDef root (Interface name)
+               let t = obtainDef root (GlobalObject name)
                let path = names |> String.concat "."
                addTypes t obtainDef [DeclareModule(path, declarations)]
             next()
+
+   and addTypesSorted root obtainDef declarations =
+      // We need to pre-register all Enums and Classes here to avoid
+      // them getting funny primed names like the interfaces might.
+      declarations |> List.choose (function
+         | DeclareEnum(name, _) -> Some(Enumeration name)
+         | DeclareClass c -> Some(Class c.Name)
+         | _ -> None)
+      |> List.iter (fun t -> obtainDef root t |> ignore)
+      addTypes root obtainDef declarations
 
    /// Open a file from file system or from the web in a type provider context
    /// (File may be relative to the type provider resolution folder and web
@@ -231,7 +285,7 @@ module TypeGenerator =
       let count = ref 0
 
       let rec makeType parentT = function
-         | GlobalObject name | Enumeration name ->
+         | GlobalObject name | Enumeration name | Class name ->
             let actualName = name.Split '.' |> Seq.last
             ProvidedTypeDefinition(name, None)
          | Interface name ->
@@ -250,17 +304,19 @@ module TypeGenerator =
          | false, _ -> 
             let t = makeType parentT tsT
             t.IsErased <- false
-            let cons = ProvidedConstructor []
-            let name = t.Name
-            cons.InvokeCode <- fun _ -> <@@ failwithf "" @@>
-            t.AddMember cons
+            match tsT with
+            | Class _ -> ()
+            | _ ->
+               let cons = ProvidedConstructor []
+               cons.InvokeCode <- fun _ -> <@@ failwithf "" @@>
+               t.AddMember cons
             t.AddInterfaceImplementation typeof<FunJS.IJSMapping>
             created.Add(tsT, t)
             // Enums can be referenced in other types but their
             // names cannot be changed or it will break the FunScript
             // integration.
             match tsT with
-            | Enumeration name -> created.Add(Interface name, t)
+            | Enumeration name | Class name -> created.Add(Interface name, t)
             | _ -> () 
             parentT.AddMember t
             t
@@ -268,7 +324,7 @@ module TypeGenerator =
       use reader = openFileOrUri resolutionFolder typeScriptFile
       let types = Parser.parse reader
       reader.Close()             
-      addTypes root obtainTypeDef types
+      addTypesSorted root obtainTypeDef types
       
 [<TypeProvider>]
 type TypeScriptProvider(cfg:TypeProviderConfig) as this =
@@ -298,7 +354,7 @@ type TypeScriptProvider(cfg:TypeProviderConfig) as this =
                rootType.IsErased <- false
                rootType.AddInterfaceImplementation typeof<FunJS.IJSRoot>
                rootType.AddInterfaceImplementation typeof<FunJS.IJSMapping>
-               //System.Diagnostics.Debugger.Break()
+               System.Diagnostics.Debugger.Break()
                try TypeGenerator.generateFrom cfg.ResolutionFolder typeScriptFile rootType
                with ex -> failwithf "Failed to generate TypeScript mapping: %s\n%s" ex.Message ex.StackTrace
                let path = System.IO.Path.GetTempFileName() + ".dll"

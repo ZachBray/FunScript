@@ -11,6 +11,16 @@ let private application =
            yield! argDecl
            yield returnStategy.Return <| Apply(lambdaRef, [argRef])
          ]
+      | Patterns.Call(Some (Split(delDecl, delRef)), mi, argExprs) 
+        when typeof<System.Delegate>.IsAssignableFrom mi.DeclaringType ->
+         let argDecls, argRefs = 
+            argExprs 
+            |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
+            |> List.unzip
+         [ yield! delDecl
+           yield! argDecls |> List.concat
+           yield returnStategy.Return <| Apply(delRef, argRefs)
+         ]
       | _ -> []
 
 let private definition =
@@ -20,6 +30,9 @@ let private definition =
       | Patterns.Lambda(var, expr) ->
          let block = compiler.Compile ReturnStrategies.returnFrom expr
          [ yield returnStategy.Return <| Lambda([var], Block block) ]
+      | Patterns.NewDelegate(_, vars, expr) ->
+         let block = compiler.Compile ReturnStrategies.returnFrom expr
+         [ yield returnStategy.Return <| Lambda(vars, Block block) ]
       | _ -> []
 
 let components = [ 

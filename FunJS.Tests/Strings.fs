@@ -37,3 +37,18 @@ let ``String.ToUpper and String.ToLower work``() =
       <@@ 
          "AbC".ToUpper() + "aBc".ToLower()
       @@>
+
+[<Fact>]
+let ``String.Length works``() =
+   check 
+      <@@ 
+         "AbC".Length |> float
+      @@>
+
+[<Fact>]
+let ``String item works``() =
+   checkAreEqual
+      "b"
+      <@@ 
+         "AbC".[1]
+      @@>

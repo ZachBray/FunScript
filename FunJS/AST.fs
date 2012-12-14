@@ -10,7 +10,11 @@ let (|Newline|) padding =
 
 let getNameScope (var:Var) scope =
    let rec getNameScope prefix =
-      let name = prefix + (JavaScriptNameMapper.sanitize var.Name)
+      let name =
+         // TODO: This string magic sucks! Wrap Var in something more
+         // useful. Or use propper namespacing so we don't have to remove dots.
+         if var.Name.StartsWith "!!!" then prefix + var.Name.Substring 3
+         else prefix + JavaScriptNameMapper.sanitize var.Name
       match scope |> Map.tryFind name with
       | Some v when v = var -> name, scope
       | Some _ -> getNameScope (prefix + "_")
@@ -31,7 +35,7 @@ type JSExpr =
    | IndexGet of JSExpr * JSExpr
    | Array of JSExpr list
    | Apply of JSExpr * JSExpr list
-   | New of JSExpr * JSExpr list
+   | New of JSRef * JSExpr list
    | Lambda of Var list * JSBlock
    | UnaryOp of string * JSExpr
    | BinaryOp of JSExpr * string * JSExpr
@@ -66,12 +70,12 @@ type JSExpr =
                argExpr.Print(padding, scope))
             |> String.concat ", "
          sprintf "%s(%s)" (lambdaExpr.Print(padding, scope)) filling
-      | New(expr, argExprs) ->
+      | New(objName, argExprs) ->
          let filling =
             argExprs |> List.map (fun argExpr -> 
                argExpr.Print(padding, scope))
             |> String.concat ", "
-         sprintf "(new %s(%s))" (expr.Print(padding, scope)) filling
+         sprintf "(new %s(%s))" objName filling
       | Lambda(vars, block) ->
          let oldScope = !scope
          let newScope, names = 
@@ -191,7 +195,8 @@ and JSBlock =
                |> List.map (fun smt -> smt.Print(padding + 1, scope))
                |> List.filter ((<>) "")
                |> String.concat (sprintf ";%s" paddedNewL)
-            sprintf "{%s%s;%s}" paddedNewL filling newL
+            if padding = 0 then filling
+            else sprintf "{%s%s;%s}" paddedNewL filling newL
       | EmitBlock code ->
          sprintf "{%s%s%s}" paddedNewL code newL
 

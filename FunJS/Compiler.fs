@@ -59,12 +59,17 @@ Array.prototype.CompareTo = function(that) {
 
 """
 
-let compileWithExtensions components expr =
-   let compiler = InternalCompiler.Compiler(allComponents @ components)
-   let program = compiler.Compile ReturnStrategies.returnFrom expr
-   let reflectedDefs = compiler.Globals
-   let block = List.append reflectedDefs program 
-   comparerPrototypes + (AST.Block block).Print()
-
-let compile expr = 
-  compileWithExtensions [] expr
+type Compiler =
+   static member Compile(expression, ?components, ?noReturn) = 
+      let components = defaultArg components []
+      let returnStrat = 
+         if defaultArg noReturn false then ReturnStrategies.inplace
+         else ReturnStrategies.returnFrom
+      let compiler = InternalCompiler.Compiler(allComponents @ components)
+      let program = compiler.Compile ReturnStrategies.returnFrom expression
+      let reflectedDefs = compiler.Globals
+      let block = List.append reflectedDefs program 
+      comparerPrototypes + (AST.Block block).Print()
+      
+let compile expr = Compiler.Compile(expr)
+let compileWithoutReturn expr = Compiler.Compile(expr, noReturn=true)

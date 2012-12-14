@@ -4,106 +4,14 @@ module Program
 open FunJS
 open FunJS.TypeScript
 
+// See https://github.com/borisyankov/DefinitelyTyped for more
 type j = FunJS.TypeScript.Api< @"..\..\Typings\jquery.d.ts" >
 type lib = FunJS.TypeScript.Api< @"..\..\Typings\lib.d.ts" >
 
-let (!) (str:string) = j.jQuery.Invoke str
+type goo = FunJS.TypeScript.Api< @"..\..\Typings\google.maps.d.ts" >
 
-let log(msg:string) =
-   let tag = "<p>" + msg + "</p>"
-   (!"body").append [| tag :> obj |]
-   |> ignore
-
-let random(lo:int, hi:int) =
-   let hi = float hi
-   let lo = float lo
-   int (lib.Math.floor(lo + lib.Math.random() * hi))
-
-type SuitType =
-   | Clubs
-   | Spades
-   | Hearts
-   | Diamonds
-
-   member t.Name =
-      match t with
-      | Clubs -> "Clubs"
-      | Spades -> "Spades"
-      | Hearts -> "Hearts"
-      | Diamonds -> "Diamonds"
-
-   static member All = [Clubs; Spades; Hearts; Diamonds]
-
-type CardType =
-   | Ace
-   | King
-   | Queen
-   | Jack
-   | Number of int
-
-   member t.Name =
-      match t with
-      | Ace -> "Ace"
-      | King -> "King"
-      | Queen -> "Queen"
-      | Jack -> "Jack"
-      | Number n -> n.ToString()
-
-   static member All =
-      [  Ace
-         King
-         Queen
-         Jack
-         Number 10
-         Number 9
-         Number 8
-         Number 7
-         Number 6
-         Number 5
-         Number 4
-         Number 3
-         Number 2 
-      ]
-
-type Card =
- { Suit: SuitType
-   Type: CardType }
-   member card.Value =
-      match card.Type with
-      | Ace -> 11
-      | King | Queen | Jack -> 10
-      | Number n -> n
-
-type Deck = Card list
-
-let createDeck() =
-   SuitType.All |> List.collect (fun suit ->
-      CardType.All |> List.map (fun t ->
-         { Suit = suit; Type = t }))
-
-let shuffle(deck:Deck) =
-   deck 
-   |> List.map (fun card -> random(0, 100000), card)
-   |> List.sortWith (fun (offA, _) (offB, _) -> offA - offB)
-   |> List.map (fun (_, shuffledCard) -> shuffledCard)
-
-type Player =
- { Hand: Card list }
-   member player.Total = 
-      player.Hand |> List.sumBy (fun card -> card.Value)
-   member player.IsBust =
-      player.Total > 21
-
-
-let createGame() =
-   let deck = createDeck() |> shuffle
-   let rec printDeck (cards:Deck) =
-      match cards with
-      | [] -> ()
-      | card::rest -> 
-         log (card.Type.Name + " of " + card.Suit.Name)
-         printDeck rest
-   printDeck deck
+// Selector operator
+let (!) (str:string) = j.jQuery.Invoke' str
 
 type AjaxSettings(onSuccess) =
    // TODO: this does not work:
@@ -111,22 +19,69 @@ type AjaxSettings(onSuccess) =
    // so we have to manually set the fields.
    // Need to implement parasitic inheritance in FunJS.
    inherit j.JQueryAjaxSettings'() 
-   override __.success (_,data,_) = onSuccess data
+   override __.success (data,_,_) = onSuccess data
+
+type Tweet =
+ { from_user: string
+   text: string }
+
+type TwitterSearch =
+ { results: Tweet[] }
+
+let mutable map = Unchecked.defaultof<goo.google.maps.Map>
+let markers = ref List.empty
+
+let showTweets (map:goo.google.maps.Map) (search:TwitterSearch) =
+   let tweetList =
+      search.results |> Array.map (fun tweet ->
+         "<p><b>" + tweet.from_user + "</b>&nbsp;" + tweet.text + "</p>")
+      |> Array.map box
+   (!"#tweets").children'().remove'() |> ignore
+   (!"#tweets").append tweetList |> ignore
+   
+let clearMap() =
+   markers.contents |> List.iter (fun (marker:goo.google.maps.Marker) ->
+      marker.setMap(unbox<goo.google.maps.Map> null))
+   markers := List.empty
+
+let query searchText (callback:'a -> unit) =
+   let settings = AjaxSettings(fun data -> callback(data :?> 'a))
+   settings.dataType <- "jsonp"
+   j.jQuery.ajax("http://search.twitter.com/search.json?q=" + searchText, settings)   
+   
+let updateTweets map =
+   clearMap()
+   query (unbox <| (!"#searchText").``val``()) (showTweets map)
+
+let createMap() =
+   let options = goo.google.maps.MapOptions'()
+   options.mapTypeId <- goo.google.maps.MapTypeId.ROADMAP
+   options.zoom <- 3.
+   let element = lib.document.getElementById "map"
+   goo.google.maps.Map(unbox element, options)
+
+let setup() =
+   //Doesn't work under localhost... might work when hosted?
+   map <- createMap()
+   map.setCenter(goo.google.maps.LatLng(51.5171,0.1026))
+   
+   let initialQuery = "%23fsharp"
+   (!"#searchText").val'' initialQuery |> ignore
+   // Odd stuff is going on here! The expression the reflected
+   // definition seems to be generating is incorrect. Unless there
+   // is some weird expression replacement going on.
+   let searchButton = !"#searchButton"
+   let result = searchButton.click'' (fun _ -> updateTweets map; null)
+   ignore result
+   updateTweets map   
 
 let main() =
-   // let settings = AjaxSettings(fun data -> lib.console.log data)
-   // settings.async <- true
-   // j.jQuery.ajax("http://search.twitter.com/search.json?q=%23fsharp", settings)
-
-   lib.window.onload <- fun _ -> 
-     (!"#test").click(fun _ -> lib.window.alert("click!")) |> ignore
-     createGame() :> obj
+   lib.window.onload <- fun _ -> setup() :> obj
 
 // Compile
-let source = <@@ main() @@> |> Compiler.compile 
-let sourceWrapped = sprintf "(function () {\n%s\n})()" source
-let filename = "blackjack.js"
+let source = <@@ main() @@> |> Compiler.compileWithoutReturn 
+let filename = "twitter-example.js"
 System.IO.File.Delete filename
-System.IO.File.WriteAllText(filename, sourceWrapped)
+System.IO.File.WriteAllText(filename, source)
 source|> printfn "%A"
 System.Console.ReadLine() |> ignore

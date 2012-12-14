@@ -41,9 +41,12 @@ let private creation =
                BindingFlags.NonPublic ||| 
                BindingFlags.Instance).[0]
          let name = JavaScriptNameMapper.mapMethod ci
-         let cons = compiler.DefineGlobal name (fun () -> createConstructor recType compiler)
+         let cons = 
+            compiler.DefineGlobal name (fun var -> 
+               [ Assign(Reference var, Lambda <| createConstructor recType compiler) ]
+            )
          [ yield! decls |> Seq.concat 
-           yield returnStategy.Return <| New(Reference(cons), refs)
+           yield returnStategy.Return <| New(cons.Name, refs)
          ]
       | _ -> []
 
