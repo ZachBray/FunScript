@@ -97,7 +97,10 @@ let createTypeMethodMappings (fromType:Type) (toType:Type) =
             | Some _ -> 
                let replacementMi =
                   if mi.IsGenericMethod then
-                     replacementMi.MakeGenericMethod(mi.GetGenericArguments())
+                     if replacementMi.IsGenericMethod then
+                        replacementMi.MakeGenericMethod(mi.GetGenericArguments())
+                     else
+                        replacementMi
                   else replacementMi
                Some <| createMethodMap mi Quote.MethodCall replacementMi
             | None -> None

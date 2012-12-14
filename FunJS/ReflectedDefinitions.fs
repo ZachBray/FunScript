@@ -1,6 +1,7 @@
 ﻿module internal FunJS.ReflectedDefinitions
 
 open AST
+open Quote
 open Microsoft.FSharp.Quotations
 open System.Reflection
 open Microsoft.FSharp.Reflection
@@ -117,6 +118,17 @@ let private createConstruction
       |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
       |> List.unzip
    match ci with
+(*
+
+TODO
+
+   | JSMapping(".ctor", false, false) ->
+      [ yield! decls |> List.concat
+        yield returnStategy.Return <| Object [] ]
+   | JSMapping(name, true, false) ->
+      [ yield! decls |> List.concat
+        yield returnStategy.Return <| New(Reference (Var.Global(name, typeof<obj>)), refs) ]
+*)
    | ReflectedDefinition name ->
       let consRef = 
          compiler.DefineGlobal name (fun var -> 
@@ -145,6 +157,9 @@ let private createCall
       |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
       |> List.unzip
    match mi, refs with
+   | (JSMapping("new", _, false) as mi), instance::arguments ->
+      [ yield! decls |> List.concat
+        yield returnStategy.Return <| New(instance, arguments) ]
    | (JSMapping(name, true, false) as mi), _ ->
       [ yield! decls |> List.concat
         yield returnStategy.Return <| Apply(Reference (Var.Global(name, typeof<obj>)), refs) ]
@@ -258,7 +273,7 @@ let private objectGuid = typeof<obj>.GUID
 let private constructingInstances =
    CompilerComponent.create <| fun split compiler returnStategy ->
       function
-      | Patterns.NewObject(ci, exprs) -> 
+      | PatternsExt.NewObject(ci, exprs) -> 
          if ci.DeclaringType.GUID = objectGuid then
             [ Scope <| Block [] ]
          else
