@@ -402,9 +402,6 @@ type SymbolKind = SDArray | Array of int | Pointer | ByRef | Generic of System.T
 type ProvidedSymbolType(kind: SymbolKind, args: Type list) =
     inherit Type()
 
-    member private x.kind = kind
-    member private x.args = args
-
     override this.FullName =   
         match kind,args with 
         | SymbolKind.SDArray,[arg] -> arg.FullName + "[]" 
