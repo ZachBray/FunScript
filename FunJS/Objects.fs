@@ -1,4 +1,4 @@
-﻿module internal FunJS.Objects
+﻿module (*internal*) FunJS.Objects
 
 open AST
 open Microsoft.FSharp.Quotations

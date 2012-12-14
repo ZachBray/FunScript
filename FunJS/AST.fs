@@ -1,4 +1,4 @@
-﻿module internal FunJS.AST
+﻿module (*internal*) FunJS.AST
 
 open Microsoft.FSharp.Quotations
 
