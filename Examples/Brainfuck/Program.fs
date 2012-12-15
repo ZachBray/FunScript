@@ -35,6 +35,7 @@ let run (program:string) (inputChar: Async<byte>) (outputChar:string -> unit) =
             | ',' ->
                 let! nextChar = inputChar
                 b.[!p] <- nextChar
+                incr pc
             | '[' -> 
                 if b.[!p] = 0uy then while program.[!pc] <> ']' do incr pc
                 else incr pc
