@@ -13,17 +13,18 @@ type lib = FunJS.TypeScript.Api<"..\\Typings\\lib.d.ts">
 // Mini implementation of some F# async primitives
 
 type Async =
-  static member AwaitJQueryEvent(f : ('T -> unit) -> j._JQuery) : Async<'T> = 
+  static member AwaitJQueryEvent(f : ('T -> obj) -> j.JQuery') : Async<'T> = 
     Async.FromContinuations(fun (cont, econt, ccont) ->
       let named = ref None
       named := Some (f (fun v -> 
         (!named).Value.off() |> ignore
-        cont v)))
+        cont v
+        obj() )))
       
 // ----------------------------------------------------------------------------
 // Demo using mini F# async
 
-let (?) (jq:j._JQueryStatic) name = jq.Invoke(name:string)
+let (?) (jq:j.JQueryStatic') name = jq.Invoke(name:string)
 
 let log(msg:string) =
    let tag = "<p>" + msg + "</p>"
@@ -38,7 +39,7 @@ let increment(n) =
 
 let rec worker(n) = 
   async { 
-    let! v = Async.AwaitJQueryEvent(j.jQuery?``#next``.click)
+    let! v = Async.AwaitJQueryEvent(fun f -> j.jQuery?``#next``.click''(f))
     let! n = increment(n)
     do log ("Count: " + n.ToString())
     return! worker(n)
