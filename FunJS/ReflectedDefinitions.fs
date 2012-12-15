@@ -118,17 +118,6 @@ let private createConstruction
       |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
       |> List.unzip
    match ci with
-(*
-
-TODO
-
-   | JSMapping(".ctor", false, false) ->
-      [ yield! decls |> List.concat
-        yield returnStategy.Return <| Object [] ]
-   | JSMapping(name, true, false) ->
-      [ yield! decls |> List.concat
-        yield returnStategy.Return <| New(Reference (Var.Global(name, typeof<obj>)), refs) ]
-*)
    | ReflectedDefinition name ->
       let consRef = 
          compiler.DefineGlobal name (fun var -> 
@@ -157,14 +146,6 @@ let private createCall
       |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
       |> List.unzip
    match mi, refs with
-(*
-
-TODO
-
-   | (JSMapping("new", _, false) as mi), instance::arguments ->
-      [ yield! decls |> List.concat
-        yield returnStategy.Return <| New(instance, arguments) ]
-*)
    | (JSMapping(name, true, false) as mi), _ ->
       [ yield! decls |> List.concat
         yield returnStategy.Return <| Apply(Reference (Var.Global(name, typeof<obj>)), refs) ]

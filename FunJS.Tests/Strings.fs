@@ -8,6 +8,16 @@ open Xunit
 open Xunit.Extensions
 open FsUnit.Xunit
 
+// System.String - static methods (INCOMPLETE)
+
+[<Theory>]
+[<InlineData(null:string); InlineData(""); InlineData("test")>]
+let ``String.IsNullOrEmpty works``(str:string) =
+   check  
+      <@@ 
+         System.String.IsNullOrEmpty(str)
+      @@>
+
 // System.String - instance methods
 
 [<Fact>]
@@ -26,17 +36,17 @@ let ``String.Replace works``() =
       @@>
 
 [<Fact>]
-let ``String.Length works``() =
-   checkAreEqual 4.
-      <@@ 
-         "abcd".Length
-      @@>
-
-[<Fact>]
 let ``String.ToUpper and String.ToLower work``() =
    check 
       <@@ 
          "AbC".ToUpper() + "aBc".ToLower()
+      @@>
+
+[<Fact>]
+let ``String.Length works``() =
+   checkAreEqual 4.
+      <@@ 
+         "abcd".Length
       @@>
 
 [<Fact>]
@@ -54,15 +64,6 @@ let ``String.ToCharArray works``() =
          a.[0].ToString() + a.[1].ToString() + a.[2].ToString() + a.[3].ToString()
       @@>
 
-// System.String - static methods (INCOMPLETE)
-
-[<Theory>]
-[<InlineData(null:string); InlineData(""); InlineData("test")>]
-let ``String.IsNullOrEmpty works``(str:string) =
-   check  
-      <@@ 
-         System.String.IsNullOrEmpty(str)
-      @@>
 
 // [<Fact>] - Messed up, because some overloads are generic and some are not
 // (and some take arrays while others take sequences...)
