@@ -354,7 +354,7 @@ type TypeScriptProvider(cfg:TypeProviderConfig) as this =
                rootType.IsErased <- false
                rootType.AddInterfaceImplementation typeof<FunJS.IJSRoot>
                rootType.AddInterfaceImplementation typeof<FunJS.IJSMapping>
-               System.Diagnostics.Debugger.Break()
+               //System.Diagnostics.Debugger.Break()
                try TypeGenerator.generateFrom cfg.ResolutionFolder typeScriptFile rootType
                with ex -> failwithf "Failed to generate TypeScript mapping: %s\n%s" ex.Message ex.StackTrace
                let path = System.IO.Path.GetTempFileName() + ".dll"
