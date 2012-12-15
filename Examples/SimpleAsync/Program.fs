@@ -46,6 +46,9 @@ let rec worker(n) =
   }
 
 let main() = 
+  let msg = "Hello world!" |> String.map (fun c -> if c = ' ' then '_' else c)
+  lib.alert(msg)
+
   async {
     let! x = Async.AwaitJQueryEvent(fun o -> j.jQuery?document.ready o)
     let cts = new CancellationTokenSource()

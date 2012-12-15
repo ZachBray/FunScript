@@ -8,7 +8,13 @@ open Xunit
 open Xunit.Extensions
 open FsUnit.Xunit
 
-// System.String - static methods (INCOMPLETE)
+// The code that is produced by writing (c:char) = 'x' does not work correctly
+// in Jint, but works fine in web browsers. This function allows us to write
+// charToInt c = charToInt 'x' in the unit tests (which works in Jint too.)
+[<FunJS.JS; FunJS.JSEmit("return {0}.charCodeAt(0);")>]
+let charToInt (c:char) : int = int c 
+
+// System.String - static methods
 
 [<Theory>]
 [<InlineData(null:string); InlineData(""); InlineData("test")>]
@@ -36,6 +42,13 @@ let ``String.Replace works``() =
       @@>
 
 [<Fact>]
+let ``String.IndexOf works``() =
+   check 
+      <@@ 
+         "abcd".IndexOf("bc") * 100 + "abcd".IndexOf("bd") |> float
+      @@>
+
+[<Fact>]
 let ``String.ToUpper and String.ToLower work``() =
    check 
       <@@ 
@@ -44,9 +57,9 @@ let ``String.ToUpper and String.ToLower work``() =
 
 [<Fact>]
 let ``String.Length works``() =
-   checkAreEqual 4.
+   check
       <@@ 
-         "abcd".Length
+         "AbC".Length |> float
       @@>
 
 [<Fact>]
@@ -57,6 +70,7 @@ let ``String item works``() =
          "AbC".[1]
       @@>
 
+[<Fact>]
 let ``String.ToCharArray works``() =
    check 
       <@@
@@ -64,9 +78,14 @@ let ``String.ToCharArray works``() =
          a.[0].ToString() + a.[1].ToString() + a.[2].ToString() + a.[3].ToString()
       @@>
 
+[<Fact>]    
+let ``String.ToCharArray returns array``() =
+   check 
+      <@@
+         "abcd".ToCharArray() |> Array.map (fun _ -> 1) |> Array.sum |> float
+      @@>
 
-// [<Fact>] - Messed up, because some overloads are generic and some are not
-// (and some take arrays while others take sequences...)
+[<Fact>]
 let ``String.Join works``() =
    check 
       <@@ 
@@ -76,16 +95,12 @@ let ``String.Join works``() =
 
 // String - F# module functions 
 
-// [<Theory>]
-// [<InlineData("!!!"); InlineData("a!a"); InlineData("aaa")>]
-// 
-// This is very odd, but if 'str = "aaa"' then Jint seems to be returning
-// true (which is wrong) but Chrome JS console gives false as expected.
+[<Theory>]
+[<InlineData("!!!"); InlineData("a!a"); InlineData("aaa")>]
 let ``String.forall and exists work``(str) =
    check 
       <@@ 
-         // let str = "aaa"
-         str |> String.forall (fun c -> c.ToString() = "!") 
+         str |> String.forall (fun c -> charToInt c = charToInt '!') 
       @@> 
 
 [<Fact>]
@@ -102,9 +117,48 @@ let ``String.collect works``() =
          "abc" |> String.collect (fun c -> "bcd")
       @@> 
 
-// String.iter
-// String.iteri
-// String.length
-// String.map
-// String.mapi
-// String.replicate
+[<Fact>]
+let ``String.iter works``() =
+   check 
+      <@@ 
+         let res = ref ""
+         "Hello world!" |> String.iter (fun c -> res := !res + c.ToString())
+         !res
+      @@> 
+
+[<Fact>]
+let ``String.iteri works``() =
+   check 
+      <@@ 
+         let res = ref ""
+         "Hello world!" |> String.iteri (fun c i -> res := !res + i.ToString() + c.ToString())
+         !res
+      @@> 
+
+[<Fact>]
+let ``String.length (function) works``() =
+   check
+      <@@ 
+         "AbC" |> String.length |> float
+      @@>
+
+[<Fact>]
+let ``String.map works``() =
+   check 
+      <@@          
+         "Hello world!" |> String.map (fun c -> if charToInt c = charToInt 'H' then '_' else c)
+      @@> 
+
+[<Fact>]
+let ``String.mapi works``() =
+   check 
+      <@@ 
+         "Hello world!" |> String.mapi (fun i c -> if i = 1 || charToInt c = charToInt 'H' then '_' else c)
+      @@> 
+
+[<Fact>]
+let ``String.replicate works``() =
+   check 
+      <@@ 
+         String.replicate 10 "hi there"
+      @@> 
