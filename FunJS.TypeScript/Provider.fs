@@ -91,8 +91,7 @@ module TypeGenerator =
          ProvidedParameter(
             p.Var.Name, 
             getActualType obtainDef p.Var.Type,
-            false,
-            p.Var.IsOptional)
+            false)
       //parameter.IsParamArray <- p.IsParamArray
       parameter
 
@@ -111,20 +110,16 @@ module TypeGenerator =
          f.Parameters |> List.map (genParameter obtainDef)
       ProvidedConstructor(parameters, InvokeCode = fun _ -> <@@ failwithf "" @@>)
 
-// Note: We could move to something like this here where all permutations of optional 
-//       arguments are allowed. At the moment it is all or none (in terms of optional params).
-//       However, this would be rubbish with the current overloading problems because
-//       the method names would be ridiculous. E.g., "Foo''''''''''''()".
-//   let rec createOptionalPermutations parameters =
-//      seq {
-//         match parameters with
-//         | [] -> yield []
-//         | (p:TSParameter)::ps ->
-//            for ps in createOptionalPermutations ps do
-//               if p.Var.IsOptional then
-//                  yield ps
-//               yield p::ps
-//      }
+   let rec createOptionalPermutations parameters =
+      seq {
+         match parameters with
+         | [] -> yield []
+         | (p:TSParameter)::ps ->
+            for ps in createOptionalPermutations ps do
+               if p.Var.IsOptional then
+                  yield ps
+               yield p::ps
+      }
 
    let genMethods (t:ProvidedTypeDefinition) obtainDef memType (f:TSFunction) =
       let name =
@@ -138,12 +133,9 @@ module TypeGenerator =
             match f.Type with
             | Void -> typeof<System.Void>
             | _ -> getActualType obtainDef f.Type
-         let rec safeName suggestion = 
-            if t.GetMember(suggestion) |> Array.isEmpty then suggestion
-            else safeName (suggestion + "'")
          let meth =
             ProvidedMethod(
-               safeName name,
+               name,
                parameters,
                retType)
          match memType with
@@ -153,15 +145,13 @@ module TypeGenerator =
          meth
      
       let genSet = getGeneratedSet t
-      let allParamTypes = f.Parameters |> List.map (fun p -> p.Var.Type)         
-      if not(!genSet |> Set.contains (name, allParamTypes)) then
-         genSet := !genSet |> Set.add (name, allParamTypes)
-         t.AddMember <| createMethod f.Parameters
-      let reqParams = f.Parameters |> List.filter (fun p -> not p.Var.IsOptional)
-      let reqParamTypes = reqParams |> List.map (fun p -> p.Var.Type)
-      if not(!genSet |> Set.contains (name, reqParamTypes)) then
-         genSet := !genSet |> Set.add (name, reqParamTypes)
-         t.AddMember <| createMethod reqParams
+      let paramPermutations = f.Parameters |> createOptionalPermutations
+      for parameters in paramPermutations do
+         let paramTypes = 
+            parameters |> Seq.map (fun p -> p.Var.Type) |> Seq.toList
+         if not(!genSet |> Set.contains (name, paramTypes)) then
+            genSet := !genSet |> Set.add (name, paramTypes)
+            t.AddMember(createMethod parameters)    
          
    let genEnum (enumT:ProvidedTypeDefinition) caseNames =
       let rec addCases = function
