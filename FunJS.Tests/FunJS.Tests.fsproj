@@ -56,6 +56,7 @@
     <Compile Include="Sets.fs" />
     <Compile Include="Maps.fs" />
     <Compile Include="Strings.fs" />
+    <Compile Include="Asyncs.fs" />
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
