@@ -11,6 +11,7 @@ let private allComponents =
       Maps.components
       Lists.components
       Strings.components
+      Asyncs.components
       ReflectedDefinitions.components
       Arrays.components
       RecordTypes.components

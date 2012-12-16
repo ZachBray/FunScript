@@ -4,6 +4,7 @@ module Program
 open FunJS
 open FunJS.TypeScript
 
+
 // See https://github.com/borisyankov/DefinitelyTyped for more
 type j = FunJS.TypeScript.Api< @"..\..\Typings\jquery.d.ts" >
 type lib = FunJS.TypeScript.Api< @"..\..\Typings\lib.d.ts" >

@@ -1,6 +1,7 @@
 ﻿module internal FunJS.ReflectedDefinitions
 
 open AST
+open Quote
 open Microsoft.FSharp.Quotations
 open System.Reflection
 open Microsoft.FSharp.Reflection
@@ -258,7 +259,7 @@ let private objectGuid = typeof<obj>.GUID
 let private constructingInstances =
    CompilerComponent.create <| fun split compiler returnStategy ->
       function
-      | Patterns.NewObject(ci, exprs) -> 
+      | PatternsExt.NewObject(ci, exprs) -> 
          if ci.DeclaringType.GUID = objectGuid then
             [ Scope <| Block [] ]
          else
