@@ -146,6 +146,14 @@ let private createCall
       |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
       |> List.unzip
    match mi, refs with
+   // TypeScript definitions expose constructors as "new" methods, 
+   // so JS call to "new" is translated as a constructor - for example:
+   // "lib.Number.``new``(10)" becomes "new Number(1)"
+   | (JSMapping("new", _, false) as mi), instance::arguments ->
+      [ let instVar = Var.Global("__inst__", typeof<obj>)
+        yield! decls |> List.concat
+        yield DeclareAndAssign(instVar, instance)
+        yield returnStategy.Return <| New(instVar.Name, arguments) ]   
    | (JSMapping(name, true, false) as mi), _ ->
       [ yield! decls |> List.concat
         yield returnStategy.Return <| Apply(Reference (Var.Global(name, typeof<obj>)), refs) ]

@@ -45,7 +45,7 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <!-- <Compile Include="ProvidedTypes.fsi" /> --> 
+    <!-- <Compile Include="ProvidedTypes.fsi" /> -->
     <Compile Include="ProvidedTypes.fs" />
     <Compile Include="AST.fs" />
     <Compile Include="Parser.fs" />
