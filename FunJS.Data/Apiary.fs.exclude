@@ -1,0 +1,165 @@
+﻿module internal FunJS.ApiaryCompiler
+
+open System
+open FunJS
+open FunJS.AST
+open System.Reflection
+open Microsoft.FSharp.Quotations
+open Microsoft.FSharp.Quotations.DerivedPatterns
+open Microsoft.FSharp.Reflection
+
+open FSharp.ProviderImplementation
+
+let private undef() = failwith "!"
+
+let (|SpecificConstructor|_|) templateParameter = 
+  match templateParameter with
+  | Patterns.NewObject(cinfo1, _) -> (function
+      | Patterns.NewObject(cinfo2, args) 
+            when cinfo1.MetadataToken = cinfo2.MetadataToken ->
+          Some(cinfo1, args)
+      | _ -> None)
+  | _ -> invalidArg "templateParameter" "Unrecognized quotation: Must be NewObject."
+
+[<JS; JSEmit("return {0}==null?List_Empty():{0};")>]
+let emptyIfNull (list:_ list) = list
+
+[<JS>]
+module Runtime = 
+  open FSharp.Web
+
+  type ApiaryJsContext = 
+    { Root : string
+      mutable GlobalQuery : (string * string)[] //ResizeArray<_>(queries)
+      mutable GlobalHeaders : (string * string)[] //ResizeArray<_>(headers)
+      mutable GlobalArguments : (string * string)[] } //arguments
+  type XMLHttpRequest = 
+    abstract ``open`` : string * string -> unit
+    abstract setRequestHeader : string * string -> unit
+    abstract send : string -> unit
+
+    abstract onreadystatechange : (unit -> unit) with get, set
+    abstract readyState : float
+    abstract responseText : string 
+
+  [<JSEmit("""
+      var res;
+      if (window.XDomainRequest) {
+        res = new XDomainRequest();
+        res.setRequestHeader = function (header, value) { };
+        res.onload = function () {
+          res.readyState = 4;
+          res.status = 200;
+          res.onreadystatechange();
+        };
+      }
+      else if (window.XMLHttpRequest)
+        res = new XMLHttpRequest();
+      else
+        res = new ActiveXObject("Microsoft.XMLHTTP");
+      res.get_onreadystatechange = function() { return res.onreadystatechange; }
+      res.set_onreadystatechange = function(a) { res.onreadystatechange = a; }
+      res.get_readyState = function() { return res.readyState; }
+      res.get_responseText = function() { return res.responseText; }
+      return res;""")>]
+  let newXMLHttpRequest() : XMLHttpRequest = failwith "never"
+
+  [<JS; JSEmit("return encodeURIComponent({0});")>]
+  let encodeURIComponent(s:string) : string = failwith "never"
+
+  [<JS; JSEmit("{0}.get_Context = function() { return {1}; };")>]
+  let setContext(o:obj, ctx:obj) : unit = ()
+
+  [<JS>]
+  type ApiaryJsRuntime =
+    static member AsyncMap(work, f) = async {
+      let! v = work in return f v }
+
+    static member ParseHeaders (headers:string) = 
+      headers.Split('\n') |> Array.choose (fun h ->
+          if String.IsNullOrEmpty(h) then None else
+            let arr = h.Split(':') 
+            if arr.Length = 2 then Some(arr.[0], arr.[1])
+            else failwith "Wrong headers" ) // : '%s'" headers )
+    
+    static member ProcessParameters(reqHeaders, headers, query) =
+      let headers = Array.append (ApiaryJsRuntime.ParseHeaders(reqHeaders)) (Array.ofList (emptyIfNull headers))
+      let query = emptyIfNull query
+      headers, Array.ofList query
+
+    static member AddQueryParam(x : ApiaryJsContext, key:string, value:string) =
+      x.GlobalQuery <- Array.append x.GlobalQuery [| key, value |]
+    
+    static member AddHeader(x : ApiaryJsContext, key:string, value:string) =
+      x.GlobalHeaders <- Array.append x.GlobalHeaders [| key, value |]
+
+    static member AsyncInvokeOperation
+        ( x : ApiaryJsContext, 
+          { Method = meth; Path = path; Arguments = args;
+            Headers = headers; Query = query }) = 
+      Async.FromContinuations(fun (cont, econt, ccont) -> 
+
+        // Replace parameters in the path with actual arguments
+        let allArguments = Array.append x.GlobalArguments args
+        let path = 
+          allArguments |> Seq.fold (fun (path:string) (key, value) -> 
+            path.Replace(key, value)) path
+
+        // Run the HTTP request
+        let allheaders = Array.append headers x.GlobalHeaders
+        let allquery = Array.append query x.GlobalQuery
+        if meth.ToLower() = "get" then
+        
+          // Construct url & query
+          let url = x.Root + path
+          let queryString = 
+            allquery 
+            |> Array.map (fun (k, v) -> k + "=" + encodeURIComponent(v))
+            |> String.concat "&"
+        
+          let xhr = newXMLHttpRequest()
+          xhr.``open``("GET", url + "?" + queryString)
+          allheaders |> Array.iter (fun (header, value) ->
+            xhr.setRequestHeader(header, value) )
+
+          xhr.onreadystatechange <- (fun () ->
+            if xhr.readyState = 4.0 then
+              let source = xhr.responseText
+              let doc = JsonDocument.Create(JsonParser.parse (source))
+              setContext(doc, { x with GlobalArguments = allArguments } )
+              cont doc
+            )
+          xhr.send("") 
+        else 
+          failwith "Only GET supported" )
+  
+
+
+open Runtime
+
+let private newApiaryCtx = 
+  <@@ new ApiaryContext(undef()) @@>
+
+let private apiary =
+   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+      function
+      | SpecificConstructor newApiaryCtx (_, [rootArgument]) ->
+         let (Split(valDecls, valRef)) = rootArgument 
+         let fields = 
+            [ "Root", valRef
+              "GlobalQuery", Array []
+              "GlobalHeaders", Array []
+              "GlobalArguments", Array [] ]
+         [ yield! valDecls
+           yield returnStategy.Return <| Object fields
+         ]
+      | _ -> []
+
+let components = 
+  [ ExpressionReplacer.createUnsafe <@ ApiaryRuntime.ProcessParameters @> <@ ApiaryJsRuntime.ProcessParameters @> 
+    ExpressionReplacer.createUnsafe <@ fun (a:ApiaryContext) -> a.AddHeader @> <@ ApiaryJsRuntime.AddHeader @> 
+    ExpressionReplacer.createUnsafe <@ fun (a:ApiaryContext) -> a.AddQueryParam @> <@ ApiaryJsRuntime.AddQueryParam @> 
+    ExpressionReplacer.createUnsafe <@ fun (a:ApiaryOperations) -> a.AsyncInvokeOperation @> <@ ApiaryJsRuntime.AsyncInvokeOperation @> 
+    ExpressionReplacer.createUnsafe <@ ApiaryGenerationHelper.AsyncMap @> <@ ApiaryJsRuntime.AsyncMap @> 
+    apiary   
+  ]

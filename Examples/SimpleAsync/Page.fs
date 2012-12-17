@@ -56,22 +56,7 @@ let main() =
     j.jQuery?``#stop``.click(fun _ -> cts.Cancel()) |> ignore
   } |> Async.StartImmediate
 
+
 // ----------------------------------------------------------------------------
-// Translate & compile (and host at http://localhost:8081 for easy testing)
 
-do
-  let source = <@@ main() @@> |> Compiler.compile
-  let sourceWrapped = sprintf "(function () {\n%s\n})()" source
-  let filename = "blackjack.js"
-  System.IO.File.Delete filename
-  System.IO.File.WriteAllText(filename, sourceWrapped)
-  source |> printfn "%A"
-
-  let root = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\"
-  let url = "http://localhost:8081/"
-  let server = HttpServer.Start(url, root)
-
-  printfn "\nHttp server running at: %s" url
-  System.Console.ReadLine() |> ignore
-  server.Stop()
-  
+do Runtime.Run()

@@ -473,6 +473,14 @@ type ProvidedSymbolType(kind: SymbolKind, args: Type list) =
     override this.UnderlyingSystemType = 
       match kind with
       | Generic gty -> gty.UnderlyingSystemType
+      | SDArray ->
+          // Not entirely sure when this is used by who & for what
+          // but using 'notRequired' breaks some uses of the provider in 
+          // MovieDatabase (array of generated types). Using the code
+          // below seems to workaround the issue... (even though it is
+          // obviously (?) wrong implementation)
+          this :> System.Type 
+
       | _ -> notRequired "UnderlyingSystemType" this.Name
     override this.GetCustomAttributesData()                                                        = notRequired "GetCustomAttributesData" this.Name
     override this.MemberType                                                                       = notRequired "MemberType" this.Name
@@ -480,6 +488,8 @@ type ProvidedSymbolType(kind: SymbolKind, args: Type list) =
     override this.Equals(_that:obj) : bool                                                        = 
       // TODO: There must be a better way of doing this!
       match kind, _that with
+      | SDArray, (:? Type as that) ->
+         that.IsArray && (that.GetElementType() = args.[0])
       | Generic gty, (:? Type as that) ->
          gty.Name = that.Name &&
          Array.forall2 (fun (x:Type) (y:Type) ->
