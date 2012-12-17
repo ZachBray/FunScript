@@ -8,7 +8,7 @@
     <ProjectGuid>{e1d45250-a24a-4d26-bfbf-bf93ab5f45e5}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>FunJS.Example</RootNamespace>
-    <AssemblyName>FunJS.Example</AssemblyName>
+    <AssemblyName>SimpleAsync</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Name>MovieDatabase</Name>
   </PropertyGroup>

@@ -3,7 +3,6 @@ module Program
 
 open FunJS
 open FunJS.TypeScript
-open FSharp.Http
 open System.Threading
 
 type j = FunJS.TypeScript.Api<"..\\Typings\\jquery.d.ts">
@@ -17,18 +16,18 @@ type Async =
     Async.FromContinuations(fun (cont, econt, ccont) ->
       let named = ref None
       named := Some (f (fun v -> 
-        (!named).Value.off() |> ignore
+        (!named).Value.off'() |> ignore
         cont v
         obj() )))
       
 // ----------------------------------------------------------------------------
 // Demo using mini F# async
 
-let (?) (jq:j.JQueryStatic') name = jq.Invoke(name:string)
+let (?) (jq:j.JQueryStatic') name = jq.Invoke'("#" + name)
 
 let log(msg:string) =
    let tag = "<p>" + msg + "</p>"
-   (j.jQuery.Invoke "#results").append [| tag :> obj |]
+   j.jQuery?results.append [| tag :> obj |]
    |> ignore
 
 let increment(n) = 
@@ -39,21 +38,18 @@ let increment(n) =
 
 let rec worker(n) = 
   async { 
-    let! v = Async.AwaitJQueryEvent(fun f -> j.jQuery?``#next``.click''(f))
+    let! v = Async.AwaitJQueryEvent(fun f -> j.jQuery?next.click''(f))
     let! n = increment(n)
     do log ("Count: " + n.ToString())
     return! worker(n)
   }
 
 let main() = 
-  let msg = "Hello world!" |> String.map (fun c -> if c = ' ' then '_' else c)
-  lib.alert(msg)
-
   async {
     let! x = Async.AwaitJQueryEvent(fun o -> j.jQuery?document.ready o)
     let cts = new CancellationTokenSource()
     Async.StartImmediate(worker 0, cts.Token)
-    j.jQuery?``#stop``.click(fun _ -> cts.Cancel()) |> ignore
+    j.jQuery?stop.click''(fun _ -> box <| cts.Cancel()) |> ignore
   } |> Async.StartImmediate
 
 

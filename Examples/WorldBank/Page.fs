@@ -12,7 +12,7 @@ type WorldBank = WorldBankProvider<"World Development Indicators", Asynchronous=
 type j = TypeScript.Api<"../Typings/jquery.d.ts">
 type h = TypeScript.Api<"../Typings/highcharts.d.ts">
 
-let jQuery (command:string) = j.jQuery.Invoke(command)
+let jQuery (command:string) = j.jQuery.Invoke'(command)
 
 // ------------------------------------------------------------------
 // World bank countries
@@ -67,8 +67,8 @@ let main() =
   // Register click handlers
   render () |> Async.StartImmediate
   for _, check in infos do
-    check.click(fun () -> 
-      render() |> Async.StartImmediate) |> ignore
+    check.click''(fun _ -> 
+      render() |> Async.StartImmediate |> box) |> ignore
 
 // ------------------------------------------------------------------
 
