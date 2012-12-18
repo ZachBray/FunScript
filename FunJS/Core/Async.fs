@@ -15,7 +15,8 @@ type CancellationTokenSource() =
       token.Cell.Value := true
 
 type AsyncParamsAux =
-   { ExceptionCont : string -> unit
+   { StackCounter : int ref 
+     ExceptionCont : string -> unit
      CancelledCont : string -> unit 
      CancellationToken : CancellationToken }
 
@@ -25,10 +26,18 @@ type AsyncParams<'T> =
 
 type Async<'T> = Cont of (AsyncParams<'T> -> unit)
 
+[<FunJS.JSEmit("return setTimeout({0}, {1});")>]
+let setTimeout (handler:unit -> unit, milliseconds:float) = failwith "never"
+  
 let private protectedCont f = Cont (fun args ->
    args.Aux.CancellationToken.ThrowIfCancellationRequested()
-   f args )
+   incr args.Aux.StackCounter
+   if !args.Aux.StackCounter > 1000 then // TODO: Make this a parameter (this is pretty arbitrary)
+      args.Aux.StackCounter := 0
+      setTimeout((fun () -> f args), 1.0)
+   else f args )
 
+//let private incrStack  
 let private invokeCont k value = 
    k.Cont value
 
@@ -59,9 +68,6 @@ type AsyncBuilder() =
 
 let async = AsyncBuilder()
 
-[<FunJS.JSEmit("return setTimeout({0}, {1});")>]
-let setTimeout (handler:unit -> unit, milliseconds:float) = failwith "never"
-  
 type Async =
    static member FromContinuations(f) = protectedCont <| fun k ->
       f (k.Cont, k.Aux.ExceptionCont, k.Aux.CancelledCont)
@@ -69,7 +75,8 @@ type Async =
    static member StartImmediate(workflow:Async<unit>, ?cancellationToken) =
       let token = defaultArg cancellationToken { Cell = None }
       let (Cont f) = workflow
-      let aux = { ExceptionCont = ignore; CancelledCont = ignore; CancellationToken = token }
+      let aux = { StackCounter = ref 0; ExceptionCont = ignore; 
+                  CancelledCont = ignore; CancellationToken = token }
       f { Cont = ignore; Aux = aux }
 
    static member Sleep(milliseconds:int) = 
