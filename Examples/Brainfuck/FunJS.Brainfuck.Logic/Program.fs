@@ -5,7 +5,7 @@ open FunJS
 open System
 open FunJS.Core.Events
 
-type Dom = FunJS.TypeScript.Api< @"..\..\Examples\Typings\lib.d.ts" >
+type Dom = FunJS.TypeScript.Api< @"..\..\..\Examples\Typings\lib.d.ts" >
 
 [<JSEmit("alert({0});")>]
 let alert (x:obj): unit = failwith "never"
@@ -69,18 +69,19 @@ type DomEvent<'T> (element, eventName) =
 let main() =
 
     let txtCode = Dom.document.getElementById("code")    
-    let submit = Dom.document.getElementById("execute_code")
-    let console = Dom.document.getElementById("output")
+    let submit = Dom.document.getElementById("execute-code")
+    let console = Dom.document.getElementById("console-text")
 
     let consoleKeyPressEvt = new DomEvent<Dom.KeyboardEvent'>(console, "keypress") :> IEvent<_>
 
     let getNextChar =             
-       Async.FromContinuations(fun(cont, error, cancelled) ->
-          alert "GNC"  
+       Async.FromContinuations(fun(cont, error, cancelled) ->            
           let sub = ref Unchecked.defaultof<IDisposable>
           let nextChar (e:Dom.KeyboardEvent') = 
               (!sub).Dispose()
               cont <| getKeyFromEvent e
+              console.disabled <- true //TODO: Should be using readonly rather than disabled but type provider doesn't support inheritance
+          console.disabled <- false    //TODO: Should be using readonly rather than disabled but type provider doesn't support inheritance
           let observer = ActionObserver<Dom.KeyboardEvent'>(nextChar, (fun e -> ()), (fun () -> ()))
           sub := consoleKeyPressEvt.Subscribe(observer)) //TODO: Implement Observable.Take to avoid this mess
     
