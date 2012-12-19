@@ -1,12 +1,13 @@
 ﻿[<FunJS.JS>]
+[<NUnit.Framework.TestFixture>] 
 module FunJS.Tests.RecordTypes
 
-open Xunit
-open FsUnit.Xunit
+open NUnit.Framework
+
 
 type Person = { Name: string; Age: float } 
 
-[<Fact>]
+[<Test>]
 let ``Record constructors can be generated``() =
    check 
       <@@ 
@@ -15,7 +16,7 @@ let ``Record constructors can be generated``() =
       @@>
 
 
-[<Fact>]
+[<Test>]
 let ``Record property access can be generated``() =
    check 
       <@@ 
@@ -23,7 +24,7 @@ let ``Record property access can be generated``() =
          x.Name
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Record expression constructors can be generated``() =
    check 
       <@@ 

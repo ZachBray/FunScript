@@ -1,14 +1,15 @@
 ﻿[<FunJS.JS>]
+[<NUnit.Framework.TestFixture>] 
 module FunJS.Tests.LambdaApplication
 
-open Xunit
-open FsUnit.Xunit
+open NUnit.Framework
 
-[<Fact>]
+
+[<Test>]
 let ``Defining lambdas works``() =
    check <@@ (fun x -> x % 2. = 0.)(2.) @@>
 
-[<Fact>]
+[<Test>]
 let ``Applying let bound functions works``() =
    check 
       <@@ 
@@ -18,7 +19,7 @@ let ``Applying let bound functions works``() =
 
 type MapDelegate<'a,'b> = delegate of 'a -> 'b
 
-[<Fact>]
+[<Test>]
 let ``Constructing delegates works``() =
    check 
       <@@ 
@@ -26,7 +27,7 @@ let ``Constructing delegates works``() =
          ()
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Invoking delegates works``() =
    check 
       <@@ 
@@ -36,7 +37,7 @@ let ``Invoking delegates works``() =
 
 type TupledMapDelegate<'a,'b,'c> = delegate of 'a * 'b -> 'c
 
-[<Fact>]
+[<Test>]
 let ``Constructing tupled delegates works``() =
    check 
       <@@ 
@@ -44,7 +45,7 @@ let ``Constructing tupled delegates works``() =
          ()
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Invoking tupled delegates works``() =
    check 
       <@@ 

@@ -1,17 +1,18 @@
-﻿module FunJS.Tests.CommonOperators
+﻿[<NUnit.Framework.TestFixture>] 
+module FunJS.Tests.CommonOperators
 
-open Xunit
-open FsUnit.Xunit
+open NUnit.Framework
+
 open FunJS
 
-[<Fact>]
+[<Test>]
 let ``the id function works``() =
    check  
       <@@ 
          id 10.
       @@>
 
-[<Fact>]
+[<Test>]
 let ``the ref function works``() =
    check  
       <@@ 
@@ -20,7 +21,7 @@ let ``the ref function works``() =
       @@>
 
 
-[<Fact>]
+[<Test>]
 let ``the ! operator works``() =
    check  
       <@@ 
@@ -28,7 +29,7 @@ let ``the ! operator works``() =
          !x
       @@>
 
-[<Fact>]
+[<Test>]
 let ``the := operator works``() =
    check  
       <@@ 
@@ -38,7 +39,7 @@ let ``the := operator works``() =
       @@>
 
 
-[<Fact>]
+[<Test>]
 let ``the |> operator works``() =
    check  
       <@@ 
@@ -47,7 +48,7 @@ let ``the |> operator works``() =
          x |> incr
       @@>
 
-[<Fact>]
+[<Test>]
 let ``the |> operator works with functions that return functions``() =
    check  
       <@@ 
@@ -56,7 +57,7 @@ let ``the |> operator works with functions that return functions``() =
          addPartial (10., 11.)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``the |> operator works with functions that return functions that return functions``() =
    check  
       <@@ 
@@ -70,7 +71,7 @@ let ``the |> operator works with functions that return functions that return fun
          addPartial 12.
       @@>
 
-[<Fact>]
+[<Test>]
 let ``the ||> operator works``() =
    check  
       <@@ 
@@ -79,7 +80,7 @@ let ``the ||> operator works``() =
          arg ||> add
       @@>
 
-[<Fact>]
+[<Test>]
 let ``the |||> operator works``() =
    check  
       <@@ 
@@ -88,7 +89,7 @@ let ``the |||> operator works``() =
          arg |||> add
       @@>
 
-[<Fact>]
+[<Test>]
 let ``the <| operator works``() =
    check  
       <@@ 
@@ -97,7 +98,7 @@ let ``the <| operator works``() =
          incr <| x
       @@>
 
-[<Fact>]
+[<Test>]
 let ``the <|| operator works``() =
    check  
       <@@ 
@@ -106,7 +107,7 @@ let ``the <|| operator works``() =
          add <|| arg
       @@>
 
-[<Fact>]
+[<Test>]
 let ``the <||| operator works``() =
    check  
       <@@ 
@@ -115,7 +116,7 @@ let ``the <||| operator works``() =
          add <||| arg
       @@>
 
-[<Fact>]
+[<Test>]
 let ``the >> operator works``() =
    check  
       <@@ 
@@ -124,7 +125,7 @@ let ``the >> operator works``() =
          (incr >> divBy2) 10.
       @@>
 
-[<Fact>]
+[<Test>]
 let ``the << operator works``() =
    check  
       <@@ 
@@ -133,7 +134,7 @@ let ``the << operator works``() =
          (incr << divBy2) 10.
       @@>
 
-[<Fact>]
+[<Test>]
 let ``the >> operator works with functions that take tuples``() =
    check  
       <@@ 
@@ -144,7 +145,7 @@ let ``the >> operator works with functions that take tuples``() =
       @@>
 
 
-[<Fact>]
+[<Test>]
 let ``the defaultArg function works``() =
    check  
       <@@ 
@@ -152,14 +153,14 @@ let ``the defaultArg function works``() =
          defaultArg x 10.
       @@>
 
-[<Fact>]
+[<Test>]
 let ``the ignore function works``() =
    check  
       <@@ 
          ignore 11.
       @@>
 
-[<Fact>]
+[<Test>]
 let ``the .. operator works``() =
    check
       <@@
@@ -167,7 +168,7 @@ let ``the .. operator works``() =
          xs.[0] + xs.[1]
        @@>
 
-[<Fact>]
+[<Test>]
 let ``the .. .. operator works``() =
    check
       <@@

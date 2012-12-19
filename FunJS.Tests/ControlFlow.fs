@@ -1,9 +1,10 @@
-﻿module FunJS.Tests.ControlFlow
+﻿[<NUnit.Framework.TestFixture>] 
+module FunJS.Tests.ControlFlow
 
-open Xunit
-open FsUnit.Xunit
+open NUnit.Framework
 
-[<Fact>]
+
+[<Test>]
 let ``If then else expressions work``() =
    check 
       <@@ 
@@ -12,7 +13,7 @@ let ``If then else expressions work``() =
          else true
       @@>
 
-[<Fact>]
+[<Test>]
 let ``If then else expressions work inline``() =
    check 
       <@@ 
@@ -21,7 +22,7 @@ let ``If then else expressions work inline``() =
          f (if y then "foo" else "bar")
       @@>
 
-[<Fact>]
+[<Test>]
 let ``While expressions work``() =
    checkAreEqual
       10. 
@@ -32,7 +33,7 @@ let ``While expressions work``() =
          x
       @@>
 
-[<Fact>]
+[<Test>]
 let ``For i = 0 to N expressions work``() =
    checkAreEqual
       10. 
@@ -43,7 +44,7 @@ let ``For i = 0 to N expressions work``() =
          x
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Lambdas inside for loops create closures``() =
    checkAreEqual
       1. 
@@ -54,7 +55,7 @@ let ``Lambdas inside for loops create closures``() =
          f()
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Matching when the matched variable name is re-used in the case works``() =
    check 
       <@@

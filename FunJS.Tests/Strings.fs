@@ -2,11 +2,11 @@
 #load "Interactive.fsx"
 open FunJS.Tests.Common
 #endif
+[<NUnit.Framework.TestFixture>] 
 module FunJS.Tests.Strings
 
-open Xunit
-open Xunit.Extensions
-open FsUnit.Xunit
+open NUnit.Framework
+
 
 // The code that is produced by writing (c:char) = 'x' does not work correctly
 // in Jint, but works fine in web browsers. This function allows us to write
@@ -16,8 +16,7 @@ let charToInt (c:char) : int = int c
 
 // System.String - static methods
 
-[<Theory>]
-[<InlineData(null:string); InlineData(""); InlineData("test")>]
+[<TestCase(null:string); TestCase(""); TestCase("test")>]
 let ``String.IsNullOrEmpty works``(str:string) =
    check  
       <@@ 
@@ -26,7 +25,7 @@ let ``String.IsNullOrEmpty works``(str:string) =
 
 // System.String - instance methods
 
-[<Fact>]
+[<Test>]
 let ``String.Split works``() =
    check 
       <@@ 
@@ -34,35 +33,35 @@ let ``String.Split works``() =
          "abc" = array.[0] + array.[1] + array.[2]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``String.Replace works``() =
    check 
       <@@ 
          "abc abc abc".Replace("abc", "d")
       @@>
 
-[<Fact>]
+[<Test>]
 let ``String.IndexOf works``() =
    check 
       <@@ 
          "abcd".IndexOf("bc") * 100 + "abcd".IndexOf("bd") |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``String.ToUpper and String.ToLower work``() =
    check 
       <@@ 
          "AbC".ToUpper() + "aBc".ToLower()
       @@>
 
-[<Fact>]
+[<Test>]
 let ``String.Length works``() =
    check
       <@@ 
          "AbC".Length |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``String item works``() =
    checkAreEqual
       "b"
@@ -70,7 +69,7 @@ let ``String item works``() =
          "AbC".[1]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``String.ToCharArray works``() =
    check 
       <@@
@@ -78,14 +77,14 @@ let ``String.ToCharArray works``() =
          a.[0].ToString() + a.[1].ToString() + a.[2].ToString() + a.[3].ToString()
       @@>
 
-[<Fact>]    
+[<Test>]    
 let ``String.ToCharArray returns array``() =
    check 
       <@@
          "abcd".ToCharArray() |> Array.map (fun _ -> 1) |> Array.sum |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``String.Join works``() =
    check 
       <@@ 
@@ -93,31 +92,30 @@ let ``String.Join works``() =
       @@>
 
 
-// String - F# module functions 
-
-[<Theory>]
-[<InlineData("!!!"); InlineData("a!a"); InlineData("aaa")>]
+// String - F# module functions
+ 
+[<TestCase("!!!"); TestCase("a!a"); TestCase("aaa")>]
 let ``String.forall and exists work``(str) =
    check 
       <@@ 
          str |> String.forall (fun c -> charToInt c = charToInt '!') 
       @@> 
 
-[<Fact>]
+[<Test>]
 let ``String.init works``() =
    check 
       <@@ 
          String.init 3 (fun i -> "a")
       @@> 
 
-[<Fact>]
+[<Test>]
 let ``String.collect works``() =
    check 
       <@@ 
          "abc" |> String.collect (fun c -> "bcd")
       @@> 
 
-[<Fact>]
+[<Test>]
 let ``String.iter works``() =
    check 
       <@@ 
@@ -126,7 +124,7 @@ let ``String.iter works``() =
          !res
       @@> 
 
-[<Fact>]
+[<Test>]
 let ``String.iteri works``() =
    check 
       <@@ 
@@ -135,28 +133,28 @@ let ``String.iteri works``() =
          !res
       @@> 
 
-[<Fact>]
+[<Test>]
 let ``String.length (function) works``() =
    check
       <@@ 
          "AbC" |> String.length |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``String.map works``() =
    check 
       <@@          
          "Hello world!" |> String.map (fun c -> if charToInt c = charToInt 'H' then '_' else c)
       @@> 
 
-[<Fact>]
+[<Test>]
 let ``String.mapi works``() =
    check 
       <@@ 
          "Hello world!" |> String.mapi (fun i c -> if i = 1 || charToInt c = charToInt 'H' then '_' else c)
       @@> 
 
-[<Fact>]
+[<Test>]
 let ``String.replicate works``() =
    check 
       <@@ 

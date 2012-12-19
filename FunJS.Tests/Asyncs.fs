@@ -2,13 +2,13 @@
 #load "Interactive.fsx"
 open FunJS.Tests.Common
 #endif
+[<NUnit.Framework.TestFixture>] 
 module FunJS.Tests.Asyncs
 
-open Xunit
-open Xunit.Extensions
-open FsUnit.Xunit
+open NUnit.Framework
 
-[<Fact>]
+
+[<Test>]
 let ``Simple async translates without exception``() =
    check 
       <@@ 

@@ -1,8 +1,9 @@
 ﻿[<FunJS.JS>]
+[<NUnit.Framework.TestFixture>] 
 module FunJS.Tests.ReflectedDefinitions
 
-open Xunit
-open FsUnit.Xunit
+open NUnit.Framework
+
 
 module Calculator =
 
@@ -18,11 +19,11 @@ module Calculator =
 
    let mutable workings = 1.
 
-[<Fact>]
+[<Test>]
 let ``application of a curried module method works``() =
    check  <@@ Calculator.add 1. 2. @@>
 
-[<Fact>]
+[<Test>]
 let ``partial application of a curried module method works``() =
    check  
       <@@ 
@@ -30,23 +31,23 @@ let ``partial application of a curried module method works``() =
          f 2. 
       @@>
 
-[<Fact>]
+[<Test>]
 let ``application of a tupled module method works``() =
    check  <@@ Calculator.subtract(1., 2.) @@>
 
-[<Fact>]
+[<Test>]
 let ``application of a partially tupled curried module method works``() =
    check  <@@ Calculator.addSub 1. (2., 3.) @@>
 
-[<Fact>]
+[<Test>]
 let ``application of a partially tupled tupled module method works``() =
    check  <@@ Calculator.addSub2(1., (2., 3.)) @@>
 
-[<Fact>]
+[<Test>]
 let ``getting a module property works``() =
    check <@@ Calculator.zero @@>
 
-[<Fact>]
+[<Test>]
 let ``setting a mutable module property works``() =
    check  
       <@@ 
@@ -63,11 +64,11 @@ type StaticCalculator() =
       with get() = 0
       and set (value:int) = ()
 
-[<Fact>]
+[<Test>]
 let ``application of a static curried method works``() =
    check  <@@ StaticCalculator.add 1. 2. @@>
 
-[<Fact>]
+[<Test>]
 let ``partial application of a static method works``() =
    check  
       <@@ 
@@ -75,15 +76,15 @@ let ``partial application of a static method works``() =
          f 2. 
       @@>
 
-[<Fact>]
+[<Test>]
 let ``application of a static tupled method works``() =
    check  <@@ StaticCalculator.subtract(1., 2.) @@>
 
-[<Fact>]
+[<Test>]
 let ``getting a static property works``() =
    check  <@@ StaticCalculator.zero @@>
 
-[<Fact>]
+[<Test>]
 let ``setting a static property works``() =
    check  <@@ StaticCalculator.current <- 1 @@>
 
@@ -98,7 +99,7 @@ type InstanceCalculator(x) =
    member __.addSub x yz = x + __.subtract yz
    member __.addSub2(x, yz) = x + __.subtract yz
 
-[<Fact>]
+[<Test>]
 let ``constructing instances works``() =
    check
       <@@
@@ -106,14 +107,14 @@ let ``constructing instances works``() =
          () @@>
       
 
-[<Fact>]
+[<Test>]
 let ``application of a curried instance method works``() =
    check  
       <@@ 
          let calc = InstanceCalculator(10.)
          calc.add 1. 2. @@>
 
-[<Fact>]
+[<Test>]
 let ``partial application of a curried instance method works``() =
    check  
       <@@ 
@@ -122,49 +123,49 @@ let ``partial application of a curried instance method works``() =
          f 2. 
       @@>
 
-[<Fact>]
+[<Test>]
 let ``application of a tupled instance method works``() =
    check  
       <@@ 
          let calc = InstanceCalculator(10.)
          calc.subtract(1., 2.) @@>
 
-[<Fact>]
+[<Test>]
 let ``application of a partially tupled curried instance method works``() =
    check  
       <@@ 
          let calc = InstanceCalculator(10.)
          calc.addSub 1. (2., 3.) @@>
 
-[<Fact>]
+[<Test>]
 let ``application of a partially tupled tupled instance method works``() =
    check  
       <@@ 
          let calc = InstanceCalculator(10.)
          calc.addSub2(1., (2., 3.)) @@>
 
-[<Fact>]
+[<Test>]
 let ``getting an instance property works``() =
    check  
       <@@ 
          let calc = InstanceCalculator(10.)
          calc.zero @@>
 
-[<Fact>]
+[<Test>]
 let ``setting an instance property works``() =
    check  
       <@@ 
          let calc = InstanceCalculator(10.)
          calc.current <- calc.current + 1. @@>
 
-[<Fact>]
+[<Test>]
 let ``let bound fields on instances work``() =
    check  
       <@@ 
          let calc = InstanceCalculator(10.)
          calc.getY @@>
 
-[<Fact>]
+[<Test>]
 let ``generic methods on instances work``() =
    check  
       <@@ 
@@ -182,14 +183,14 @@ type CalculatorUnion =
    member __.subtract(x, y) = x - y
    member __.genericIdentity x = x
 
-[<Fact>]
+[<Test>]
 let ``application of a curried union method works``() =
    check  
       <@@ 
          let calc = Calculator(10.)
          calc.add 1. 2. @@>
 
-[<Fact>]
+[<Test>]
 let ``partial application of a curried union method works``() =
    check  
       <@@ 
@@ -198,28 +199,28 @@ let ``partial application of a curried union method works``() =
          f 2. 
       @@>
 
-[<Fact>]
+[<Test>]
 let ``application of a tupled union method works``() =
    check  
       <@@ 
          let calc = Calculator(10.)
          calc.subtract(1., 2.) @@>
 
-[<Fact>]
+[<Test>]
 let ``getting an union property works``() =
    check  
       <@@ 
          let calc = Calculator(10.)
          calc.zero @@>
 
-[<Fact>]
+[<Test>]
 let ``let bound fields on unions work``() =
    check  
       <@@ 
          let calc = Calculator(10.)
          calc.getSeed @@>
 
-[<Fact>]
+[<Test>]
 let ``generic methods on unions work``() =
    check  
       <@@ 
@@ -234,14 +235,14 @@ type RecordCalculator =
    member __.subtract(x, y) = x - y
    member __.genericIdentity x = x
      
-[<Fact>]
+[<Test>]
 let ``application of a curried record method works``() =
    check  
       <@@ 
          let calc = { y = 10. }
          calc.add 1. 2. @@>
 
-[<Fact>]
+[<Test>]
 let ``partial application of a curried record method works``() =
    check  
       <@@ 
@@ -250,21 +251,21 @@ let ``partial application of a curried record method works``() =
          f 2. 
       @@>
 
-[<Fact>]
+[<Test>]
 let ``application of a tupled record method works``() =
    check  
       <@@ 
          let calc = { y = 10. }
          calc.subtract(1., 2.) @@>
 
-[<Fact>]
+[<Test>]
 let ``getting an record property works``() =
    check  
       <@@ 
          let calc = { y = 10. }
          calc.zero @@>
 
-[<Fact>]
+[<Test>]
 let ``setting an record property works``() =
    check  
       <@@ 
@@ -272,14 +273,14 @@ let ``setting an record property works``() =
          calc.y <- calc.y + 1.
          calc.y @@>
 
-[<Fact>]
+[<Test>]
 let ``let bound fields on records work``() =
    check  
       <@@ 
          let calc = { y = 10. }
          calc.getY @@>
 
-[<Fact>]
+[<Test>]
 let ``generic methods on records work``() =
    check  
       <@@ 

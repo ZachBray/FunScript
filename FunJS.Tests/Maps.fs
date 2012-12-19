@@ -1,10 +1,11 @@
 ﻿[<FunJS.JS>]
+[<NUnit.Framework.TestFixture>] 
 module FunJS.Tests.Maps
 
-open Xunit
-open FsUnit.Xunit
+open NUnit.Framework
 
-[<Fact>]
+
+[<Test>]
 let ``Map construction from lists works``() =
    check  
       <@@ 
@@ -12,7 +13,7 @@ let ``Map construction from lists works``() =
          xs |> Seq.isEmpty
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.isEmpty works``() =
    check  
       <@@ 
@@ -20,7 +21,7 @@ let ``Map.isEmpty works``() =
          xs |> Seq.isEmpty
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.IsEmpty works``() =
    check  
       <@@ 
@@ -28,7 +29,7 @@ let ``Map.IsEmpty works``() =
          xs.IsEmpty
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.empty works``() =
    check  
       <@@ 
@@ -36,7 +37,7 @@ let ``Map.empty works``() =
          ()
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.Count works``() =
    check  
       <@@ 
@@ -44,7 +45,7 @@ let ``Map.Count works``() =
          xs.Count |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.add works``() =
    check  
       <@@ 
@@ -52,7 +53,7 @@ let ``Map.add works``() =
          float xs.Count
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.Add works``() =
    check  
       <@@ 
@@ -60,7 +61,7 @@ let ``Map.Add works``() =
          float xs.Count
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.containsKey works``() =
    check  
       <@@ 
@@ -68,7 +69,7 @@ let ``Map.containsKey works``() =
          xs |> Map.containsKey 1
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.ContainsKey works``() =
    check  
       <@@ 
@@ -77,7 +78,7 @@ let ``Map.ContainsKey works``() =
       @@>
 
 
-[<Fact>]
+[<Test>]
 let ``Map.remove works``() =
    check  
       <@@ 
@@ -85,7 +86,7 @@ let ``Map.remove works``() =
          xs.IsEmpty
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.Remove works``() =
    check  
       <@@ 
@@ -93,7 +94,7 @@ let ``Map.Remove works``() =
          xs.IsEmpty
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.iter works``() =
    check  
       <@@ 
@@ -104,7 +105,7 @@ let ``Map.iter works``() =
       @@>
 
 
-[<Fact>]
+[<Test>]
 let ``Map.forAll works``() =
    check  
       <@@ 
@@ -112,7 +113,7 @@ let ``Map.forAll works``() =
          xs |> Map.forall (fun x y -> x < 5.)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.exists works``() =
    check  
       <@@ 
@@ -120,7 +121,7 @@ let ``Map.exists works``() =
          xs |> Map.exists (fun k v -> k = 2)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.filter works``() =
    check  
       <@@ 
@@ -129,7 +130,7 @@ let ``Map.filter works``() =
          ys.Count |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.partition works``() =
    check  
       <@@ 
@@ -138,7 +139,7 @@ let ``Map.partition works``() =
          float(ys.Count + zs.Count)
       @@> 
 
-[<Fact>]
+[<Test>]
 let ``Map.fold works``() =
    check   
       <@@ 
@@ -146,7 +147,7 @@ let ``Map.fold works``() =
          xs |> Map.fold (fun acc k v -> v + acc) 0.
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.foldBack works``() =
    check   
       <@@ 
@@ -154,7 +155,7 @@ let ``Map.foldBack works``() =
          Map.foldBack (fun k v acc -> v + acc) xs 0.
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.map works``() =
    check   
       <@@ 
@@ -163,7 +164,7 @@ let ``Map.map works``() =
          ys.ContainsKey 1
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.find works``() =
    check   
       <@@ 
@@ -171,7 +172,7 @@ let ``Map.find works``() =
          xs |> Map.find 1
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.tryFind works``() =
    check   
       <@@ 
@@ -179,7 +180,7 @@ let ``Map.tryFind works``() =
          (xs |> Map.tryFind 0).IsNone
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.TryFind works``() =
    check   
       <@@ 
@@ -187,7 +188,7 @@ let ``Map.TryFind works``() =
          (xs.TryFind 3).IsSome
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.tryFindKey works``() =
    check   
       <@@ 
@@ -195,7 +196,7 @@ let ``Map.tryFindKey works``() =
          (xs |> Map.tryFindKey (fun k v -> k = 3)).IsSome
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.pick works``() =
    check   
       <@@ 
@@ -207,7 +208,7 @@ let ``Map.pick works``() =
          float y
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.tryPick works``() =
    check   
       <@@ 
@@ -219,7 +220,7 @@ let ``Map.tryPick works``() =
          float y.Value
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.ofList works``() =
    check   
       <@@ 
@@ -227,7 +228,7 @@ let ``Map.ofList works``() =
          float xs.Count
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.ofArray works``() =
    check   
       <@@ 
@@ -235,7 +236,7 @@ let ``Map.ofArray works``() =
          float xs.Count
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.ofSeq works``() =
    check   
       <@@ 
@@ -243,7 +244,7 @@ let ``Map.ofSeq works``() =
          float xs.Count
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.toList works``() =
    check   
       <@@ 
@@ -253,7 +254,7 @@ let ``Map.toList works``() =
          xs = zs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.toArray works``() =
    check   
       <@@ 
@@ -263,7 +264,7 @@ let ``Map.toArray works``() =
          xs = zs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Map.toSeq works``() =
    check   
       <@@ 

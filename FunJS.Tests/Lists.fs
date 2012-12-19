@@ -1,9 +1,10 @@
-﻿module FunJS.Tests.Lists
+﻿[<NUnit.Framework.TestFixture>] 
+module FunJS.Tests.Lists
 
-open Xunit
-open FsUnit.Xunit
+open NUnit.Framework
 
-[<Fact>]
+
+[<Test>]
 let ``List literals work``() =
    check  
       <@@ 
@@ -11,7 +12,7 @@ let ``List literals work``() =
          ()
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.Length works``() =
    check  
       <@@ 
@@ -19,7 +20,7 @@ let ``List.Length works``() =
          xs.Length |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.IsEmpty works``() =
    check  
       <@@ 
@@ -27,7 +28,7 @@ let ``List.IsEmpty works``() =
          xs.IsEmpty
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.Head works``() =
    check  
       <@@ 
@@ -35,7 +36,7 @@ let ``List.Head works``() =
          xs.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.Tail works``() =
    check  
       <@@ 
@@ -43,7 +44,7 @@ let ``List.Tail works``() =
          xs.Tail.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.Item works``() =
    check  
       <@@ 
@@ -51,7 +52,7 @@ let ``List.Item works``() =
          xs.[3]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List cons works``() =
    check  
       <@@ 
@@ -61,7 +62,7 @@ let ``List cons works``() =
          ys.Head + xs.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.empty works``() =
    check  
       <@@ 
@@ -70,7 +71,7 @@ let ``List.empty works``() =
          xs.Head + ys.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.append works``() =
    check  
       <@@ 
@@ -80,7 +81,7 @@ let ``List.append works``() =
          zs.Head + zs.Tail.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.average works``() =
    check  
       <@@ 
@@ -88,7 +89,7 @@ let ``List.average works``() =
          List.average xs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.averageBy works``() =
    check  
       <@@ 
@@ -96,7 +97,7 @@ let ``List.averageBy works``() =
          List.averageBy ((*) 2.) xs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.choose works``() =
    check  
       <@@ 
@@ -107,7 +108,7 @@ let ``List.choose works``() =
          result.Head + result.Tail.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.collect works``() =
    check  
       <@@ 
@@ -124,7 +125,7 @@ let ``List.concat works``() =
          ys.Head  + ys.Tail.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.exists works``() =
    check  
       <@@ 
@@ -132,7 +133,7 @@ let ``List.exists works``() =
          xs |> List.exists (fun x -> x = 2.)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.exists2 works``() =
    check  
       <@@ 
@@ -141,7 +142,7 @@ let ``List.exists2 works``() =
          List.exists2 (fun x y -> x * y = 16.) xs ys
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.filter works``() =
    check  
       <@@ 
@@ -150,7 +151,7 @@ let ``List.filter works``() =
          ys.IsEmpty
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.find works``() =
    check  
       <@@ 
@@ -158,7 +159,7 @@ let ``List.find works``() =
          xs |> List.find ((=) 2.)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.findIndex works``() =
    check  
       <@@ 
@@ -167,7 +168,7 @@ let ``List.findIndex works``() =
          |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.fold works``() =
    check  
       <@@ 
@@ -176,7 +177,7 @@ let ``List.fold works``() =
          total
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.fold2 works``() =
    check  
       <@@ 
@@ -186,7 +187,7 @@ let ``List.fold2 works``() =
          total
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.foldBack works``() =
    check  
       <@@ 
@@ -195,7 +196,7 @@ let ``List.foldBack works``() =
          total
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.foldBack2 works``() =
    check  
       <@@ 
@@ -205,7 +206,7 @@ let ``List.foldBack2 works``() =
          total
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.forall works``() =
    check  
       <@@ 
@@ -213,7 +214,7 @@ let ``List.forall works``() =
          List.forall (fun x -> x < 5.) xs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.forall2 works``() =
    check  
       <@@ 
@@ -222,7 +223,7 @@ let ``List.forall2 works``() =
          List.forall2 (=) xs ys
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.head works``() =
    check  
       <@@ 
@@ -230,7 +231,7 @@ let ``List.head works``() =
          List.head xs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.init works``() =
    check  
       <@@ 
@@ -238,7 +239,7 @@ let ``List.init works``() =
          xs.Head + xs.Tail.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.isEmpty works``() =
    check  
       <@@ 
@@ -246,7 +247,7 @@ let ``List.isEmpty works``() =
          List.isEmpty xs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.iter works``() =
    check  
       <@@ 
@@ -258,7 +259,7 @@ let ``List.iter works``() =
          !total
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.iter2 works``() =
    check  
       <@@ 
@@ -270,7 +271,7 @@ let ``List.iter2 works``() =
          !total
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.iteri works``() =
    check  
       <@@ 
@@ -282,7 +283,7 @@ let ``List.iteri works``() =
          !total
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.iteri2 works``() =
    check  
       <@@ 
@@ -294,7 +295,7 @@ let ``List.iteri2 works``() =
          !total
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.length works``() =
    check  
       <@@ 
@@ -303,7 +304,7 @@ let ``List.length works``() =
          |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.map works``() =
    check  
       <@@ 
@@ -312,7 +313,7 @@ let ``List.map works``() =
          ys.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.map2 works``() =
    check  
       <@@ 
@@ -322,7 +323,7 @@ let ``List.map2 works``() =
          zs.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.map3 works``() =
    check  
       <@@ 
@@ -333,7 +334,7 @@ let ``List.map3 works``() =
          zs.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.mapi works``() =
    check  
       <@@ 
@@ -342,7 +343,7 @@ let ``List.mapi works``() =
          ys.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.mapi2 works``() =
    check  
       <@@ 
@@ -352,7 +353,7 @@ let ``List.mapi2 works``() =
          zs.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.max works``() =
    check  
       <@@ 
@@ -360,7 +361,7 @@ let ``List.max works``() =
          xs |> List.max
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.maxBy works``() =
    check  
       <@@ 
@@ -368,7 +369,7 @@ let ``List.maxBy works``() =
          xs |> List.maxBy (fun x -> -x)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.min works``() =
    check  
       <@@ 
@@ -376,7 +377,7 @@ let ``List.min works``() =
          xs |> List.min
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.minBy works``() =
    check  
       <@@ 
@@ -384,7 +385,7 @@ let ``List.minBy works``() =
          xs |> List.minBy (fun x -> -x)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.nth works``() =
    check  
       <@@ 
@@ -392,7 +393,7 @@ let ``List.nth works``() =
          List.nth xs 1
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.ofArray works``() =
    check  
       <@@ 
@@ -401,7 +402,7 @@ let ``List.ofArray works``() =
          ys.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.ofSeq works``() =
    check  
       <@@ 
@@ -410,7 +411,7 @@ let ``List.ofSeq works``() =
          ys.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.partition works``() =
    check  
       <@@ 
@@ -419,7 +420,7 @@ let ``List.partition works``() =
          ys.Head - zs.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.permute works``() =
    check  
       <@@ 
@@ -428,7 +429,7 @@ let ``List.permute works``() =
          ys.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.pick works``() =
    check  
       <@@ 
@@ -439,7 +440,7 @@ let ``List.pick works``() =
             | _ -> None)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.reduce works``() =
    check  
       <@@ 
@@ -447,7 +448,7 @@ let ``List.reduce works``() =
          xs |> List.reduce (+)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.reduceBack works``() =
    check  
       <@@ 
@@ -455,7 +456,7 @@ let ``List.reduceBack works``() =
          xs |> List.reduceBack (+)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.replicate works``() =
    check  
       <@@ 
@@ -463,7 +464,7 @@ let ``List.replicate works``() =
          xs.Head + xs.Tail.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.rev works``() =
    check  
       <@@ 
@@ -472,7 +473,7 @@ let ``List.rev works``() =
          ys.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.scan works``() =
    check  
       <@@ 
@@ -481,7 +482,7 @@ let ``List.scan works``() =
          ys.Head + ys.Tail.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.scanBack works``() =
    check  
       <@@ 
@@ -490,7 +491,7 @@ let ``List.scanBack works``() =
          ys.Head + ys.Tail.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.sort works``() =
    check  
       <@@ 
@@ -499,7 +500,7 @@ let ``List.sort works``() =
          ys.Head + ys.Tail.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.sortBy works``() =
    check  
       <@@ 
@@ -508,7 +509,7 @@ let ``List.sortBy works``() =
          ys.Head + ys.Tail.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.sortWith works``() =
    check  
       <@@ 
@@ -517,7 +518,7 @@ let ``List.sortWith works``() =
          ys.Head + ys.Tail.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.sum works``() =
    check  
       <@@ 
@@ -525,7 +526,7 @@ let ``List.sum works``() =
          xs |> List.sum
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.sumBy works``() =
    check  
       <@@ 
@@ -533,7 +534,7 @@ let ``List.sumBy works``() =
          xs |> List.sumBy ((*) 2.)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.tail works``() =
    check  
       <@@ 
@@ -542,7 +543,7 @@ let ``List.tail works``() =
          ys.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.toArray works``() =
    check  
       <@@ 
@@ -551,7 +552,7 @@ let ``List.toArray works``() =
          ys.[0] + ys.[1]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.toSeq works``() =
    check  
       <@@ 
@@ -560,7 +561,7 @@ let ``List.toSeq works``() =
          ys.GetEnumerator().MoveNext()
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.tryFind works``() =
    check  
       <@@ 
@@ -569,7 +570,7 @@ let ``List.tryFind works``() =
          ys.IsSome
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.tryFindIndex works``() =
    check  
       <@@ 
@@ -578,7 +579,7 @@ let ``List.tryFindIndex works``() =
          ys.Value |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.tryPick works``() =
    check  
       <@@ 
@@ -592,7 +593,7 @@ let ``List.tryPick works``() =
          | None -> 0.
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.unzip works``() =
    check  
       <@@ 
@@ -601,7 +602,7 @@ let ``List.unzip works``() =
          ys.Head + zs.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.unzip3 works``() =
    check  
       <@@ 
@@ -610,7 +611,7 @@ let ``List.unzip3 works``() =
          ys.Head + zs.Head + ks.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.zip works``() =
    check  
       <@@ 
@@ -621,7 +622,7 @@ let ``List.zip works``() =
          x + y
       @@>
 
-[<Fact>]
+[<Test>]
 let ``List.zip3 works``() =
    check  
       <@@ 

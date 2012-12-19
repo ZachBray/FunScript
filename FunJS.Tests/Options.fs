@@ -1,9 +1,10 @@
-﻿module FunJS.Tests.Options
+﻿[<NUnit.Framework.TestFixture>] 
+module FunJS.Tests.Options
 
-open Xunit
-open FsUnit.Xunit
+open NUnit.Framework
 
-[<Fact>]
+
+[<Test>]
 let ``Option.Value works``() =
    check  
       <@@ 
@@ -11,7 +12,7 @@ let ``Option.Value works``() =
          x.Value
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Option.IsSome works``() =
    check  
       <@@ 
@@ -19,7 +20,7 @@ let ``Option.IsSome works``() =
          x.IsSome
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Option.IsNone works``() =
    check  
       <@@ 
@@ -27,7 +28,7 @@ let ``Option.IsNone works``() =
          x.IsNone
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Option.bind works``() =
    check  
       <@@ 
@@ -38,7 +39,7 @@ let ``Option.bind works``() =
          r.Value
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Option.count works``() =
    check  
       <@@ 
@@ -47,28 +48,28 @@ let ``Option.count works``() =
          |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Option.exists works``() =
    check  
       <@@ 
          Some 1. |> Option.exists ((=) 1.)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Option.fold works``() =
    check  
       <@@ 
          Some 1. |> Option.fold (+) 1.
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Option.foldBack works``() =
    check  
       <@@ 
          Option.foldBack (+) (Some 1.) 1.
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Option.forall works``() =
    check  
       <@@ 
@@ -76,28 +77,28 @@ let ``Option.forall works``() =
       @@>
 
 
-[<Fact>]
+[<Test>]
 let ``Option.get works``() =
    check  
       <@@ 
          Some 1. |> Option.get
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Option.isNone works``() =
    check  
       <@@ 
          Some 1. |> Option.isNone
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Option.isSome works``() =
    check  
       <@@ 
          Some 1. |> Option.isSome
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Option.iter works``() =
    check  
       <@@ 
@@ -106,7 +107,7 @@ let ``Option.iter works``() =
          !x
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Option.map works``() =
    check  
       <@@ 
@@ -114,7 +115,7 @@ let ``Option.map works``() =
          |> Option.get
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Option.toArray works``() =
    check  
       <@@ 
@@ -122,7 +123,7 @@ let ``Option.toArray works``() =
          xs.[0]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Option.toList works``() =
    check  
       <@@ 

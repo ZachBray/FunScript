@@ -1,9 +1,10 @@
-﻿module FunJS.Tests.Arrays
+﻿[<NUnit.Framework.TestFixture>] 
+module FunJS.Tests.Arrays
 
-open Xunit
-open FsUnit.Xunit
+open NUnit.Framework
 
-[<Fact>]
+
+[<Test>]
 let ``Array literals work``() =
    check 
       <@@ 
@@ -11,7 +12,7 @@ let ``Array literals work``() =
          true
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array indexer getter works``() =
    check 
       <@@ 
@@ -19,7 +20,7 @@ let ``Array indexer getter works``() =
          x.[2]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array indexer setter works``() =
    check 
       <@@ 
@@ -27,7 +28,7 @@ let ``Array indexer setter works``() =
          x.[3] <- 10.
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.Length works``() =
    check  
       <@@ 
@@ -35,7 +36,7 @@ let ``Array.Length works``() =
          xs.Length |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.zeroCreate works``() =
    check  
       <@@ 
@@ -45,7 +46,7 @@ let ``Array.zeroCreate works``() =
          ()
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.blit works``() =
    check  
       <@@ 
@@ -55,7 +56,7 @@ let ``Array.blit works``() =
          ys.[0] + ys.[1]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.copy works``() =
    check  
       <@@ 
@@ -64,7 +65,7 @@ let ``Array.copy works``() =
          ys.[0] + ys.[1]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.sub works``() =
    check  
       <@@ 
@@ -73,7 +74,7 @@ let ``Array.sub works``() =
          ys.[0] + ys.[1]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.fill works``() =
    check  
       <@@ 
@@ -82,7 +83,7 @@ let ``Array.fill works``() =
          xs.[0] + xs.[1]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.empty works``() =
    check  
       <@@ 
@@ -90,7 +91,7 @@ let ``Array.empty works``() =
          float xs.Length
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.append works``() =
    check  
       <@@ 
@@ -100,7 +101,7 @@ let ``Array.append works``() =
          zs.[0] + zs.[1]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.average works``() =
    check  
       <@@ 
@@ -108,7 +109,7 @@ let ``Array.average works``() =
          Array.average xs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.averageBy works``() =
    check  
       <@@ 
@@ -116,7 +117,7 @@ let ``Array.averageBy works``() =
          Array.averageBy ((*) 2.) xs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.choose works``() =
    check  
       <@@ 
@@ -127,7 +128,7 @@ let ``Array.choose works``() =
          result.[0] + result.[1]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.collect works``() =
    check  
       <@@ 
@@ -136,7 +137,7 @@ let ``Array.collect works``() =
          ys.[0]  + ys.[1]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.concat works``() =
    check  
       <@@ 
@@ -145,7 +146,7 @@ let ``Array.concat works``() =
          ys.[0]  + ys.[1]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.exists works``() =
    check  
       <@@ 
@@ -153,7 +154,7 @@ let ``Array.exists works``() =
          xs |> Array.exists (fun x -> x = 2.)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.exists2 works``() =
    check  
       <@@ 
@@ -162,7 +163,7 @@ let ``Array.exists2 works``() =
          Array.exists2 (fun x y -> x * y = 16.) xs ys
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.filter works``() =
    check  
       <@@ 
@@ -171,7 +172,7 @@ let ``Array.filter works``() =
          float ys.Length
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.find works``() =
    check  
       <@@ 
@@ -179,7 +180,7 @@ let ``Array.find works``() =
          xs |> Array.find ((=) 2.)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.findIndex works``() =
    check  
       <@@ 
@@ -188,7 +189,7 @@ let ``Array.findIndex works``() =
          |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.fold works``() =
    check  
       <@@ 
@@ -197,7 +198,7 @@ let ``Array.fold works``() =
          total
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.fold2 works``() =
    check  
       <@@ 
@@ -207,7 +208,7 @@ let ``Array.fold2 works``() =
          total
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.foldBack works``() =
    check  
       <@@ 
@@ -216,7 +217,7 @@ let ``Array.foldBack works``() =
          total
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.foldBack2 works``() =
    check  
       <@@ 
@@ -226,7 +227,7 @@ let ``Array.foldBack2 works``() =
          total
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.forall works``() =
    check  
       <@@ 
@@ -234,7 +235,7 @@ let ``Array.forall works``() =
          Array.forall (fun x -> x < 5.) xs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.forall2 works``() =
    check  
       <@@ 
@@ -243,7 +244,7 @@ let ``Array.forall2 works``() =
          Array.forall2 (=) xs ys
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.init works``() =
    check  
       <@@ 
@@ -251,7 +252,7 @@ let ``Array.init works``() =
          xs.[0] + xs.[1]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.isEmpty works``() =
    check  
       <@@ 
@@ -259,7 +260,7 @@ let ``Array.isEmpty works``() =
          Array.isEmpty xs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.iter works``() =
    check  
       <@@ 
@@ -271,7 +272,7 @@ let ``Array.iter works``() =
          !total
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.iter2 works``() =
    check  
       <@@ 
@@ -283,7 +284,7 @@ let ``Array.iter2 works``() =
          !total
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.iteri works``() =
    check  
       <@@ 
@@ -295,7 +296,7 @@ let ``Array.iteri works``() =
          !total
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.iteri2 works``() =
    check  
       <@@ 
@@ -307,7 +308,7 @@ let ``Array.iteri2 works``() =
          !total
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.length works``() =
    check  
       <@@ 
@@ -316,7 +317,7 @@ let ``Array.length works``() =
          |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.map works``() =
    check  
       <@@ 
@@ -325,7 +326,7 @@ let ``Array.map works``() =
          ys.[0]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.map2 works``() =
    check  
       <@@ 
@@ -335,7 +336,7 @@ let ``Array.map2 works``() =
          zs.[0]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.mapi works``() =
    check  
       <@@ 
@@ -344,7 +345,7 @@ let ``Array.mapi works``() =
          ys.[0]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.mapi2 works``() =
    check  
       <@@ 
@@ -354,7 +355,7 @@ let ``Array.mapi2 works``() =
          zs.[0]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.max works``() =
    check  
       <@@ 
@@ -362,7 +363,7 @@ let ``Array.max works``() =
          xs |> Array.max
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.maxBy works``() =
    check  
       <@@ 
@@ -370,7 +371,7 @@ let ``Array.maxBy works``() =
          xs |> Array.maxBy (fun x -> -x)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.min works``() =
    check  
       <@@ 
@@ -378,7 +379,7 @@ let ``Array.min works``() =
          xs |> Array.min
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.minBy works``() =
    check  
       <@@ 
@@ -386,7 +387,7 @@ let ``Array.minBy works``() =
          xs |> Array.minBy (fun x -> -x)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.ofList works``() =
    check  
       <@@ 
@@ -395,7 +396,7 @@ let ``Array.ofList works``() =
          ys.[0]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.ofSeq works``() =
    check  
       <@@ 
@@ -404,7 +405,7 @@ let ``Array.ofSeq works``() =
          ys.[0]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.partition works``() =
    check  
       <@@ 
@@ -413,7 +414,7 @@ let ``Array.partition works``() =
          ys.[0] - zs.[0]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.permute works``() =
    check  
       <@@ 
@@ -422,7 +423,7 @@ let ``Array.permute works``() =
          ys.[0]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.pick works``() =
    check  
       <@@ 
@@ -433,7 +434,7 @@ let ``Array.pick works``() =
             | _ -> None)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.reduce works``() =
    check  
       <@@ 
@@ -441,7 +442,7 @@ let ``Array.reduce works``() =
          xs |> Array.reduce (+)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.reduceBack works``() =
    check  
       <@@ 
@@ -449,7 +450,7 @@ let ``Array.reduceBack works``() =
          xs |> Array.reduceBack (+)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.rev works``() =
    check  
       <@@ 
@@ -458,7 +459,7 @@ let ``Array.rev works``() =
          ys.[0]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.scan works``() =
    check  
       <@@ 
@@ -467,7 +468,7 @@ let ``Array.scan works``() =
          ys.[0] + ys.[1]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.scanBack works``() =
    check  
       <@@ 
@@ -476,7 +477,7 @@ let ``Array.scanBack works``() =
          ys.[0] + ys.[1]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.sort works``() =
    check  
       <@@ 
@@ -485,7 +486,7 @@ let ``Array.sort works``() =
          ys.[0] + ys.[1]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.sortBy works``() =
    check  
       <@@ 
@@ -494,7 +495,7 @@ let ``Array.sortBy works``() =
          ys.[0] + ys.[1]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.sortWith works``() =
    check  
       <@@ 
@@ -503,7 +504,7 @@ let ``Array.sortWith works``() =
          ys.[0] + ys.[1]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.sortInPlace works``() =
    check  
       <@@ 
@@ -512,7 +513,7 @@ let ``Array.sortInPlace works``() =
          xs.[0] + xs.[1]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.sortInPlaceBy works``() =
    check  
       <@@ 
@@ -521,7 +522,7 @@ let ``Array.sortInPlaceBy works``() =
          xs.[0] + xs.[1]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.sortInPlaceWith works``() =
    check  
       <@@ 
@@ -530,7 +531,7 @@ let ``Array.sortInPlaceWith works``() =
          xs.[0] + xs.[1]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.sum works``() =
    check  
       <@@ 
@@ -538,7 +539,7 @@ let ``Array.sum works``() =
          xs |> Array.sum
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.sumBy works``() =
    check  
       <@@ 
@@ -546,7 +547,7 @@ let ``Array.sumBy works``() =
          xs |> Array.sumBy ((*) 2.)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.toList works``() =
    check  
       <@@ 
@@ -555,7 +556,7 @@ let ``Array.toList works``() =
          ys.[0] + ys.[1]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.toSeq works``() =
    check  
       <@@ 
@@ -564,7 +565,7 @@ let ``Array.toSeq works``() =
          ys |> Seq.head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.tryFind works``() =
    check  
       <@@ 
@@ -573,7 +574,7 @@ let ``Array.tryFind works``() =
          ys.IsSome
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.tryFindIndex works``() =
    check  
       <@@ 
@@ -582,7 +583,7 @@ let ``Array.tryFindIndex works``() =
          ys.Value |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.tryPick works``() =
    check  
       <@@ 
@@ -596,7 +597,7 @@ let ``Array.tryPick works``() =
          | None -> 0.
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.unzip works``() =
    check  
       <@@ 
@@ -605,7 +606,7 @@ let ``Array.unzip works``() =
          ys.[0] + zs.[0]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.unzip3 works``() =
    check  
       <@@ 
@@ -614,7 +615,7 @@ let ``Array.unzip3 works``() =
          ys.[0] + zs.[0] + ks.[0]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.zip works``() =
    check  
       <@@ 
@@ -625,7 +626,7 @@ let ``Array.zip works``() =
          x + y
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Array.zip3 works``() =
    check  
       <@@ 
