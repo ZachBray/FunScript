@@ -75,24 +75,31 @@ let private (|JSConservativeMethodMapping|_|) (mi:MethodBase) =
    | JSConservativeMapping name -> Some <| name + "." + mi.Name
    | _  -> None
 
-let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list) bodyExpr (compiler:InternalCompiler.ICompiler) =
-   let block =
-      match replacementMi.GetCustomAttribute<JSEmitAttribute>() with
-      | meth when meth <> Unchecked.defaultof<_> ->
-         let code =
-            vars 
-            |> List.mapi (fun i v -> i,v)
-            |> List.fold (fun (acc:string) (i,v) ->
-               acc.Replace(sprintf "{%i}" i, v.Name)
-               ) meth.Emit
-         EmitBlock code
-      | _ when mb.IsConstructor ->
-         Block [  
-            yield! compiler.Compile ReturnStrategies.inplace bodyExpr
-            yield! compiler |> Objects.genInstanceMethods mb.DeclaringType
-         ]
-      | _ -> Block(compiler.Compile ReturnStrategies.returnFrom bodyExpr)
-   vars, block
+let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list) bodyExpr var (compiler:InternalCompiler.ICompiler) =
+   match replacementMi.GetCustomAttribute<JSEmitAttribute>() with
+   | meth when meth <> Unchecked.defaultof<_> ->
+      let code =
+         vars 
+         |> List.mapi (fun i v -> i,v)
+         |> List.fold (fun (acc:string) (i,v) ->
+            acc.Replace(sprintf "{%i}" i, v.Name)
+            ) meth.Emit
+      [ Assign(Reference var, Lambda(vars, EmitBlock code)) ]
+   | _ when mb.IsConstructor ->
+      [  
+         yield Assign(Reference var, Lambda(vars, Block(compiler.Compile ReturnStrategies.inplace bodyExpr)))
+         let methods = compiler |> Objects.genInstanceMethods mb.DeclaringType
+         let proto = PropertyGet(Reference var, "prototype")
+         for name, lambda in methods do
+            yield Assign(PropertyGet(proto, name), lambda)
+      ]
+   | _ -> 
+      [ Assign(
+         Reference var, 
+         Lambda(vars, 
+            Block(compiler.Compile ReturnStrategies.returnFrom bodyExpr))) ] 
+
+   
 
 let private replaceIfAvailable (compiler:InternalCompiler.ICompiler) mb callType =
    match compiler.ReplacementFor mb callType with
@@ -101,10 +108,10 @@ let private replaceIfAvailable (compiler:InternalCompiler.ICompiler) mb callType
 
 let private (|CallPattern|_|) = Objects.methodCallPattern
 
-let private createGlobalMethod compiler mb callType =
+let private createGlobalMethod compiler mb callType var =
    match replaceIfAvailable compiler mb callType with
    | CallPattern(vars, bodyExpr) as replacementMi ->
-      genMethod mb replacementMi vars bodyExpr compiler
+      genMethod mb replacementMi vars bodyExpr var compiler
    | _ -> failwithf "No reflected definition for method: %s" mb.Name
 
 let private createConstruction
@@ -120,9 +127,7 @@ let private createConstruction
    match ci with
    | ReflectedDefinition name ->
       let consRef = 
-         compiler.DefineGlobal name (fun var -> 
-            [ Assign(Reference var, Lambda <| createGlobalMethod compiler ci Quote.ConstructorCall) ]
-         )
+         compiler.DefineGlobal name (createGlobalMethod compiler ci Quote.ConstructorCall)
       [ yield! decls |> List.concat
         yield returnStategy.Return <| New(consRef.Name, refs) ]
    | JSConservativeCtorMapping name ->
@@ -165,9 +170,7 @@ let private createCall
            yield returnStategy.Return <| Apply(PropertyGet(objRef, mi.Name), argRefs) ]
       | true, exprs ->
          let methRef = 
-            compiler.DefineGlobal name (fun var -> 
-               [ Assign(Reference var, Lambda <| createGlobalMethod compiler mi Quote.MethodCall) ]
-            )
+            compiler.DefineGlobal name (createGlobalMethod compiler mi Quote.MethodCall)
          [ yield! decls |> List.concat
            yield returnStategy.Return <| Apply(Reference methRef, refs) ]
       | _ -> failwith "never"

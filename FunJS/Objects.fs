@@ -151,7 +151,7 @@ let genComparisonMethods t =
    if not isGeneratedCompareRequired then []
    else
       let func = genComparisonFunc t
-      [ Assign(PropertyGet(This, "CompareTo"), func) ]
+      [ "CompareTo", func ]
       
 let genInstanceMethods t (compiler:InternalCompiler.ICompiler) =
    let methods = getInstanceMethods t
@@ -159,7 +159,7 @@ let genInstanceMethods t (compiler:InternalCompiler.ICompiler) =
    [  for name, vars, bodyExpr in methods do
          let methodRef = PropertyGet(This, name) 
          let body = compiler.Compile ReturnStrategies.returnFrom bodyExpr
-         yield Assign(methodRef, Lambda(vars, Block body)) 
+         yield name, Lambda(vars, Block body)
       yield! comparisonMethods
    ]
 
