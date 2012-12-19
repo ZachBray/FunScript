@@ -7,12 +7,21 @@ let private forLoop =
    CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
       let (|Return|) = compiler.Compile
       function
-      | Patterns.ForIntegerRangeLoop(var, Split(fromDecl, fromRef), Split(toDecl, toRef), Return ReturnStrategies.inplace block) ->
-         [ yield! fromDecl
-           yield! toDecl
-           let mutableName = compiler.NextTempVar()
-           // Messiness here is to get around the closure problem in javascript for loops.
-           yield ForLoop(mutableName, fromRef, toRef, Block [Do <| Apply(Lambda([var], Block block), [Reference mutableName])])
+      | Patterns.ForIntegerRangeLoop(var, Split(fromDecl, fromRef), Split(toDecl, toRef), (Return ReturnStrategies.inplace block as bodyExpr)) ->
+         [  yield! fromDecl
+            yield! toDecl
+            let hasClosure =
+               bodyExpr |> Expr.exists (function
+                  | Patterns.Lambda _ -> true
+                  | _ -> false)
+            let countVar, block =
+               if hasClosure then
+                  let mutableName = compiler.NextTempVar()
+                  let block = Block [Do <| Apply(Lambda([var], Block block), [Reference mutableName])]
+                  mutableName, block
+               else var, Block block
+               // Messiness here is to get around the closure problem in javascript for loops.
+            yield ForLoop(countVar, fromRef, toRef, block)
          ]
       | _ -> []
 

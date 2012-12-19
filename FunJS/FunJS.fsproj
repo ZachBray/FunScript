@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Attributes.fs" />
     <Compile Include="AttributeHelpers.fs" />
+    <Compile Include="ExprExtensions.fs" />
     <Compile Include="Core\LanguagePrimitives.fs" />
     <Compile Include="Core\GenericConstants.fs" />
     <Compile Include="Core\Array.fs" />
@@ -83,7 +84,6 @@
     <Compile Include="Tuples.fs" />
     <Compile Include="Strings.fs" />
     <Compile Include="Asyncs.fs" />
-    <Compile Include="ExprExtensions.fs" />
     <Compile Include="UnionTypes.fs" />
     <Compile Include="RecordTypes.fs" />
     <Compile Include="ReflectedDefinitions.fs" />
