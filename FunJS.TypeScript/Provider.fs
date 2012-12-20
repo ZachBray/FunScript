@@ -91,8 +91,7 @@ module TypeGenerator =
          ProvidedParameter(
             p.Var.Name, 
             getActualType obtainDef p.Var.Type,
-            false,
-            p.Var.IsOptional)
+            false)
       //parameter.IsParamArray <- p.IsParamArray
       parameter
 
@@ -111,7 +110,18 @@ module TypeGenerator =
          f.Parameters |> List.map (genParameter obtainDef)
       ProvidedConstructor(parameters, InvokeCode = fun _ -> <@@ failwithf "" @@>)
 
-   let genMethods t obtainDef memType (f:TSFunction) =
+   let rec createOptionalPermutations parameters =
+      seq {
+         match parameters with
+         | [] -> yield []
+         | (p:TSParameter)::ps ->
+            for ps in createOptionalPermutations ps do
+               if p.Var.IsOptional then
+                  yield ps
+               yield p::ps
+      }
+
+   let genMethods (t:ProvidedTypeDefinition) obtainDef memType (f:TSFunction) =
       let name =
          match f.Name with
          | "" -> "Invoke"
@@ -132,18 +142,16 @@ module TypeGenerator =
          | Global -> meth.IsStaticMethod <- true
          | Local -> meth.AddMethodAttrs MethodAttributes.Virtual
          meth.InvokeCode <- fun _ -> <@@ failwith "never" @@>
-         meth :> MemberInfo
+         meth
+     
       let genSet = getGeneratedSet t
-      [  let allParamTypes = f.Parameters |> List.map (fun p -> p.Var.Type)         
-         if not(!genSet |> Set.contains (name, allParamTypes)) then
-            genSet := !genSet |> Set.add (name, allParamTypes)
-            yield createMethod f.Parameters
-         let reqParams = f.Parameters |> List.filter (fun p -> not p.Var.IsOptional)
-         let reqParamTypes = reqParams |> List.map (fun p -> p.Var.Type)
-         if not(!genSet |> Set.contains (name, reqParamTypes)) then
-            genSet := !genSet |> Set.add (name, reqParamTypes)
-            yield createMethod reqParams
-      ]
+      let paramPermutations = f.Parameters |> createOptionalPermutations
+      for parameters in paramPermutations do
+         let paramTypes = 
+            parameters |> Seq.map (fun p -> p.Var.Type) |> Seq.toList
+         if not(!genSet |> Set.contains (name, paramTypes)) then
+            genSet := !genSet |> Set.add (name, paramTypes)
+            t.AddMember(createMethod parameters)    
          
    let genEnum (enumT:ProvidedTypeDefinition) caseNames =
       let rec addCases = function
@@ -167,9 +175,7 @@ module TypeGenerator =
             root.AddMember property
             next()
          | Method f ->
-            let meths = genMethods root obtainDef memType f
-            for meth in meths do
-               root.AddMember meth
+            genMethods root obtainDef memType f
             next()
          | _ -> 
             // TODO: indexers
@@ -186,9 +192,7 @@ module TypeGenerator =
             root.AddMember property
             next()  
          | DeclareFunction f ->
-            let meths = genMethods root (obtainDef root) Global f
-            for meth in meths do
-               root.AddMember meth
+            genMethods root (obtainDef root) Global f
             next()
          | DeclareEnum(name, names) ->
             let t = obtainDef root (Enumeration name)

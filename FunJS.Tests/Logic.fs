@@ -1,20 +1,21 @@
-﻿module FunJS.Tests.Logic
+﻿[<NUnit.Framework.TestFixture>]
+module FunJS.Tests.Logic
 
-open Xunit
-open FsUnit.Xunit
+open NUnit.Framework
 
-[<Fact>]
+
+[<Test>]
 let ``Infix AND can be generated``() =
    check <@@ true && false @@>
 
-[<Fact>]
+[<Test>]
 let ``Infix OR can be generated``() =
    check <@@ true && false @@>
 
-[<Fact>]
+[<Test>]
 let ``Not can be generated``() =
    check <@@ not false @@>
 
-[<Fact>]
+[<Test>]
 let ``Evaluation order is preserved by generated code``() =
    check <@@ (true && false) || false  @@>

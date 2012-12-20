@@ -1,10 +1,11 @@
 ﻿[<FunJS.JS>]
+[<NUnit.Framework.TestFixture>] 
 module FunJS.Tests.Sets
 
-open Xunit
-open FsUnit.Xunit
+open NUnit.Framework
 
-[<Fact>]
+
+[<Test>]
 let ``set function works``() =
    check  
       <@@ 
@@ -12,7 +13,7 @@ let ``set function works``() =
          xs |> Seq.isEmpty
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.isEmpty works``() =
    check  
       <@@ 
@@ -20,7 +21,7 @@ let ``Set.isEmpty works``() =
          xs |> Seq.isEmpty
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.IsEmpty works``() =
    check  
       <@@ 
@@ -28,7 +29,7 @@ let ``Set.IsEmpty works``() =
          xs.IsEmpty
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.empty works``() =
    check  
       <@@ 
@@ -36,7 +37,7 @@ let ``Set.empty works``() =
          ()
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.count works``() =
    check  
       <@@ 
@@ -44,7 +45,7 @@ let ``Set.count works``() =
          Set.count xs |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.Count works``() =
    check  
       <@@ 
@@ -52,7 +53,7 @@ let ``Set.Count works``() =
          xs.Count |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.add works``() =
    check  
       <@@ 
@@ -60,7 +61,7 @@ let ``Set.add works``() =
          Set.count xs |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.Add works``() =
    check  
       <@@ 
@@ -68,7 +69,7 @@ let ``Set.Add works``() =
          Set.count xs |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.contains works``() =
    check  
       <@@ 
@@ -76,7 +77,7 @@ let ``Set.contains works``() =
          xs |> Set.contains 1
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.Contains works``() =
    check  
       <@@ 
@@ -84,7 +85,7 @@ let ``Set.Contains works``() =
          xs.Contains 1
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.singleton works``() =
    check  
       <@@ 
@@ -93,7 +94,7 @@ let ``Set.singleton works``() =
       @@>
 
 
-[<Fact>]
+[<Test>]
 let ``Set.remove works``() =
    check  
       <@@ 
@@ -101,7 +102,7 @@ let ``Set.remove works``() =
          xs.IsEmpty
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.Remove works``() =
    check  
       <@@ 
@@ -109,7 +110,7 @@ let ``Set.Remove works``() =
          xs.IsEmpty
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.union works``() =
    check  
       <@@ 
@@ -119,7 +120,7 @@ let ``Set.union works``() =
          zs.Contains 1 && zs.Contains 2
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set (+) works``() =
    check  
       <@@ 
@@ -129,7 +130,7 @@ let ``Set (+) works``() =
          zs.Contains 1 && zs.Contains 2
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.unionMany works``() =
    check  
       <@@ 
@@ -140,7 +141,7 @@ let ``Set.unionMany works``() =
          ks.Contains 1 && ks.Contains 2 && ks.Contains 3
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.intersect works``() =
    check  
       <@@ 
@@ -150,7 +151,7 @@ let ``Set.intersect works``() =
          zs.Contains 2 && not(zs.Contains 1)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.intersectMany works``() =
    check  
       <@@ 
@@ -161,7 +162,7 @@ let ``Set.intersectMany works``() =
          ks.Contains 2 && not(ks.Contains 1 || ks.Contains 3)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.iterate works``() =
    check  
       <@@ 
@@ -172,7 +173,7 @@ let ``Set.iterate works``() =
       @@>
 
 
-[<Fact>]
+[<Test>]
 let ``Set.forAll works``() =
    check  
       <@@ 
@@ -180,7 +181,7 @@ let ``Set.forAll works``() =
          xs |> Set.forall (fun x -> x < 5)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.exists works``() =
    check  
       <@@ 
@@ -188,7 +189,7 @@ let ``Set.exists works``() =
          xs |> Set.exists ((=) 2)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.filter works``() =
    check  
       <@@ 
@@ -197,7 +198,7 @@ let ``Set.filter works``() =
          |> Set.count |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.partition works``() =
    check  
       <@@ 
@@ -206,7 +207,7 @@ let ``Set.partition works``() =
          float(ys.Count + zs.Count)
       @@> 
 
-[<Fact>]
+[<Test>]
 let ``Set.fold works``() =
    check   
       <@@ 
@@ -214,7 +215,7 @@ let ``Set.fold works``() =
          xs |> Set.fold (+) 0.
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.foldBack works``() =
    check   
       <@@ 
@@ -222,7 +223,7 @@ let ``Set.foldBack works``() =
          Set.foldBack (+) xs 0.
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.map works``() =
    check   
       <@@ 
@@ -231,7 +232,7 @@ let ``Set.map works``() =
          ys.Contains 1.
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.minElement works``() =
    check   
       <@@ 
@@ -239,7 +240,7 @@ let ``Set.minElement works``() =
          xs |> Set.minElement
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.MinimumElement works``() =
    check   
       <@@ 
@@ -247,7 +248,7 @@ let ``Set.MinimumElement works``() =
          xs.MinimumElement
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.maxElement works``() =
    check   
       <@@ 
@@ -255,7 +256,7 @@ let ``Set.maxElement works``() =
          xs |> Set.maxElement
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.MaximumElement works``() =
    check   
       <@@ 
@@ -263,7 +264,7 @@ let ``Set.MaximumElement works``() =
          xs.MaximumElement
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.difference works``() =
    check   
       <@@ 
@@ -273,7 +274,7 @@ let ``Set.difference works``() =
          float zs.Count
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set (-) works``() =
    check   
       <@@ 
@@ -283,7 +284,7 @@ let ``Set (-) works``() =
          float zs.Count
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.isSubset works``() =
    check   
       <@@ 
@@ -293,7 +294,7 @@ let ``Set.isSubset works``() =
       @@>
 
 
-[<Fact>]
+[<Test>]
 let ``Set.IsSubset works``() =
    check   
       <@@ 
@@ -302,7 +303,7 @@ let ``Set.IsSubset works``() =
          ys.IsSubsetOf xs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.isSuperset works``() =
    check   
       <@@ 
@@ -312,7 +313,7 @@ let ``Set.isSuperset works``() =
       @@>
 
 
-[<Fact>]
+[<Test>]
 let ``Set.IsSuperset works``() =
    check   
       <@@ 
@@ -321,7 +322,7 @@ let ``Set.IsSuperset works``() =
          xs.IsSupersetOf ys
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.isProperSubset works``() =
    check   
       <@@ 
@@ -331,7 +332,7 @@ let ``Set.isProperSubset works``() =
       @@>
 
 
-[<Fact>]
+[<Test>]
 let ``Set.IsProperSubset works``() =
    check   
       <@@ 
@@ -340,7 +341,7 @@ let ``Set.IsProperSubset works``() =
          ys.IsProperSubsetOf xs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.isProperSuperset works``() =
    check   
       <@@ 
@@ -350,7 +351,7 @@ let ``Set.isProperSuperset works``() =
       @@>
 
 
-[<Fact>]
+[<Test>]
 let ``Set.IsProperSuperset works``() =
    check   
       <@@ 
@@ -359,7 +360,7 @@ let ``Set.IsProperSuperset works``() =
          xs.IsProperSupersetOf ys
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.ofList works``() =
    check   
       <@@ 
@@ -367,7 +368,7 @@ let ``Set.ofList works``() =
          float xs.Count
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.ofArray works``() =
    check   
       <@@ 
@@ -375,7 +376,7 @@ let ``Set.ofArray works``() =
          float xs.Count
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.ofSeq works``() =
    check   
       <@@ 
@@ -383,7 +384,7 @@ let ``Set.ofSeq works``() =
          float xs.Count
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.toList works``() =
    check   
       <@@ 
@@ -393,7 +394,7 @@ let ``Set.toList works``() =
          xs = zs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.toArray works``() =
    check   
       <@@ 
@@ -403,7 +404,7 @@ let ``Set.toArray works``() =
          xs = zs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Set.toSeq works``() =
    check   
       <@@ 

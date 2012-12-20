@@ -27,7 +27,6 @@ let private createConstructor uci compiler =
    vars, Block [
       yield Assign(PropertyGet(This, "Tag"), String uci.Name)
       for var in vars do yield Assign(PropertyGet(This, var.Name), Reference var)
-      yield! compiler |> Objects.genInstanceMethods uci.DeclaringType
    ]
 
 let private creation =
@@ -53,7 +52,14 @@ let private creation =
          let name = JavaScriptNameMapper.mapType uci.DeclaringType + "_" + uci.Name
          let cons = 
             compiler.DefineGlobal name (fun var -> 
-               [ Assign(Reference var, Lambda <| createConstructor uci compiler) ]
+               [ 
+                  yield Assign(Reference var, Lambda <| createConstructor uci compiler)
+                  let methods = 
+                     compiler |> Objects.genInstanceMethods uci.DeclaringType
+                  let proto = PropertyGet(Reference var, "prototype")
+                  for name, lambda in methods do
+                     yield Assign(PropertyGet(proto, name), lambda)
+               ]                    
             )
          [ yield! decls |> Seq.concat 
            yield returnStategy.Return <| New(cons.Name, refs)

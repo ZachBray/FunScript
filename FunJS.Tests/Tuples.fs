@@ -1,9 +1,10 @@
-﻿module FunJS.Tests.Tuples
+﻿[<NUnit.Framework.TestFixture>] 
+module FunJS.Tests.Tuples
 
-open Xunit
-open FsUnit.Xunit
+open NUnit.Framework
 
-[<Fact>]
+
+[<Test>]
 let ``Tuple declarations can be generated``() =
    check 
       <@@ 
@@ -11,7 +12,7 @@ let ``Tuple declarations can be generated``() =
          true
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Tuple dereferencing can be generated``() =
    check 
       <@@ 
@@ -19,7 +20,7 @@ let ``Tuple dereferencing can be generated``() =
          y
       @@>
 
-[<Fact>]
+[<Test>]
 let ``fst function can be generated``() =
    check 
       <@@ 
@@ -27,7 +28,7 @@ let ``fst function can be generated``() =
          fst xy
       @@>
 
-[<Fact>]
+[<Test>]
 let ``snd function can be generated``() =
    check 
       <@@ 

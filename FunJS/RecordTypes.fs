@@ -1,6 +1,7 @@
 ﻿module internal FunJS.RecordTypes
 
 open AST
+open Quote
 open Microsoft.FSharp.Quotations
 open System.Reflection
 
@@ -14,7 +15,6 @@ let private createConstructor recType compiler =
    let vars = getRecordVars recType
    vars, Block [  
       for var in vars do yield Assign(PropertyGet(This, var.Name), Reference var)
-      yield! compiler |> Objects.genInstanceMethods recType
    ]
 
 let private creation =
@@ -30,7 +30,7 @@ let private creation =
          [  yield! decls |> Seq.concat 
             yield returnStategy.Return <| Object fields
          ]
-      | Patterns.NewRecord(recType, exprs) ->
+      | PatternsExt.NewRecord(recType, exprs) ->
          let decls, refs = 
             exprs 
             |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
@@ -43,7 +43,13 @@ let private creation =
          let name = JavaScriptNameMapper.mapMethod ci
          let cons = 
             compiler.DefineGlobal name (fun var -> 
-               [ Assign(Reference var, Lambda <| createConstructor recType compiler) ]
+               [ 
+                  yield Assign(Reference var, Lambda <| createConstructor recType compiler) 
+                  let methods = compiler |> Objects.genInstanceMethods recType
+                  let proto = PropertyGet(Reference var, "prototype")
+                  for name, lambda in methods do
+                     yield Assign(PropertyGet(proto, name), lambda)
+               ]
             )
          [ yield! decls |> Seq.concat 
            yield returnStategy.Return <| New(cons.Name, refs)

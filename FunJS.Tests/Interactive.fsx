@@ -1,4 +1,5 @@
 ﻿#r "bin\\Debug\\xunit.dll"
+#r "bin\\Debug\\xunit.extensions.dll"
 #r "bin\\Debug\\Jint.dll"
 #r "bin\\Debug\\NHamcrest.dll"
 #r "bin\\Debug\\FunJS.dll"

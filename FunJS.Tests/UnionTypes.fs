@@ -1,9 +1,10 @@
-﻿module FunJS.Tests.UnionTypes
+﻿[<NUnit.Framework.TestFixture>] 
+module FunJS.Tests.UnionTypes
 
-open Xunit
-open FsUnit.Xunit
+open NUnit.Framework
 
-[<Fact>]
+
+[<Test>]
 let ``Union case constructions with no arguments can be generated``() =
    check 
       <@@ 
@@ -11,7 +12,7 @@ let ``Union case constructions with no arguments can be generated``() =
          true
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Union cases matches with no arguments can be generated``() =
    check 
       <@@ 
@@ -21,7 +22,7 @@ let ``Union cases matches with no arguments can be generated``() =
          | Some y -> y
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Union case constructions with one argument can be generated``() =
    check 
       <@@ 
@@ -29,7 +30,7 @@ let ``Union case constructions with one argument can be generated``() =
          true
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Union cases matches with one argument can be generated``() =
    check 
       <@@ 
@@ -47,7 +48,7 @@ type TestUnion =
    | Case3 of string * string * string
 
 
-[<Fact>]
+[<Test>]
 let ``Union case constructions with many arguments can be generated``() =
    check 
       <@@ 
@@ -55,7 +56,7 @@ let ``Union case constructions with many arguments can be generated``() =
          true
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Union cases matches with many arguments can be generated``() =
    check 
       <@@ 

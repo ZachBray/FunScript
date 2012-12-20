@@ -1,9 +1,10 @@
-﻿module FunJS.Tests.LetBindings
+﻿[<NUnit.Framework.TestFixture>] 
+module FunJS.Tests.LetBindings
 
-open Xunit
-open FsUnit.Xunit
+open NUnit.Framework
 
-[<Fact>]
+
+[<Test>]
 let ``Let bindings can be generated``() =
    check 
       <@@
@@ -11,7 +12,7 @@ let ``Let bindings can be generated``() =
          x
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Let bindings inline can be generated``() =
    check 
       <@@
@@ -19,7 +20,7 @@ let ``Let bindings inline can be generated``() =
          f (let y = "foo" in y)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Recursive let bindings can be generated``() =
    check 
       <@@
@@ -33,7 +34,7 @@ let ``Recursive let bindings can be generated``() =
       @@>
 
 
-[<Fact>]
+[<Test>]
 let ``Mutable let bindings can be generated``() =
    check 
       <@@
@@ -41,7 +42,7 @@ let ``Mutable let bindings can be generated``() =
          x
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Mutations of let bindings can be generated``() =
    checkAreEqual
       false 
@@ -52,7 +53,7 @@ let ``Mutations of let bindings can be generated``() =
       @@>
 
 
-[<Fact>] // see: http://www.adequatelygood.com/2010/2/JavaScript-Scoping-and-Hoisting
+[<Test>] // see: http://www.adequatelygood.com/2010/2/JavaScript-Scoping-and-Hoisting
 let ``Inner-scope let-bindings do not destroy outer-scope let-bindings``() =
    check 
       <@@

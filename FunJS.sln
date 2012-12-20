@@ -35,4 +35,17 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		$0.TextStylePolicy = $2
+		$1.inheritsSet = null
+		$1.scope = text/x-fsharp
+		$2.FileWidth = 120
+		$2.IndentWidth = 3
+		$2.TabWidth = 3
+		$2.inheritsScope = text/plain
+		$2.inheritsSet = VisualStudio
+		$2.scope = text/plain
+		Policies = $0
+		StartupItem = FunJS\FunJS.fsproj
+	EndGlobalSection
 EndGlobal

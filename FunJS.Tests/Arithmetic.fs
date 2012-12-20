@@ -1,29 +1,29 @@
-﻿module FunJS.Tests.Arithmetic
+﻿[<NUnit.Framework.TestFixture>] 
+module FunJS.Tests.Arithmetic
 
-open Xunit
-open FsUnit.Xunit
+open NUnit.Framework
 
-[<Fact>]
+[<Test>]
 let ``Infix add can be generated``() =
    check <@@ 4. + 2. @@>
 
-[<Fact>]
+[<Test>]
 let ``Infix subtract can be generated``() =
    check <@@ 4. - 2. @@>
 
-[<Fact>]
+[<Test>]
 let ``Infix multiply can be generated``() =
    check <@@ 4. * 2. @@>
 
-[<Fact>]
+[<Test>]
 let ``Infix divide can be generated``() =
    check <@@ 4. / 2. @@>
 
-[<Fact>]
+[<Test>]
 let ``Infix modulo can be generated``() =
    check <@@ 4. % 2. @@>
 
-[<Fact>]
+[<Test>]
 let ``Evaluation order is preserved by generated code``() =
    check <@@ (4. - 2.) * 2. + 1. @@>
 

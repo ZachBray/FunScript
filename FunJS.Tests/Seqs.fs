@@ -1,15 +1,16 @@
 ﻿[<FunJS.JS>]
+[<NUnit.Framework.TestFixture>] 
 module FunJS.Tests.Seqs
 
-open Xunit
-open FsUnit.Xunit
+open NUnit.Framework
+
 
 let sumFirstTwo zs =
    let first = Seq.head zs
    let second = Seq.skip 1 zs |> Seq.head
    first + second
 
-[<Fact>]
+[<Test>]
 let ``Seq.length works``() =
    check  
       <@@ 
@@ -17,7 +18,7 @@ let ``Seq.length works``() =
          float (Seq.length xs)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.delay works``() =
    check  
       <@@ 
@@ -26,7 +27,7 @@ let ``Seq.delay works``() =
          ys |> Seq.head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.unfold works``() =
    check  
       <@@ 
@@ -37,7 +38,7 @@ let ``Seq.unfold works``() =
          |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.empty works``() =
    check  
       <@@ 
@@ -45,7 +46,7 @@ let ``Seq.empty works``() =
          xs.GetEnumerator().MoveNext()
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.append works``() =
    check  
       <@@ 
@@ -55,7 +56,7 @@ let ``Seq.append works``() =
          sumFirstTwo zs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.average works``() =
    check  
       <@@ 
@@ -63,7 +64,7 @@ let ``Seq.average works``() =
          Seq.average xs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.averageBy works``() =
    check  
       <@@ 
@@ -71,7 +72,7 @@ let ``Seq.averageBy works``() =
          Seq.averageBy ((*) 2.) xs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.choose works``() =
    check  
       <@@ 
@@ -82,7 +83,7 @@ let ``Seq.choose works``() =
          sumFirstTwo zs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.concat works``() =
    check  
       <@@ 
@@ -91,7 +92,7 @@ let ``Seq.concat works``() =
          sumFirstTwo ys
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.collect works``() =
    check  
       <@@ 
@@ -100,7 +101,7 @@ let ``Seq.collect works``() =
          sumFirstTwo ys
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.exists works``() =
    check  
       <@@ 
@@ -108,7 +109,7 @@ let ``Seq.exists works``() =
          xs |> Seq.exists (fun x -> x = 2.)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.exists2 works``() =
    check  
       <@@ 
@@ -117,7 +118,7 @@ let ``Seq.exists2 works``() =
          Seq.exists2 (fun x y -> x * y = 16.) xs ys
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.filter works``() =
    check  
       <@@ 
@@ -126,7 +127,7 @@ let ``Seq.filter works``() =
          ys |> Seq.isEmpty
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.find works``() =
    check  
       <@@ 
@@ -134,7 +135,7 @@ let ``Seq.find works``() =
          xs |> Seq.find ((=) 2.)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.findIndex works``() =
    check  
       <@@ 
@@ -143,7 +144,7 @@ let ``Seq.findIndex works``() =
          |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.fold works``() =
    check  
       <@@ 
@@ -152,7 +153,7 @@ let ``Seq.fold works``() =
          total
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.forall works``() =
    check  
       <@@ 
@@ -160,7 +161,7 @@ let ``Seq.forall works``() =
          Seq.forall (fun x -> x < 5.) xs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.forall2 works``() =
    check  
       <@@ 
@@ -169,7 +170,7 @@ let ``Seq.forall2 works``() =
          Seq.forall2 (=) xs ys
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.head works``() =
    check  
       <@@ 
@@ -177,7 +178,7 @@ let ``Seq.head works``() =
          Seq.head xs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.init works``() =
    check  
       <@@ 
@@ -185,7 +186,7 @@ let ``Seq.init works``() =
          sumFirstTwo xs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.isEmpty works``() =
    check  
       <@@ 
@@ -193,7 +194,7 @@ let ``Seq.isEmpty works``() =
          Seq.isEmpty xs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.iter works``() =
    check  
       <@@ 
@@ -205,7 +206,7 @@ let ``Seq.iter works``() =
          !total
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.iter2 works``() =
    check  
       <@@ 
@@ -217,7 +218,7 @@ let ``Seq.iter2 works``() =
          !total
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.iteri works``() =
    check  
       <@@ 
@@ -229,7 +230,7 @@ let ``Seq.iteri works``() =
          !total
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.map works``() =
    check  
       <@@ 
@@ -238,7 +239,7 @@ let ``Seq.map works``() =
          ys |> Seq.head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.map2 works``() =
    check  
       <@@ 
@@ -248,7 +249,7 @@ let ``Seq.map2 works``() =
          zs |> Seq.head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.mapi works``() =
    check  
       <@@ 
@@ -257,7 +258,7 @@ let ``Seq.mapi works``() =
          ys |> Seq.head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.max works``() =
    check  
       <@@ 
@@ -265,7 +266,7 @@ let ``Seq.max works``() =
          xs |> Seq.max
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.maxBy works``() =
    check  
       <@@ 
@@ -273,7 +274,7 @@ let ``Seq.maxBy works``() =
          xs |> Seq.maxBy (fun x -> -x)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.min works``() =
    check  
       <@@ 
@@ -281,7 +282,7 @@ let ``Seq.min works``() =
          xs |> Seq.min
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.minBy works``() =
    check  
       <@@ 
@@ -289,7 +290,7 @@ let ``Seq.minBy works``() =
          xs |> Seq.minBy (fun x -> -x)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.nth works``() =
    check  
       <@@ 
@@ -297,7 +298,7 @@ let ``Seq.nth works``() =
          Seq.nth 1 xs
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.ofArray works``() =
    check  
       <@@ 
@@ -306,7 +307,7 @@ let ``Seq.ofArray works``() =
          ys |> Seq.head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.ofList works``() =
    check  
       <@@ 
@@ -315,7 +316,7 @@ let ``Seq.ofList works``() =
          ys |> Seq.head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.pick works``() =
    check  
       <@@ 
@@ -326,7 +327,7 @@ let ``Seq.pick works``() =
             | _ -> None)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.reduce works``() =
    check  
       <@@ 
@@ -334,7 +335,7 @@ let ``Seq.reduce works``() =
          xs |> Seq.reduce (+)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.scan works``() =
    check  
       <@@ 
@@ -351,7 +352,7 @@ let ``Seq.sort works``() =
          sumFirstTwo ys
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.sortBy works``() =
    check  
       <@@ 
@@ -360,7 +361,7 @@ let ``Seq.sortBy works``() =
          sumFirstTwo ys
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.sum works``() =
    check  
       <@@ 
@@ -368,7 +369,7 @@ let ``Seq.sum works``() =
          xs |> Seq.sum
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.sumBy works``() =
    check  
       <@@ 
@@ -376,7 +377,7 @@ let ``Seq.sumBy works``() =
          xs |> Seq.sumBy ((*) 2.)
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.skip works``() =
    check  
       <@@ 
@@ -385,7 +386,7 @@ let ``Seq.skip works``() =
          ys |> Seq.head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.toArray works``() =
    check  
       <@@ 
@@ -394,7 +395,7 @@ let ``Seq.toArray works``() =
          ys.[0] + ys.[1]
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.toList works``() =
    check  
       <@@ 
@@ -403,7 +404,7 @@ let ``Seq.toList works``() =
          ys.Head + ys.Tail.Head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.tryFind works``() =
    check  
       <@@ 
@@ -412,7 +413,7 @@ let ``Seq.tryFind works``() =
          ys.IsSome
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.tryFindIndex works``() =
    check  
       <@@ 
@@ -421,7 +422,7 @@ let ``Seq.tryFindIndex works``() =
          ys.Value |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.tryPick works``() =
    check  
       <@@ 
@@ -435,7 +436,7 @@ let ``Seq.tryPick works``() =
          | None -> 0.
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.zip works``() =
    check  
       <@@ 
@@ -446,7 +447,7 @@ let ``Seq.zip works``() =
          x + y
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.zip3 works``() =
    check  
       <@@ 
@@ -472,7 +473,7 @@ let ``Seq.cache works``() =
          !count
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.cast works``() =
    check  
       <@@ 
@@ -481,7 +482,7 @@ let ``Seq.cast works``() =
          ys |> Seq.head |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.compareWith works``() =
    check  
       <@@ 
@@ -491,7 +492,7 @@ let ``Seq.compareWith works``() =
          float diff
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.countBy works``() =
    check  
       <@@ 
@@ -500,7 +501,7 @@ let ``Seq.countBy works``() =
          ys |> Seq.length |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.distinct works``() =
    check  
       <@@ 
@@ -509,7 +510,7 @@ let ``Seq.distinct works``() =
          ys |> Seq.length |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.distinctBy works``() =
    check  
       <@@ 
@@ -518,7 +519,7 @@ let ``Seq.distinctBy works``() =
          ys |> Seq.length |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.exactlyOne works``() =
    check  
       <@@ 
@@ -526,7 +527,7 @@ let ``Seq.exactlyOne works``() =
          xs |> Seq.exactlyOne
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.groupBy works``() =
    check  
       <@@ 
@@ -535,7 +536,7 @@ let ``Seq.groupBy works``() =
          ys |> Seq.length |> float
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.initInfinite works``() =
    check  
       <@@ 
@@ -544,7 +545,7 @@ let ``Seq.initInfinite works``() =
          |> Seq.sum
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.last works``() =
    check  
       <@@ 
@@ -552,7 +553,7 @@ let ``Seq.last works``() =
          xs |> Seq.last
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.pairwise works``() =
    check  
       <@@ 
@@ -562,7 +563,7 @@ let ``Seq.pairwise works``() =
          |> Seq.sum
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.readonly works``() =
    check  
       <@@ 
@@ -571,7 +572,7 @@ let ``Seq.readonly works``() =
          |> Seq.head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.singleton works``() =
    check  
       <@@ 
@@ -579,7 +580,7 @@ let ``Seq.singleton works``() =
          xs |> Seq.head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.skipWhile works``() =
    check  
       <@@ 
@@ -588,7 +589,7 @@ let ``Seq.skipWhile works``() =
          |> Seq.head
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.take works``() =
    check  
       <@@ 
@@ -597,7 +598,7 @@ let ``Seq.take works``() =
          |> Seq.last
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.takeWhile works``() =
    check  
       <@@ 
@@ -606,7 +607,7 @@ let ``Seq.takeWhile works``() =
          |> Seq.last
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.truncate works``() =
    check  
       <@@ 
@@ -615,7 +616,7 @@ let ``Seq.truncate works``() =
          |> Seq.last
       @@>
 
-[<Fact>]
+[<Test>]
 let ``Seq.where works``() =
    check  
       <@@ 

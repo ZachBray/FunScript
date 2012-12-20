@@ -1,28 +1,28 @@
-﻿module FunJS.Tests.PrimitiveTypes
+﻿[<NUnit.Framework.TestFixture>] 
+module FunJS.Tests.PrimitiveTypes
 
-open Xunit
-open FsUnit.Xunit
+open NUnit.Framework
 
-[<Fact>]
+[<Test>]
 let ``Unit is generated as null``() =
    checkAreEqual null <@@ () @@>
 
-[<Fact>]
+[<Test>]
 let ``Ints are generated as numbers``() =
    checkAreEqual 1. <@@ 1 @@>
 
-[<Fact>]
+[<Test>]
 let ``Chars are generated as strings``() =
    checkAreEqual "a" <@@ 'a' @@>
 
-[<Fact>]
+[<Test>]
 let ``Floats are generated as numbers``() =
    checkAreEqual 1. <@@ 1. @@>
 
-[<Fact>]
+[<Test>]
 let ``Strings are generated as strings``() =
    check <@@ "test" @@>
 
-[<Fact>]
+[<Test>]
 let ``Bools are generated as bools``() =
    check <@@ true @@>

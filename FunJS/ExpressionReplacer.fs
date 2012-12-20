@@ -1,4 +1,4 @@
-﻿module internal FunJS.ExpressionReplacer
+﻿module (*internal*) FunJS.ExpressionReplacer
 
 open InternalCompiler
 open CompilerComponent
@@ -42,7 +42,7 @@ let private isInlined (replacementMi:MethodInfo) =
 
 let private castMi =
    typeof<Helpers>
-      .GetMethod("Cast", BindingFlags.NonPublic ||| BindingFlags.Static)
+      .GetMethod("Cast", BindingFlags.Public ||| BindingFlags.NonPublic ||| BindingFlags.Static)
       .GetGenericMethodDefinition()
 
 let buildCall (mi:MethodInfo) exprs =
@@ -97,7 +97,10 @@ let createTypeMethodMappings (fromType:Type) (toType:Type) =
             | Some _ -> 
                let replacementMi =
                   if mi.IsGenericMethod then
-                     replacementMi.MakeGenericMethod(mi.GetGenericArguments())
+                     if replacementMi.IsGenericMethod then
+                        replacementMi.MakeGenericMethod(mi.GetGenericArguments())
+                     else
+                        replacementMi
                   else replacementMi
                Some <| createMethodMap mi Quote.MethodCall replacementMi
             | None -> None

@@ -9,8 +9,8 @@
     <OutputType>Library</OutputType>
     <RootNamespace>FunJS</RootNamespace>
     <AssemblyName>FunJS</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Name>FunJS</Name>
+    <ProductVersion>10.0.0</ProductVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -45,10 +45,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes.fs" />
+    <Compile Include="AttributeHelpers.fs" />
+    <Compile Include="ExprExtensions.fs" />
     <Compile Include="Core\LanguagePrimitives.fs" />
     <Compile Include="Core\GenericConstants.fs" />
     <Compile Include="Core\Array.fs" />
-    <Compile Include="Core\List.fs" />
+    <Compile Include="Core\list.fs" />
     <Compile Include="Core\Option.fs" />
     <Compile Include="Core\Seq.fs" />
     <Compile Include="Core\Range.fs" />
@@ -56,6 +58,7 @@
     <Compile Include="Core\Map.fs" />
     <Compile Include="Core\String.fs" />
     <Compile Include="Core\Events.fs" />
+    <Compile Include="Core\Async.fs" />
     <Compile Include="JavaScriptNameMapper.fs" />
     <Compile Include="AST.fs" />
     <Compile Include="QuoteExtensions.fs" />
@@ -80,7 +83,7 @@
     <Compile Include="Objects.fs" />
     <Compile Include="Tuples.fs" />
     <Compile Include="Strings.fs" />
-    <Compile Include="ExprExtensions.fs" />
+    <Compile Include="Asyncs.fs" />
     <Compile Include="UnionTypes.fs" />
     <Compile Include="RecordTypes.fs" />
     <Compile Include="ReflectedDefinitions.fs" />

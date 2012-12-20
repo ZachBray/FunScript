@@ -2,8 +2,8 @@
 module FunJS.Tests.Common
 
 open FunJS
-open FsUnit.Xunit
 open Jint
+open NUnit.Framework
 open Linq.QuotationEvaluation
 
 let checkAreEqual expectedResult quote =
@@ -12,7 +12,7 @@ let checkAreEqual expectedResult quote =
    try
       let engine = JintEngine()
       let result = engine.Run(code + "\nreturn null;")
-      result |> should equal expectedResult
+      Assert.That((result = expectedResult))
    // Wrap xUnit exceptions to stop pauses.
    with ex ->
       if ex.GetType().Namespace.StartsWith "FunJS" then raise ex

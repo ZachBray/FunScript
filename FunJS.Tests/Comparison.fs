@@ -1,29 +1,30 @@
-﻿module FunJS.Tests.Comparison
+﻿[<NUnit.Framework.TestFixture>] 
+module FunJS.Tests.Comparison
 
-open Xunit
+open NUnit.Framework
 open FunJS
 
-[<Fact>]
+[<Test>]
 let ``Infix equality works``() =
    check <@@ 2. = 3. @@>
 
-[<Fact>]
+[<Test>]
 let ``Infix inequality works``() =
    check <@@ 2. <> 3. @@>
 
-[<Fact>]
+[<Test>]
 let ``Infix less than works``() =
    check <@@ 2. < 3. @@>
 
-[<Fact>]
+[<Test>]
 let ``Infix greater than works``() =
    check <@@ 2. > 3. @@>
 
-[<Fact>]
+[<Test>]
 let ``Infix less than or equal to works``() =
    check <@@ 2. <= 3. @@>
 
-[<Fact>]
+[<Test>]
 let ``Infix greater than or equal to works``() =
    check <@@ 2. >= 3. @@>
 
@@ -34,7 +35,7 @@ type Address = { PostCode: int }
 [<JS>] //Note: Jint doesn't compare strings correctly.
 type Person = { IsMale: bool; Age: int; Address: Address }
 
-[<Fact>]
+[<Test>]
 let ``structural equality works``() =
    for isMaleA in [true; false] do
    for ageA in [0; 1] do
@@ -55,7 +56,7 @@ let ``structural equality works``() =
             personA = personB
          @@>
 
-[<Fact>]
+[<Test>]
 let ``structural inequality works``() =
    for isMaleA in [true; false] do
    for ageA in [0; 1] do
@@ -76,7 +77,7 @@ let ``structural inequality works``() =
             personA <> personB
          @@>
 
-[<Fact>]
+[<Test>]
 let ``structural less than works``() =
    for isMaleA in [true; false] do
    for ageA in [0; 1] do
@@ -97,7 +98,7 @@ let ``structural less than works``() =
             personA < personB
          @@>
 
-[<Fact>]
+[<Test>]
 let ``structural greater than works``() =
    for isMaleA in [true; false] do
    for ageA in [0; 1] do
@@ -118,7 +119,7 @@ let ``structural greater than works``() =
             personA > personB
          @@>
 
-[<Fact>]
+[<Test>]
 let ``structural less than or equal to works``() =
    for isMaleA in [true; false] do
    for ageA in [0; 1] do
@@ -139,7 +140,7 @@ let ``structural less than or equal to works``() =
             personA <= personB
          @@>
 
-[<Fact>]
+[<Test>]
 let ``structural greater than or equal to works``() =
    for isMaleA in [true; false] do
    for ageA in [0; 1] do

@@ -1,4 +1,4 @@
-﻿module internal FunJS.InternalCompiler
+﻿module (*internal*) FunJS.InternalCompiler
 
 open AST
 open System
