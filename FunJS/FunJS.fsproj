@@ -57,8 +57,8 @@
     <Compile Include="Core\Set.fs" />
     <Compile Include="Core\Map.fs" />
     <Compile Include="Core\String.fs" />
+    <Compile Include="Core\Events.fs" />
     <Compile Include="Core\Async.fs" />
-    <Compile Include="Events.fs" />
     <Compile Include="JavaScriptNameMapper.fs" />
     <Compile Include="AST.fs" />
     <Compile Include="QuoteExtensions.fs" />
