@@ -266,15 +266,17 @@ let private fieldSetting =
       | _ -> []
 
 let private objectGuid = typeof<obj>.GUID
+let private objectName = typeof<obj>.FullName
 
 let private constructingInstances =
    CompilerComponent.create <| fun split compiler returnStategy ->
       function
       | PatternsExt.NewObject(ci, exprs) -> 
-         if ci.DeclaringType.GUID = objectGuid then
-            [ Scope <| Block [] ]
-         else
-            createConstruction split returnStategy compiler [exprs] ci
+         let declaringType = ci.DeclaringType
+         if declaringType.GUID = objectGuid &&
+            declaringType.FullName = objectName 
+         then [ Scope <| Block [] ]
+         else createConstruction split returnStategy compiler [exprs] ci
       | _ -> []
 
 let components = [ 
