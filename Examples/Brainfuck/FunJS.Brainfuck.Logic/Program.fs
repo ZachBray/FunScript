@@ -97,7 +97,7 @@ let main() =
           let nextChar (e:Dom.KeyboardEvent') = 
               (!sub).Dispose()
               console.disabled <- true //TODO: Should be using readonly rather than disabled but type provider doesn't support inheritance
-              waitingForInput.fadeOut(30, fun _ ->
+              waitingForInput.fadeOut(300, fun _ ->
                  cont <| getKeyFromEvent e) |> ignore              
           waitingForInput.fadeIn(300, fun _ ->
             console.disabled <- false    //TODO: Should be using readonly rather than disabled but type provider doesn't support inheritance          
@@ -109,6 +109,7 @@ let main() =
           
     let executeCode (e:Dom.MouseEvent') =        
         clear console        
+        waitingForInput.fadeOut(300) |> ignore
         let code = txtCode |> getValue
         run code getNextChar outputChar |> Async.StartImmediate
         ignore |> box        
