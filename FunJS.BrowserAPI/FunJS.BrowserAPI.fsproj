@@ -9,8 +9,8 @@
     <OutputType>Library</OutputType>
     <RootNamespace>FunJS.BrowserAPI</RootNamespace>
     <AssemblyName>FunJS.BrowserAPI</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Name>FunJS.BrowserAPI</Name>
+    <ProductVersion>10.0.0</ProductVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,9 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
-    <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <Private>True</Private>
-    </Reference>
+    <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
@@ -46,8 +44,7 @@
   <ItemGroup>
     <ProjectReference Include="..\FunJS\FunJS.fsproj">
       <Name>FunJS</Name>
-      <Project>{e0916e67-d3b0-4c3a-ad18-4146882fcedd}</Project>
-      <Private>True</Private>
+      <Project>e0916e67-d3b0-4c3a-ad18-4146882fcedd</Project>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

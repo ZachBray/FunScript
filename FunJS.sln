@@ -1,5 +1,5 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2012
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FunJS", "FunJS\FunJS.fsproj", "{E0916E67-D3B0-4C3A-AD18-4146882FCEDD}"
 EndProject
