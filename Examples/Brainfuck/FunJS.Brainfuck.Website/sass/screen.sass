@@ -1,0 +1,71 @@
+// ---------------------------------------------------------------------------
+// Imports
+
+@import base
+@import sassy-buttons
+
+/* -------------------------------------------------------------------------
+/* Layout
+
+html
+  font-family: "CenturyOldStyleFS","Adobe Caslon Pro",Caslon,Baskerville,Palatino,"Palatino Linotype","Hoefler Text",Garamond,"URW Palladio L","Book Antiqua",Georgia,serif
+
+// Treat border/padding as inside the form controls so they line up with the grid properly
+textarea, input:not([type="radio"]) 
+  +box-sizing(border-box) 
+  width: 100% 
+
+body
+  background-color: #F8F9ED
+  margin: 0px 0px 0px 0px
+
+  .container
+    +container
+    +susy-grid-background
+  
+    h1
+      +span-columns(12 omega)
+      text-align: center
+  
+    #code  
+      +span-columns(12 omega)
+      height: 5 * $base-line-height
+  
+    #console
+      padding-top: 1em
+      +span-columns(12 omega)
+      height: 10 * $base-line-height
+
+      #waiting-for-input
+        text-align: center
+        color: green
+        font-weight: bold
+        display: none
+  
+    #console-text    
+      height: 5 * $base-line-height
+
+    #inputs   
+      +span-columns(8)
+      height: 3em
+      padding-top: 1em
+
+      input
+        +span-columns(1)
+        height: 3em      
+        display: block
+        font-weight: bold
+        +sassy-button("matte", 5px, 1em, #4ba3cc)
+  
+    #execute-code-container      
+      +span-columns(2 omega)
+      padding-top: 1em
+    
+    #execute-code    
+      +sassy-button("matte", 10px, 19px, #4ba3cc)
+      width: 100%
+
+    #footer
+      +span-columns(12 omega)
+      padding-top: 3em
+      text-align: center
