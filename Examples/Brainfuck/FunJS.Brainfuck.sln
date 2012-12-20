@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FunJS.Brainfuck", "FunJS.Brainfuck.Logic\FunJS.Brainfuck.Logic.fsproj", "{7DF4263D-AD55-4C6A-9998-054E210A2EF6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunJS.Brainfuck.Website", "FunJS.Brainfuck.Website\FunJS.Brainfuck.Website.csproj", "{FA9A7393-4CCC-41B7-B001-6DE963EBC2CC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7DF4263D-AD55-4C6A-9998-054E210A2EF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DF4263D-AD55-4C6A-9998-054E210A2EF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DF4263D-AD55-4C6A-9998-054E210A2EF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DF4263D-AD55-4C6A-9998-054E210A2EF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA9A7393-4CCC-41B7-B001-6DE963EBC2CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA9A7393-4CCC-41B7-B001-6DE963EBC2CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA9A7393-4CCC-41B7-B001-6DE963EBC2CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA9A7393-4CCC-41B7-B001-6DE963EBC2CC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
