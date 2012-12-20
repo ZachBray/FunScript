@@ -18,6 +18,7 @@ let exists f expr =
          match expr with
          | ExprShape.ShapeVar _ -> false
          | ExprShape.ShapeLambda(_, expr) -> exists expr
+         | Patterns.Let(_, exprA, exprB) -> exists exprA || exists exprB
          | ExprShape.ShapeCombination (_, exprs) ->
             exprs |> List.exists exists
    exists expr
