@@ -68,12 +68,20 @@ body .container #console {
   margin-right: 0;
   #margin-left: -1em;
   display: inline;
+  height: 240px;
 }
-/* line 38, ../sass/screen.sass */
+/* line 39, ../sass/screen.sass */
+body .container #console #waiting-for-input {
+  text-align: center;
+  color: green;
+  font-weight: bold;
+  display: none;
+}
+/* line 45, ../sass/screen.sass */
 body .container #console-text {
   height: 120px;
 }
-/* line 41, ../sass/screen.sass */
+/* line 48, ../sass/screen.sass */
 body .container #inputs {
   width: 66.10169%;
   float: left;
@@ -82,7 +90,7 @@ body .container #inputs {
   height: 3em;
   padding-top: 1em;
 }
-/* line 46, ../sass/screen.sass */
+/* line 53, ../sass/screen.sass */
 body .container #inputs input {
   width: 6.77966%;
   float: left;
@@ -147,7 +155,7 @@ body .container #inputs input::-moz-focus-inner {
   padding: 0 !important;
   margin: -1px !important;
 }
-/* line 53, ../sass/screen.sass */
+/* line 60, ../sass/screen.sass */
 body .container #execute-code-container {
   width: 15.25424%;
   float: right;
@@ -156,7 +164,7 @@ body .container #execute-code-container {
   display: inline;
   padding-top: 1em;
 }
-/* line 57, ../sass/screen.sass */
+/* line 64, ../sass/screen.sass */
 body .container #execute-code {
   font-size: 19px;
   padding: 0.5em 1.5em;
@@ -215,7 +223,7 @@ body .container #execute-code::-moz-focus-inner {
   padding: 0 !important;
   margin: -1px !important;
 }
-/* line 61, ../sass/screen.sass */
+/* line 68, ../sass/screen.sass */
 body .container #footer {
   width: 100%;
   float: right;

@@ -15,16 +15,16 @@
 
     <div id="interpreter">
       <h2>Brainfuck Input</h2>
-      <textarea id="code">,++++++++++[&gt;+++++++&gt;++++++++++&gt;+++&gt;+&lt;&lt;&lt;&lt;-]&gt;++.&gt;+.+++++++..+++.&gt;++.&lt;&lt;+++++++++++++++.&gt;.+++.------.--------.&gt;+.&gt;.</textarea>
+      <textarea id="code">,&gt;++++++++++[&gt;+++++++&gt;++++++++++&gt;+++&gt;+&lt;&lt;&lt;&lt;-]&gt;++.&gt;+.+++++++..+++.&gt;++.&lt;&lt;+++++++++++++++.&gt;.+++.------.--------.&gt;+.&gt;.</textarea>
       <div id="inputs">
-        <input type="submit" value="[" />
-        <input type="submit" value="-" />
-        <input type="submit" value="+" />
-        <input type="submit" value="&lt;" />
-        <input type="submit" value="&gt;" />
-        <input type="submit" value="," />
-        <input type="submit" value="," />
-        <input type="submit" value="]" />
+        <input class="keyboard-button" type="submit" value="[" />
+        <input class="keyboard-button" type="submit" value="-" />
+        <input class="keyboard-button" type="submit" value="+" />
+        <input class="keyboard-button" type="submit" value="&lt;" />
+        <input class="keyboard-button" type="submit" value="&gt;" />
+        <input class="keyboard-button" type="submit" value="," />
+        <input class="keyboard-button" type="submit" value="," />
+        <input class="keyboard-button" type="submit" value="]" />
       </div>
       <div id="execute-code-container">
         <input id="execute-code" type="submit" value="Go!" />
@@ -34,12 +34,14 @@
     <div id="console">
       <h2>Console</h2>
       <textarea id="console-text" readonly="readonly"></textarea>
+      <p id="waiting-for-input">Waiting for keyboard input...</p>
     </div>
     
     <div id="footer">
       Built with HTML5 and <a href="https://github.com/ZachBray/FunScript">Funscript</a> on a cold winter's night in London.
     </div>
-
+    
+    <script src="jquery-1.8.0.js"></script>
     <script src="brainfuck.js"></script>
   </div>
 </body>
