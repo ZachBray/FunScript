@@ -1,0 +1,24 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="FunJS.Data/WorldBankProvider.fs">
+    <Files>
+      <File FileName="FunJS.Data/WorldBankProvider.fs" Line="12" Column="1" />
+      <File FileName="FunJS.Data/JsonProvider.fs" Line="1" Column="1" />
+      <File FileName="FunJS.Data/Components.fs" Line="1" Column="1" />
+      <File FileName="FunJS.Data/worldbank.json" Line="1" Column="9897" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="FunJS.Data" expanded="True">
+            <Node name="WorldBankProvider.fs" selected="True" />
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
