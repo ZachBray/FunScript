@@ -45,22 +45,25 @@ let createCallerReplacer methodInfo callType replacement replace =
 open Microsoft.FSharp.Quotations
 open System.Reflection
 
-let private generateArity quote (|ArgMatch|_|) =
+let generateArityWithCompiler quote (|ArgMatch|_|) =
    let mi, callType = Quote.toMethodBaseFromLambdas quote
-   createCallerReplacer mi callType None <| fun split (|Return|) returnStategy ->
+   createCallerReplacer mi callType None <| fun split compiler returnStategy ->
       function
-      | None, _, ArgMatch split (decls, code) ->
+      | None, _, ArgMatch split compiler (decls, code) ->
          [ yield! decls |> List.concat
            yield returnStategy.Return code
          ]
       | Some obj, _, args ->
          match obj::args with
-         | ArgMatch split (decls, code) ->
+         | ArgMatch split compiler (decls, code) ->
             [ yield! decls |> List.concat
               yield returnStategy.Return code
             ]
          | _ -> []
       | _ -> []
+
+let generateArity quote argMatch = 
+   generateArityWithCompiler quote (fun x _ -> argMatch x)
 
 let nullary quote code =
    generateArity quote (fun (|Split|) ->

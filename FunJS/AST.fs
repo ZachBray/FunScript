@@ -10,11 +10,7 @@ let (|Newline|) padding =
 
 let getNameScope (var:Var) scope =
    let rec getNameScope prefix =
-      let name =
-         // TODO: This string magic sucks! Wrap Var in something more
-         // useful. Or use propper namespacing so we don't have to remove dots.
-         if var.Name.StartsWith "!!!" then prefix + var.Name.Substring 3
-         else prefix + JavaScriptNameMapper.sanitize var.Name
+      let name = prefix + JavaScriptNameMapper.sanitize var.Name
       match scope |> Map.tryFind name with
       | Some v when v = var -> name, scope
       | Some _ -> getNameScope (prefix + "_")
@@ -29,6 +25,7 @@ type JSExpr =
    | Number of float
    | String of string
    | Reference of Var
+   | UnsafeReference of JSRef
    | This
    | Object of (JSRef * JSExpr) list
    | PropertyGet of JSExpr * JSRef
@@ -47,6 +44,7 @@ type JSExpr =
       | Number f -> sprintf "%f" f
       | String str -> sprintf @"""%s""" (System.Web.HttpUtility.JavaScriptStringEncode(str))
       | Reference ref -> getNameScope ref !scope |> fst
+      | UnsafeReference ref -> ref
       | This -> "this"
       | Object propExprs ->
          let filling =

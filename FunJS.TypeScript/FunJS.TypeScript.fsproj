@@ -47,9 +47,15 @@
     <Compile Include="ProvidedTypes.fs" />
     <Compile Include="AST.fs" />
     <Compile Include="Parser.fs" />
+    <Compile Include="TypeGenerator.fs" />
     <Compile Include="Provider.fs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FunJS.TypeScript.Interop\FunJS.TypeScript.Interop.fsproj">
+      <Name>FunJS.TypeScript.Interop</Name>
+      <Project>{0803befe-9f5f-4a5f-8572-6a8b5d089506}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\FunJS\FunJS.fsproj">
       <Name>FunJS</Name>
       <Project>e0916e67-d3b0-4c3a-ad18-4146882fcedd</Project>

@@ -29,18 +29,19 @@ and TSFunction =
  { Name: name
    Type: TSType
    Parameters: TSParameter list
-   IsOptional: bool
-   IsStatic: bool }
+   IsOptional: bool }
+
+and isStatic = bool
 
 and TSObjectMember =
-   | Property of TSVariable
-   | Method of TSFunction
-   | Indexer of TSFunction
+   | Property of TSVariable * isStatic
+   | Method of TSFunction * isStatic
+   | Indexer of TSFunction * isStatic
 
 type TSObject =
  { Name: string
    Members: TSObjectMember list
-   SuperTypes: TSType list }
+   SuperTypes: string list }
 
 type TSGlobal =
    | DeclareVar of TSVariable

@@ -1,4 +1,4 @@
-﻿module internal FunJS.ReturnStrategies
+﻿module (*internal*) FunJS.ReturnStrategies
 
 open AST
 open InternalCompiler

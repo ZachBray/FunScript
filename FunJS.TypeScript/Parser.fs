@@ -153,7 +153,6 @@ let parse(stream:StreamReader) =
       | _ -> None
 
    and (|Indexer|_|) p =
-      let isStatic = false
       match p with
       | Consume "[" (Take alphaNumeric (name, Consume ":" (Type (t, Consume "]" (Consume ":" (Type(retT, p))))))) ->
          let parameter =
@@ -166,8 +165,7 @@ let parse(stream:StreamReader) =
            { TSFunction.Name = name
              TSFunction.IsOptional = false
              TSFunction.Parameters = [parameter]
-             TSFunction.Type = retT 
-             TSFunction.IsStatic = isStatic }
+             TSFunction.Type = retT }
          Some(func, p)
       | Consume "[" (Take alphaNumeric (name, Consume "]" (Type(retT, p)))) ->
          let parameter =
@@ -180,8 +178,7 @@ let parse(stream:StreamReader) =
            { TSFunction.Name = name
              TSFunction.IsOptional = false
              TSFunction.Parameters = [parameter]
-             TSFunction.Type = retT 
-             TSFunction.IsStatic = isStatic }
+             TSFunction.Type = retT }
          Some(func, p)
       | Consume "[" (Take alphaNumeric (name, Consume ":" (Type (t, Consume "]" p)))) ->
          let parameter =
@@ -194,8 +191,7 @@ let parse(stream:StreamReader) =
            { TSFunction.Name = name
              TSFunction.IsOptional = false
              TSFunction.Parameters = [parameter]
-             TSFunction.Type = Any 
-             TSFunction.IsStatic = isStatic }
+             TSFunction.Type = Any }
          Some(func, p)
       | Consume "[" (Take alphaNumeric (name, Consume "]" p)) ->
          let parameter =
@@ -208,8 +204,7 @@ let parse(stream:StreamReader) =
            { TSFunction.Name = name
              TSFunction.IsOptional = false
              TSFunction.Parameters = [parameter]
-             TSFunction.Type = Any 
-             TSFunction.IsStatic = isStatic }
+             TSFunction.Type = Any }
          Some(func, p)
       | _ -> None
 
@@ -228,81 +223,76 @@ let parse(stream:StreamReader) =
       
    and (|ParameterList|_|) = listOf parameter "," "(" ")"
 
-   and (|Function|_|) isStatic = function
+   and (|Function|_|) = function
       | ParameterList (paras, Consume ":" (Type (t, p))) ->
          let func =
            { TSFunction.Name = ""
              TSFunction.Parameters = paras
              TSFunction.Type = t
-             TSFunction.IsOptional = false
-             TSFunction.IsStatic = isStatic }
+             TSFunction.IsOptional = false }
          Some(func, p)
       | Take alphaNumeric (name, ParameterList (paras, Consume ":" (Type (t, p)))) ->
          let func =
            { TSFunction.Name = name
              TSFunction.Parameters = paras
              TSFunction.Type = t 
-             TSFunction.IsOptional = false
-             TSFunction.IsStatic = isStatic }
+             TSFunction.IsOptional = false}
          Some(func, p)
       | Consume "?" (ParameterList (paras, Consume ":" (Type (t, p)))) ->
          let func =
            { TSFunction.Name = ""
              TSFunction.Parameters = paras
              TSFunction.Type = t
-             TSFunction.IsOptional = true
-             TSFunction.IsStatic = isStatic }
+             TSFunction.IsOptional = true}
          Some(func, p)
       | Take alphaNumeric (name, Consume "?" (ParameterList (paras, Consume ":" (Type (t, p))))) ->
          let func =
            { TSFunction.Name = name
              TSFunction.Parameters = paras
              TSFunction.Type = t 
-             TSFunction.IsOptional = true
-             TSFunction.IsStatic = isStatic }
+             TSFunction.IsOptional = true }
          Some(func, p)
       | ParameterList (paras, p) ->
          let func =
            { TSFunction.Name = ""
              TSFunction.Parameters = paras
              TSFunction.Type = Void
-             TSFunction.IsOptional = false
-             TSFunction.IsStatic = isStatic }
+             TSFunction.IsOptional = false }
          Some(func, p)
       | Take alphaNumeric (name, ParameterList (paras, p)) ->
          let func =
            { TSFunction.Name = name
              TSFunction.Parameters = paras
              TSFunction.Type = Void 
-             TSFunction.IsOptional = false
-             TSFunction.IsStatic = isStatic }
+             TSFunction.IsOptional = false }
          Some(func, p)
       | Consume "?" (ParameterList (paras, p)) ->
          let func =
            { TSFunction.Name = ""
              TSFunction.Parameters = paras
              TSFunction.Type = Void
-             TSFunction.IsOptional = true
-             TSFunction.IsStatic = isStatic }
+             TSFunction.IsOptional = true }
          Some(func, p)
       | Take alphaNumeric (name, Consume "?" (ParameterList (paras, p))) ->
          let func =
            { TSFunction.Name = name
              TSFunction.Parameters = paras
              TSFunction.Type = Void 
-             TSFunction.IsOptional = true
-             TSFunction.IsStatic = isStatic }
+             TSFunction.IsOptional = true }
          Some(func, p)
       | _ -> None
 
-   and objProperty isStatic = function
-      | Consume "static" (Function true (f, p))
-      | Function isStatic (f, p) -> 
+   and (|ObjProperty|_|) isStatic = function
+      | Consume "static" (ObjProperty true (f, p)) ->
+        Some(f, p)
+      | Function (f, p) -> 
          let x = 0
-         Some(Method f, p)
-      | Indexer (f, p) -> Some(Indexer f, p)
-      | Var (v, p) -> Some(Property v, p)      
+         Some(Method(f,isStatic), p)
+      | Indexer (f, p) -> Some(Indexer(f, isStatic), p)
+      | Var (v, p) -> Some(Property(v, isStatic), p)      
       | _ -> None
+
+   and objProperty = (|ObjProperty|_|)
 
    and (|ObjectPropertyList|_|) isStatic = listOf (objProperty isStatic) ";" "{" "}"
 
@@ -312,7 +302,7 @@ let parse(stream:StreamReader) =
       | _ -> None
    
    let (|GlobalFunc|_|) = function
-      | Consume "function" (Function true (f, Consume ";" p)) ->
+      | Consume "function" (Function (f, Consume ";" p)) ->
          Some(DeclareFunction f, p)
       | _ -> None
 
@@ -332,7 +322,7 @@ let parse(stream:StreamReader) =
          let obj =
            { TSObject.Name = name
              TSObject.Members = props 
-             TSObject.SuperTypes = superTypes |> List.map Interface }
+             TSObject.SuperTypes = superTypes }
          Some(DeclareInterface obj, p)
       | Take alphaNumeric (name, ObjectPropertyList false (props, p)) ->
          let obj =

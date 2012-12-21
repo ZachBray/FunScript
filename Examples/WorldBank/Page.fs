@@ -50,7 +50,7 @@ let main() =
 
   // Render the chart based on checkboxes
   let render () = async {
-    let opts = h.HighchartsOptions'()
+    let opts = h.HighchartsOptions()
     opts.chart <- h.HighchartsChartOptions'(renderTo = "chart", ``type`` = "line")
     opts.title <- h.HighchartsTitleOptions'(text = "School enrollment, tertiary (% gross)")
     opts.series <- [| |]

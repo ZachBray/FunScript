@@ -19,62 +19,6 @@ let private (|ReflectedDefinition|_|) (mi:MethodBase) =
       | Some _ -> Some(JavaScriptNameMapper.mapMethod mi)
       | _ -> None
 
-let private rootInterfaceName = typeof<IJSRoot>.Name
-let private mappingInterfaceName = typeof<IJSMapping>.Name
-let private conserveMappingInterfaceName = typeof<IJSConservativeMapping>.Name
-
-let rec private buildRootWalk acc (t:System.Type) =
-   match t with
-   | NonNull t ->
-      match t.GetInterface rootInterfaceName with
-      | NonNull _ -> acc
-      | _ -> buildRootWalk (t.Name :: acc) t.DeclaringType
-   | _ -> failwith "An IJSMapping interface had no root"
-
-let fixOverloads (name:string) = name.Replace("'", "")
-
-let private removePropertyPrefixes name =
-   let name = fixOverloads name
-   if name.StartsWith "get_" || name.StartsWith "set_" then 
-      name.Substring(4), true
-   else name, false
-
-let private (|JSMapping|_|) (mi:MethodBase) = 
-   let mappingInterface = 
-      mi.DeclaringType.GetInterface mappingInterfaceName
-   match mappingInterface with
-   | NonNull _ -> 
-      let name, isProperty = removePropertyPrefixes mi.Name
-      let isStatic = mi.IsStatic
-      if not isStatic then Some (name, isStatic, isProperty)
-      else 
-         let rootWalk = buildRootWalk [] mi.DeclaringType
-         match rootWalk with
-         | [] -> Some (name, isStatic, isProperty)
-         | _ ->
-            let prefix = rootWalk |> String.concat "."
-            Some (sprintf "%s.%s" prefix name, isStatic, isProperty)
-   | _ -> None
-
-
-let private (|JSConservativeMapping|_|) (t:System.Type) =
-   let interfaceDef = t.GetInterface conserveMappingInterfaceName
-   let hasInterface = interfaceDef <> Unchecked.defaultof<_>
-   if hasInterface then
-      let rootWalk = buildRootWalk [] t
-      Some(rootWalk |> String.concat ".")
-   else None
-
-let private (|JSConservativeCtorMapping|_|) (mi:MethodBase) =
-   match mi.DeclaringType with
-   | JSConservativeMapping name -> Some <| name
-   | _  -> None
-
-let private (|JSConservativeMethodMapping|_|) (mi:MethodBase) =
-   match mi.DeclaringType with
-   | JSConservativeMapping name -> Some <| name + "." + mi.Name
-   | _  -> None
-
 let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list) bodyExpr var (compiler:InternalCompiler.ICompiler) =
    match replacementMi.GetCustomAttribute<JSEmitAttribute>() with
    | meth when meth <> Unchecked.defaultof<_> ->
@@ -130,12 +74,6 @@ let private createConstruction
          compiler.DefineGlobal name (createGlobalMethod compiler ci Quote.ConstructorCall)
       [ yield! decls |> List.concat
         yield returnStategy.Return <| New(consRef.Name, refs) ]
-   | JSConservativeCtorMapping name ->
-      [ yield! decls |> List.concat
-        yield returnStategy.Return <| New(name, refs) ]
-   | JSMapping(name, false, false) ->
-      [ yield! decls |> List.concat
-        yield returnStategy.Return <| New("Object", []) ]
    | _ -> []
 
 let private (|SpecialOp|_|) = Quote.specialOp
@@ -150,20 +88,9 @@ let private createCall
       exprs 
       |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
       |> List.unzip
-   match mi, refs with
-   // TypeScript definitions expose constructors as "new" methods, 
-   // so JS call to "new" is translated as a constructor - for example:
-   // "lib.Number.``new``(10)" becomes "new Number(1)"
-   | (JSMapping("new", _, false) as mi), instance::arguments ->
-      [ let instVar = Var.Global("__inst__", typeof<obj>)
-        yield! decls |> List.concat
-        yield DeclareAndAssign(instVar, instance)
-        yield returnStategy.Return <| New(instVar.Name, arguments) ]   
-   | (JSMapping(name, true, false) as mi), _ ->
-      [ yield! decls |> List.concat
-        yield returnStategy.Return <| Apply(Reference (Var.Global(name, typeof<obj>)), refs) ]
-   | SpecialOp((ReflectedDefinition name) as mi), _
-   | (ReflectedDefinition name as mi), _ ->
+   match mi with
+   | SpecialOp((ReflectedDefinition name) as mi)
+   | (ReflectedDefinition name as mi) ->
       match mi.IsStatic, refs with
       | false, objRef::argRefs ->
          [ yield! decls |> List.concat
@@ -174,21 +101,6 @@ let private createCall
          [ yield! decls |> List.concat
            yield returnStategy.Return <| Apply(Reference methRef, refs) ]
       | _ -> failwith "never"
-   | JSConservativeMethodMapping name, [] ->
-      [ yield! decls |> List.concat
-        yield returnStategy.Return <| Reference (Var.Global("!!!" + name, typeof<obj>)) ]
-   | JSMapping(name, true, true), [] ->
-      [ yield! decls |> List.concat
-        yield returnStategy.Return <| Reference (Var.Global(name, typeof<obj>)) ]
-   | JSMapping("Invoke", false, false), instance::refs ->
-      [ yield! decls |> List.concat
-        yield returnStategy.Return <| Apply(instance, refs) ]
-   | JSMapping(name, false, false), instance::refs ->
-      [ yield! decls |> List.concat
-        yield returnStategy.Return <| Apply(PropertyGet(instance, name), refs) ]
-   | JSMapping(name, false, true), instance::[] ->
-      [ yield! decls |> List.concat
-        yield returnStategy.Return <| PropertyGet(instance, name) ]
    | _ -> []
 
 let private methodCalling =
