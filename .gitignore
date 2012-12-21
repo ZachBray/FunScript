@@ -6,5 +6,7 @@ _ReSharper*/
 *.ReSharper.user
 *.suo
 *.user
+*.userprefs
 *.fs.bak
+*.*~
 :
