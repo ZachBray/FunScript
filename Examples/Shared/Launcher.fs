@@ -1,4 +1,4 @@
-﻿namespace FunJS
+﻿namespace FunScript
 
 open System.IO
 open System.Net
@@ -77,7 +77,7 @@ module RuntimeImplementation =
 // Main method that finds 'main' function and generates JS file
 // ----------------------------------------------------------------------------
 
-open FunJS
+open FunScript
 open System.IO
 open System.Reflection
 open Microsoft.FSharp.Quotations
@@ -116,7 +116,7 @@ type Runtime private() =
 
     // Compile the main function into a script
     let sw = System.Diagnostics.Stopwatch.StartNew()
-    let source = FunJS.Compiler.Compiler.Compile(main, components=components)
+    let source = FunScript.Compiler.Compiler.Compile(main, components=components)
     let sourceWrapped = sprintf "$(document).ready(function () {\n%s\n});" source
     let filename = Path.Combine(root, (System.IO.Path.GetFileNameWithoutExtension(thisAsm.Location).ToLower()) + ".js")
     printfn "Generated JavaScript in %f sec..." (float sw.ElapsedMilliseconds / 1000.0) 

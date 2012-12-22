@@ -1,12 +1,12 @@
 ﻿[<ReflectedDefinition>]
 module Program
 
-open FunJS
-open FunJS.TypeScript
+open FunScript
+open FunScript.TypeScript
 open System.Threading
 
-type j = FunJS.TypeScript.Api<"..\\Typings\\jquery.d.ts">
-type lib = FunJS.TypeScript.Api<"..\\Typings\\lib.d.ts">
+type j = FunScript.TypeScript.Api<"..\\Typings\\jquery.d.ts">
+type lib = FunScript.TypeScript.Api<"..\\Typings\\lib.d.ts">
 
 // ----------------------------------------------------------------------------
 // Mini implementation of some F# async primitives

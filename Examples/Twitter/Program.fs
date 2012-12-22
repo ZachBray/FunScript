@@ -1,12 +1,12 @@
 ﻿[<ReflectedDefinition>]
 module Program
 
-open FunJS
-open FunJS.TypeScript
+open FunScript
+open FunScript.TypeScript
 
 
 // See https://github.com/borisyankov/DefinitelyTyped for more
-type ts = FunJS.TypeScript.Api< 
+type ts = FunScript.TypeScript.Api< 
                @"Examples/Typings/jquery.d.ts
                  Examples/Typings/google.maps.d.ts
                  Examples/Typings/lib.d.ts" >
@@ -70,7 +70,7 @@ let main() =
    ts.onload <- fun _ -> Program().Setup() :> obj
 
 // Compile
-let additionalComponents = FunJS.Interop.Components.all
+let additionalComponents = FunScript.Interop.Components.all
 let source = Compiler.Compiler.Compile(<@@ main() @@>, components=additionalComponents, noReturn=true)
 let filename = "twitter-example.js"
 System.IO.File.Delete filename

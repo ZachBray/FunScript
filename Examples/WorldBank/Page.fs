@@ -1,7 +1,7 @@
 ﻿[<ReflectedDefinition>]
 module Program
 
-open FunJS
+open FunScript
 open FSharp.Data
 
 // ------------------------------------------------------------------
@@ -72,4 +72,4 @@ let main() =
 
 // ------------------------------------------------------------------
 
-do Runtime.Run(components=FunJS.Data.Components.DataProviders, directory="Web")
+do Runtime.Run(components=FunScript.Data.Components.DataProviders, directory="Web")

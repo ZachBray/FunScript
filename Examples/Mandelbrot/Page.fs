@@ -1,7 +1,7 @@
 ﻿[<ReflectedDefinition>]
 module Program
 
-open FunJS
+open FunScript
 
 type Complex = { r : double; i : double }
 type Color = { r : int; g : int; b : int; a : int }

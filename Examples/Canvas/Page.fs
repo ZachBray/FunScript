@@ -1,8 +1,8 @@
 ﻿[<ReflectedDefinition>]
 module Program
 
-open FunJS
-open FunJS.TypeScript
+open FunScript
+open FunScript.TypeScript
 
 type ts = Api< "Examples/Typings/lib.d.ts" >
 
