@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{4925A630-B079-445d-BCD4-3A9C94FE9307}") = "Canvas", "Canvas.fsproj", "761ce569-eddc-4163-95b4-30ade1f4bd07"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		761ce569-eddc-4163-95b4-30ade1f4bd07.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		761ce569-eddc-4163-95b4-30ade1f4bd07.Debug|Any CPU.Build.0 = Debug|Any CPU
+		761ce569-eddc-4163-95b4-30ade1f4bd07.Release|Any CPU.ActiveCfg = Release|Any CPU
+		761ce569-eddc-4163-95b4-30ade1f4bd07.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Canvas.fsproj
+	EndGlobalSection
+EndGlobal

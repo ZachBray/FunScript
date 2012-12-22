@@ -117,56 +117,20 @@ let private partitionMembers members =
    members |> List.fold (fun (ctors, meths, props) -> 
       function
       | Method (f, isStatic) ->
-         if not isStatic && isConstructor f then f::ctors, meths, props
+         if isConstructor f then f::ctors, meths, props
          else ctors, (f, isStatic)::meths, props
       | Property (v, isStatic) -> ctors, meths, (v, isStatic)::props
       | Indexer _ -> (* TODO *) ctors, meths, props) ([], [], [])
 
-let rec private findSubTypePermutations subTypeLookup tsType =
-   match tsType with
-   | Interface name ->
-      let typePath = extractTypePath name
-      match subTypeLookup |> Map.tryFind typePath with
-      | None -> [tsType]
-      | Some subTypes ->
-         tsType :: (subTypes |> List.map (String.concat "." >> Interface))
-   | Lambda(parameters, returnType) ->
-      let rec permutations parameters =
-         seq {
-            match parameters with
-            | [] -> yield []
-            | (p:TSParameter)::ps ->
-               let pSubTypes = 
-                  findSubTypePermutations subTypeLookup p.Var.Type
-               let pSubTypeMappings =
-                  pSubTypes |> List.map (fun pSubType ->
-                     { p with Var = { p.Var with Type = pSubType  } })
-               for combination in permutations ps do
-                  for pSubTypeMapping in parameters do
-                     yield pSubTypeMapping::combination
-         } 
-      let paramPermutations = permutations parameters
-      let returnSubTypes = findSubTypePermutations subTypeLookup returnType
-      paramPermutations |> Seq.collect (fun permutation ->
-         returnSubTypes |> List.map (fun returnSubType ->
-            Lambda(permutation, returnSubType)
-         )
-      ) |> Seq.toList    
-   | t -> [t]
-   
-
-let rec private createParameterPermutations subTypeLookup parameters =
+let rec private createParameterPermutations parameters =
    seq {
       match parameters with
       | [] -> yield []
       | (p:TSParameter)::ps ->
-         for ps in createParameterPermutations subTypeLookup ps do
+         for ps in createParameterPermutations ps do
             if p.Var.IsOptional then yield ps
             let paramType = p.Var.Type
-            let paramSubTypes = findSubTypePermutations subTypeLookup paramType
-            for paramSubType in paramSubTypes do
-               let subP = { p with Var = { p.Var with Type = paramSubType } }
-               yield subP::ps
+            yield p::ps
    }
    
 let private makeTupleType ts =
@@ -269,9 +233,9 @@ let private createObj() = exprFor Emit.CreateObject Static "boo" []
 
 let private pathToName = List.rev >> String.concat "."
 
-let private createConstructors defs subTypeLookup (ctors:TSFunction list) parentType parentTypePath =
+let private createConstructors defs (ctors:TSFunction list) parentType parentTypePath =
    ctors 
-   |> Seq.collect (fun ctor -> createParameterPermutations subTypeLookup ctor.Parameters)
+   |> Seq.collect (fun ctor -> createParameterPermutations ctor.Parameters)
    |> Seq.distinctBy (fun paramReqs -> paramReqs |> List.map (fun p -> p.Var.Type))
    |> Seq.map (List.map (createParameter defs))
    |> Seq.map (fun providedParams ->
@@ -280,14 +244,14 @@ let private createConstructors defs subTypeLookup (ctors:TSFunction list) parent
          parameters=providedParams,
          returnType=parentType,
          IsStaticMethod=true,
-         InvokeCode=fun exprs -> createNew (pathToName parentTypePath) exprs))
+         InvokeCode=fun exprs -> createNew (pathToName parentTypePath) exprs) :> MemberInfo)
    |> Seq.toList
          
 let sanitise = function
    | "" -> "Invoke" 
    | name -> name 
    
-let private createMethods defs subTypeLookup name (meths:(TSFunction * bool) list) (parent:MergedType) =
+let private createMethods defs name (meths:(TSFunction * bool) list) (parent:MergedType) =
    let isStatic = meths |> List.exists snd
    let meths = 
       meths |> List.choose (fun (m, isS) ->
@@ -302,7 +266,7 @@ let private createMethods defs subTypeLookup name (meths:(TSFunction * bool) lis
       else Any
    let returnType = convertToTypeDef defs returnTSType
    meths 
-   |> Seq.collect (fun meth -> createParameterPermutations subTypeLookup meth.Parameters)
+   |> Seq.collect (fun meth -> createParameterPermutations meth.Parameters)
    |> Seq.distinctBy (fun paramReqs -> paramReqs |> List.map (fun p -> p.Var.Type))
    |> Seq.collect (fun paramReqs ->
       seq {
@@ -315,7 +279,7 @@ let private createMethods defs subTypeLookup name (meths:(TSFunction * bool) lis
             InvokeCode=fun exprs ->
                if isStatic then
                   call Static (pathToName (name::parent.TypePath)) exprs
-               else call Instance name exprs)
+               else call Instance name exprs) :> MemberInfo
          if parent.HasInterface && 
             not isStatic &&
             paramReqs.Length < 8 then
@@ -328,8 +292,32 @@ let private createMethods defs subTypeLookup name (meths:(TSFunction * bool) lis
                parameters=[createParameter defs parameter],
                returnType=typeof<Void>,
                IsStaticMethod=false,
-               InvokeCode=fun exprs -> replaceMethod name exprs)
+               InvokeCode=fun exprs -> replaceMethod name exprs) :> MemberInfo
       })
+      
+let rec private findReachableTypes types (mergedType:MergedType) =
+   seq {
+      yield! mergedType.SuperTypes
+      for superType in mergedType.SuperTypes do
+         match types |> Map.tryFind superType with
+         | Some mergedSuperType ->
+            yield! findReachableTypes types mergedSuperType
+         | None -> ()
+   }
+      
+let private createConversions defs types mergedType =
+   findReachableTypes types mergedType
+   |> Seq.distinct
+   |> Seq.map (fun superType ->
+     let typeName = pathToName superType
+     let returnType = convertToTypeDef defs (Interface typeName)
+     ProvidedMethod(
+         methodName="As" + typeName,
+         parameters=[],
+         returnType=returnType,
+         IsStaticMethod=false,
+         InvokeCode=fun exprs -> Expr.Coerce(exprs.Head, typeof<obj>)) :> MemberInfo
+   ) |> Seq.toList
          
 let private createProperty defs parentTypePath (prop:TSVariable, isStatic) =
    let propType = convertToTypeDef defs prop.Type
@@ -344,28 +332,23 @@ let private createProperty defs parentTypePath (prop:TSVariable, isStatic) =
       SetterCode=(fun exprs -> 
          if isStatic then
             propertySet Static (pathToName (prop.Name::parentTypePath)) exprs
-         else propertySet Instance prop.Name exprs))
+         else propertySet Instance prop.Name exprs)) :> MemberInfo
       
-let private createMembers defs subTypeLookup members (mergedType:MergedType) parentType =
-   let ctors, meths, props = partitionMembers members
-   let ctorDefs = createConstructors defs subTypeLookup ctors parentType mergedType.TypePath
+let private createMembers defs types (mergedType:MergedType) parentType =
+   let ctors, meths, props = partitionMembers mergedType.Members
+   let ctorDefs = createConstructors defs ctors parentType mergedType.TypePath
+   let conversions = createConversions defs types mergedType
    let methDefs = 
       let methsByName = meths |> Seq.groupBy (fun (m,_) -> m.Name)
       methsByName |> Seq.collect (fun (name, meths) ->
-         createMethods defs subTypeLookup name (meths |> Seq.toList) mergedType)
+         createMethods defs name (meths |> Seq.toList) mergedType)
       |> Seq.toList
    let propDefs = props |> List.map (createProperty defs mergedType.TypePath)
-   ctorDefs, methDefs, propDefs
+   ctorDefs @ methDefs @ propDefs @ conversions
 
-let private createType (mergedType:MergedType) types defs subTypeLookup =
+let private createType (mergedType:MergedType) types defs =
    let typeDef = defs |> obtainTypeDef mergedType.TypePath
-   let inheritedMembers = 
-      mergedType.SuperTypes |> List.choose (fun typePath ->
-         types |> Map.tryFind typePath)
-      |> List.collect (fun (mergedType:MergedType) -> mergedType.Members)
-   let allMembers = inheritedMembers @ mergedType.Members
-   let ctorDefs, methDefs, propDefs = 
-      createMembers defs subTypeLookup allMembers mergedType typeDef
+   
    // TODO: Would be nice to build a builder here or something
    // that makes it easier to use these interfaces.
    if mergedType.HasInterface then
@@ -373,17 +356,11 @@ let private createType (mergedType:MergedType) types defs subTypeLookup =
          parameters=[], 
          InvokeCode=fun args -> createObj())
       |> typeDef.AddMember
-   typeDef.AddMembers ctorDefs
-   typeDef.AddMembers methDefs
-   typeDef.AddMembers propDefs
-
-let private buildSubTypeLookup mergedTypes =
-   mergedTypes 
-   |> Map.fold (fun acc subTypePath (mergedType:MergedType) ->
-      mergedType.SuperTypes |> List.fold (fun acc superType ->
-         match acc |> Map.tryFind superType with
-         | Some subTypes -> acc |> Map.add superType (subTypePath :: subTypes)
-         | None -> acc |> Map.add superType [subTypePath]) acc) Map.empty
+      
+   let allMembers =
+      lazy createMembers defs types mergedType typeDef
+               
+   typeDef.AddMembersDelayed(fun () -> allMembers.Value)
 
 let rec private mostSpecificPath mergedTypes parentTypePath path =
    match parentTypePath with
@@ -437,7 +414,6 @@ let private improveTypePaths mergedTypes =
 
 let generate globals root =
    let mergedTypes = mergeTypes globals |> improveTypePaths
-   let subTypeLookup = buildSubTypeLookup mergedTypes
    let defs = ref(Map [[], root])
    for KeyValue(_, t) in mergedTypes do 
-      createType t mergedTypes defs subTypeLookup
+      createType t mergedTypes defs
