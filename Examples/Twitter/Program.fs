@@ -6,10 +6,10 @@ open FunJS.TypeScript
 
 
 // See https://github.com/borisyankov/DefinitelyTyped for more
-type ts = FunJS.TypeScript.Api<"""
-               https://github.com/borisyankov/DefinitelyTyped/raw/master/jquery/jquery-1.8.d.ts
-               https://github.com/borisyankov/DefinitelyTyped/raw/master/googlemaps/google.maps.d.ts
-               https://github.com/c9/typescript/raw/master/bin/lib.d.ts""" >
+type ts = FunJS.TypeScript.Api< 
+               @"Examples/Typings/jquery.d.ts
+                 Examples/Typings/google.maps.d.ts
+                 Examples/Typings/lib.d.ts" >
 
 type gmaps = ts.google.maps
 

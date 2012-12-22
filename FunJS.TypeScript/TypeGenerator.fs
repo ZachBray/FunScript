@@ -16,7 +16,7 @@ let private createTypeNamed typePath =
    {  
       TypePath = typePath
       Members = []
-      HasInterface = true
+      HasInterface = false
       SuperTypes = []
    }
    
@@ -122,18 +122,38 @@ let private partitionMembers members =
       | Property (v, isStatic) -> ctors, meths, (v, isStatic)::props
       | Indexer _ -> (* TODO *) ctors, meths, props) ([], [], [])
 
-let private findSubTypes subTypeLookup tsType =
+let rec private findSubTypePermutations subTypeLookup tsType =
    match tsType with
    | Interface name ->
       let typePath = extractTypePath name
       match subTypeLookup |> Map.tryFind typePath with
-      | None -> []
+      | None -> [tsType]
       | Some subTypes ->
-         subTypes |> List.map (String.concat "." >> Interface)
-   | _ -> []
+         tsType :: (subTypes |> List.map (String.concat "." >> Interface))
+   | Lambda(parameters, returnType) ->
+      let rec permutations parameters =
+         seq {
+            match parameters with
+            | [] -> yield []
+            | (p:TSParameter)::ps ->
+               let pSubTypes = 
+                  findSubTypePermutations subTypeLookup p.Var.Type
+               let pSubTypeMappings =
+                  pSubTypes |> List.map (fun pSubType ->
+                     { p with Var = { p.Var with Type = pSubType  } })
+               for combination in permutations ps do
+                  for pSubTypeMapping in parameters do
+                     yield pSubTypeMapping::combination
+         } 
+      let paramPermutations = permutations parameters
+      let returnSubTypes = findSubTypePermutations subTypeLookup returnType
+      paramPermutations |> Seq.collect (fun permutation ->
+         returnSubTypes |> List.map (fun returnSubType ->
+            Lambda(permutation, returnSubType)
+         )
+      ) |> Seq.toList    
+   | t -> [t]
    
-let private findSubTypePermutations subTypeLookup tsType =
-   tsType :: findSubTypes subTypeLookup tsType
 
 let rec private createParameterPermutations subTypeLookup parameters =
    seq {
@@ -221,8 +241,6 @@ let rec private convertToTypeDef defs tsType =
 let private createParameter defs (param:TSParameter) =
    let paramType = convertToTypeDef defs param.Var.Type
    ProvidedParameter(name=param.Var.Name, parameterType=paramType)
-
-
 
 type CallType = Static | Instance
 
@@ -381,9 +399,15 @@ let rec private mostSpecificType mergedTypes parentTypePath = function
       let typePath = mostSpecificPath mergedTypes parentTypePath (extractTypePath name)
       let specificName = typePath |> List.rev |> String.concat "."
       Interface specificName
+   | Lambda(parameters, returnType) ->
+      let updatedParameters =
+         parameters |> List.map (improveParameterTypePath mergedTypes parentTypePath)
+      let updatedReturnType =
+         mostSpecificType mergedTypes parentTypePath returnType 
+      Lambda(updatedParameters, updatedReturnType)
    | t -> t
 
-let private improveParameterTypePath mergedTypes parentTypePath (parameter:TSParameter) =
+and private improveParameterTypePath mergedTypes parentTypePath (parameter:TSParameter) =
    let updatedType = mostSpecificType mergedTypes parentTypePath parameter.Var.Type
    { parameter with 
       Var = { parameter.Var with Type = updatedType } }

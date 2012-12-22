@@ -1,5 +1,5 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2012
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "WorldBank", "WorldBank\WorldBank.fsproj", "{A4799ED1-4228-4B1D-8ACB-61293F90B07E}"
 EndProject
