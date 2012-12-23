@@ -8,3 +8,6 @@ _ReSharper*/
 *.suo
 *.user
 *.fs.bak
+
+# Generated documentation
+Examples/Documentation/Output/*.html
