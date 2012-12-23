@@ -4,7 +4,7 @@ module Program
 open FunScript
 open FunScript.TypeScript
 
-type ts = Api< "Examples/Typings/lib.d.ts" >
+type ts = Api<"../Typings/lib.d.ts">
 
 let main() =
    let canvas = unbox<ts.HTMLCanvasElement>(ts.document.getElementById("canvas"))

@@ -55,4 +55,4 @@ let main() =
 
 // ----------------------------------------------------------------------------
 
-do Runtime.Run()
+do Runtime.Run(components=Interop.Components.all)

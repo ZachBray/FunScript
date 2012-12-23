@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>a4799ed1-4228-4b1d-8acb-61293f90b07e</ProjectGuid>
+    <ProjectGuid>{63eaf56e-2390-453d-bd73-b79e85cf0de0}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>FunScript.Example</RootNamespace>
     <AssemblyName>FunScript.Example</AssemblyName>
