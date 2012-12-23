@@ -76,9 +76,16 @@ hr {
 
 /* Format the right-side menu */
 #menu {
-  margin-top:50px;
   font-size:11pt;
   padding-left:20px;
+  margin-top:50px;
+}
+
+#run-button {
+  margin:15px 0px 35px 30px;
+}
+#run-button a {
+  width:100px;
 }
 
 #menu .nav-header {
@@ -101,6 +108,26 @@ hr {
 pre, pre code {
   font: 9pt 'Droid Sans Mono', sans-serif;
   line-height:13pt;
+}
+
+/* Dialog box with live code sample */
+#sample-dialog {
+  font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size:14px;
+}
+#sample-dialog .modal-body
+{
+  height:300px;
+  overflow:scroll;
+}
+#sample-dialog h2 
+{ 
+  font-size: 16pt; 
+  margin:40px 0px 0px 0px;
+}
+#sample-dialog h2.first 
+{
+  margin-top:0px;
 }
 
 /* Additional formatting for the homepage */

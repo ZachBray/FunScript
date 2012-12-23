@@ -18,48 +18,60 @@
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <script type="text/javascript">
+      {sample-javascript}
+    </script>
   </head>
   <body>
     <div class="container">
       <div class="masthead">
         <ul class="nav nav-pills pull-right">
           <li><a href="http://fsharp.org">fsharp.org</a></li>
-          <li><a href="http://github.com/tpetricek/FSharp.Data">github page</a></li>
-          <li><a href="http://fsharp.github.com/fsharpx/">fsharpx library</a></li>
         </ul>
-        <h3 class="muted">F# Data Library</h3>
+        <h3 class="muted">FunScript</h3>
       </div>
       <hr />
+
+			<div class="modal hide fade" id="sample-dialog">
+				<div class="modal-header">
+					<a href="#" class="close" data-dismiss="modal">&times;</a>
+					<h3>{sample-title}</h3>
+					</div>
+				<div class="modal-body">
+          {sample-body}
+			  </div>
+				<div class="modal-footer">
+					<a href="#" class="btn btn-primary" data-dismiss="modal">Close</a>
+	  		</div>
+  		</div>
+
       <div class="row">
         <div class="span9" id="main">
+
           {document}
+
           {tooltips}
         </div>
         <div class="span3">
-
           <ul class="nav nav-list" id="menu">
-            <li class="nav-header">F# Data Library</li>
-            <li><a href="../index.html">Home page</a></li>
-            <li class="divider"></li>
-            <li><a href="https://nuget.org/packages/FSharp.Data">Get Library via NuGet</a></li>
-            <li><a href="https://github.com/tpetricek/FSharp.Data">Source Code on GitHub</a></li>
-            <li><a href="https://github.com/tpetricek/FSharp.Data/blob/master/LICENSE.md">License (Apache 2.0)</a></li>
+            <li class="nav-header">Live demo</li>
+            <li>
+              Click to open the live JavaScript sample in a dialog window.
+              <div id="run-button">
+			    	    <a data-toggle="modal" href="#sample-dialog" class="btn btn-primary">Open sample</a>
+  				    </div>
+            </li>
+            <li class="nav-header">FunScript</li>
+            <li><a href="index.html">Home page</a></li>
+            <li><a href="https://github.com/ZachBray/FunScript">Source Code on GitHub</a></li>
             
-            <li class="nav-header">Documentation</li>
-            <li><a href="FSharpData.html">F# Data Library</a></li>
-            <li class="divider"></li>
-            <li><a href="JsonProvider.html">F# Data: JSON Type Provider</a></li>
-            <li><a href="XmlProvider.html">F# Data: XML Type Provider</a></li>
-            <li><a href="CsvProvider.html">F# Data: CSV Type Provider</a></li>
-            <li><a href="WorldBank.html">F# Data: WorldBank Provider</a></li>
-            <li class="divider"></li>
-            <li><a href="JsonValue.html">F# Data: JSON Parser and Reader</a></li>
-            <li><a href="Http.html">F# Data: HTTP Utilities</a></li>
+            <li class="nav-header">Examples</li>
+            <li><a href="tutorial.html">Tutorial</a></li>
           </ul>
 
         </div>
       </div>
     </div>
-    <a href="https://github.com/tpetricek/FSharp.Data"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
+    <a href="https://github.com/ZachBray/FunScript"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
   </body>
   </html>
