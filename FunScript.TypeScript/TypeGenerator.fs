@@ -91,6 +91,7 @@ let rec private addGlobal typePath glob =
    | TSGlobal.DeclareModule(name, globals) ->
       let typePath = extractTypePath name @ typePath
       List.foldBack (addGlobal typePath) globals
+   | TSGlobal.ImportModule _ -> id
          
 let private mergeTypes globals =
    List.foldBack (addGlobal []) globals Map.empty
@@ -133,17 +134,30 @@ let rec private createParameterPermutations parameters =
             yield p::ps
    }
    
-let private makeTupleType ts =
-   let tupleType =
-      match ts |> List.length with
-      | 2 -> typedefof<_ * _>
-      | 3 -> typedefof<_ * _ * _>
-      | 4 -> typedefof<_ * _ * _ * _>
-      | 5 -> typedefof<_ * _ * _ * _ * _>
-      | 6 -> typedefof<_ * _ * _ * _ * _ * _>
-      | 7 -> typedefof<_ * _ * _ * _ * _ * _ * _>
+let private makeFuncType domainTypes rangeType =
+   let funcType =
+      match domainTypes |> List.length with
+      // TODO: Replace Func with TypeScript delegate if
+      // auto conversion from FSharpFuncs works ok.
+      | 0 -> typedefof<Func<_>>
+      | 1 -> typedefof<Func<_,_>>
+      | 2 -> typedefof<Func<_,_,_>>
+      | 3 -> typedefof<Func<_,_,_,_>>
+      | 4 -> typedefof<Func<_,_,_,_,_>>
+      | 5 -> typedefof<Func<_,_,_,_,_,_>>
+      | 6 -> typedefof<Func<_,_,_,_,_,_,_>>
+      | 7 -> typedefof<Func<_,_,_,_,_,_,_,_>>
+      | 8 -> typedefof<Func<_,_,_,_,_,_,_,_,_>>
+      | 9 -> typedefof<Func<_,_,_,_,_,_,_,_,_,_>>
+      | 10 -> typedefof<Func<_,_,_,_,_,_,_,_,_,_,_>>
+      | 11 -> typedefof<Func<_,_,_,_,_,_,_,_,_,_,_,_>>
+      | 12 -> typedefof<Func<_,_,_,_,_,_,_,_,_,_,_,_,_>>
+      | 13 -> typedefof<Func<_,_,_,_,_,_,_,_,_,_,_,_,_,_>>
+      | 14 -> typedefof<Func<_,_,_,_,_,_,_,_,_,_,_,_,_,_,_>>
+      | 15 -> typedefof<Func<_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_>>
+      | 16 -> typedefof<Func<_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_>>
       | _ -> failwith "Unsupported tuple size"
-   ProvidedSymbolType(Generic tupleType, ts) :> Type
+   ProvidedSymbolType(Generic funcType, domainTypes @ [rangeType]) :> Type
 
 let rec private convertToTypeDef defs tsType =
    match tsType with
@@ -161,9 +175,7 @@ let rec private convertToTypeDef defs tsType =
       try actualT.MakeArrayType()
       with _ -> failwithf "Could not make array from Type: %A" t
    //TODO: Param arrays
-   | Lambda([], retT) ->
-      //let domain = typeof<unit>
-      let range = convertToTypeDef defs retT
+   | Lambda(ps, retT) ->
       // NOTE:
       // You would think that it would be ok to do this here:
       //    FSharpType.MakeFunctionType(domain, range)
@@ -173,22 +185,11 @@ let rec private convertToTypeDef defs tsType =
       // IsAssignableFrom. This means that calls to the method that takes
       // or returns the lambda fail the checkArgs test when creating a Call 
       // quotation Expr.
-      let genericType = typedefof<_ -> _>
-      ProvidedSymbolType(SymbolKind.Generic genericType, [typeof<unit>; range]) :> Type
-   | Lambda([p], retT) ->
-      let domain = convertToTypeDef defs p.Var.Type
-      let range = convertToTypeDef defs retT
-      let genericType = typedefof<_ -> _>
-      ProvidedSymbolType(SymbolKind.Generic genericType, [domain; range]) :> Type
-   | Lambda(ps, retT) ->
       try
-         let domain = 
-            ps 
-            |> List.map (fun p -> convertToTypeDef defs p.Var.Type)
-            |> makeTupleType
-         let range = convertToTypeDef defs retT
-         let genericType = typedefof<_ -> _>
-         ProvidedSymbolType(SymbolKind.Generic genericType, [domain; range]) :> Type
+         let domainTypes = 
+            ps |> List.map (fun p -> convertToTypeDef defs p.Var.Type)
+         let rangeType = convertToTypeDef defs retT
+         makeFuncType domainTypes rangeType
       with ex ->
          failwithf "Failed to make function type. %s For: %A => %A" ex.Message ps retT
    | Structural obj -> 
@@ -278,7 +279,9 @@ let private createMethods defs name (meths:(TSFunction * bool) list) (parent:Mer
             IsStaticMethod=isStatic,
             InvokeCode=fun exprs ->
                if isStatic then
-                  call Static (pathToName (name::parent.TypePath)) exprs
+                  match name with
+                  | "" -> call Static (pathToName parent.TypePath) exprs
+                  | _ -> call Static (pathToName (name::parent.TypePath)) exprs
                else call Instance name exprs) :> MemberInfo
          if parent.HasInterface && 
             not isStatic &&
@@ -307,12 +310,12 @@ let rec private findReachableTypes types (mergedType:MergedType) =
       
 let private createConversions defs types mergedType =
    findReachableTypes types mergedType
-   |> Seq.distinct
+   |> Seq.distinctBy List.head
    |> Seq.map (fun superType ->
      let typeName = pathToName superType
      let returnType = convertToTypeDef defs (Interface typeName)
      ProvidedMethod(
-         methodName="As" + typeName,
+         methodName="As" + superType.Head,
          parameters=[],
          returnType=returnType,
          IsStaticMethod=false,

@@ -69,10 +69,13 @@ module Components =
    let private callReplacement =
       replace <@ Emit.CallImpl @> (fun isStatic methName args ->
          let call =
-            if isStatic then Apply(UnsafeReference methName, args)
+            if isStatic then 
+               match methName with
+               | null | "" -> Apply(UnsafeReference "", args.Tail)
+               | _ -> Apply(UnsafeReference methName, args)
             else 
                match methName with
-               | "" -> Apply(args.Head, args.Tail)
+               | null | "" -> Apply(args.Head, args.Tail)
                | _ -> Apply(PropertyGet(args.Head, methName), args.Tail)
          Some([], call))
 

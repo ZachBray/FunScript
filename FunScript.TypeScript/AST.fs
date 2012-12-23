@@ -51,3 +51,4 @@ type TSGlobal =
    | DeclareObject of TSObject
    | DeclareModule of name * TSGlobal list
    | DeclareEnum of name * name list
+   | ImportModule of name * name

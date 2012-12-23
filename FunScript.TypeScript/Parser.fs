@@ -46,11 +46,11 @@ let parse(stream:StreamReader) =
    let numeric = set ['0' .. '9']
    let lowercase = set ['a' .. 'z']
    let uppercase = set ['A' .. 'Z']
-   let specialSymbols = set ['$'; '_']
+   let quotes = "\"" |> Seq.toArray
+   let specialSymbols = set ['$'; '_'; '.']
    let alpha = lowercase + uppercase
-   let alphaNumeric = alpha + numeric + specialSymbols
    let dot = set ['.']
-   let typePath = alphaNumeric + dot
+   let alphaNumeric = alpha + numeric + specialSymbols + set quotes + dot
 
    let furthestPos = ref 0
 
@@ -83,7 +83,7 @@ let parse(stream:StreamReader) =
       furthestPos := max pos !furthestPos
       match count pos with
       | n when n > pos -> 
-         let toEmit = text.Substring(pos, n - pos)
+         let toEmit = text.Substring(pos, n - pos).Trim(quotes)
          Some(toEmit, n)
       | _ -> None
 
@@ -110,6 +110,9 @@ let parse(stream:StreamReader) =
    let rec (|Type|_|) pos =
       let x = 10
       match pos with
+      // TODO: There is a recursion bug here to do with consuming arrays.
+      //       Therefore, we have had to special case some. This might not be enough for
+      //       all cases.
       | Take alphaNumeric (name, Consume "[]" (Consume "[]" (Consume "[]" p))) ->
          Some(Array(Array(Array(getTypeFromName name))), p)
       | Take alphaNumeric (name, Consume "[]" (Consume "[]" p)) ->
@@ -121,6 +124,8 @@ let parse(stream:StreamReader) =
          Some(t, p)
       | ParameterList (paras, Consume "=>" (Type(t, p))) ->
          Some(Lambda(paras, t), p)
+      | ObjectPropertyList false (props, Consume "[]" p) ->
+         Some(Array(Structural props), p)
       | ObjectPropertyList false (props, p) ->
          Some(Structural(props), p)
       | _ -> None
@@ -340,10 +345,15 @@ let parse(stream:StreamReader) =
       | _ -> None
 
    let rec (|GlobalModule|_|) = function
-      | Consume "module" (Take typePath (name, DeclarationList (declarations, p))) ->
+      | Consume "module" (Take alphaNumeric (name, DeclarationList (declarations, p))) ->
          Some(DeclareModule(name, declarations), p)
       | _ -> None
 
+   and (|GlobalImportModule|_|) = function
+      | Consume "import" (Take alphaNumeric (alias, (Consume "=" (Consume "module" (Consume "(" (Take alphaNumeric (moduleName, Consume ")" (Consume ";" p))))))))
+          -> Some(ImportModule(alias, moduleName), p) 
+      | _ -> None
+      
    and declaration = function
       | Consume "declare" p ->
          match p with
@@ -366,10 +376,13 @@ let parse(stream:StreamReader) =
          | GlobalModule (v, p)
             -> Some(v, p)
          | _ -> None
+      | GlobalVar (v, p)
+      | GlobalFunc (v, p)
       | GlobalModule (v,p)
-      | GlobalEnum (v, p)
+      | GlobalEnum (v,p)
       | Consume "interface" (GlobalInterface (v, p))
-         -> Some(v, p)
+      | GlobalImportModule(v, p)
+         -> Some(v, p)              
       | _ -> None
 
    and (|DeclarationList|_|) = listOf declaration "" "{" "}"
