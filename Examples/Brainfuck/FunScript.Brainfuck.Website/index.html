@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Try Brainfuck</title>
+  <link href="stylesheets/screen.css" rel="stylesheet" media="screen">
+</head>
+<body>
+  <div class="container">
+    <h1>Try Brainfuck!</h1>
+    
+    <blockquote cite="http://en.wikipedia.org/wiki/Brainfuck">
+      <p>Brainfuck is an esoteric programming language noted for its extreme minimalism. It is a Turing tarpit, designed to challenge and amuse programmers, and was not made to be suitable for practical use. It was created in 1993 by Urban Müller.</p>
+      <footer>— <a href="http://en.wikipedia.org/wiki/Brainfuck">Wikipedia</a></footer>
+    </blockquote>
+
+    <div id="interpreter">
+      <h2>Brainfuck Input</h2>
+      <textarea id="code">,&gt;++++++++++[&gt;+++++++&gt;++++++++++&gt;+++&gt;+&lt;&lt;&lt;&lt;-]&gt;++.&gt;+.+++++++..+++.&gt;++.&lt;&lt;+++++++++++++++.&gt;.+++.------.--------.&gt;+.&gt;.</textarea>
+      <div id="inputs">
+        <input class="keyboard-button" type="submit" value="[" />
+        <input class="keyboard-button" type="submit" value="-" />
+        <input class="keyboard-button" type="submit" value="+" />
+        <input class="keyboard-button" type="submit" value="&lt;" />
+        <input class="keyboard-button" type="submit" value="&gt;" />
+        <input class="keyboard-button" type="submit" value="," />
+        <input class="keyboard-button" type="submit" value="," />
+        <input class="keyboard-button" type="submit" value="]" />
+      </div>
+      <div id="execute-code-container">
+        <input id="execute-code" type="submit" value="Go!" />
+      </div>
+    </div>
+
+    <div id="console">
+      <h2>Console</h2>
+      <textarea id="console-text" readonly="readonly"></textarea>
+      <p id="waiting-for-input">Waiting for keyboard input...</p>
+    </div>
+    
+    <div id="footer">
+      Built with HTML5 and <a href="https://github.com/ZachBray/FunScript">Funscript</a> on a cold winter's night in London.
+    </div>
+    
+    <script src="jquery-1.8.0.js"></script>
+    <script src="brainfuck.js"></script>
+  </div>
+</body>
+</html>

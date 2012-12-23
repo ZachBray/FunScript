@@ -7,7 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>a4799ed1-4228-4b1d-8acb-61293f90b07e</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>FunJS.Example</RootNamespace>
+    <RootNamespace>FunScript.Example</RootNamespace>
     <AssemblyName>WorldBank</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Name>WorldBank</Name>
@@ -21,7 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DocumentationFile>bin\Debug\FunJS.Example.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\FunScript.Example.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -32,7 +32,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DocumentationFile>bin\Release\FunJS.Example.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\FunScript.Example.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
@@ -59,14 +59,17 @@
       <HintPath>..\packages\FSharp.Data.1.0.4\lib\net40\FSharp.Data.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="FunJS">
-      <HintPath>..\..\FunJS.TypeScript\bin\Debug\FunJS.dll</HintPath>
+    <Reference Include="FunScript">
+      <HintPath>..\..\FunScript.TypeScript\bin\Debug\FunScript.dll</HintPath>
     </Reference>
-    <Reference Include="FunJS.Data">
-      <HintPath>..\..\FunJS.Data\bin\Debug\FunJS.Data.dll</HintPath>
+    <Reference Include="FunScript.Data">
+      <HintPath>..\..\FunScript.Data\bin\Debug\FunScript.Data.dll</HintPath>
     </Reference>
-    <Reference Include="FunJS.TypeScript">
-      <HintPath>..\..\FunJS.TypeScript\bin\Debug\FunJS.TypeScript.dll</HintPath>
+    <Reference Include="FunScript.TypeScript">
+      <HintPath>..\..\FunScript.TypeScript\bin\Debug\FunScript.TypeScript.dll</HintPath>
+    </Reference>
+    <Reference Include="FunScript.TypeScript.Interop">
+      <HintPath>..\..\FunScript.TypeScript\bin\Debug\FunScript.TypeScript.Interop.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

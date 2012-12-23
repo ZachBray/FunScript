@@ -1,4 +1,3 @@
-# Build Folders (you can keep bin if you'd like, to store dlls and pdbs)
 bin
 obj
 [Rr]elease*/
@@ -8,6 +7,10 @@ _ReSharper*/
 *.suo
 *.user
 *.fs.bak
+*.userprefs
+*.fs.bak
+*.*~
+:
 
 # Generated documentation
 Examples/Documentation/Output/*.html

@@ -1,7 +1,7 @@
 ﻿[<ReflectedDefinition>]
 module Program
 
-open FunJS
+open FunScript
 open FSharp.Data
 
 // ------------------------------------------------------------------
@@ -12,7 +12,7 @@ type WorldBank = WorldBankProvider<"World Development Indicators", Asynchronous=
 type j = TypeScript.Api<"../Typings/jquery.d.ts">
 type h = TypeScript.Api<"../Typings/highcharts.d.ts">
 
-let jQuery (command:string) = j.jQuery.Invoke'(command)
+let jQuery (command:string) = j.jQuery.Invoke(command)
 
 // ------------------------------------------------------------------
 // World bank countries
@@ -42,15 +42,15 @@ let main() =
 
   // Create check boxes for all countries
   let infos = countries () |> Array.toList |> List.mapi (fun index country ->
-    let input = jQuery("<input>").attr'("type", "checkbox")
-    let label = jQuery("<label>").append([| input |]).append([| country.Name |])
+    let input = jQuery("<input>").attr("type", "checkbox")
+    let label = jQuery("<label>").append([| box input |]).append([| box country.Name |])
     let panel = floor (index % 3) + 1
     label.appendTo(jQuery("#countryList" + panel.ToString())) |> ignore
     country, input )
 
   // Render the chart based on checkboxes
   let render () = async {
-    let opts = h.HighchartsOptions'()
+    let opts = h.HighchartsOptions()
     opts.chart <- h.HighchartsChartOptions'(renderTo = "chart", ``type`` = "line")
     opts.title <- h.HighchartsTitleOptions'(text = "School enrollment, tertiary (% gross)")
     opts.series <- [| |]
@@ -67,9 +67,9 @@ let main() =
   // Register click handlers
   render () |> Async.StartImmediate
   for _, check in infos do
-    check.click''(fun _ -> 
+    check.click(fun _ -> 
       render() |> Async.StartImmediate |> box) |> ignore
 
 // ------------------------------------------------------------------
 
-do Runtime.Run(components=FunJS.Data.Components.DataProviders, directory="Web")
+do Runtime.Run(components=FunScript.Data.Components.DataProviders, directory="Web")

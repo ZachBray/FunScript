@@ -1,0 +1,235 @@
+/* ------------------------------------------------------------------------- */
+/* Layout */
+/* line 10, ../sass/screen.sass */
+html {
+  font-family: "CenturyOldStyleFS", "Adobe Caslon Pro", Caslon, Baskerville, Palatino, "Palatino Linotype", "Hoefler Text", Garamond, "URW Palladio L", "Book Antiqua", Georgia, serif;
+}
+
+/* line 14, ../sass/screen.sass */
+textarea, input:not([type="radio"]) {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* line 18, ../sass/screen.sass */
+body {
+  background-color: #f8f9ed;
+  margin: 0px 0px 0px 0px;
+}
+/* line 22, ../sass/screen.sass */
+body .container {
+  *zoom: 1;
+  max-width: 59em;
+  _width: 59em;
+  padding-left: 1em;
+  padding-right: 1em;
+  margin-left: auto;
+  margin-right: auto;
+  -webkit-background-origin: content;
+  -moz-background-origin: content;
+  -ms-background-origin: content-box;
+  -o-background-origin: content-box;
+  background-origin: content-box;
+  -webkit-background-clip: content-box;
+  -moz-background-clip: content-box;
+  background-clip: content-box;
+}
+/* line 38, C:/Ruby192/lib/ruby/gems/1.9.1/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/utilities/general/_clearfix.scss */
+body .container:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+/* line 26, ../sass/screen.sass */
+body .container h1 {
+  width: 100%;
+  float: right;
+  margin-right: 0;
+  #margin-left: -1em;
+  display: inline;
+  text-align: center;
+}
+/* line 30, ../sass/screen.sass */
+body .container #code {
+  width: 100%;
+  float: right;
+  margin-right: 0;
+  #margin-left: -1em;
+  display: inline;
+  height: 120px;
+}
+/* line 34, ../sass/screen.sass */
+body .container #console {
+  padding-top: 1em;
+  width: 100%;
+  float: right;
+  margin-right: 0;
+  #margin-left: -1em;
+  display: inline;
+  height: 240px;
+}
+/* line 39, ../sass/screen.sass */
+body .container #console #waiting-for-input {
+  text-align: center;
+  color: green;
+  font-weight: bold;
+  display: none;
+}
+/* line 45, ../sass/screen.sass */
+body .container #console-text {
+  height: 120px;
+}
+/* line 48, ../sass/screen.sass */
+body .container #inputs {
+  width: 66.10169%;
+  float: left;
+  margin-right: 1.69492%;
+  display: inline;
+  height: 3em;
+  padding-top: 1em;
+}
+/* line 53, ../sass/screen.sass */
+body .container #inputs input {
+  width: 6.77966%;
+  float: left;
+  margin-right: 1.69492%;
+  display: inline;
+  height: 3em;
+  display: block;
+  font-weight: bold;
+  font-size: 1em;
+  padding: 0.5em 1.5em;
+  display: inline-block;
+  cursor: pointer;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
+  *zoom: 1;
+  filter: progid:DXImageTransform.Microsoft.gradient(gradientType=0, startColorstr='#FF4BA3CC', endColorstr='#FF276B8A');
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #87c1dd), color-stop(70%, #4ba3cc));
+  background: -webkit-linear-gradient(#87c1dd, #4ba3cc 70%);
+  background: -moz-linear-gradient(#87c1dd, #4ba3cc 70%);
+  background: -o-linear-gradient(#87c1dd, #4ba3cc 70%);
+  background: linear-gradient(#87c1dd, #4ba3cc 70%);
+  -webkit-box-shadow: #c2e0ee 0 1px 0 inset;
+  -moz-box-shadow: #c2e0ee 0 1px 0 inset;
+  box-shadow: #c2e0ee 0 1px 0 inset;
+  border: 1px solid #3899c6;
+  color: white;
+  text-shadow: #3185ac 0 -1px 0;
+}
+/* line 15, C:/Ruby192/lib/ruby/gems/1.9.1/gems/sassy-buttons-0.1.4/stylesheets/sassy-buttons/_sassy-button-pseudo-states.sass */
+body .container #inputs input:hover {
+  text-decoration: none;
+}
+/* line 18, C:/Ruby192/lib/ruby/gems/1.9.1/gems/sassy-buttons-0.1.4/stylesheets/sassy-buttons/_sassy-button-pseudo-states.sass */
+body .container #inputs input:hover {
+  background-color: #3899c6;
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(3%, #73b7d7), color-stop(75%, #3899c6));
+  background: -webkit-linear-gradient(#73b7d7 3%, #3899c6 75%);
+  background: -moz-linear-gradient(#73b7d7 3%, #3899c6 75%);
+  background: -o-linear-gradient(#73b7d7 3%, #3899c6 75%);
+  background: linear-gradient(#73b7d7 3%, #3899c6 75%);
+}
+/* line 21, C:/Ruby192/lib/ruby/gems/1.9.1/gems/sassy-buttons-0.1.4/stylesheets/sassy-buttons/_sassy-button-pseudo-states.sass */
+body .container #inputs input:active {
+  -webkit-box-shadow: #358fba 0 1px 2px inset;
+  -moz-box-shadow: #358fba 0 1px 2px inset;
+  box-shadow: #358fba 0 1px 2px inset;
+}
+/* line 6, C:/Ruby192/lib/ruby/gems/1.9.1/gems/sassy-buttons-0.1.4/stylesheets/sassy-buttons/_sassy-button-pseudo-states.sass */
+body .container #inputs input.disabled, body .container #inputs input[disabled] {
+  opacity: 0.6;
+  background: #4ba3cc;
+  cursor: default;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+/* line 73, C:/Ruby192/lib/ruby/gems/1.9.1/gems/sassy-buttons-0.1.4/stylesheets/_sassy-buttons.sass */
+body .container #inputs input::-moz-focus-inner {
+  padding: 0 !important;
+  margin: -1px !important;
+}
+/* line 60, ../sass/screen.sass */
+body .container #execute-code-container {
+  width: 15.25424%;
+  float: right;
+  margin-right: 0;
+  #margin-left: -1em;
+  display: inline;
+  padding-top: 1em;
+}
+/* line 64, ../sass/screen.sass */
+body .container #execute-code {
+  font-size: 19px;
+  padding: 0.5em 1.5em;
+  display: inline-block;
+  cursor: pointer;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+  border-radius: 10px;
+  *zoom: 1;
+  filter: progid:DXImageTransform.Microsoft.gradient(gradientType=0, startColorstr='#FF4BA3CC', endColorstr='#FF276B8A');
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #87c1dd), color-stop(70%, #4ba3cc));
+  background: -webkit-linear-gradient(#87c1dd, #4ba3cc 70%);
+  background: -moz-linear-gradient(#87c1dd, #4ba3cc 70%);
+  background: -o-linear-gradient(#87c1dd, #4ba3cc 70%);
+  background: linear-gradient(#87c1dd, #4ba3cc 70%);
+  -webkit-box-shadow: #c2e0ee 0 1px 0 inset;
+  -moz-box-shadow: #c2e0ee 0 1px 0 inset;
+  box-shadow: #c2e0ee 0 1px 0 inset;
+  border: 1px solid #3899c6;
+  color: white;
+  text-shadow: #3185ac 0 -1px 0;
+  width: 100%;
+}
+/* line 15, C:/Ruby192/lib/ruby/gems/1.9.1/gems/sassy-buttons-0.1.4/stylesheets/sassy-buttons/_sassy-button-pseudo-states.sass */
+body .container #execute-code:hover {
+  text-decoration: none;
+}
+/* line 18, C:/Ruby192/lib/ruby/gems/1.9.1/gems/sassy-buttons-0.1.4/stylesheets/sassy-buttons/_sassy-button-pseudo-states.sass */
+body .container #execute-code:hover {
+  background-color: #3899c6;
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(3%, #73b7d7), color-stop(75%, #3899c6));
+  background: -webkit-linear-gradient(#73b7d7 3%, #3899c6 75%);
+  background: -moz-linear-gradient(#73b7d7 3%, #3899c6 75%);
+  background: -o-linear-gradient(#73b7d7 3%, #3899c6 75%);
+  background: linear-gradient(#73b7d7 3%, #3899c6 75%);
+}
+/* line 21, C:/Ruby192/lib/ruby/gems/1.9.1/gems/sassy-buttons-0.1.4/stylesheets/sassy-buttons/_sassy-button-pseudo-states.sass */
+body .container #execute-code:active {
+  -webkit-box-shadow: #358fba 0 1px 2px inset;
+  -moz-box-shadow: #358fba 0 1px 2px inset;
+  box-shadow: #358fba 0 1px 2px inset;
+}
+/* line 6, C:/Ruby192/lib/ruby/gems/1.9.1/gems/sassy-buttons-0.1.4/stylesheets/sassy-buttons/_sassy-button-pseudo-states.sass */
+body .container #execute-code.disabled, body .container #execute-code[disabled] {
+  opacity: 0.6;
+  background: #4ba3cc;
+  cursor: default;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+/* line 73, C:/Ruby192/lib/ruby/gems/1.9.1/gems/sassy-buttons-0.1.4/stylesheets/_sassy-buttons.sass */
+body .container #execute-code::-moz-focus-inner {
+  padding: 0 !important;
+  margin: -1px !important;
+}
+/* line 68, ../sass/screen.sass */
+body .container #footer {
+  width: 100%;
+  float: right;
+  margin-right: 0;
+  #margin-left: -1em;
+  display: inline;
+  padding-top: 3em;
+  text-align: center;
+}
