@@ -6,7 +6,11 @@ _ReSharper*/
 *.ReSharper.user
 *.suo
 *.user
+*.fs.bak
 *.userprefs
 *.fs.bak
 *.*~
 :
+
+# Generated documentation
+Examples/Documentation/Output/*.html
