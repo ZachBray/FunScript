@@ -7,9 +7,9 @@ open FunScript.TypeScript
 
 // See https://github.com/borisyankov/DefinitelyTyped for more
 type ts = FunScript.TypeScript.Api< 
-               @"Examples/Typings/jquery.d.ts
-                 Examples/Typings/google.maps.d.ts
-                 Examples/Typings/lib.d.ts" >
+               @"../Typings/jquery.d.ts
+                 ../Typings/google.maps.d.ts
+                 ../Typings/lib.d.ts" >
 
 type gmaps = ts.google.maps
 
@@ -28,7 +28,7 @@ type Program() =
 
    let map = 
       let mapElement = ts.document.getElementById("map")
-      ts.google.maps.Map.CreateInstance(mapElement)
+      ts.google.maps.Map.CreateInstance(unbox mapElement)
 
    let mutable markers = List.empty
 
@@ -47,7 +47,7 @@ type Program() =
 
    let query searchText (callback:'a -> unit) =
       let settings = ts.JQueryAjaxSettings()
-      settings.set_success(fun (data, _, _) -> callback(unbox data))
+      settings.set_success(fun data _ _ -> callback(unbox data))
       settings.dataType <- "jsonp"
       ts.jQuery.ajax("http://search.twitter.com/search.json?q=" + searchText, settings)   
    

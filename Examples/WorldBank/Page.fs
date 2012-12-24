@@ -42,8 +42,11 @@ let main() =
 
   // Create check boxes for all countries
   let infos = countries () |> Array.toList |> List.mapi (fun index country ->
-    let input = jQuery("<input>").attr("type", "checkbox")
-    let label = jQuery("<label>").append([| box input |]).append([| box country.Name |])
+    let input = jQuery("<input>")
+    input.attr("type", "checkbox") |> ignore
+    let label = jQuery("<label>")
+    label.append([| box input |]) |> ignore
+    label.append([| box country.Name |]) |> ignore
     let panel = floor (index % 3) + 1
     label.appendTo(jQuery("#countryList" + panel.ToString())) |> ignore
     country, input )
@@ -51,8 +54,8 @@ let main() =
   // Render the chart based on checkboxes
   let render () = async {
     let opts = h.HighchartsOptions()
-    opts.chart <- h.HighchartsChartOptions'(renderTo = "chart", ``type`` = "line")
-    opts.title <- h.HighchartsTitleOptions'(text = "School enrollment, tertiary (% gross)")
+    opts.chart <- h.HighchartsChartOptions(renderTo = "chart", ``type`` = "line")
+    opts.title <- h.HighchartsTitleOptions(text = "School enrollment, tertiary (% gross)")
     opts.series <- [| |]
     
     // Create series we want to render
@@ -61,8 +64,9 @@ let main() =
       if check.is(":checked") |> unbox then
         let! vals = country.Indicators.``School enrollment, tertiary (% gross)``
         let data = vals |> Seq.map (fun (k, v) -> [| number k; number v |]) |> Array.ofSeq
-        opts.series.push(h.HighchartsSeriesOptions'(data=data, name=country.Name))
-    h.Highcharts.Chart.``new``(opts) |> ignore }
+        opts.series.push(h.HighchartsSeriesOptions(data=data, name=country.Name))
+    // h.Highcharts.Chart.``new``(opts) |> ignore 
+    }
   
   // Register click handlers
   render () |> Async.StartImmediate

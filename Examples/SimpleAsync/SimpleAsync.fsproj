@@ -47,7 +47,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Compile Include="Page.fs" />
-    <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FunScript">
