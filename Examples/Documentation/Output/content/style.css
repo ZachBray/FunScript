@@ -57,7 +57,7 @@ body {
 
 /* Format the heading - nicer spacing etc. */
 .masthead {
-  overflow: hidden;
+  overflow: auto;
 }
 .masthead ul, .masthead li {
   margin-bottom:0px;
