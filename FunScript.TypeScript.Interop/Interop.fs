@@ -31,13 +31,6 @@ type Emit() =
       let flags = BindingFlags.Public ||| BindingFlags.Static
       typeof<Emit>.GetMethod("NewImpl", flags)
 
-   static member ReplaceMethodImpl (isStatic:bool) (name:string) (args:obj[]):obj = 
-      failwith "never"
-
-   static member ReplaceMethod =
-      let flags = BindingFlags.Public ||| BindingFlags.Static
-      typeof<Emit>.GetMethod("ReplaceMethodImpl", flags)
-
    static member CreateObjectImpl (isStatic:bool) (name:string) (args:obj[]):obj = 
       failwith "never"
 
@@ -106,24 +99,9 @@ module Components =
          | [] when isStatic -> Some([], Object [])
          | _ -> None)
 
-   let private replaceMethodReplacement =
-      CompilerComponent.generateArityWithCompiler <@ Emit.ReplaceMethodImpl @> (fun (|Split|) compiler -> 
-         function
-         | Patterns.Value(:? bool as isStatic, _)::
-           Patterns.Value(:? string as meth, _):: 
-           Patterns.NewArray(_, [objExpr; Patterns.Coerce(lambda, _)])::[] -> 
-            match objExpr, lambda with
-            | Split(objDecl, objRef), DerivedPatterns.Lambdas(vars, bodyExpr) ->
-               let vars = vars |> List.concat
-               let replacement = Lambda(vars, Block(compiler.Compile ReturnStrategies.returnFrom bodyExpr))
-               Some([objDecl; [Assign(PropertyGet(objRef, meth), replacement)]], Null)
-            | _ -> None
-         | _ -> None)
-
    let all = [
       callReplacement
       newReplacement
-      replaceMethodReplacement
       getterReplacement
       setterReplacement
       createObjectReplacement

@@ -227,7 +227,6 @@ let private exprFor mi callType methName exprs =
 
 let private call callType methName exprs = exprFor Emit.Call callType methName exprs
 let private createNew methName exprs = exprFor Emit.New Static methName exprs
-let private replaceMethod methName exprs = exprFor Emit.ReplaceMethod Instance methName exprs
 let private propertyGet callType methName exprs = exprFor Emit.PropertyGet callType methName exprs
 let private propertySet callType methName exprs = exprFor Emit.PropertySet callType methName exprs
 let private createObj() = exprFor Emit.CreateObject Static "boo" []
@@ -285,7 +284,7 @@ let private createMethods defs name (meths:(TSFunction * bool) list) (parent:Mer
                else call Instance name exprs) :> MemberInfo
          if parent.HasInterface && 
             not isStatic &&
-            paramReqs.Length < 8 then
+            paramReqs.Length < 17 then
             let parameter =
                let parameterType = Lambda(paramReqs, returnTSType)
                { Var = { Name = "replacement"; IsOptional = false; Type = parameterType }
@@ -295,7 +294,7 @@ let private createMethods defs name (meths:(TSFunction * bool) list) (parent:Mer
                parameters=[createParameter defs parameter],
                returnType=typeof<Void>,
                IsStaticMethod=false,
-               InvokeCode=fun exprs -> replaceMethod name exprs) :> MemberInfo
+               InvokeCode=fun exprs -> propertySet Instance name exprs) :> MemberInfo
       })
       
 let rec private findReachableTypes types (mergedType:MergedType) =
