@@ -9,8 +9,11 @@ _ReSharper*/
 *.fs.bak
 *.userprefs
 *.fs.bak
+*.nupkg
 *.*~
 :
+nugetpackage/lib
+build
 
 # Generated documentation
 Examples/Documentation/Output/*.html
