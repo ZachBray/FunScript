@@ -72,7 +72,7 @@ let methodCallPattern (mb:MethodBase) =
                         yield Var(sprintf "%s_%i" var.Name i, genericArgs.[i], var.IsMutable)
                   ]
                let refs = subVars |> List.map Expr.Var
-               let construction = Expr.NewTuple(refs)
+               let construction = if refs = [] then Expr.Value( () ) else Expr.NewTuple(refs)
                subVars, Some (var, construction) 
             else failwith "Unexpected argument format"               
             ) vars argCounts
