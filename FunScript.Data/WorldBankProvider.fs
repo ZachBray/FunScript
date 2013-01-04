@@ -1,34 +1,19 @@
-﻿module private FunScript.Data.WorldBank
+﻿// --------------------------------------------------------------------------------------
+// Mappings for the WorldBank Type Provider runtime
+// --------------------------------------------------------------------------------------
+
+module private FunScript.Data.WorldBank
 
 open System
 open FunScript
 open FunScript.AST
+open FunScript.Data.Utils
 open System.Reflection
 open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.DerivedPatterns
 open Microsoft.FSharp.Reflection
 
 type WorldBankResponse = FSharp.Data.JsonProvider<"worldbank.json">
-
-let private undef() = failwith "!"
-
-let (|SpecificConstructor|_|) templateParameter = 
-  match templateParameter with
-  | Patterns.NewObject(cinfo1, _) -> (function
-      | Patterns.NewObject(cinfo2, args) 
-            when cinfo1.MetadataToken = cinfo2.MetadataToken ->
-          Some(cinfo1, args)
-      | _ -> None)
-  | _ -> invalidArg "templateParameter" "Unrecognized quotation: Must be NewObject."
-
-[<JS; JSEmit("return {0}==null?List_Empty():{0};")>]
-let emptyIfNull (list:_ list) = list
-
-[<JS; JSEmit("return $.getJSON({0}, {1});")>]
-let getJSON (url:string, callback : string -> unit) : unit = failwith "never"
-
-[<JS; JSEmit("return encodeURIComponent({0});")>]
-let encodeURIComponent(s:string) : string = failwith "never"
 
 [<JS>]
 module Runtime = 
