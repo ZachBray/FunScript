@@ -65,8 +65,7 @@ let main() =
         let! vals = country.Indicators.``School enrollment, tertiary (% gross)``
         let data = vals |> Seq.map (fun (k, v) -> [| number k; number v |]) |> Array.ofSeq
         opts.series.push(h.HighchartsSeriesOptions(data=data, name=country.Name))
-    // h.Highcharts.Chart.``new``(opts) |> ignore 
-    }
+    clone(h.Highcharts.Chart, opts) |> ignore }
   
   // Register click handlers
   render () |> Async.StartImmediate
@@ -75,5 +74,7 @@ let main() =
       render() |> Async.StartImmediate |> box) |> ignore
 
 // ------------------------------------------------------------------
-
-do Runtime.Run(components=FunScript.Data.Components.DataProviders, directory="Web")
+let components = 
+  FunScript.Data.Components.DataProviders @ 
+  FunScript.Interop.Components.all
+do Runtime.Run(components=components, directory="Web")

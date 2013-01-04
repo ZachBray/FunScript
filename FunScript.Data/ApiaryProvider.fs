@@ -1,77 +1,40 @@
-﻿module internal FunScript.ApiaryCompiler
+﻿// --------------------------------------------------------------------------------------
+// Mappings for the Apiary Type Provider runtime
+// --------------------------------------------------------------------------------------
+
+module private FunScript.Data.ApiaryProvider
 
 open System
+open System.Reflection
+open FSharp.Data.Json
 open FunScript
 open FunScript.AST
-open System.Reflection
+open FunScript.Data.Utils
+open ProviderImplementation
 open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.DerivedPatterns
 open Microsoft.FSharp.Reflection
 
-open FSharp.ProviderImplementation
-
-let private undef() = failwith "!"
-
-let (|SpecificConstructor|_|) templateParameter = 
-  match templateParameter with
-  | Patterns.NewObject(cinfo1, _) -> (function
-      | Patterns.NewObject(cinfo2, args) 
-            when cinfo1.MetadataToken = cinfo2.MetadataToken ->
-          Some(cinfo1, args)
-      | _ -> None)
-  | _ -> invalidArg "templateParameter" "Unrecognized quotation: Must be NewObject."
-
-[<JS; JSEmit("return {0}==null?List_Empty():{0};")>]
-let emptyIfNull (list:_ list) = list
+// --------------------------------------------------------------------------------------
+// Reimplemntation of the Apiary provider runtime
 
 [<JS>]
 module Runtime = 
-  open FSharp.Web
-
   type ApiaryJsContext = 
     { Root : string
-      mutable GlobalQuery : (string * string)[] //ResizeArray<_>(queries)
-      mutable GlobalHeaders : (string * string)[] //ResizeArray<_>(headers)
-      mutable GlobalArguments : (string * string)[] } //arguments
-  type XMLHttpRequest = 
-    abstract ``open`` : string * string -> unit
-    abstract setRequestHeader : string * string -> unit
-    abstract send : string -> unit
-
-    abstract onreadystatechange : (unit -> unit) with get, set
-    abstract readyState : float
-    abstract responseText : string 
-
-  [<JSEmit("""
-      var res;
-      if (window.XDomainRequest) {
-        res = new XDomainRequest();
-        res.setRequestHeader = function (header, value) { };
-        res.onload = function () {
-          res.readyState = 4;
-          res.status = 200;
-          res.onreadystatechange();
-        };
-      }
-      else if (window.XMLHttpRequest)
-        res = new XMLHttpRequest();
-      else
-        res = new ActiveXObject("Microsoft.XMLHTTP");
-      res.get_onreadystatechange = function() { return res.onreadystatechange; }
-      res.set_onreadystatechange = function(a) { res.onreadystatechange = a; }
-      res.get_readyState = function() { return res.readyState; }
-      res.get_responseText = function() { return res.responseText; }
-      return res;""")>]
-  let newXMLHttpRequest() : XMLHttpRequest = failwith "never"
-
-  [<JS; JSEmit("return encodeURIComponent({0});")>]
-  let encodeURIComponent(s:string) : string = failwith "never"
+      mutable GlobalQuery : (string * string)[] 
+      mutable GlobalHeaders : (string * string)[]
+      mutable GlobalArguments : (string * string)[] }
 
   [<JS; JSEmit("{0}.get_Context = function() { return {1}; };")>]
   let setContext(o:obj, ctx:obj) : unit = ()
 
+  [<JS; JSEmit("return {0}.get_Context();")>]
+  let getContext(o:obj) : InternalApiaryContext = failwith "never"
+
   [<JS>]
   type ApiaryJsRuntime =
+
     static member AsyncMap(work, f) = async {
       let! v = work in return f v }
 
@@ -125,23 +88,38 @@ module Runtime =
           xhr.onreadystatechange <- (fun () ->
             if xhr.readyState = 4.0 then
               let source = xhr.responseText
-              let doc = JsonDocument.Create(JsonParser.parse (source))
+              let doc = JsonDocument.Create(JsonValue.Parse(source))
               setContext(doc, { x with GlobalArguments = allArguments } )
               cont doc
             )
           xhr.send("") 
         else 
           failwith "Only GET supported" )
-  
 
+
+// --------------------------------------------------------------------------------------
+// Define the mappings
 
 open Runtime
 
-let private newApiaryCtx = 
-  <@@ new ApiaryContext(undef()) @@>
+// Deserialize the quotation for performance reasons
+let private newApiaryCtx = <@@ new ApiaryContext(undef()) @@>
 
-let private apiary =
-   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+let components = 
+  [ // ApiaryDocument behaves just like JsonDocument
+    ExpressionReplacer.createUnsafe <@ ApiaryDocument.Create @> <@ JsonProvider.JsRuntime.CreateDocument @>
+    ExpressionReplacer.createUnsafe <@ fun (d:ApiaryDocument) -> d.JsonValue @> <@ JsonProvider.JsRuntime.Identity @>
+    ExpressionReplacer.createUnsafe <@ fun (d:ApiaryDocument) -> d.Context @> <@ getContext @>
+
+    // Apiary runtime is reimplemented by ApiaryJsRuntime
+    ExpressionReplacer.createUnsafe <@ ApiaryRuntime.ProcessParameters @> <@ ApiaryJsRuntime.ProcessParameters @> 
+    ExpressionReplacer.createUnsafe <@ fun (a:ApiaryContext) -> a.AddHeader @> <@ ApiaryJsRuntime.AddHeader @> 
+    ExpressionReplacer.createUnsafe <@ fun (a:ApiaryContext) -> a.AddQueryParam @> <@ ApiaryJsRuntime.AddQueryParam @> 
+    ExpressionReplacer.createUnsafe <@ fun (a:ApiaryOperations) -> a.AsyncInvokeOperation @> <@ ApiaryJsRuntime.AsyncInvokeOperation @> 
+    ExpressionReplacer.createUnsafe <@ ApiaryGenerationHelper.AsyncMap @> <@ ApiaryJsRuntime.AsyncMap @> 
+
+    // Construction of ApiaryContext becomes just a record
+    CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
       function
       | SpecificConstructor newApiaryCtx (_, [rootArgument]) ->
          let (Split(valDecls, valRef)) = rootArgument 
@@ -151,15 +129,6 @@ let private apiary =
               "GlobalHeaders", Array []
               "GlobalArguments", Array [] ]
          [ yield! valDecls
-           yield returnStategy.Return <| Object fields
-         ]
+           yield returnStategy.Return <| Object fields ]
       | _ -> []
-
-let components = 
-  [ ExpressionReplacer.createUnsafe <@ ApiaryRuntime.ProcessParameters @> <@ ApiaryJsRuntime.ProcessParameters @> 
-    ExpressionReplacer.createUnsafe <@ fun (a:ApiaryContext) -> a.AddHeader @> <@ ApiaryJsRuntime.AddHeader @> 
-    ExpressionReplacer.createUnsafe <@ fun (a:ApiaryContext) -> a.AddQueryParam @> <@ ApiaryJsRuntime.AddQueryParam @> 
-    ExpressionReplacer.createUnsafe <@ fun (a:ApiaryOperations) -> a.AsyncInvokeOperation @> <@ ApiaryJsRuntime.AsyncInvokeOperation @> 
-    ExpressionReplacer.createUnsafe <@ ApiaryGenerationHelper.AsyncMap @> <@ ApiaryJsRuntime.AsyncMap @> 
-    apiary   
   ]
