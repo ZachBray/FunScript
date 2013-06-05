@@ -5,12 +5,12 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>4aad0f56-af0f-46bd-811e-fec88ebed669</ProjectGuid>
+    <ProjectGuid>4AAD0F56-AF0F-46BD-811E-FEC88EBED669</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>FunScript.Compiler</RootNamespace>
     <AssemblyName>funsc</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Name>FunScript.Compiler</Name>
+    <ProductVersion>12.0.0</ProductVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -40,27 +40,23 @@
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets" Condition=" Exists('$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets')" />
   <ItemGroup>
-    <Compile Include="PowerPack/Args.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
+    <Compile Include="PowerPack\Args.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FunScript.TypeScript.Interop\FunScript.TypeScript.Interop.fsproj">
       <Name>FunScript.TypeScript.Interop</Name>
-      <Project>{0803befe-9f5f-4a5f-8572-6a8b5d089506}</Project>
-      <Private>True</Private>
+      <Project>{0803BEFE-9F5F-4A5F-8572-6A8B5D089506}</Project>
     </ProjectReference>
     <Reference Include="mscorlib" />
-    <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <Private>True</Private>
-    </Reference>
+    <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
     <ProjectReference Include="..\FunScript\FunScript.fsproj">
       <Name>FunScript</Name>
-      <Project>{e0916e67-d3b0-4c3a-ad18-4146882fcedd}</Project>
-      <Private>True</Private>
+      <Project>E0916E67-D3B0-4C3A-AD18-4146882FCEDD</Project>
     </ProjectReference>
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
