@@ -13,7 +13,8 @@ let (|SpecificConstructor|_|) templateParameter =
   match templateParameter with
   | Patterns.NewObject(cinfo1, _) -> (function
       | Patterns.NewObject(cinfo2, args) 
-            when cinfo1.MetadataToken = cinfo2.MetadataToken ->
+            when cinfo1.DeclaringType.FullName = cinfo2.DeclaringType.FullName ->
+//            when cinfo1.MetadataToken = cinfo2.MetadataToken ->
           Some(cinfo1, args)
       | _ -> None)
   | _ -> invalidArg "templateParameter" "Unrecognized quotation: Must be NewObject."

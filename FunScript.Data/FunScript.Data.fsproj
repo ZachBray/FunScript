@@ -11,6 +11,8 @@
     <AssemblyName>FunScript.Data</AssemblyName>
     <Name>FunScript.Data</Name>
     <ProductVersion>10.0.0</ProductVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -45,11 +47,14 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Data">
-      <HintPath>..\packages\FSharp.Data.1.0.9\lib\net40\FSharp.Data.dll</HintPath>
+      <HintPath>..\packages\FSharp.Data.1.1.0\lib\net40\FSharp.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="FSharp.Data.DesignTime">
+      <HintPath>..\packages\FSharp.Data.1.1.0\lib\net40\FSharp.Data.DesignTime.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="FSharp.Data.Experimental">
-      <HintPath>..\packages\FSharp.Data.Experimental.1.0.1\lib\net40\FSharp.Data.Experimental.dll</HintPath>
+    <Reference Include="FSharp.Data.Experimental.DesignTime">
+      <HintPath>..\packages\FSharp.Data.Experimental.1.1.0\lib\net40\FSharp.Data.Experimental.DesignTime.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="FunScript">

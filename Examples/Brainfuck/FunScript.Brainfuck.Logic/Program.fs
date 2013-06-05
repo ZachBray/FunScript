@@ -71,7 +71,7 @@ type DomEvent<'T> (element, eventName) =
       member this.RemoveHandler (f : 'T -> unit) = removeEventListener element eventName f
 
 [<JSEmit("return {0}.srcElement;")>]
-let src e : Dom.HTMLInputElement' = failwith "notimpl"
+let src e : Dom.HTMLInputElement = failwith "notimpl"
 
 let main() =
 
@@ -83,18 +83,18 @@ let main() =
     let (!.) (str:string) = J.jQuery.Invoke(str)
 
     // Wire up the virtual keyboard buttons
-    (!. ".keyboard-button").click(fun (e:J.JQueryEventObject') ->
+    (!. ".keyboard-button").click(fun (e:J.JQueryEventObject) ->
        let el = src e
        output txtCode el.value) |> ignore
 
     let waitingForInput = (!. "#waiting-for-input")
 
-    let consoleKeyPressEvt = new DomEvent<Dom.KeyboardEvent'>(console, "keypress") :> IEvent<_>
+    let consoleKeyPressEvt = new DomEvent<Dom.KeyboardEvent>(console, "keypress") :> IEvent<_>
 
     let getNextChar =                    
        Async.FromContinuations(fun(cont, error, cancelled) ->            
           let sub = ref Unchecked.defaultof<IDisposable>
-          let nextChar (e:Dom.KeyboardEvent') = 
+          let nextChar (e:Dom.KeyboardEvent) = 
               (!sub).Dispose()
               console.disabled <- true //TODO: Should be using readonly rather than disabled but type provider doesn't support inheritance
               waitingForInput.fadeOut(300, fun _ ->
@@ -102,19 +102,19 @@ let main() =
           waitingForInput.fadeIn(300, fun _ ->
             console.disabled <- false    //TODO: Should be using readonly rather than disabled but type provider doesn't support inheritance          
             console.focus()
-            let observer = ActionObserver<Dom.KeyboardEvent'>(nextChar, (fun e -> ()), (fun () -> ()))
+            let observer = ActionObserver<Dom.KeyboardEvent>(nextChar, (fun e -> ()), (fun () -> ()))
             sub := consoleKeyPressEvt.Subscribe(observer)) |> ignore)  //TODO: Implement Observable.Take to avoid this mess)
     
     let outputChar = console |> output
           
-    let executeCode (e:Dom.MouseEvent') =        
+    let executeCode (e:Dom.MouseEvent) =        
         clear console        
         waitingForInput.fadeOut(300) |> ignore
         let code = txtCode |> getValue
         run code getNextChar outputChar |> Async.StartImmediate
         ignore |> box        
 
-    submit.onclick <- executeCode    
+    submit.onclick <- Func<_,_>(executeCode)
 
 // Compile
 let source = <@@ main() @@> |> Compiler.compileWithoutReturn 

@@ -7,6 +7,7 @@ module private FunScript.Data.JsonProvider
 open FunScript
 open FSharp.Data.Json
 open ProviderImplementation
+open FSharp.Data.RuntimeImplementation
 
 // --------------------------------------------------------------------------------------
 // Low level JS helpers for getting types & reflection
@@ -14,7 +15,7 @@ open ProviderImplementation
 [<AutoOpen>]
 module JsHelpers = 
   [<JS; JSEmit("return typeof({0});")>]
-  let typeof(o:obj) : string = failwith "never"
+  let jstypeof(o:obj) : string = failwith "never"
   [<JS; JSEmit("return Array.isArray({0});")>]
   let isArray(o:obj) : bool = failwith "never"
   [<JS; JSEmit("return {0}==null;")>]
@@ -30,8 +31,11 @@ type JsRuntime =
   // Document is parsed into JS object using nasty 'eval'
   // Various getters that do conversions become just identities
 
+  [<JSEmit("return null;")>]
+  static member GetCulture(name:string) : obj = failwith "never"
+
   [<JSEmit("var it = {0}; return (typeof(it)==\"string\") ? eval(\"(function(a){return a;})(\" + it + \")\") : it;")>]
-  static member Parse(source:string) : JsonValue = failwith "never"
+  static member Parse(source:string, culture:obj) : JsonValue = failwith "never"
 
   [<JSEmit("return {0};")>]
   static member CreateDocument(json:JsonValue) : JsonDocument = failwith "never"
@@ -41,24 +45,27 @@ type JsRuntime =
 
   [<JSEmit("return {0};")>]
   static member Identity(arg:obj) : obj = failwith "never"
+  [<JSEmit("return {0};")>]
+  static member Identity2(arg:obj, culture:obj) : obj = failwith "never"
 
   // The `GetArrayChildrenByTypeTag` is a JS reimplementation of the
   // equivalent in the JSON type provider. The following functions
   // are derived (copied from JSON provider code)
   static member GetArrayChildrenByTypeTag<'P, 'R>
     (doc:JsonValue, tag:string, pack:JsonValue -> 'P, f:'P -> 'R) : 'R[] =
-    let matchesTag (value:obj) = 
-      if isNull value then false
-      elif typeof(value) = "boolean" then tag = "Boolean"
-      elif typeof(value) = "number" then tag = "Number"
-      elif typeof(value) = "string" then tag = "string"
-      elif isArray(value) then tag = "Array"
-      elif typeof(value) = "object" then tag = "Record"
-      else failwith "JSON mismatch: Unexpected node type" 
+    let matchTag (value:obj) : option<obj> = 
+      if isNull value then None
+      elif jstypeof(value) = "boolean" && tag = "Boolean" then Some(unbox value)
+      elif jstypeof(value) = "number" && tag = "Number" then Some(unbox value)
+      elif jstypeof(value) = "string" && tag = "Number" then Some(unbox (1 * unbox value))
+      elif jstypeof(value) = "string" && tag = "String" then Some(unbox value)
+      elif isArray(value) && tag = "Array"then Some(unbox value)
+      elif jstypeof(value) = "object" && tag = "Record" then Some(unbox value)
+      else None // ??? maybe sometimes fail
     if isArray doc then
       doc |> unbox 
-          |> Array.filter matchesTag
-          |> Array.map (pack >> f)
+          |> Array.choose matchTag
+          |> Array.map (unbox >> pack >> f)
     else failwith "JSON mismatch: Expected Array node"
 
   static member GetArrayChildByTypeTag
@@ -76,8 +83,8 @@ type JsRuntime =
 
   static member TryGetValueByTypeTag<'P, 'R>
     (value:JsonValue, tag:string, pack:JsonValue -> 'P, f:'P -> 'R) : 'R option =
-    let arrayValue = JsonValue.Array [value]
-    JsonOperations.TryGetArrayChildByTypeTag(arrayValue, tag, pack, f) 
+    let arrayValue = [|value|]
+    JsonOperations.TryGetArrayChildByTypeTag(unbox arrayValue, tag, unbox pack, unbox f) 
 
   static member ConvertOptionalProperty<'P, 'R>
     (doc:JsonValue, name:string, packer:JsonValue -> 'P, f:'P -> 'R) : 'R option = 
@@ -92,11 +99,32 @@ type JsRuntime =
 // --------------------------------------------------------------------------------------
 // Define the mappings
 
+open FunScript.Data.Utils
+open Microsoft.FSharp.Quotations
+
+let private newJsonDoc = <@@ new JsonDocument(undef()) @@>
+
 let components = 
   [ // Document is parsed into JS object
-    ExpressionReplacer.create <@ JsonValue.Parse @> <@ JsRuntime.Parse @>
-    ExpressionReplacer.create <@ JsonDocument.Create @> <@ JsRuntime.CreateDocument @>
+    ExpressionReplacer.createUnsafe <@ JsonValue.Parse @> <@ JsRuntime.Parse @>
     ExpressionReplacer.createUnsafe <@ fun (d:JsonDocument) -> d.JsonValue @> <@ JsRuntime.Identity @>
+
+    // Turn 'new ApiaryDocument(...)' to just 'return {0}'
+    CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+      function
+      | SpecificConstructor newJsonDoc (_, [rootArgument]) ->
+         let (Split(valDecls, valRef)) = rootArgument
+         [ yield! valDecls
+           yield returnStategy.Return <| valRef ]
+      | _ -> []
+
+    CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+      function
+      | Patterns.Call(None, mi, _) when mi.Name = "Some" && mi.DeclaringType.Name = "FSharpOption`1" ->
+         [ yield returnStategy.Return <| FunScript.AST.Null ] /// TODO!!!!!
+      | _ -> []
+
+    ExpressionReplacer.createUnsafe <@ Operations.GetCulture @> <@ JsRuntime.GetCulture @>
 
     // Get property using indexer
     ExpressionReplacer.createUnsafe <@ JsonOperations.GetProperty @> <@ JsRuntime.GetProperty @>
@@ -104,10 +132,10 @@ let components =
     // Conversion becomes just identity
     ExpressionReplacer.createUnsafe <@ JsonOperations.GetString @> <@ JsRuntime.Identity @>
     ExpressionReplacer.createUnsafe <@ JsonOperations.GetBoolean @> <@ JsRuntime.Identity @>
-    ExpressionReplacer.createUnsafe <@ JsonOperations.GetFloat @> <@ JsRuntime.Identity @>
-    ExpressionReplacer.createUnsafe <@ JsonOperations.GetDecimal @> <@ JsRuntime.Identity @>
-    ExpressionReplacer.createUnsafe <@ JsonOperations.GetInteger @> <@ JsRuntime.Identity @>
-    ExpressionReplacer.createUnsafe <@ JsonOperations.GetInteger64 @> <@ JsRuntime.Identity @>
+    ExpressionReplacer.createUnsafe <@ JsonOperations.GetFloat @> <@ JsRuntime.Identity2 @>
+    ExpressionReplacer.createUnsafe <@ JsonOperations.GetDecimal @> <@ JsRuntime.Identity2 @>
+    ExpressionReplacer.createUnsafe <@ JsonOperations.GetInteger @> <@ JsRuntime.Identity2 @>
+    ExpressionReplacer.createUnsafe <@ JsonOperations.GetInteger64 @> <@ JsRuntime.Identity2 @>
 
     // Functions that do something tricky are reimplemented
     ExpressionReplacer.createUnsafe <@ JsonOperations.GetArrayChildrenByTypeTag @> <@ JsRuntime.GetArrayChildrenByTypeTag @>

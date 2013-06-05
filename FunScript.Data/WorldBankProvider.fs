@@ -57,11 +57,12 @@ module Runtime =
           let res =
             data.Array |> Seq.ofArray |> Seq.choose (fun v ->
               if JsonProvider.JsHelpers.isNull v.Value then None
-              else Some(int v.Date, float v.Value))
+              else Some(int v.Date, float v.Value.Number.Value))
           cont res ))
 
 open Runtime
 open ProviderImplementation
+open FSharp.Data.RuntimeImplementation.WorldBank
 
 let private newWorldBankData = <@@ new WorldBankData(undef(), undef()) @@>
 let private worldbank =
@@ -85,9 +86,9 @@ let private worldbank =
       | _ -> []
 
 let components = 
-  [ ExpressionReplacer.createUnsafe <@ fun (w:WorldBankData) -> w._GetCountries @> <@ WorldBankRuntime.GetCountries @> 
-    ExpressionReplacer.createUnsafe <@ fun (w:Country) -> w._GetIndicators @> <@ WorldBankRuntime.GetIndicators @> 
-    ExpressionReplacer.createUnsafe <@ fun (w:CountryCollection<Country>) -> w._GetCountry @> <@ WorldBankRuntime.GetCountry @> 
-    ExpressionReplacer.createUnsafe <@ fun (w:Indicators) -> w._AsyncGetIndicator @> <@ WorldBankRuntime.AsyncGetIndicator @> 
+  [ ExpressionReplacer.createUnsafe <@ fun (w:IWorldBankData) -> w.GetCountries @> <@ WorldBankRuntime.GetCountries @> 
+    ExpressionReplacer.createUnsafe <@ fun (w:ICountry) -> w.GetIndicators @> <@ WorldBankRuntime.GetIndicators @> 
+    ExpressionReplacer.createUnsafe <@ fun (w:ICountryCollection) -> w.GetCountry @> <@ WorldBankRuntime.GetCountry @> 
+    ExpressionReplacer.createUnsafe <@ fun (w:IIndicators) -> w.AsyncGetIndicator @> <@ WorldBankRuntime.AsyncGetIndicator @> 
     worldbank
   ]
