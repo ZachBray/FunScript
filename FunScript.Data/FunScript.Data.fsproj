@@ -11,6 +11,8 @@
     <AssemblyName>FunScript.Data</AssemblyName>
     <Name>FunScript.Data</Name>
     <ProductVersion>10.0.0</ProductVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,16 +43,13 @@
     <Compile Include="ApiaryProvider.fs" />
     <Compile Include="WorldBankProvider.fs" />
     <Compile Include="Components.fs" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Data">
-      <HintPath>..\packages\FSharp.Data.1.0.9\lib\net40\FSharp.Data.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\ThirdParty\FSharp.Data.dll</HintPath>
     </Reference>
     <Reference Include="FSharp.Data.Experimental">
-      <HintPath>..\packages\FSharp.Data.Experimental.1.0.1\lib\net40\FSharp.Data.Experimental.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\ThirdParty\FSharp.Data.Experimental.dll</HintPath>
     </Reference>
     <Reference Include="FunScript">
       <HintPath>..\FunScript.TypeScript\bin\Debug\FunScript.dll</HintPath>

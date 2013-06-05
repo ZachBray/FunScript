@@ -52,6 +52,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="../Shared/Launcher.fs">
+      <Link>Shared/Launcher</Link>
+    </Compile>
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <None Include="index.html">

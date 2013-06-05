@@ -36,6 +36,7 @@
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets" Condition=" Exists('$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets')" />
   <ItemGroup>
+    <Compile Include="PowerPack/Linq.fs" />
     <Compile Include="Common.fs" />
     <Compile Include="PrimitiveTypes.fs" />
     <Compile Include="Comparison.fs" />
@@ -58,23 +59,15 @@
     <Compile Include="Strings.fs" />
     <Compile Include="Asyncs.fs" />
     <None Include="app.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="FSharp.PowerPack">
-      <HintPath>..\packages\FSPowerPack.Core.Community.2.0.1.0\Lib\Net40\FSharp.PowerPack.dll</HintPath>
-    </Reference>
-    <Reference Include="FSharp.PowerPack.Linq">
-      <HintPath>..\packages\FSPowerPack.Linq.Community.2.0.0.1\Lib\Net40\FSharp.PowerPack.Linq.dll</HintPath>
-    </Reference>
     <Reference Include="Jint">
-      <HintPath>..\FunScript\ThirdParty\Jint.dll</HintPath>
+      <HintPath>..\ThirdParty\Jint.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\ThirdParty\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

@@ -7,6 +7,8 @@ module private FunScript.Data.ApiaryProvider
 open System
 open System.Reflection
 open FSharp.Data.Json
+open FSharp.Data.RuntimeImplementation
+open FSharp.Data.RuntimeImplementation.Apiary
 open FunScript
 open FunScript.AST
 open FunScript.Data.Utils
@@ -104,10 +106,10 @@ open Runtime
 
 // Deserialize the quotation for performance reasons
 let private newApiaryCtx = <@@ new ApiaryContext(undef()) @@>
+let private newApiaryDoc = <@@ new ApiaryDocument(undef()) @@>
 
 let components = 
   [ // ApiaryDocument behaves just like JsonDocument
-    ExpressionReplacer.createUnsafe <@ ApiaryDocument.Create @> <@ JsonProvider.JsRuntime.CreateDocument @>
     ExpressionReplacer.createUnsafe <@ fun (d:ApiaryDocument) -> d.JsonValue @> <@ JsonProvider.JsRuntime.Identity @>
     ExpressionReplacer.createUnsafe <@ fun (d:ApiaryDocument) -> d.Context @> <@ getContext @>
 
@@ -117,6 +119,15 @@ let components =
     ExpressionReplacer.createUnsafe <@ fun (a:ApiaryContext) -> a.AddQueryParam @> <@ ApiaryJsRuntime.AddQueryParam @> 
     ExpressionReplacer.createUnsafe <@ fun (a:ApiaryOperations) -> a.AsyncInvokeOperation @> <@ ApiaryJsRuntime.AsyncInvokeOperation @> 
     ExpressionReplacer.createUnsafe <@ ApiaryGenerationHelper.AsyncMap @> <@ ApiaryJsRuntime.AsyncMap @> 
+
+    // Turn 'new ApiaryDocument(...)' to just 'return {0}'
+    CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+      function
+      | SpecificConstructor newApiaryDoc (_, [rootArgument]) ->
+         let (Split(valDecls, valRef)) = rootArgument
+         [ yield! valDecls
+           yield returnStategy.Return <| valRef ]
+      | _ -> []
 
     // Construction of ApiaryContext becomes just a record
     CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
