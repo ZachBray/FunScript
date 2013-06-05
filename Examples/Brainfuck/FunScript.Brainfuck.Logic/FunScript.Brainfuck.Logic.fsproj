@@ -43,6 +43,9 @@
     <Reference Include="FunScript.TypeScript">
       <HintPath>..\..\..\FunScript.TypeScript\bin\Debug\FunScript.TypeScript.dll</HintPath>
     </Reference>
+    <Reference Include="FunScript.TypeScript.Interop">
+      <HintPath>..\..\..\FunScript.TypeScript.Interop\bin\Debug\FunScript.TypeScript.Interop.dll</HintPath>
+    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <Private>True</Private>

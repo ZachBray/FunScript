@@ -7,7 +7,7 @@ open FSharp.Data
 // ------------------------------------------------------------------
 // Initializataion
 
-type WorldBank = WorldBankProvider<"World Development Indicators", Asynchronous=true>
+type WorldBank = WorldBankDataProvider<"World Development Indicators", Asynchronous=true>
 
 type j = TypeScript.Api<"../Typings/jquery.d.ts">
 type h = TypeScript.Api<"../Typings/highcharts.d.ts">

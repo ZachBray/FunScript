@@ -4,7 +4,7 @@ module FunScript.Tests.Common
 open FunScript
 open Jint
 open NUnit.Framework
-open Linq.QuotationEvaluation
+open Microsoft.FSharp.Linq.QuotationEvaluation
 
 let checkAreEqual expectedResult quote =
    let code = Compiler.compile quote

@@ -69,11 +69,4 @@ type Program() =
 let main() =
    ts.onload <- fun _ -> Program().Setup() :> obj
 
-// Compile
-let additionalComponents = FunScript.Interop.Components.all
-let source = Compiler.Compiler.Compile(<@@ main() @@>, components=additionalComponents, noReturn=true)
-let filename = "twitter-example.js"
-System.IO.File.Delete filename
-System.IO.File.WriteAllText(filename, source)
-source|> printfn "%A"
-System.Console.ReadLine() |> ignore
+do Runtime.Run(components=Interop.Components.all)
