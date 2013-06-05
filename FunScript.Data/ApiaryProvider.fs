@@ -90,7 +90,7 @@ module Runtime =
           xhr.onreadystatechange <- (fun () ->
             if xhr.readyState = 4.0 then
               let source = xhr.responseText
-              let doc = new JsonDocument(JsonValue.Parse(source))
+              let doc = JsonDocument.Create(JsonValue.Parse(source))
               setContext(doc, { x with GlobalArguments = allArguments } )
               cont doc
             )

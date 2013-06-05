@@ -56,8 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Data">
-      <HintPath>..\packages\FSharp.Data.1.0.4\lib\net40\FSharp.Data.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\..\ThirdParty\FSharp.Data.dll</HintPath>
     </Reference>
     <Reference Include="FunScript">
       <HintPath>..\..\FunScript.TypeScript\bin\Debug\FunScript.dll</HintPath>

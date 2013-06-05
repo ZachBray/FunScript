@@ -63,7 +63,11 @@ let main() =
             click(fun _ -> showDetails item.Id |> Async.StartImmediate ).asJQuery()
 
         let details = jQuery("<ul>")
-        jQuery("<li>").html("<strong>Released:</strong> " + item.ReleaseDate).
+        let date = 
+          match item.ReleaseDate.DateTime with
+          | None -> "(not known)"
+          | Some dt -> dt.ToString()
+        jQuery("<li>").html("<strong>Released:</strong> " + date).
           asJQuery().appendTo(details) |> ignore
         jQuery("<li>").html("<strong>Average vote:</strong> " + item.VoteAverage.ToString()).
           asJQuery().appendTo(details) |> ignore

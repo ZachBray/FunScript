@@ -43,19 +43,13 @@
     <Compile Include="ApiaryProvider.fs" />
     <Compile Include="WorldBankProvider.fs" />
     <Compile Include="Components.fs" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Data">
-      <HintPath>..\packages\FSharp.Data.1.1.0\lib\net40\FSharp.Data.dll</HintPath>
+      <HintPath>..\ThirdParty\FSharp.Data.dll</HintPath>
     </Reference>
-    <Reference Include="FSharp.Data.DesignTime">
-      <HintPath>..\packages\FSharp.Data.1.1.0\lib\net40\FSharp.Data.DesignTime.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="FSharp.Data.Experimental.DesignTime">
-      <HintPath>..\packages\FSharp.Data.Experimental.1.1.0\lib\net40\FSharp.Data.Experimental.DesignTime.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="FSharp.Data.Experimental">
+      <HintPath>..\ThirdParty\FSharp.Data.Experimental.dll</HintPath>
     </Reference>
     <Reference Include="FunScript">
       <HintPath>..\FunScript.TypeScript\bin\Debug\FunScript.dll</HintPath>

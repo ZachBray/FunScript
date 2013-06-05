@@ -59,17 +59,15 @@
     <Compile Include="Strings.fs" />
     <Compile Include="Asyncs.fs" />
     <None Include="app.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Jint">
-      <HintPath>..\FunScript\ThirdParty\Jint.dll</HintPath>
+      <HintPath>..\ThirdParty\Jint.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\ThirdParty\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

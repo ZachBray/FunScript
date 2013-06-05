@@ -102,21 +102,13 @@ type JsRuntime =
 open FunScript.Data.Utils
 open Microsoft.FSharp.Quotations
 
-let private newJsonDoc = <@@ new JsonDocument(undef()) @@>
-
 let components = 
   [ // Document is parsed into JS object
     ExpressionReplacer.createUnsafe <@ JsonValue.Parse @> <@ JsRuntime.Parse @>
     ExpressionReplacer.createUnsafe <@ fun (d:JsonDocument) -> d.JsonValue @> <@ JsRuntime.Identity @>
 
-    // Turn 'new ApiaryDocument(...)' to just 'return {0}'
-    CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
-      function
-      | SpecificConstructor newJsonDoc (_, [rootArgument]) ->
-         let (Split(valDecls, valRef)) = rootArgument
-         [ yield! valDecls
-           yield returnStategy.Return <| valRef ]
-      | _ -> []
+    // Turn 'new JsonDocument(...)' to just 'return {0}'
+    ExpressionReplacer.createUnsafe <@ JsonDocument.Create @> <@ JsRuntime.Identity @>
 
     CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
       function
@@ -136,6 +128,7 @@ let components =
     ExpressionReplacer.createUnsafe <@ JsonOperations.GetDecimal @> <@ JsRuntime.Identity2 @>
     ExpressionReplacer.createUnsafe <@ JsonOperations.GetInteger @> <@ JsRuntime.Identity2 @>
     ExpressionReplacer.createUnsafe <@ JsonOperations.GetInteger64 @> <@ JsRuntime.Identity2 @>
+    ExpressionReplacer.createUnsafe <@ JsonOperations.GetDateTime @> <@ JsRuntime.Identity2 @>
 
     // Functions that do something tricky are reimplemented
     ExpressionReplacer.createUnsafe <@ JsonOperations.GetArrayChildrenByTypeTag @> <@ JsRuntime.GetArrayChildrenByTypeTag @>
