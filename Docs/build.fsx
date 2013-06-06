@@ -69,7 +69,7 @@ let getTempFileAndHeader file =
 // Configuration
 // --------------------------------------------------------------------------------------
 
-//let root = @"file:///C:\Tomas\Projects\FunScript\Docs\output"
+//let root = @"file:///C:/Tomas/Projects/FunScript/Docs/output"
 let root = "http://tpetricek.github.io/FunScript"
 
 let source = __SOURCE_DIRECTORY__     // Root directory with pages

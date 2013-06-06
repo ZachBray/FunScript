@@ -68,7 +68,7 @@ and take a look at our tutorials and samples:
  - [Calling The Movie Database](samples/moviedatabase.html)
  - [Brainfuck interpreter!!](samples/brainfuck.html)
 
-  </div></div>
+</div></div>
 
 </div><div class="large-5 columns">
 
