@@ -1,4 +1,9 @@
-﻿[<ReflectedDefinition>]
+﻿// ---
+// header: WorldBank
+// tagline: Getting and visualizing data
+// ---
+
+[<ReflectedDefinition>]
 module Program
 
 open FunScript

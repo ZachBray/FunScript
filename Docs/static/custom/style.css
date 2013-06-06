@@ -1,0 +1,64 @@
+@import url(http://fonts.googleapis.com/css?family=Arimo);
+@import url(http://fonts.googleapis.com/css?family=Raleway:500,400,300);
+
+/* Customize the fonts in navigation bar */
+.top-bar .title-area {
+  margin-right:20px; 
+}
+
+.top-bar-section ul li a {
+  font-family: Raleway, sans-serif;
+  font-weight:400;
+  font-size:120%;
+}
+
+/* Header (the blue thing) */
+header {
+  position:relative;
+  top:-30px;
+  background-color:#2BA6CB;
+  padding:30px;
+  margin:0px;
+}
+
+header h1 {
+  color:white;
+  margin-bottom:0px;
+}
+header h3 {
+  color:white;
+  font-weight:normal;
+}
+
+#footer {
+  margin-top:50px;
+  font-size:80%;
+  padding:20px;
+  text-align:center;
+  font-family: Raleway, sans-serif;
+  color:#404040;
+}
+
+/* NuGet download thing */
+pre.nuget {
+  font-size:115%;
+  padding:15px;
+}
+
+/* General fonts and styles for the pages */
+body {
+  font-family:Arimo, arial, sans-serif;
+}
+h1, h2, h3, h4 {
+  font-family: Raleway, sans-serif;
+}
+h2 {
+  font-size: 150%;
+  margin-top:25px;
+  font-weight:500;
+}
+h3 {
+  font-size: 120%;
+  margin-top:15px;
+  font-weight:600;
+}

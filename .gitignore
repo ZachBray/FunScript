@@ -16,4 +16,4 @@ nugetpackage/lib
 build
 
 # Generated documentation
-Examples/Documentation/Output/*.html
+Docs/output/*

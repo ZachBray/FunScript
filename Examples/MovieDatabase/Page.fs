@@ -1,4 +1,9 @@
-﻿[<ReflectedDefinition>]
+﻿// ---
+// header: Movie Database
+// tagline: Calling REST API using Apiary.io
+// ---
+
+[<ReflectedDefinition>]
 module Program
 
 open FunScript
