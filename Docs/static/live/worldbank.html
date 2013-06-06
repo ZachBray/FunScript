@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+   <head>
+   <meta charset="utf-8">
+   <title>Charting World Bank data with F#</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Tomas Petricek">
+
+    <script src="http://code.jquery.com/jquery-1.8.0.js"></script>
+    <script src="http://code.jquery.com/ui/1.8.23/jquery-ui.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highcharts/2.3.1/highcharts.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
+    <link href="worldbank.css" rel="stylesheet" type="text/css" />
+    <script src="worldbank.js"></script>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <div class="container">
+
+      <div class="masthead">
+        <ul class="nav nav-pills pull-right">
+          <li><a href="http://fsharp.org">fsharp.org</a></li>
+          <li><a href="https://github.com/ZachBray/FunScript">funscript</a></li>
+          <li><a href="http://www.worldbank.org">worldbank.org</a></li>
+          <li><a href="http://highcharts.com">highcharts.com</a></li>
+        </ul>
+        <h3 class="muted">World Bank</h3>
+      </div>
+
+      <hr>
+
+      <div class="jumbotron">
+        <h1>Charting World Bank data with F#</h1>
+        <p class="lead">
+          Comparing university enrollment using F# type provider for the WorldBank data,
+          FunScript F# to JavaScript compiler with a type provider for TypeScript definitions
+          and Highcharts charting library for JavaScript.
+          Select countries you want to compare:
+        </p>
+      </div>
+
+      <div class="row">
+        <div class="span2"></div>
+        <div class="span8">
+          <div class="well well-small hpBanner">
+            <div class="row-fluid">
+              <div class="span4 countryList" id="countryList1">
+              </div>
+              <div class="span4 countryList" id="countryList2">
+              </div>
+              <div class="span4 countryList" id="countryList3">
+              </div>
+            </div>          
+          </div>
+        </div>
+        <div class="span2"></div>
+      </div>
+
+
+      <h2>Chart updates automatically</h2>
+      <div class="row">
+        
+      <div id="chart">
+      </div>
+
+      </div>
+      <hr>
+
+      <div class="footer">
+        <p>&copy; Tomas Petricek (<a href="http://tomasp.net">tomasp.net</a>) 2012</p>
+      </div>
+
+    </div> <!-- /container -->
+
+  </body>
+</html>

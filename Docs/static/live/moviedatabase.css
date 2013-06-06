@@ -1,0 +1,77 @@
+﻿@import url(http://fonts.googleapis.com/css?family=News+Cycle:400);
+
+body {
+  font-family: 'News Cycle', sans-serif;
+  padding-top: 0px;
+  padding-bottom: 40px;
+}
+.masthead {
+  overflow: hidden;
+}
+.masthead ul, .masthead li {
+  margin-bottom:0px;
+}
+.masthead .nav li {
+  margin-top: 10px;
+}
+.masthead h3 {
+  margin-bottom:10px;
+  font-size:150%;
+}
+hr {
+  margin:0px 0px 0px 0px;
+}
+
+.jumbotron h1 {
+  font-size:220%;
+}
+.jumbotron p {
+  font-size:130%;
+}
+
+h2 {
+  font-size:200%;
+}
+
+.well-small h2 {
+  font-size:150%;
+}
+
+.btn {
+  border-radius: 0px;
+}
+
+input.no-margin {
+  margin-bottom:0px;
+}
+
+h3 {
+  font-size:120%;
+  line-height:normal;
+}
+
+.searchResult img {
+  float: left;
+}
+
+.searchResult ul {
+  margin-left:120px;
+}
+
+.searchResult .clearer {
+  clear:both;
+  height:20px;
+}
+
+#detailsDialog img {
+  float:left;
+  margin:0px 10px 10px 0px;
+}
+
+#detailsDialog .divDialogElements h3 {
+  clear:both;
+  margin-top:10px;
+}
+#results {
+  min-height:300px;
+}

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<!--[if IE 8]> 				 <html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+
+<head>
+  <meta charset="utf-8">
+  <title>{header} - {tagline}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="
+    FunScript consists of a standalone F# to JavaScript compiler library and a Type Provider to TypeScript.       
+    FunScript lets you connect to client and server APIs with Intellisense and types automagically using
+    F# 3's Type Provider mechanism.">
+  <meta name="author" content="Zach Bray">
+
+  <!-- Reference Foundation -->
+  <link rel="stylesheet" href="{root}/css/foundation.css" />
+  <script src="{root}/js/vendor/custom.modernizr.js"></script>
+
+  <!-- Reference custom CSS and tooltips -->
+  <link type="text/css" rel="stylesheet" href="{root}/custom/style.css" />
+  <script src="{root}/custom/tooltips.js" type="text/javascript"></script>
+  <link type="text/css" rel="stylesheet" href="{root}/custom/tooltips.css" />
+</head>
+<body>
+
+  <!-- Header bar with name and navigation links -->
+  <nav class="top-bar">
+    <ul class="title-area">
+      <li class="name"><h1><a href="{root}">FunScript</a></h1></li>
+      <li class="toggle-topbar"><a href="#"><span>Menu</span></a></li>
+    </ul>
+
+    <section class="top-bar-section">
+      <ul class="left">
+        <li><a href="{root}/index.html">home</a></li>
+        <li><a href="{root}/learn.html">learn more</a></li>
+        <li><a href="{root}/get.html">get started</a></li>
+        <li><a href="{root}/contribute.html">contribute</a></li>
+      </ul>
+    </section>
+  </nav>
+
+  <header>
+    <div class="row">
+      <div class="twelve columns">
+        <h1>{header}</h1>
+        <h3>{tagline}</h3>
+      </div>
+    </div>
+  </header>
+
+	{document}
+  {tooltips}
+
+  <div class="row"><div class="large-12 columns" id="footer">
+    FunScript is open-source project available under Apache 2.0 &#160; | &#160;  <a href="http://fsharp.org">The F# Software Foundation</a>
+  </div></div>
+  
+  <!-- Fork me on GitHub link -->
+  <a href="https://github.com/ZachBray/FunScript"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+   
+  <!-- Some more Foundation references -->
+  <script>
+    document.write('<script src=' +
+    ('__proto__' in {} ? 'js/vendor/zepto' : 'js/vendor/jquery') +
+    '.js><\/script>')
+  </script>  
+  <script src="js/foundation.min.js"></script>  
+  <script src="js/foundation/foundation.reveal.js"></script>
+  <script>
+    $(document).foundation();
+  </script>
+
+</body>
+</html>
