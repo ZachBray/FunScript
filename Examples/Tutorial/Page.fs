@@ -1,5 +1,9 @@
-﻿(**
-# FunScript Tutorial
+﻿// ---
+// header: Tutorial
+// tagline: Introducing FunScript
+// ---
+
+(**
 
 This example shows basic features of FunScript. It demonstrates how to use the TypeScript
 type provider to access standard DOM library functions and to call JavaScript libraries 
