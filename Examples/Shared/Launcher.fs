@@ -118,7 +118,7 @@ type Runtime private() =
     let sw = System.Diagnostics.Stopwatch.StartNew()
     let source = FunScript.Compiler.Compiler.Compile(main, components=components)
     let sourceWrapped = sprintf "$(document).ready(function () {\n%s\n});" source
-    let filename = Path.Combine(root, (System.IO.Path.GetFileNameWithoutExtension(thisAsm.Location).ToLower()) + ".js")
+    let filename = Path.Combine(root, "page.js")
     printfn "Generated JavaScript in %f sec..." (float sw.ElapsedMilliseconds / 1000.0) 
     System.IO.File.Delete filename
     System.IO.File.WriteAllText(filename, sourceWrapped)

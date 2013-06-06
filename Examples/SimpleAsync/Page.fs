@@ -1,4 +1,9 @@
-﻿[<ReflectedDefinition>]
+﻿// ---
+// header: Asynchronous programming
+// tagline: Use the full power of F# asynchronous workflows
+// ---
+
+[<ReflectedDefinition>]
 module Program
 
 open FunScript

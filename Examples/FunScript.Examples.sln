@@ -14,17 +14,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Typings", "Typings", "{F86C
 		Typings\lib.d.ts = Typings\lib.d.ts
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{DEA69E61-D766-42F3-85A5-88A698725688}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{DEA69E61-D766-42F3-85A5-88A698725688}"
 	ProjectSection(SolutionItems) = preProject
-		Documentation\Tools\build.fsx = Documentation\Tools\build.fsx
-		Documentation\Tools\template.html = Documentation\Tools\template.html
+		..\Docs\build.fsx = ..\Docs\build.fsx
 	EndProjectSection
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Tutorial", "Tutorial\Tutorial.fsproj", "{64D64D70-C665-4A7B-BF83-9635485578E0}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Mandelbrot", "Mandelbrot\Mandelbrot.fsproj", "{D5231916-12DD-42ED-A0F3-10C2A8C6A807}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{061C35D2-AB7F-47DC-A3B5-614E94FFFDD6}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Canvas", "Canvas\Canvas.fsproj", "{761CE569-EDDC-4163-95B4-30ADE1F4BD07}"
 EndProject

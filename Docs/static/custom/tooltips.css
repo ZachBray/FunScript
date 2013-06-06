@@ -1,0 +1,72 @@
+@import url(http://fonts.googleapis.com/css?family=Droid+Sans+Mono);
+@import url(http://fonts.googleapis.com/css?family=Arimo);
+
+/* identifier */
+span.i { color:#d1d1d1; }
+/* string */
+span.s { color:#d4943c; }
+/* keywords */
+span.k { color:#4e98dc; }
+/* comment */
+span.c { color:#96C71D; }
+/* operators */
+span.o { color:#af75c1; }
+/* numbers */
+span.n { color:#af75c1; }
+/* line number */
+span.l { color:#80b0b0; }
+
+
+/* inactive code */
+span.inactive { color:#808080; }
+/* preprocessor */
+span.prep { color:#800080; }
+/* fsi output */
+span.fsi { font-style:italic; color:#606060; }
+
+/* omitted */
+span.omitted { 
+	background:#3c4e52;
+  border-radius:5px;
+	color:#808080;
+	padding:0px 0px 1px 0px;
+}
+/* tool tip */
+div.tip {
+	background:#475b5f;
+  border-radius:4px;
+  font:11pt Arimo, arial, sans-serif;
+	padding:6px 8px 6px 8px;
+	display:none;
+  color:#d1d1d1;
+}
+
+code {
+  font: 10pt 'Droid Sans Mono',consolas,monospace;
+  border:1px solid #e8e8e8;
+  background-color:#f8f8f8;
+  border-radius:2px;
+  border-radius:3px;
+  padding:1px 3px 1px 3px;
+  color:#c31515;  
+}
+table.pre td {
+  padding:0px;
+}
+table.pre td.lines {
+  width:20px;
+}
+table.pre pre {
+  padding:0px;
+  margin:0px;
+  border-radius:0px;
+} 
+table.pre, pre.fssnip, pre {
+  font: 10pt 'Droid Sans Mono',consolas,monospace;
+  width:90%;
+  margin:10px 20px 20px 20px;
+  background-color:#212d30;
+  padding:10px;
+  border-radius:5px;
+  color:#d1d1d1;  
+}
