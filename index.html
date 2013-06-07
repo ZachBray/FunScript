@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<!--[if IE 8]> 				 <html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+
+<head>
+  <meta charset="utf-8">
+  <title>FunScript - F# to JavaScript with type providers</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="
+    FunScript consists of a standalone F# to JavaScript compiler library and a Type Provider to TypeScript.       
+    FunScript lets you connect to client and server APIs with Intellisense and types automagically using
+    F# 3's Type Provider mechanism.">
+  <meta name="author" content="Zach Bray">
+
+  <!-- Reference Foundation -->
+  <link rel="stylesheet" href="http://www.funscript.info/css/foundation.css" />
+  <script src="http://www.funscript.info/js/vendor/custom.modernizr.js"></script>
+
+  <!-- Reference custom CSS and tooltips -->
+  <link type="text/css" rel="stylesheet" href="http://www.funscript.info/custom/style.css" />
+  <script src="http://www.funscript.info/custom/tooltips.js" type="text/javascript"></script>
+  <link type="text/css" rel="stylesheet" href="http://www.funscript.info/custom/tooltips.css" />
+</head>
+<body>
+
+  <!-- Header bar with name and navigation links -->
+  <nav class="top-bar">
+    <ul class="title-area">
+      <li class="name"><h1><a href="http://www.funscript.info">FunScript</a></h1></li>
+      <li class="toggle-topbar"><a href="#"><span>Menu</span></a></li>
+    </ul>
+
+    <section class="top-bar-section">
+      <ul class="left">
+        <li><a href="http://www.funscript.info/index.html">home</a></li>
+        <li><a href="http://www.funscript.info/learn.html">learn more</a></li>
+        <li><a href="http://www.funscript.info/get.html">get started</a></li>
+        <li><a href="http://www.funscript.info/contribute.html">contribute</a></li>
+      </ul>
+    </section>
+  </nav>
+
+  <header>
+    <div class="row">
+      <div class="twelve columns">
+        <h1>FunScript</h1>
+        <h3>F# to JavaScript with type providers</h3>
+      </div>
+    </div>
+  </header>
+
+	<div class="row"><div class="large-7 columns" id="hp-snippet">
+
+<pre class="fssnip">
+<span class="c">// Access standard JavaScript libraries in a type-safe way</span>
+<span class="k">type</span> <span onmouseout="hideTip(event, 'fs11', 12)" onmouseover="showTip(event, 'fs11', 12)" class="i">j</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs12', 13)" onmouseover="showTip(event, 'fs12', 13)" class="i">Api</span><span class="o">&lt;</span><span class="s">&quot;</span><span class="s">.</span><span class="s">.</span><span class="s">/</span><span class="s">.</span><span class="s">.</span><span class="s">/</span><span class="s">Examples</span><span class="s">/</span><span class="s">Typings</span><span class="s">/</span><span class="s">jquery</span><span class="s">.</span><span class="s">d</span><span class="s">.</span><span class="s">ts</span><span class="s">&quot;</span><span class="o">&gt;</span>
+<span class="k">type</span> <span onmouseout="hideTip(event, 'fs13', 14)" onmouseover="showTip(event, 'fs13', 14)" class="i">h</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs12', 15)" onmouseover="showTip(event, 'fs12', 15)" class="i">Api</span><span class="o">&lt;</span><span class="s">&quot;</span><span class="s">.</span><span class="s">.</span><span class="s">/</span><span class="s">.</span><span class="s">.</span><span class="s">/</span><span class="s">Examples</span><span class="s">/</span><span class="s">Typings</span><span class="s">/</span><span class="s">highcharts</span><span class="s">.</span><span class="s">d</span><span class="s">.</span><span class="s">ts</span><span class="s">&quot;</span><span class="o">&gt;</span>
+
+<span class="c">// Integrate REST APIs with F# 3.0 type providers</span>
+<span class="k">type</span> <span onmouseout="hideTip(event, 'fs14', 16)" onmouseover="showTip(event, 'fs14', 16)" class="i">WorldBank</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs15', 17)" onmouseover="showTip(event, 'fs15', 17)" class="i">WorldBankDataProvider</span><span class="o">&lt;</span><span class="i">Asynchronous</span><span class="o">=</span><span class="k">true</span><span class="o">&gt;</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs16', 18)" onmouseover="showTip(event, 'fs16', 18)" class="i">data</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs14', 19)" onmouseover="showTip(event, 'fs14', 19)" class="i">WorldBank</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 20)" onmouseover="showTip(event, 'fs17', 20)" class="i">GetDataContext</span>()
+
+<span class="c">// Get full type checking for external data sources!</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs18', 21)" onmouseover="showTip(event, 'fs18', 21)" class="i">countries</span> <span class="o">=</span> 
+  [ <span onmouseout="hideTip(event, 'fs16', 22)" onmouseover="showTip(event, 'fs16', 22)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs19', 23)" onmouseover="showTip(event, 'fs19', 23)" class="i">Countries</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 24)" onmouseover="showTip(event, 'fs20', 24)" class="i">Denmark</span>
+    <span onmouseout="hideTip(event, 'fs16', 25)" onmouseover="showTip(event, 'fs16', 25)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs19', 26)" onmouseover="showTip(event, 'fs19', 26)" class="i">Countries</span><span class="o">.</span><span class="i">``Czech Republic``</span>
+    <span onmouseout="hideTip(event, 'fs16', 27)" onmouseover="showTip(event, 'fs16', 27)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs19', 28)" onmouseover="showTip(event, 'fs19', 28)" class="i">Countries</span><span class="o">.</span><span class="i">``United Kingdom``</span>
+    <span onmouseout="hideTip(event, 'fs16', 29)" onmouseover="showTip(event, 'fs16', 29)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs19', 30)" onmouseover="showTip(event, 'fs19', 30)" class="i">Countries</span><span class="o">.</span><span class="i">``United States``</span> ]
+
+<span class="c">// Write asynchronous computations without callbacks</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs21', 31)" onmouseover="showTip(event, 'fs21', 31)" class="i">render</span> () <span class="o">=</span> <span onmouseout="hideTip(event, 'fs22', 32)" onmouseover="showTip(event, 'fs22', 32)" class="i">async</span> {
+  <span class="k">let</span> <span onmouseout="hideTip(event, 'fs23', 33)" onmouseover="showTip(event, 'fs23', 33)" class="i">chart</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs13', 34)" onmouseover="showTip(event, 'fs13', 34)" class="i">h</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs24', 35)" onmouseover="showTip(event, 'fs24', 35)" class="i">HighchartsOptions</span>(<span id="fst25" onmouseout="hideTip(event, 'fs25', 36)" onmouseover="showTip(event, 'fs25', 36, document.getElementById('fst25'))" class="omitted">(...)</span>)
+  <span class="k">for</span> <span onmouseout="hideTip(event, 'fs26', 37)" onmouseover="showTip(event, 'fs26', 37)" class="i">country</span> <span class="k">in</span> <span onmouseout="hideTip(event, 'fs18', 38)" onmouseover="showTip(event, 'fs18', 38)" class="i">countries</span> <span class="k">do</span>
+
+    <span class="c">// Access data sets in a statically typed way</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs27', 39)" onmouseover="showTip(event, 'fs27', 39)" class="i">data</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs26', 40)" onmouseover="showTip(event, 'fs26', 40)" class="i">country</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs28', 41)" onmouseover="showTip(event, 'fs28', 41)" class="i">Indicators</span>
+    <span class="k">let!</span> <span onmouseout="hideTip(event, 'fs29', 42)" onmouseover="showTip(event, 'fs29', 42)" class="i">l</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs27', 43)" onmouseover="showTip(event, 'fs27', 43)" class="i">data</span><span class="o">.</span><span class="i">``School enrollment, tertiary (% gross)``</span>
+
+    <span class="c">// Add line series to the chart</span>
+    <span onmouseout="hideTip(event, 'fs13', 44)" onmouseover="showTip(event, 'fs13', 44)" class="i">h</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs30', 45)" onmouseover="showTip(event, 'fs30', 45)" class="i">HighchartsSeriesOptions</span>(<span onmouseout="hideTip(event, 'fs27', 46)" onmouseover="showTip(event, 'fs27', 46)" class="i">data</span><span class="o">=</span><span onmouseout="hideTip(event, 'fs29', 47)" onmouseover="showTip(event, 'fs29', 47)" class="i">l</span>, <span class="i">name</span><span class="o">=</span><span onmouseout="hideTip(event, 'fs26', 48)" onmouseover="showTip(event, 'fs26', 48)" class="i">country</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs31', 49)" onmouseover="showTip(event, 'fs31', 49)" class="i">Name</span>)
+    <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs23', 50)" onmouseover="showTip(event, 'fs23', 50)" class="i">chart</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs32', 51)" onmouseover="showTip(event, 'fs32', 51)" class="i">series</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs33', 52)" onmouseover="showTip(event, 'fs33', 52)" class="i">push</span> }</pre>
+
+
+<p><div class="row"><div class="large-6 columns"></p>
+
+<h3>Contributions</h3>
+
+<p>FunScript is open-source and has been created by F# experts and active community contributors.</p>
+
+<ul>
+<li>Zach Bray (<a href="https://twitter.com/zbray">@zbray</a>)</li>
+<li>Tomas Petricek (<a href="https://twitter.com/tomaspetricek">@tomaspetricek</a>)</li>
+<li>Robert Pickering (<a href="http://twitter.com/robertpi">@robertpi</a>)</li>
+<li>James Freiwirth (<a href="https://github.com/endeavour">@endeavour</a>)</li>
+</ul>
+
+<p>Help us make <a href="contribute.html">improve FunScript</a>!</p>
+
+<p></div><div class="large-6 columns"></p>
+
+<h3>Samples and tutorials</h3>
+
+<p>For more information, explore <a href="https://github.com/ZachBray/FunScript/tree/master/Examples">examples on GitHub</a>
+and take a look at our tutorials and samples:</p>
+
+<ul>
+<li><a href="samples/tutorial.html">Getting started tutorial</a></li>
+<li><a href="samples/canvas.html">Using HTML5 canvas</a></li>
+<li><a href="samples/simpleasync.html">Asynchornous computations</a></li>
+<li><a href="samples/worldbank.html">Visualizing World Bank data</a></li>
+<li><a href="samples/moviedatabase.html">Calling The Movie Database</a></li>
+<li><a href="samples/brainfuck.html">Brainfuck interpreter!!</a></li>
+</ul>
+
+</div></div>
+
+</div><div class="large-5 columns">
+
+<p><strong>FunScript</strong> is a lightweight F# library that lets you rapidly develop single-page 
+applications. You can connect to external data sources and call REST APIs in a type 
+safe way, produce dashboards using JavaScript visualization libraries and write 
+asynchronous computations easily without explicit callbacks.</p>
+
+<div style="margin-left:auto;margin-right:auto;text-align:center;">
+<a href="get.html" class="success button">Get FunScript today!</a>
+</div>
+
+<h2>What do you get</h2>
+
+<ul>
+<li>Write <strong>client-side code in F#</strong> with the full comfort of MonoDevelop, Visual Studio or Emacs</li>
+<li>Get <strong>autocomplete and tooltips</strong> for the HTML DOM, jQuery and other popular JavaScript libraries</li>
+<li>Use language with <strong>sound generics</strong> and support for <strong>asynchronous</strong> programming</li>
+<li>Process JSON and call REST APIs using F# 3.0 type providers with no hassle!</li>
+</ul>
+
+<h2>FunScript on Channel 9</h2>
+
+<p>Tomas talks about type providers, the <a href="http://fsharp.github.io/FSharp.Data">F# Data library</a> and 
+FunScript on Channel 9 and shows how you can easily visualize <a href="http://data.worldbank.org/">World Bank data</a>
+and connect to <a href="http://www.themoviedb.org/">The Movie Database</a>.</p>
+
+<div style="margin-left:auto;margin-right:auto;text-align:center;">
+<a href="http://channel9.msdn.com/posts/Tomas-Petricek-How-F-Learned-to-Stop-Worrying-and-Love-the-Data">
+<img src="img/talk.jpg" alt="Tomas Petricek: How F# Learned to Stop Worrying and Love the Data" style="border:none"/>
+</a>
+</div>
+
+</div>
+</div>
+
+  <div class="tip" id="fs1">namespace FSharp</div>
+<div class="tip" id="fs2">namespace FSharp.Data</div>
+<div class="tip" id="fs3">namespace FunScript</div>
+<div class="tip" id="fs4">namespace FunScript.TypeScript</div>
+<div class="tip" id="fs5">namespace System</div>
+<div class="tip" id="fs6">type Array =<br />&#160;&#160;member Clone : unit -&gt; obj<br />&#160;&#160;member CopyTo : array:Array * index:int -&gt; unit + 1 overload<br />&#160;&#160;member GetEnumerator : unit -&gt; IEnumerator<br />&#160;&#160;member GetLength : dimension:int -&gt; int<br />&#160;&#160;member GetLongLength : dimension:int -&gt; int64<br />&#160;&#160;member GetLowerBound : dimension:int -&gt; int<br />&#160;&#160;member GetUpperBound : dimension:int -&gt; int<br />&#160;&#160;member GetValue : params indices:int[] -&gt; obj + 7 overloads<br />&#160;&#160;member Initialize : unit -&gt; unit<br />&#160;&#160;member IsFixedSize : bool<br />&#160;&#160;...<br /><br />Full name: System.Array</div>
+<div class="tip" id="fs7">val x : System.Array</div>
+<div class="tip" id="fs8">member System.Array.push : element:obj -&gt; unit<br /><br />Full name: index.push</div>
+<div class="tip" id="fs9">val element : obj</div>
+<div class="tip" id="fs10">type obj = System.Object<br /><br />Full name: Microsoft.FSharp.Core.obj</div>
+<div class="tip" id="fs11">type j = Api&lt;...&gt;<br /><br />Full name: index.j</div>
+<div class="tip" id="fs12">type Api<br /><br />Full name: FunScript.TypeScript.Api</div>
+<div class="tip" id="fs13">type h = Api&lt;...&gt;<br /><br />Full name: index.h</div>
+<div class="tip" id="fs14">type WorldBank = WorldBankDataProvider&lt;...&gt;<br /><br />Full name: index.WorldBank</div>
+<div class="tip" id="fs15">type WorldBankDataProvider<br /><br />Full name: FSharp.Data.WorldBankDataProvider<br /><em><br /><br />&lt;summary&gt;Typed representation of WorldBank data with additional configuration parameters&lt;/summary&gt;<br />&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&lt;param name=&#39;Sources&#39;&gt;The World Bank data sources to include, separated by semicolons. Defaults to &quot;World Development Indicators;Global Financial Development&quot;. If an empty string is specified, includes all data sources.&lt;/param&gt;<br />&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&lt;param name=&#39;Asynchronous&#39;&gt;Generate asynchronous calls. Defaults to false&lt;/param&gt;</em></div>
+<div class="tip" id="fs16">val data : WorldBankDataProvider&lt;...&gt;.ServiceTypes.WorldBankDataService<br /><br />Full name: index.data</div>
+<div class="tip" id="fs17">WorldBankDataProvider&lt;...&gt;.GetDataContext() : WorldBankDataProvider&lt;...&gt;.ServiceTypes.WorldBankDataService</div>
+<div class="tip" id="fs18">val countries : WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country list<br /><br />Full name: index.countries</div>
+<div class="tip" id="fs19">property WorldBankDataProvider&lt;...&gt;.ServiceTypes.WorldBankDataService.Countries: WorldBankDataProvider&lt;...&gt;.ServiceTypes.Countries</div>
+<div class="tip" id="fs20">property WorldBankDataProvider&lt;...&gt;.ServiceTypes.Countries.Denmark: WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country<br /><em><br /><br />The data for country &#39;Denmark&#39;</em></div>
+<div class="tip" id="fs21">val render : unit -&gt; Async&lt;unit&gt;<br /><br />Full name: index.render</div>
+<div class="tip" id="fs22">val async : AsyncBuilder<br /><br />Full name: Microsoft.FSharp.Core.ExtraTopLevelOperators.async</div>
+<div class="tip" id="fs23">val chart : Api&lt;...&gt;.HighchartsOptions</div>
+<div class="tip" id="fs24">type HighchartsOptions =<br />&#160;&#160;new : unit -&gt; HighchartsOptions<br />&#160;&#160;member chart : HighchartsChartOptions with get, set<br />&#160;&#160;member colors : string [] with get, set<br />&#160;&#160;member credits : HighchartsCreditsOptions with get, set<br />&#160;&#160;member exporting : HighchartsExportingOptions with get, set<br />&#160;&#160;member ``global`` : HighchartsGlobalOptions with get, set<br />&#160;&#160;member labels : HighchartsLabelsOptions with get, set<br />&#160;&#160;member lang : HighchartsLangOptions with get, set<br />&#160;&#160;member legend : HighchartsLegendOptions with get, set<br />&#160;&#160;member loading : HighchartsLoadingOptions with get, set<br />&#160;&#160;...<br /><br />Full name: FunScript.TypeScript.Api,files=&quot;../../Examples/Typings/highcharts.d.ts&quot;.HighchartsOptions</div>
+<div class="tip" id="fs25">chart = h.HighchartsChartOptions(renderTo = &quot;chart&quot;, ``type`` = &quot;line&quot;), title = h.HighchartsTitleOptions(text = &quot;University enrollment&quot;), series = [| |]</div>
+<div class="tip" id="fs26">val country : WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country</div>
+<div class="tip" id="fs27">val data : WorldBankDataProvider&lt;...&gt;.ServiceTypes.Indicators</div>
+<div class="tip" id="fs28">property WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country.Indicators: WorldBankDataProvider&lt;...&gt;.ServiceTypes.Indicators<br /><em><br /><br />&lt;summary&gt;The indicators for the country&lt;/summary&gt;</em></div>
+<div class="tip" id="fs29">val l : RuntimeImplementation.WorldBank.Indicator</div>
+<div class="tip" id="fs30">type HighchartsSeriesOptions =<br />&#160;&#160;new : unit -&gt; HighchartsSeriesOptions<br />&#160;&#160;member data : obj with get, set<br />&#160;&#160;member index : float with get, set<br />&#160;&#160;member legendIndex : float with get, set<br />&#160;&#160;member name : string with get, set<br />&#160;&#160;member stack : obj with get, set<br />&#160;&#160;member ``type`` : string with get, set<br />&#160;&#160;member xAxis : float with get, set<br />&#160;&#160;member yAxis : float with get, set<br /><br />Full name: FunScript.TypeScript.Api,files=&quot;../../Examples/Typings/highcharts.d.ts&quot;.HighchartsSeriesOptions</div>
+<div class="tip" id="fs31">property RuntimeImplementation.WorldBank.Country.Name: string</div>
+<div class="tip" id="fs32">property Api&lt;...&gt;.HighchartsOptions.series: Api&lt;...&gt;.HighchartsSeriesOptions []</div>
+<div class="tip" id="fs33">member System.Array.push : element:obj -&gt; unit</div>
+
+
+  <div class="row"><div class="large-12 columns" id="footer">
+    FunScript is open-source project available under Apache 2.0 &#160; | &#160;  <a href="http://fsharp.org">The F# Software Foundation</a>
+  </div></div>
+  
+  <!-- Fork me on GitHub link -->
+  <a href="https://github.com/ZachBray/FunScript"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+   
+  <!-- Some more Foundation references -->
+  <script>
+    document.write('<script src=' +
+    ('__proto__' in {} ? 'js/vendor/zepto' : 'js/vendor/jquery') +
+    '.js><\/script>')
+  </script>  
+  <script src="js/foundation.min.js"></script>  
+  <script src="js/foundation/foundation.reveal.js"></script>
+  <script>
+    $(document).foundation();
+  </script>
+
+</body>
+</html>

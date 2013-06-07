@@ -1,0 +1,1832 @@
+<!DOCTYPE html>
+<!--[if IE 8]> 				 <html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+
+<head>
+  <meta charset="utf-8">
+  <title>FunScript - WorldBank - Getting and visualizing data</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="
+    FunScript consists of a standalone F# to JavaScript compiler library and a Type Provider to TypeScript.       
+    FunScript lets you connect to client and server APIs with Intellisense and types automagically using
+    F# 3's Type Provider mechanism.">
+  <meta name="author" content="Zach Bray">
+
+  <!-- Reference Foundation -->
+  <link rel="stylesheet" href="http://www.funscript.info/css/foundation.css" />
+  <script src="http://www.funscript.info/js/vendor/custom.modernizr.js"></script>
+
+  <!-- Reference custom CSS and tooltips -->
+  <link type="text/css" rel="stylesheet" href="http://www.funscript.info/custom/style.css" />
+  <script src="http://www.funscript.info/custom/tooltips.js" type="text/javascript"></script>
+  <link type="text/css" rel="stylesheet" href="http://www.funscript.info/custom/tooltips.css" />
+</head>
+<body>
+
+  <!-- Header bar with name and navigation links -->
+  <nav class="top-bar">
+    <ul class="title-area">
+      <li class="name"><h1><a href="http://www.funscript.info">FunScript</a></h1></li>
+      <li class="toggle-topbar"><a href="#"><span>Menu</span></a></li>
+    </ul>
+
+    <section class="top-bar-section">
+      <ul class="left">
+        <li><a href="http://www.funscript.info/index.html">home</a></li>
+        <li><a href="http://www.funscript.info/learn.html">learn more</a></li>
+        <li><a href="http://www.funscript.info/get.html">get started</a></li>
+        <li><a href="http://www.funscript.info/contribute.html">contribute</a></li>
+      </ul>
+    </section>
+  </nav>
+
+  <header>
+    <div class="row">
+      <div class="twelve columns">
+        <h1>WorldBank</h1>
+        <h3>Getting and visualizing data</h3>
+      </div>
+    </div>
+  </header>
+
+  <!-- Foundation dialog that appears when "Open Sample"  is clicked -->
+  <div id="sampleDialog" class="reveal-modal medium">
+    <h2>Charting World Bank data with F#</h2>
+    
+      <div class="row">
+        <div class="span2"></div>
+        <div class="span8">
+          <div class="well well-small hpBanner">
+            <div class="row-fluid">
+              <div class="span4 countryList" id="countryList1">
+              </div>
+              <div class="span4 countryList" id="countryList2">
+              </div>
+              <div class="span4 countryList" id="countryList3">
+              </div>
+            </div>          
+          </div>
+        </div>
+        <div class="span2"></div>
+      </div>
+
+
+      <h2>Chart updates automatically</h2>
+      <div class="row">
+        
+      <div id="chart">
+      </div>
+
+      </div>
+      
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
+
+	<div class="row">
+    <div class="large-9 columns">
+      <table class="pre"><tr><td class="lines"><pre class="fssnip">
+<span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+<span class="l">17: </span>
+<span class="l">18: </span>
+<span class="l">19: </span>
+<span class="l">20: </span>
+<span class="l">21: </span>
+<span class="l">22: </span>
+<span class="l">23: </span>
+<span class="l">24: </span>
+<span class="l">25: </span>
+<span class="l">26: </span>
+<span class="l">27: </span>
+<span class="l">28: </span>
+<span class="l">29: </span>
+<span class="l">30: </span>
+<span class="l">31: </span>
+<span class="l">32: </span>
+<span class="l">33: </span>
+<span class="l">34: </span>
+<span class="l">35: </span>
+<span class="l">36: </span>
+<span class="l">37: </span>
+<span class="l">38: </span>
+<span class="l">39: </span>
+<span class="l">40: </span>
+<span class="l">41: </span>
+<span class="l">42: </span>
+<span class="l">43: </span>
+<span class="l">44: </span>
+<span class="l">45: </span>
+<span class="l">46: </span>
+<span class="l">47: </span>
+<span class="l">48: </span>
+<span class="l">49: </span>
+<span class="l">50: </span>
+<span class="l">51: </span>
+<span class="l">52: </span>
+<span class="l">53: </span>
+<span class="l">54: </span>
+<span class="l">55: </span>
+<span class="l">56: </span>
+<span class="l">57: </span>
+<span class="l">58: </span>
+<span class="l">59: </span>
+<span class="l">60: </span>
+<span class="l">61: </span>
+<span class="l">62: </span>
+<span class="l">63: </span>
+<span class="l">64: </span>
+<span class="l">65: </span>
+<span class="l">66: </span>
+<span class="l">67: </span>
+<span class="l">68: </span>
+<span class="l">69: </span>
+<span class="l">70: </span>
+<span class="l">71: </span>
+<span class="l">72: </span>
+<span class="l">73: </span>
+<span class="l">74: </span>
+<span class="l">75: </span>
+<span class="l">76: </span>
+<span class="l">77: </span>
+<span class="l">78: </span>
+<span class="l">79: </span>
+<span class="l">80: </span>
+</pre>
+</td>
+<td class="snippet"><pre class="fssnip">
+[&lt;<span onmouseout="hideTip(event, 'fs1', 1)" onmouseover="showTip(event, 'fs1', 1)" class="i">ReflectedDefinition</span>&gt;]
+<span class="k">module</span> <span onmouseout="hideTip(event, 'fs2', 2)" onmouseover="showTip(event, 'fs2', 2)" class="i">Program</span>
+
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs3', 3)" onmouseover="showTip(event, 'fs3', 3)" class="i">FunScript</span>
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs4', 4)" onmouseover="showTip(event, 'fs4', 4)" class="i">FSharp</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 5)" onmouseover="showTip(event, 'fs5', 5)" class="i">Data</span>
+
+<span class="c">// ------------------------------------------------------------------</span>
+<span class="c">// Initializataion</span>
+
+<span class="k">type</span> <span onmouseout="hideTip(event, 'fs6', 6)" onmouseover="showTip(event, 'fs6', 6)" class="i">WorldBank</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs7', 7)" onmouseover="showTip(event, 'fs7', 7)" class="i">WorldBankDataProvider</span><span class="o">&lt;</span><span class="s">&quot;</span><span class="s">World</span><span class="s"> </span><span class="s">Development</span><span class="s"> </span><span class="s">Indicators</span><span class="s">&quot;</span>, <span class="i">Asynchronous</span><span class="o">=</span><span class="k">true</span><span class="o">&gt;</span>
+
+<span class="k">type</span> <span onmouseout="hideTip(event, 'fs8', 8)" onmouseover="showTip(event, 'fs8', 8)" class="i">j</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs9', 9)" onmouseover="showTip(event, 'fs9', 9)" class="i">TypeScript</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs10', 10)" onmouseover="showTip(event, 'fs10', 10)" class="i">Api</span><span class="o">&lt;</span><span class="s">&quot;</span><span class="s">.</span><span class="s">.</span><span class="s">/</span><span class="s">Typings</span><span class="s">/</span><span class="s">jquery</span><span class="s">.</span><span class="s">d</span><span class="s">.</span><span class="s">ts</span><span class="s">&quot;</span><span class="o">&gt;</span>
+<span class="k">type</span> <span onmouseout="hideTip(event, 'fs11', 11)" onmouseover="showTip(event, 'fs11', 11)" class="i">h</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs9', 12)" onmouseover="showTip(event, 'fs9', 12)" class="i">TypeScript</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs10', 13)" onmouseover="showTip(event, 'fs10', 13)" class="i">Api</span><span class="o">&lt;</span><span class="s">&quot;</span><span class="s">.</span><span class="s">.</span><span class="s">/</span><span class="s">Typings</span><span class="s">/</span><span class="s">highcharts</span><span class="s">.</span><span class="s">d</span><span class="s">.</span><span class="s">ts</span><span class="s">&quot;</span><span class="o">&gt;</span>
+
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs12', 14)" onmouseover="showTip(event, 'fs12', 14)" class="i">jQuery</span> (<span onmouseout="hideTip(event, 'fs13', 15)" onmouseover="showTip(event, 'fs13', 15)" class="i">command</span><span class="o">:</span><span onmouseout="hideTip(event, 'fs14', 16)" onmouseover="showTip(event, 'fs14', 16)" class="i">string</span>) <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 17)" onmouseover="showTip(event, 'fs8', 17)" class="i">j</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs15', 18)" onmouseover="showTip(event, 'fs15', 18)" class="i">jQuery</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs16', 19)" onmouseover="showTip(event, 'fs16', 19)" class="i">Invoke</span>(<span onmouseout="hideTip(event, 'fs13', 20)" onmouseover="showTip(event, 'fs13', 20)" class="i">command</span>)
+
+<span class="c">// ------------------------------------------------------------------</span>
+<span class="c">// World bank countries</span>
+
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs17', 21)" onmouseover="showTip(event, 'fs17', 21)" class="i">data</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs6', 22)" onmouseover="showTip(event, 'fs6', 22)" class="i">WorldBank</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs18', 23)" onmouseover="showTip(event, 'fs18', 23)" class="i">GetDataContext</span>()
+
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs19', 24)" onmouseover="showTip(event, 'fs19', 24)" class="i">countries</span> () <span class="o">=</span> 
+ [| <span onmouseout="hideTip(event, 'fs17', 25)" onmouseover="showTip(event, 'fs17', 25)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 26)" onmouseover="showTip(event, 'fs20', 26)" class="i">Countries</span><span class="o">.</span><span class="i">``Arab World``</span> 
+    <span onmouseout="hideTip(event, 'fs17', 27)" onmouseover="showTip(event, 'fs17', 27)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 28)" onmouseover="showTip(event, 'fs20', 28)" class="i">Countries</span><span class="o">.</span><span class="i">``European Union``</span>
+    <span onmouseout="hideTip(event, 'fs17', 29)" onmouseover="showTip(event, 'fs17', 29)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 30)" onmouseover="showTip(event, 'fs20', 30)" class="i">Countries</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs21', 31)" onmouseover="showTip(event, 'fs21', 31)" class="i">Australia</span>
+    <span onmouseout="hideTip(event, 'fs17', 32)" onmouseover="showTip(event, 'fs17', 32)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 33)" onmouseover="showTip(event, 'fs20', 33)" class="i">Countries</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs22', 34)" onmouseover="showTip(event, 'fs22', 34)" class="i">Brazil</span>
+    <span onmouseout="hideTip(event, 'fs17', 35)" onmouseover="showTip(event, 'fs17', 35)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 36)" onmouseover="showTip(event, 'fs20', 36)" class="i">Countries</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs23', 37)" onmouseover="showTip(event, 'fs23', 37)" class="i">Canada</span>
+    <span onmouseout="hideTip(event, 'fs17', 38)" onmouseover="showTip(event, 'fs17', 38)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 39)" onmouseover="showTip(event, 'fs20', 39)" class="i">Countries</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs24', 40)" onmouseover="showTip(event, 'fs24', 40)" class="i">Chile</span>
+    <span onmouseout="hideTip(event, 'fs17', 41)" onmouseover="showTip(event, 'fs17', 41)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 42)" onmouseover="showTip(event, 'fs20', 42)" class="i">Countries</span><span class="o">.</span><span class="i">``Czech Republic``</span>
+    <span onmouseout="hideTip(event, 'fs17', 43)" onmouseover="showTip(event, 'fs17', 43)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 44)" onmouseover="showTip(event, 'fs20', 44)" class="i">Countries</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs25', 45)" onmouseover="showTip(event, 'fs25', 45)" class="i">Denmark</span>
+    <span onmouseout="hideTip(event, 'fs17', 46)" onmouseover="showTip(event, 'fs17', 46)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 47)" onmouseover="showTip(event, 'fs20', 47)" class="i">Countries</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs26', 48)" onmouseover="showTip(event, 'fs26', 48)" class="i">France</span>
+    <span onmouseout="hideTip(event, 'fs17', 49)" onmouseover="showTip(event, 'fs17', 49)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 50)" onmouseover="showTip(event, 'fs20', 50)" class="i">Countries</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs27', 51)" onmouseover="showTip(event, 'fs27', 51)" class="i">Greece</span>
+    <span onmouseout="hideTip(event, 'fs17', 52)" onmouseover="showTip(event, 'fs17', 52)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 53)" onmouseover="showTip(event, 'fs20', 53)" class="i">Countries</span><span class="o">.</span><span class="i">``Low income``</span>
+    <span onmouseout="hideTip(event, 'fs17', 54)" onmouseover="showTip(event, 'fs17', 54)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 55)" onmouseover="showTip(event, 'fs20', 55)" class="i">Countries</span><span class="o">.</span><span class="i">``High income``</span>
+    <span onmouseout="hideTip(event, 'fs17', 56)" onmouseover="showTip(event, 'fs17', 56)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 57)" onmouseover="showTip(event, 'fs20', 57)" class="i">Countries</span><span class="o">.</span><span class="i">``United Kingdom``</span>
+    <span onmouseout="hideTip(event, 'fs17', 58)" onmouseover="showTip(event, 'fs17', 58)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 59)" onmouseover="showTip(event, 'fs20', 59)" class="i">Countries</span><span class="o">.</span><span class="i">``United States``</span> |]
+
+<span class="c">// ------------------------------------------------------------------</span>
+<span class="c">// Main function</span>
+
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs28', 60)" onmouseover="showTip(event, 'fs28', 60)" class="i">main</span>() <span class="o">=</span> 
+
+  <span class="c">// Create check boxes for all countries</span>
+  <span class="k">let</span> <span onmouseout="hideTip(event, 'fs29', 61)" onmouseover="showTip(event, 'fs29', 61)" class="i">infos</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs19', 62)" onmouseover="showTip(event, 'fs19', 62)" class="i">countries</span> () <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs30', 63)" onmouseover="showTip(event, 'fs30', 63)" class="i">Array</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs31', 64)" onmouseover="showTip(event, 'fs31', 64)" class="i">toList</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs32', 65)" onmouseover="showTip(event, 'fs32', 65)" class="i">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs33', 66)" onmouseover="showTip(event, 'fs33', 66)" class="i">mapi</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs34', 67)" onmouseover="showTip(event, 'fs34', 67)" class="i">index</span> <span onmouseout="hideTip(event, 'fs35', 68)" onmouseover="showTip(event, 'fs35', 68)" class="i">country</span> <span class="k">-&gt;</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs36', 69)" onmouseover="showTip(event, 'fs36', 69)" class="i">input</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs12', 70)" onmouseover="showTip(event, 'fs12', 70)" class="i">jQuery</span>(<span class="s">&quot;</span><span class="s">&lt;</span><span class="s">input</span><span class="s">&gt;</span><span class="s">&quot;</span>)
+    <span onmouseout="hideTip(event, 'fs36', 71)" onmouseover="showTip(event, 'fs36', 71)" class="i">input</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs37', 72)" onmouseover="showTip(event, 'fs37', 72)" class="i">attr</span>(<span class="s">&quot;</span><span class="s">type</span><span class="s">&quot;</span>, <span class="s">&quot;</span><span class="s">checkbox</span><span class="s">&quot;</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs38', 73)" onmouseover="showTip(event, 'fs38', 73)" class="i">ignore</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs39', 74)" onmouseover="showTip(event, 'fs39', 74)" class="i">label</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs12', 75)" onmouseover="showTip(event, 'fs12', 75)" class="i">jQuery</span>(<span class="s">&quot;</span><span class="s">&lt;</span><span class="s">label</span><span class="s">&gt;</span><span class="s">&quot;</span>)
+    <span onmouseout="hideTip(event, 'fs39', 76)" onmouseover="showTip(event, 'fs39', 76)" class="i">label</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs40', 77)" onmouseover="showTip(event, 'fs40', 77)" class="i">append</span>([| <span onmouseout="hideTip(event, 'fs41', 78)" onmouseover="showTip(event, 'fs41', 78)" class="i">box</span> <span onmouseout="hideTip(event, 'fs36', 79)" onmouseover="showTip(event, 'fs36', 79)" class="i">input</span> |]) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs38', 80)" onmouseover="showTip(event, 'fs38', 80)" class="i">ignore</span>
+    <span onmouseout="hideTip(event, 'fs39', 81)" onmouseover="showTip(event, 'fs39', 81)" class="i">label</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs40', 82)" onmouseover="showTip(event, 'fs40', 82)" class="i">append</span>([| <span onmouseout="hideTip(event, 'fs41', 83)" onmouseover="showTip(event, 'fs41', 83)" class="i">box</span> <span onmouseout="hideTip(event, 'fs35', 84)" onmouseover="showTip(event, 'fs35', 84)" class="i">country</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs42', 85)" onmouseover="showTip(event, 'fs42', 85)" class="i">Name</span> |]) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs38', 86)" onmouseover="showTip(event, 'fs38', 86)" class="i">ignore</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs43', 87)" onmouseover="showTip(event, 'fs43', 87)" class="i">panel</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs44', 88)" onmouseover="showTip(event, 'fs44', 88)" class="i">floor</span> (<span onmouseout="hideTip(event, 'fs34', 89)" onmouseover="showTip(event, 'fs34', 89)" class="i">index</span> <span class="o">%</span> <span class="n">3</span>) <span class="o">+</span> <span class="n">1</span>
+    <span onmouseout="hideTip(event, 'fs39', 90)" onmouseover="showTip(event, 'fs39', 90)" class="i">label</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs45', 91)" onmouseover="showTip(event, 'fs45', 91)" class="i">appendTo</span>(<span onmouseout="hideTip(event, 'fs12', 92)" onmouseover="showTip(event, 'fs12', 92)" class="i">jQuery</span>(<span class="s">&quot;</span><span class="s">#</span><span class="s">countryList</span><span class="s">&quot;</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs43', 93)" onmouseover="showTip(event, 'fs43', 93)" class="i">panel</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs46', 94)" onmouseover="showTip(event, 'fs46', 94)" class="i">ToString</span>())) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs38', 95)" onmouseover="showTip(event, 'fs38', 95)" class="i">ignore</span>
+    <span onmouseout="hideTip(event, 'fs35', 96)" onmouseover="showTip(event, 'fs35', 96)" class="i">country</span>, <span onmouseout="hideTip(event, 'fs36', 97)" onmouseover="showTip(event, 'fs36', 97)" class="i">input</span> )
+
+  <span class="c">// Render the chart based on checkboxes</span>
+  <span class="k">let</span> <span onmouseout="hideTip(event, 'fs47', 98)" onmouseover="showTip(event, 'fs47', 98)" class="i">render</span> () <span class="o">=</span> <span onmouseout="hideTip(event, 'fs48', 99)" onmouseover="showTip(event, 'fs48', 99)" class="i">async</span> {
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs49', 100)" onmouseover="showTip(event, 'fs49', 100)" class="i">opts</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs11', 101)" onmouseover="showTip(event, 'fs11', 101)" class="i">h</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs50', 102)" onmouseover="showTip(event, 'fs50', 102)" class="i">HighchartsOptions</span>()
+    <span onmouseout="hideTip(event, 'fs49', 103)" onmouseover="showTip(event, 'fs49', 103)" class="i">opts</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs51', 104)" onmouseover="showTip(event, 'fs51', 104)" class="i">chart</span> <span class="o">&lt;-</span> <span onmouseout="hideTip(event, 'fs11', 105)" onmouseover="showTip(event, 'fs11', 105)" class="i">h</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs52', 106)" onmouseover="showTip(event, 'fs52', 106)" class="i">HighchartsChartOptions</span>(<span class="i">renderTo</span> <span class="o">=</span> <span class="s">&quot;</span><span class="s">chart</span><span class="s">&quot;</span>, <span class="i">``type``</span> <span class="o">=</span> <span class="s">&quot;</span><span class="s">line</span><span class="s">&quot;</span>)
+    <span onmouseout="hideTip(event, 'fs49', 107)" onmouseover="showTip(event, 'fs49', 107)" class="i">opts</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs53', 108)" onmouseover="showTip(event, 'fs53', 108)" class="i">title</span> <span class="o">&lt;-</span> <span onmouseout="hideTip(event, 'fs11', 109)" onmouseover="showTip(event, 'fs11', 109)" class="i">h</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs54', 110)" onmouseover="showTip(event, 'fs54', 110)" class="i">HighchartsTitleOptions</span>(<span class="i">text</span> <span class="o">=</span> <span class="s">&quot;</span><span class="s">School</span><span class="s"> </span><span class="s">enrollment</span><span class="s">,</span><span class="s"> </span><span class="s">tertiary</span><span class="s"> </span><span class="s">(</span><span class="s">%</span><span class="s"> </span><span class="s">gross</span><span class="s">)</span><span class="s">&quot;</span>)
+    <span onmouseout="hideTip(event, 'fs49', 111)" onmouseover="showTip(event, 'fs49', 111)" class="i">opts</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs55', 112)" onmouseover="showTip(event, 'fs55', 112)" class="i">series</span> <span class="o">&lt;-</span> [| |]
+    
+    <span class="c">// Create series we want to render</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs56', 113)" onmouseover="showTip(event, 'fs56', 113)" class="i">series</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs57', 114)" onmouseover="showTip(event, 'fs57', 114)" class="i">ref</span> []
+    <span class="k">for</span> <span onmouseout="hideTip(event, 'fs35', 115)" onmouseover="showTip(event, 'fs35', 115)" class="i">country</span>, <span onmouseout="hideTip(event, 'fs58', 116)" onmouseover="showTip(event, 'fs58', 116)" class="i">check</span> <span class="k">in</span> <span onmouseout="hideTip(event, 'fs29', 117)" onmouseover="showTip(event, 'fs29', 117)" class="i">infos</span> <span class="k">do</span>
+      <span class="k">if</span> <span onmouseout="hideTip(event, 'fs58', 118)" onmouseover="showTip(event, 'fs58', 118)" class="i">check</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs59', 119)" onmouseover="showTip(event, 'fs59', 119)" class="i">is</span>(<span class="s">&quot;</span><span class="s">:</span><span class="s">checked</span><span class="s">&quot;</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs60', 120)" onmouseover="showTip(event, 'fs60', 120)" class="i">unbox</span> <span class="k">then</span>
+        <span class="k">let!</span> <span onmouseout="hideTip(event, 'fs61', 121)" onmouseover="showTip(event, 'fs61', 121)" class="i">vals</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs35', 122)" onmouseover="showTip(event, 'fs35', 122)" class="i">country</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs62', 123)" onmouseover="showTip(event, 'fs62', 123)" class="i">Indicators</span><span class="o">.</span><span class="i">``School enrollment, tertiary (% gross)``</span>
+        <span class="k">let</span> <span onmouseout="hideTip(event, 'fs63', 124)" onmouseover="showTip(event, 'fs63', 124)" class="i">data</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs61', 125)" onmouseover="showTip(event, 'fs61', 125)" class="i">vals</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs64', 126)" onmouseover="showTip(event, 'fs64', 126)" class="i">Seq</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs65', 127)" onmouseover="showTip(event, 'fs65', 127)" class="i">map</span> (<span class="k">fun</span> (<span onmouseout="hideTip(event, 'fs66', 128)" onmouseover="showTip(event, 'fs66', 128)" class="i">k</span>, <span onmouseout="hideTip(event, 'fs67', 129)" onmouseover="showTip(event, 'fs67', 129)" class="i">v</span>) <span class="k">-&gt;</span> [| <span class="i">number</span> <span onmouseout="hideTip(event, 'fs66', 130)" onmouseover="showTip(event, 'fs66', 130)" class="i">k</span>; <span class="i">number</span> <span onmouseout="hideTip(event, 'fs67', 131)" onmouseover="showTip(event, 'fs67', 131)" class="i">v</span> |]) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs30', 132)" onmouseover="showTip(event, 'fs30', 132)" class="i">Array</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs68', 133)" onmouseover="showTip(event, 'fs68', 133)" class="i">ofSeq</span>
+        <span onmouseout="hideTip(event, 'fs49', 134)" onmouseover="showTip(event, 'fs49', 134)" class="i">opts</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs55', 135)" onmouseover="showTip(event, 'fs55', 135)" class="i">series</span><span class="o">.</span><span class="i">push</span>(<span onmouseout="hideTip(event, 'fs11', 136)" onmouseover="showTip(event, 'fs11', 136)" class="i">h</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs69', 137)" onmouseover="showTip(event, 'fs69', 137)" class="i">HighchartsSeriesOptions</span>(<span onmouseout="hideTip(event, 'fs63', 138)" onmouseover="showTip(event, 'fs63', 138)" class="i">data</span><span class="o">=</span><span onmouseout="hideTip(event, 'fs63', 139)" onmouseover="showTip(event, 'fs63', 139)" class="i">data</span>, <span class="i">name</span><span class="o">=</span><span onmouseout="hideTip(event, 'fs35', 140)" onmouseover="showTip(event, 'fs35', 140)" class="i">country</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs42', 141)" onmouseover="showTip(event, 'fs42', 141)" class="i">Name</span>))
+    <span class="i">clone</span>(<span onmouseout="hideTip(event, 'fs11', 142)" onmouseover="showTip(event, 'fs11', 142)" class="i">h</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs70', 143)" onmouseover="showTip(event, 'fs70', 143)" class="i">Highcharts</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs71', 144)" onmouseover="showTip(event, 'fs71', 144)" class="i">Chart</span>, <span onmouseout="hideTip(event, 'fs49', 145)" onmouseover="showTip(event, 'fs49', 145)" class="i">opts</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs38', 146)" onmouseover="showTip(event, 'fs38', 146)" class="i">ignore</span> }
+  
+  <span class="c">// Register click handlers</span>
+  <span onmouseout="hideTip(event, 'fs47', 147)" onmouseover="showTip(event, 'fs47', 147)" class="i">render</span> () <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs72', 148)" onmouseover="showTip(event, 'fs72', 148)" class="i">Async</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs73', 149)" onmouseover="showTip(event, 'fs73', 149)" class="i">StartImmediate</span>
+  <span class="k">for</span> _, <span onmouseout="hideTip(event, 'fs58', 150)" onmouseover="showTip(event, 'fs58', 150)" class="i">check</span> <span class="k">in</span> <span onmouseout="hideTip(event, 'fs29', 151)" onmouseover="showTip(event, 'fs29', 151)" class="i">infos</span> <span class="k">do</span>
+    <span onmouseout="hideTip(event, 'fs58', 152)" onmouseover="showTip(event, 'fs58', 152)" class="i">check</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs74', 153)" onmouseover="showTip(event, 'fs74', 153)" class="i">click</span>(<span class="k">fun</span> _ <span class="k">-&gt;</span> 
+      <span onmouseout="hideTip(event, 'fs47', 154)" onmouseover="showTip(event, 'fs47', 154)" class="i">render</span>() <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs72', 155)" onmouseover="showTip(event, 'fs72', 155)" class="i">Async</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs73', 156)" onmouseover="showTip(event, 'fs73', 156)" class="i">StartImmediate</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs41', 157)" onmouseover="showTip(event, 'fs41', 157)" class="i">box</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs38', 158)" onmouseover="showTip(event, 'fs38', 158)" class="i">ignore</span>
+
+<span class="c">// ------------------------------------------------------------------</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs75', 159)" onmouseover="showTip(event, 'fs75', 159)" class="i">components</span> <span class="o">=</span> 
+  <span onmouseout="hideTip(event, 'fs3', 160)" onmouseover="showTip(event, 'fs3', 160)" class="i">FunScript</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs76', 161)" onmouseover="showTip(event, 'fs76', 161)" class="i">Data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs77', 162)" onmouseover="showTip(event, 'fs77', 162)" class="i">Components</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs78', 163)" onmouseover="showTip(event, 'fs78', 163)" class="i">DataProviders</span> <span class="o">@</span> 
+  <span onmouseout="hideTip(event, 'fs3', 164)" onmouseover="showTip(event, 'fs3', 164)" class="i">FunScript</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs79', 165)" onmouseover="showTip(event, 'fs79', 165)" class="i">Interop</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs80', 166)" onmouseover="showTip(event, 'fs80', 166)" class="i">Components</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs81', 167)" onmouseover="showTip(event, 'fs81', 167)" class="i">all</span>
+<span class="k">do</span> <span class="i">Runtime</span><span class="o">.</span><span class="i">Run</span>(<span onmouseout="hideTip(event, 'fs75', 168)" onmouseover="showTip(event, 'fs75', 168)" class="i">components</span><span class="o">=</span><span onmouseout="hideTip(event, 'fs75', 169)" onmouseover="showTip(event, 'fs75', 169)" class="i">components</span>, <span class="i">directory</span><span class="o">=</span><span class="s">&quot;</span><span class="s">Web</span><span class="s">&quot;</span>)</pre>
+</td>
+</tr>
+</table>
+      <div class="tip" id="fs1">Multiple items<br />type ReflectedDefinitionAttribute =<br />&#160;&#160;inherit Attribute<br />&#160;&#160;new : unit -&gt; ReflectedDefinitionAttribute<br /><br />Full name: Microsoft.FSharp.Core.ReflectedDefinitionAttribute<br /><br />--------------------<br />new : unit -&gt; ReflectedDefinitionAttribute</div>
+<div class="tip" id="fs2">module Program</div>
+<div class="tip" id="fs3">namespace FunScript</div>
+<div class="tip" id="fs4">namespace FSharp</div>
+<div class="tip" id="fs5">namespace FSharp.Data</div>
+<div class="tip" id="fs6">type WorldBank = WorldBankDataProvider&lt;...&gt;<br /><br />Full name: Program.WorldBank</div>
+<div class="tip" id="fs7">type WorldBankDataProvider<br /><br />Full name: FSharp.Data.WorldBankDataProvider<br /><em><br /><br />&lt;summary&gt;Typed representation of WorldBank data with additional configuration parameters&lt;/summary&gt;<br />&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&lt;param name=&#39;Sources&#39;&gt;The World Bank data sources to include, separated by semicolons. Defaults to &quot;World Development Indicators;Global Financial Development&quot;. If an empty string is specified, includes all data sources.&lt;/param&gt;<br />&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&lt;param name=&#39;Asynchronous&#39;&gt;Generate asynchronous calls. Defaults to false&lt;/param&gt;</em></div>
+<div class="tip" id="fs8">type j = TypeScript.Api&lt;...&gt;<br /><br />Full name: Program.j</div>
+<div class="tip" id="fs9">namespace FunScript.TypeScript</div>
+<div class="tip" id="fs10">type Api<br /><br />Full name: FunScript.TypeScript.Api</div>
+<div class="tip" id="fs11">type h = TypeScript.Api&lt;...&gt;<br /><br />Full name: Program.h</div>
+<div class="tip" id="fs12">val jQuery : command:string -&gt; TypeScript.Api&lt;...&gt;.JQuery<br /><br />Full name: Program.jQuery</div>
+<div class="tip" id="fs13">val command : string</div>
+<div class="tip" id="fs14">Multiple items<br />val string : value:&#39;T -&gt; string<br /><br />Full name: Microsoft.FSharp.Core.Operators.string<br /><br />--------------------<br />type string = System.String<br /><br />Full name: Microsoft.FSharp.Core.string</div>
+<div class="tip" id="fs15">property TypeScript.Api&lt;...&gt;.jQuery: TypeScript.Api&lt;...&gt;.JQueryStatic</div>
+<div class="tip" id="fs16">TypeScript.Api&lt;...&gt;.JQueryStatic.Invoke() : TypeScript.Api&lt;...&gt;.JQuery<br />TypeScript.Api&lt;...&gt;.JQueryStatic.Invoke(selector: string) : TypeScript.Api&lt;...&gt;.JQuery<br />TypeScript.Api&lt;...&gt;.JQueryStatic.Invoke(element: TypeScript.Api&lt;...&gt;.Element) : TypeScript.Api&lt;...&gt;.JQuery<br />TypeScript.Api&lt;...&gt;.JQueryStatic.Invoke(elementArray: TypeScript.Api&lt;...&gt;.Element []) : TypeScript.Api&lt;...&gt;.JQuery<br />TypeScript.Api&lt;...&gt;.JQueryStatic.Invoke(object: TypeScript.Api&lt;...&gt;.JQuery) : TypeScript.Api&lt;...&gt;.JQuery<br />TypeScript.Api&lt;...&gt;.JQueryStatic.Invoke(func: TypeScript.Api&lt;...&gt;.Function) : TypeScript.Api&lt;...&gt;.JQuery<br />TypeScript.Api&lt;...&gt;.JQueryStatic.Invoke(selector: string, context: obj) : TypeScript.Api&lt;...&gt;.JQuery</div>
+<div class="tip" id="fs17">val data : WorldBankDataProvider&lt;...&gt;.ServiceTypes.WorldBankDataService<br /><br />Full name: Program.data</div>
+<div class="tip" id="fs18">WorldBankDataProvider&lt;...&gt;.GetDataContext() : WorldBankDataProvider&lt;...&gt;.ServiceTypes.WorldBankDataService</div>
+<div class="tip" id="fs19">val countries : unit -&gt; WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country []<br /><br />Full name: Program.countries</div>
+<div class="tip" id="fs20">property WorldBankDataProvider&lt;...&gt;.ServiceTypes.WorldBankDataService.Countries: WorldBankDataProvider&lt;...&gt;.ServiceTypes.Countries</div>
+<div class="tip" id="fs21">property WorldBankDataProvider&lt;...&gt;.ServiceTypes.Countries.Australia: WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country<br /><em><br /><br />The data for country &#39;Australia&#39;</em></div>
+<div class="tip" id="fs22">property WorldBankDataProvider&lt;...&gt;.ServiceTypes.Countries.Brazil: WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country<br /><em><br /><br />The data for country &#39;Brazil&#39;</em></div>
+<div class="tip" id="fs23">property WorldBankDataProvider&lt;...&gt;.ServiceTypes.Countries.Canada: WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country<br /><em><br /><br />The data for country &#39;Canada&#39;</em></div>
+<div class="tip" id="fs24">property WorldBankDataProvider&lt;...&gt;.ServiceTypes.Countries.Chile: WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country<br /><em><br /><br />The data for country &#39;Chile&#39;</em></div>
+<div class="tip" id="fs25">property WorldBankDataProvider&lt;...&gt;.ServiceTypes.Countries.Denmark: WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country<br /><em><br /><br />The data for country &#39;Denmark&#39;</em></div>
+<div class="tip" id="fs26">property WorldBankDataProvider&lt;...&gt;.ServiceTypes.Countries.France: WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country<br /><em><br /><br />The data for country &#39;France&#39;</em></div>
+<div class="tip" id="fs27">property WorldBankDataProvider&lt;...&gt;.ServiceTypes.Countries.Greece: WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country<br /><em><br /><br />The data for country &#39;Greece&#39;</em></div>
+<div class="tip" id="fs28">val main : unit -&gt; unit<br /><br />Full name: Program.main</div>
+<div class="tip" id="fs29">val infos : (WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country * TypeScript.Api&lt;...&gt;.JQuery) list</div>
+<div class="tip" id="fs30">module Array<br /><br />from Microsoft.FSharp.Collections</div>
+<div class="tip" id="fs31">val toList : array:&#39;T [] -&gt; &#39;T list<br /><br />Full name: Microsoft.FSharp.Collections.Array.toList</div>
+<div class="tip" id="fs32">Multiple items<br />module List<br /><br />from Microsoft.FSharp.Collections<br /><br />--------------------<br />type List&lt;&#39;T&gt; =<br />&#160;&#160;| ( [] )<br />&#160;&#160;| ( :: ) of &#39;T * &#39;T list<br />&#160;&#160;interface IEnumerable<br />&#160;&#160;interface IEnumerable&lt;&#39;T&gt;<br />&#160;&#160;member Head : &#39;T<br />&#160;&#160;member IsEmpty : bool<br />&#160;&#160;member Item : index:int -&gt; &#39;T with get<br />&#160;&#160;member Length : int<br />&#160;&#160;member Tail : &#39;T list<br />&#160;&#160;static member Cons : head:&#39;T * tail:&#39;T list -&gt; &#39;T list<br />&#160;&#160;static member Empty : &#39;T list<br /><br />Full name: Microsoft.FSharp.Collections.List&lt;_&gt;</div>
+<div class="tip" id="fs33">val mapi : mapping:(int -&gt; &#39;T -&gt; &#39;U) -&gt; list:&#39;T list -&gt; &#39;U list<br /><br />Full name: Microsoft.FSharp.Collections.List.mapi</div>
+<div class="tip" id="fs34">val index : int</div>
+<div class="tip" id="fs35">val country : WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country</div>
+<div class="tip" id="fs36">val input : TypeScript.Api&lt;...&gt;.JQuery</div>
+<div class="tip" id="fs37">TypeScript.Api&lt;...&gt;.JQuery.attr(attributeName: string) : obj<br />TypeScript.Api&lt;...&gt;.JQuery.attr(attributeName: string, value: obj) : obj<br />TypeScript.Api&lt;...&gt;.JQuery.attr(attributeName: string, func: System.Func&lt;obj,obj,obj&gt;) : obj</div>
+<div class="tip" id="fs38">val ignore : value:&#39;T -&gt; unit<br /><br />Full name: Microsoft.FSharp.Core.Operators.ignore</div>
+<div class="tip" id="fs39">val label : TypeScript.Api&lt;...&gt;.JQuery</div>
+<div class="tip" id="fs40">TypeScript.Api&lt;...&gt;.JQuery.append(content: obj []) : obj<br />TypeScript.Api&lt;...&gt;.JQuery.append(func: System.Func&lt;obj,obj,obj&gt;) : obj</div>
+<div class="tip" id="fs41">val box : value:&#39;T -&gt; obj<br /><br />Full name: Microsoft.FSharp.Core.Operators.box</div>
+<div class="tip" id="fs42">property RuntimeImplementation.WorldBank.Country.Name: string</div>
+<div class="tip" id="fs43">val panel : int</div>
+<div class="tip" id="fs44">val floor : value:&#39;T -&gt; &#39;T (requires member Floor)<br /><br />Full name: Microsoft.FSharp.Core.Operators.floor</div>
+<div class="tip" id="fs45">TypeScript.Api&lt;...&gt;.JQuery.appendTo(target: obj) : TypeScript.Api&lt;...&gt;.JQuery</div>
+<div class="tip" id="fs46">System.Int32.ToString() : string<br />System.Int32.ToString(provider: System.IFormatProvider) : string<br />System.Int32.ToString(format: string) : string<br />System.Int32.ToString(format: string, provider: System.IFormatProvider) : string</div>
+<div class="tip" id="fs47">val render : (unit -&gt; Async&lt;unit&gt;)</div>
+<div class="tip" id="fs48">val async : AsyncBuilder<br /><br />Full name: Microsoft.FSharp.Core.ExtraTopLevelOperators.async</div>
+<div class="tip" id="fs49">val opts : TypeScript.Api&lt;...&gt;.HighchartsOptions</div>
+<div class="tip" id="fs50">type HighchartsOptions =<br />&#160;&#160;new : unit -&gt; HighchartsOptions<br />&#160;&#160;member chart : HighchartsChartOptions with get, set<br />&#160;&#160;member colors : string [] with get, set<br />&#160;&#160;member credits : HighchartsCreditsOptions with get, set<br />&#160;&#160;member exporting : HighchartsExportingOptions with get, set<br />&#160;&#160;member ``global`` : HighchartsGlobalOptions with get, set<br />&#160;&#160;member labels : HighchartsLabelsOptions with get, set<br />&#160;&#160;member lang : HighchartsLangOptions with get, set<br />&#160;&#160;member legend : HighchartsLegendOptions with get, set<br />&#160;&#160;member loading : HighchartsLoadingOptions with get, set<br />&#160;&#160;...<br /><br />Full name: FunScript.TypeScript.Api,files=&quot;../Typings/highcharts.d.ts&quot;.HighchartsOptions</div>
+<div class="tip" id="fs51">property TypeScript.Api&lt;...&gt;.HighchartsOptions.chart: TypeScript.Api&lt;...&gt;.HighchartsChartOptions</div>
+<div class="tip" id="fs52">type HighchartsChartOptions =<br />&#160;&#160;new : unit -&gt; HighchartsChartOptions<br />&#160;&#160;member alignTicks : bool with get, set<br />&#160;&#160;member animation : HighchartsBoolOrAnimation with get, set<br />&#160;&#160;member backgroundColor : HighchartsColorOrGradient with get, set<br />&#160;&#160;member borderColor : string with get, set<br />&#160;&#160;member borderRadius : float with get, set<br />&#160;&#160;member borderWidth : float with get, set<br />&#160;&#160;member className : string with get, set<br />&#160;&#160;member defaultSeriesType : string with get, set<br />&#160;&#160;member events : HighchartsChartEvents with get, set<br />&#160;&#160;...<br /><br />Full name: FunScript.TypeScript.Api,files=&quot;../Typings/highcharts.d.ts&quot;.HighchartsChartOptions</div>
+<div class="tip" id="fs53">property TypeScript.Api&lt;...&gt;.HighchartsOptions.title: TypeScript.Api&lt;...&gt;.HighchartsTitleOptions</div>
+<div class="tip" id="fs54">type HighchartsTitleOptions =<br />&#160;&#160;new : unit -&gt; HighchartsTitleOptions<br />&#160;&#160;member align : string with get, set<br />&#160;&#160;member floating : bool with get, set<br />&#160;&#160;member margin : float with get, set<br />&#160;&#160;member style : HighchartsCSSObject with get, set<br />&#160;&#160;member text : string with get, set<br />&#160;&#160;member useHTML : bool with get, set<br />&#160;&#160;member verticalAlign : string with get, set<br />&#160;&#160;member x : float with get, set<br />&#160;&#160;member y : float with get, set<br /><br />Full name: FunScript.TypeScript.Api,files=&quot;../Typings/highcharts.d.ts&quot;.HighchartsTitleOptions</div>
+<div class="tip" id="fs55">property TypeScript.Api&lt;...&gt;.HighchartsOptions.series: TypeScript.Api&lt;...&gt;.HighchartsSeriesOptions []</div>
+<div class="tip" id="fs56">val series : obj list ref</div>
+<div class="tip" id="fs57">Multiple items<br />val ref : value:&#39;T -&gt; &#39;T ref<br /><br />Full name: Microsoft.FSharp.Core.Operators.ref<br /><br />--------------------<br />type &#39;T ref = Ref&lt;&#39;T&gt;<br /><br />Full name: Microsoft.FSharp.Core.ref&lt;_&gt;</div>
+<div class="tip" id="fs58">val check : TypeScript.Api&lt;...&gt;.JQuery</div>
+<div class="tip" id="fs59">TypeScript.Api&lt;...&gt;.JQuery.is(selector: string) : TypeScript.Api&lt;...&gt;.JQuery<br />TypeScript.Api&lt;...&gt;.JQuery.is(func: System.Func&lt;obj,obj&gt;) : TypeScript.Api&lt;...&gt;.JQuery<br />TypeScript.Api&lt;...&gt;.JQuery.is(element: obj) : TypeScript.Api&lt;...&gt;.JQuery<br />TypeScript.Api&lt;...&gt;.JQuery.is(obj: TypeScript.Api&lt;...&gt;.JQuery) : TypeScript.Api&lt;...&gt;.JQuery</div>
+<div class="tip" id="fs60">val unbox : value:obj -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Core.Operators.unbox</div>
+<div class="tip" id="fs61">val vals : RuntimeImplementation.WorldBank.Indicator</div>
+<div class="tip" id="fs62">property WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country.Indicators: WorldBankDataProvider&lt;...&gt;.ServiceTypes.Indicators<br /><em><br /><br />&lt;summary&gt;The indicators for the country&lt;/summary&gt;</em></div>
+<div class="tip" id="fs63">val data : obj [] []</div>
+<div class="tip" id="fs64">module Seq<br /><br />from Microsoft.FSharp.Collections</div>
+<div class="tip" id="fs65">val map : mapping:(&#39;T -&gt; &#39;U) -&gt; source:seq&lt;&#39;T&gt; -&gt; seq&lt;&#39;U&gt;<br /><br />Full name: Microsoft.FSharp.Collections.Seq.map</div>
+<div class="tip" id="fs66">val k : int</div>
+<div class="tip" id="fs67">val v : float</div>
+<div class="tip" id="fs68">val ofSeq : source:seq&lt;&#39;T&gt; -&gt; &#39;T []<br /><br />Full name: Microsoft.FSharp.Collections.Array.ofSeq</div>
+<div class="tip" id="fs69">type HighchartsSeriesOptions =<br />&#160;&#160;new : unit -&gt; HighchartsSeriesOptions<br />&#160;&#160;member data : obj with get, set<br />&#160;&#160;member index : float with get, set<br />&#160;&#160;member legendIndex : float with get, set<br />&#160;&#160;member name : string with get, set<br />&#160;&#160;member stack : obj with get, set<br />&#160;&#160;member ``type`` : string with get, set<br />&#160;&#160;member xAxis : float with get, set<br />&#160;&#160;member yAxis : float with get, set<br /><br />Full name: FunScript.TypeScript.Api,files=&quot;../Typings/highcharts.d.ts&quot;.HighchartsSeriesOptions</div>
+<div class="tip" id="fs70">property TypeScript.Api&lt;...&gt;.Highcharts: TypeScript.Api&lt;...&gt;.HighchartsStatic</div>
+<div class="tip" id="fs71">property TypeScript.Api&lt;...&gt;.HighchartsStatic.Chart: TypeScript.Api&lt;...&gt;.HighchartsChart</div>
+<div class="tip" id="fs72">Multiple items<br />type Async<br />static member AsBeginEnd : computation:(&#39;Arg -&gt; Async&lt;&#39;T&gt;) -&gt; (&#39;Arg * AsyncCallback * obj -&gt; IAsyncResult) * (IAsyncResult -&gt; &#39;T) * (IAsyncResult -&gt; unit)<br />static member AwaitEvent : event:IEvent&lt;&#39;Del,&#39;T&gt; * ?cancelAction:(unit -&gt; unit) -&gt; Async&lt;&#39;T&gt; (requires delegate and &#39;Del :&gt; Delegate)<br />static member AwaitIAsyncResult : iar:IAsyncResult * ?millisecondsTimeout:int -&gt; Async&lt;bool&gt;<br />static member AwaitTask : task:Task&lt;&#39;T&gt; -&gt; Async&lt;&#39;T&gt;<br />static member AwaitWaitHandle : waitHandle:WaitHandle * ?millisecondsTimeout:int -&gt; Async&lt;bool&gt;<br />static member CancelDefaultToken : unit -&gt; unit<br />static member Catch : computation:Async&lt;&#39;T&gt; -&gt; Async&lt;Choice&lt;&#39;T,exn&gt;&gt;<br />static member FromBeginEnd : beginAction:(AsyncCallback * obj -&gt; IAsyncResult) * endAction:(IAsyncResult -&gt; &#39;T) * ?cancelAction:(unit -&gt; unit) -&gt; Async&lt;&#39;T&gt;<br />static member FromBeginEnd : arg:&#39;Arg1 * beginAction:(&#39;Arg1 * AsyncCallback * obj -&gt; IAsyncResult) * endAction:(IAsyncResult -&gt; &#39;T) * ?cancelAction:(unit -&gt; unit) -&gt; Async&lt;&#39;T&gt;<br />static member FromBeginEnd : arg1:&#39;Arg1 * arg2:&#39;Arg2 * beginAction:(&#39;Arg1 * &#39;Arg2 * AsyncCallback * obj -&gt; IAsyncResult) * endAction:(IAsyncResult -&gt; &#39;T) * ?cancelAction:(unit -&gt; unit) -&gt; Async&lt;&#39;T&gt;<br />static member FromBeginEnd : arg1:&#39;Arg1 * arg2:&#39;Arg2 * arg3:&#39;Arg3 * beginAction:(&#39;Arg1 * &#39;Arg2 * &#39;Arg3 * AsyncCallback * obj -&gt; IAsyncResult) * endAction:(IAsyncResult -&gt; &#39;T) * ?cancelAction:(unit -&gt; unit) -&gt; Async&lt;&#39;T&gt;<br />static member FromContinuations : callback:((&#39;T -&gt; unit) * (exn -&gt; unit) * (OperationCanceledException -&gt; unit) -&gt; unit) -&gt; Async&lt;&#39;T&gt;<br />static member Ignore : computation:Async&lt;&#39;T&gt; -&gt; Async&lt;unit&gt;<br />static member OnCancel : interruption:(unit -&gt; unit) -&gt; Async&lt;IDisposable&gt;<br />static member Parallel : computations:seq&lt;Async&lt;&#39;T&gt;&gt; -&gt; Async&lt;&#39;T []&gt;<br />static member RunSynchronously : computation:Async&lt;&#39;T&gt; * ?timeout:int * ?cancellationToken:CancellationToken -&gt; &#39;T<br />static member Sleep : millisecondsDueTime:int -&gt; Async&lt;unit&gt;<br />static member Start : computation:Async&lt;unit&gt; * ?cancellationToken:CancellationToken -&gt; unit<br />static member StartAsTask : computation:Async&lt;&#39;T&gt; * ?taskCreationOptions:TaskCreationOptions * ?cancellationToken:CancellationToken -&gt; Task&lt;&#39;T&gt;<br />static member StartChild : computation:Async&lt;&#39;T&gt; * ?millisecondsTimeout:int -&gt; Async&lt;Async&lt;&#39;T&gt;&gt;<br />static member StartChildAsTask : computation:Async&lt;&#39;T&gt; * ?taskCreationOptions:TaskCreationOptions -&gt; Async&lt;Task&lt;&#39;T&gt;&gt;<br />static member StartImmediate : computation:Async&lt;unit&gt; * ?cancellationToken:CancellationToken -&gt; unit<br />static member StartWithContinuations : computation:Async&lt;&#39;T&gt; * continuation:(&#39;T -&gt; unit) * exceptionContinuation:(exn -&gt; unit) * cancellationContinuation:(OperationCanceledException -&gt; unit) * ?cancellationToken:CancellationToken -&gt; unit<br />static member SwitchToContext : syncContext:SynchronizationContext -&gt; Async&lt;unit&gt;<br />static member SwitchToNewThread : unit -&gt; Async&lt;unit&gt;<br />static member SwitchToThreadPool : unit -&gt; Async&lt;unit&gt;<br />static member TryCancelled : computation:Async&lt;&#39;T&gt; * compensation:(OperationCanceledException -&gt; unit) -&gt; Async&lt;&#39;T&gt;<br />static member CancellationToken : Async&lt;CancellationToken&gt;<br />static member DefaultCancellationToken : CancellationToken<br /><br />Full name: Microsoft.FSharp.Control.Async<br /><br />--------------------<br />type Async&lt;&#39;T&gt;<br /><br />Full name: Microsoft.FSharp.Control.Async&lt;_&gt;</div>
+<div class="tip" id="fs73">static member Async.StartImmediate : computation:Async&lt;unit&gt; * ?cancellationToken:System.Threading.CancellationToken -&gt; unit</div>
+<div class="tip" id="fs74">TypeScript.Api&lt;...&gt;.JQuery.click() : TypeScript.Api&lt;...&gt;.JQuery<br />TypeScript.Api&lt;...&gt;.JQuery.click(eventData: obj) : TypeScript.Api&lt;...&gt;.JQuery<br />TypeScript.Api&lt;...&gt;.JQuery.click(handler: System.Func&lt;TypeScript.Api&lt;...&gt;.JQueryEventObject,obj&gt;) : TypeScript.Api&lt;...&gt;.JQuery<br />TypeScript.Api&lt;...&gt;.JQuery.click(eventData: obj, handler: System.Func&lt;TypeScript.Api&lt;...&gt;.JQueryEventObject,obj&gt;) : TypeScript.Api&lt;...&gt;.JQuery</div>
+<div class="tip" id="fs75">val components : InternalCompiler.CompilerComponent list<br /><br />Full name: Program.components</div>
+<div class="tip" id="fs76">namespace FunScript.Data</div>
+<div class="tip" id="fs77">module Components<br /><br />from FunScript.Data</div>
+<div class="tip" id="fs78">val DataProviders : InternalCompiler.CompilerComponent list<br /><br />Full name: FunScript.Data.Components.DataProviders</div>
+<div class="tip" id="fs79">namespace FunScript.Interop</div>
+<div class="tip" id="fs80">module Components<br /><br />from FunScript.Interop</div>
+<div class="tip" id="fs81">val all : InternalCompiler.CompilerComponent list<br /><br />Full name: FunScript.Interop.Components.all</div>
+
+    </div>
+    <div class="large-3 columns">
+
+      <h3>Live demo</h3>
+      <p>Click here to open the sample live, running using JavaScript in a dialog window.</p>
+
+      <div style="margin-left:auto;margin-right:auto;text-align:center;">
+      <div id="run-button">
+			  <a data-reveal-id="sampleDialog" href="#" class="success button">Open sample</a>
+  		</div>
+      </div>
+
+      <p>To look at the generated JavaScript, view the source of this web page
+        and scroll to the end of the file.</p>
+
+      <h3>Samples</h3>
+      <p>Browse other samples to learn more about FunScript</p>
+      <ul>
+        <li><a href="tutorial.html">Getting started tutorial</a></li>
+        <li><a href="canvas.html">Using HTML5 canvas</a></li>
+        <li><a href="simpleasync.html">Asynchornous computations</a></li>
+        <li><a href="worldbank.html">Visualizing World Bank data</a></li>
+        <li><a href="moviedatabase.html">Calling The Movie Database</a></li>
+        <li><a href="brainfuck.html">Brainfuck interpreter!!</a></li>
+      </ul>
+
+    </div>
+	</div>
+
+  <div class="row"><div class="large-12 columns" id="footer">
+    FunScript is open-source project available under Apache 2.0 &#160; | &#160;  <a href="http://fsharp.org">The F# Software Foundation</a>
+  </div></div>
+
+  <!-- Fork me on GitHub link -->
+  <a href="https://github.com/ZachBray/FunScript"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+   
+  <!-- Some more Foundation references (always load jQuery, because samples use it) -->
+  <script src="http://www.funscript.info/js/vendor/jquery.js"></script>
+  <script src="http://www.funscript.info/js/foundation.min.js"></script>  
+  <script src="http://www.funscript.info/js/foundation/foundation.reveal.js"></script>
+  <script>
+    $(document).foundation();
+  </script>
+
+  <!-- JavaScript code from the sample goes here... -->
+  <script type="text/javascript">
+    $(document).ready(function () {
+
+
+Boolean.prototype.CompareTo = function(that) {
+   return this - that;
+};
+
+Number.prototype.CompareTo = function(that) {
+   return this - that;
+};
+
+String.prototype.CompareTo = function(that) {
+   return this > that
+      ? 1
+      : this < that
+         ? -1
+         : 0;
+};
+
+Array.prototype.CompareTo = function(that) {
+   var i = 0;
+   while(i < this.length && i < that.length) {
+      var diff = this[i].CompareTo(that[i]);
+      if(diff != 0) {
+         return diff;
+      }
+      i = i + 1;
+   };
+   return this.length - that.length;
+};
+
+var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__ctor, i_CreateEnumerable_1__ctor, i_CancellationToken__ctor, i_AsyncParams_1__ctor, i_AsyncParamsAux__ctor, i_AsyncBuilder__ctor, WorldBankRuntime_GetIndicators, WorldBankRuntime_GetCountry, WorldBankRuntime_GetCountries, WorldBankRuntime_AsyncGetIndicator, Utils_getJSON, Utils_encodeURIComponent, String_Join, Seq_Unfold, Seq_TryPickIndexedAux, Seq_TryPickIndexed, Seq_TryFind, Seq_ToArray, Seq_OfList, Seq_OfArray, Seq_Map2, Seq_Map, Seq_Length, Seq_IterateIndexed, Seq_FromFactory, Seq_FoldIndexedAux, Seq_FoldIndexed, Seq_Fold, Seq_Enumerator, Seq_Delay, Seq_CompareWith, Seq_Choose, Runtime_worldBankUrl, Program_main, Program_jQuery, Program_get_data, Program_data, Program_countries, List_Tail, List_Reverse, List_OfArray, List_MapIndexed, List_Map, List_Head, List_FoldIndexedAux, List_FoldIndexed, List_Fold, List_Empty, List_CreateCons, LanguagePrimitives_UnboxGeneric, JsRuntime_TryGetValueByTypeTag, JsRuntime_TryGetArrayChildByTypeTag, JsRuntime_Parse, JsRuntime_Identity2, JsRuntime_Identity, JsRuntime_GetProperty, JsRuntime_GetCulture, JsRuntime_GetArrayChildrenByTypeTag, JsRuntime_GetArrayChildByTypeTag, JsRuntime_ConvertArray, JsHelpers_jstypeof, JsHelpers_isNull, JsHelpers_isArray, FunScriptExtensions_number, FunScriptExtensions_floor, FunScriptExtensions_clone, FunScriptExtensions_Array_push, FSharpString_Concat, Async_setTimeout, Async_protectedCont, Async_invokeCont, Async_get_async, Async_StartImmediate, Async_FromContinuations, Async_1_Cont, Array_ZeroCreate, Array_MapIndexed, Array_Map, Array_Length, Array_FoldBackIndexed, Array_FoldBack, Array_Choose, Array_BoxedLength;
+  Array_BoxedLength = (function (xs)
+  {
+    return xs.length;
+  });
+  Array_Choose = (function (f, xs)
+  {
+    var ys = Array_ZeroCreate(0.000000);
+    var j = 0.000000;
+    for (var i = 0.000000; i <= (Array_Length(xs) - 1.000000); i++)
+    {
+      var matchValue = f(xs[i]);
+      if ((matchValue.Tag == "None")) 
+      {
+        ;
+      }
+      else
+      {
+        var y = matchValue.Value;
+        ys[j] = y;
+        null;
+        j = (j + 1.000000);
+        null;
+      };
+    };
+    return ys;
+  });
+  Array_FoldBack = (function (f, xs, seed)
+  {
+    return Array_FoldBackIndexed((function (_arg1)
+    {
+      return (function (x)
+      {
+        return (function (acc)
+        {
+          return f(x)(acc);
+        });
+      });
+    }), xs, seed);
+  });
+  Array_FoldBackIndexed = (function (f, xs, seed)
+  {
+    var acc = seed;
+    var size = Array_Length(xs);
+    for (var i = 1.000000; i <= size; i++)
+    {
+      acc = f((i - 1.000000))(xs[(size - i)])(acc);
+      null;
+    };
+    return acc;
+  });
+  Array_Length = (function (xs)
+  {
+    return xs.length;
+  });
+  Array_Map = (function (f, xs)
+  {
+    return Array_MapIndexed((function (_arg1)
+    {
+      return (function (x)
+      {
+        return f(x);
+      });
+    }), xs);
+  });
+  Array_MapIndexed = (function (f, xs)
+  {
+    var ys = Array_ZeroCreate(Array_Length(xs));
+    for (var i = 0.000000; i <= (Array_Length(xs) - 1.000000); i++)
+    {
+      ys[i] = f(i)(xs[i]);
+      null;
+    };
+    return ys;
+  });
+  Array_ZeroCreate = (function (size)
+  {
+    return new Array(size);
+  });
+  Async_1_Cont = (function (Item)
+  {
+    this.Tag = "Cont";
+    this.Item = Item;
+  });
+  Async_FromContinuations = (function (f)
+  {
+    return (function (_f)
+    {
+      return Async_protectedCont(_f);
+    })((function (k)
+    {
+      return f({CompareTo: (function (that)
+      {
+        var diff;
+        return 0.000000;
+      }), Item1: k.Cont, Item2: k.Aux.ExceptionCont, Item3: k.Aux.CancelledCont});
+    }));
+  });
+  Async_StartImmediate = (function (workflow, cancellationToken)
+  {
+    var _temp208;
+    if ((cancellationToken.Tag == "Some")) 
+    {
+      var v = cancellationToken.Value;
+      _temp208 = v;
+    }
+    else
+    {
+      _temp208 = (new i_CancellationToken__ctor({Tag: "None"}));
+    };
+    var token = _temp208;
+    var f = workflow.Item;
+    var aux = (new i_AsyncParamsAux__ctor({contents: 0.000000}, (function (value)
+    {
+      ;
+    }), (function (value)
+    {
+      ;
+    }), token));
+    return f((new i_AsyncParams_1__ctor((function (value)
+    {
+      ;
+    }), aux)));
+  });
+  Async_get_async = (function ()
+  {
+    return (new i_AsyncBuilder__ctor());
+  });
+  Async_invokeCont = (function (k, value)
+  {
+    return k.Cont(value);
+  });
+  Async_protectedCont = (function (f)
+  {
+    return (new Async_1_Cont((function (args)
+    {
+      args.Aux.CancellationToken.ThrowIfCancellationRequested();
+      args.Aux.StackCounter.contents = (args.Aux.StackCounter.contents + 1.000000);
+      null;
+      if ((args.Aux.StackCounter.contents.CompareTo(1000.000000) > 0.000000)) 
+      {
+        args.Aux.StackCounter.contents = 0.000000;
+        null;
+        return Async_setTimeout((function (unitVar0)
+        {
+          return f(args);
+        }), 1.000000);
+      }
+      else
+      {
+        return f(args);
+      };
+    })));
+  });
+  Async_setTimeout = (function (handler, milliseconds)
+  {
+    return setTimeout(handler, milliseconds);
+  });
+  FSharpString_Concat = (function (sep, strings)
+  {
+    return String_Join(sep, Seq_ToArray(strings));
+  });
+  FunScriptExtensions_Array_push = (function (x, element)
+  {
+    return x.push(element);
+  });
+  FunScriptExtensions_clone = (function (obj, args)
+  {
+    return new obj(args);
+  });
+  FunScriptExtensions_floor = (function (n)
+  {
+    return Math.floor(n);
+  });
+  FunScriptExtensions_number = (function (a)
+  {
+    return a*1.0;
+  });
+  JsHelpers_isArray = (function (o)
+  {
+    return Array.isArray(o);
+  });
+  JsHelpers_isNull = (function (o)
+  {
+    return o==null;
+  });
+  JsHelpers_jstypeof = (function (o)
+  {
+    return typeof(o);
+  });
+  JsRuntime_ConvertArray = (function (value, packer, f)
+  {
+    return value;
+  });
+  JsRuntime_GetArrayChildByTypeTag = (function (value, tag)
+  {
+    var arr = JsRuntime_GetArrayChildrenByTypeTag(value, tag, (function (x)
+    {
+      return x;
+    }), (function (x)
+    {
+      return x;
+    }));
+    if ((Array_BoxedLength(arr).CompareTo(1.000000) == 0.000000)) 
+    {
+      return arr[0.000000];
+    }
+    else
+    {
+      throw ("JSON mismatch: Expected single value, but found multiple.");
+      return null;
+    };
+  });
+  JsRuntime_GetArrayChildrenByTypeTag = (function (doc, tag, pack, f)
+  {
+    var matchTag = (function (value)
+    {
+      if (JsHelpers_isNull(value)) 
+      {
+        return {Tag: "None"};
+      }
+      else
+      {
+        if (((JsHelpers_jstypeof(value).CompareTo("boolean") == 0.000000) && (tag.CompareTo("Boolean") == 0.000000))) 
+        {
+          return {Tag: "Some", Value: value};
+        }
+        else
+        {
+          if (((JsHelpers_jstypeof(value).CompareTo("number") == 0.000000) && (tag.CompareTo("Number") == 0.000000))) 
+          {
+            return {Tag: "Some", Value: value};
+          }
+          else
+          {
+            if (((JsHelpers_jstypeof(value).CompareTo("string") == 0.000000) && (tag.CompareTo("Number") == 0.000000))) 
+            {
+              return {Tag: "Some", Value: (1.000000 * value)};
+            }
+            else
+            {
+              if (((JsHelpers_jstypeof(value).CompareTo("string") == 0.000000) && (tag.CompareTo("String") == 0.000000))) 
+              {
+                return {Tag: "Some", Value: value};
+              }
+              else
+              {
+                if ((JsHelpers_isArray(value) && (tag.CompareTo("Array") == 0.000000))) 
+                {
+                  return {Tag: "Some", Value: value};
+                }
+                else
+                {
+                  if (((JsHelpers_jstypeof(value).CompareTo("object") == 0.000000) && (tag.CompareTo("Record") == 0.000000))) 
+                  {
+                    return {Tag: "Some", Value: value};
+                  }
+                  else
+                  {
+                    return {Tag: "None"};
+                  };
+                };
+              };
+            };
+          };
+        };
+      };
+    });
+    if (JsHelpers_isArray(doc)) 
+    {
+      var _temp87;
+      var mapping = (function (x)
+      {
+        return f((function (_x)
+        {
+          return pack((function (value)
+          {
+            return value;
+          })(_x));
+        })(x));
+      });
+      _temp87 = (function (array)
+      {
+        return Array_Map(mapping, array);
+      });
+      var _temp89;
+      var _temp90;
+      var chooser = matchTag;
+      _temp90 = (function (array)
+      {
+        return Array_Choose(chooser, array);
+      });
+      _temp89 = _temp90((function (value)
+      {
+        return value;
+      })(doc));
+      return _temp87(_temp89);
+    }
+    else
+    {
+      throw ("JSON mismatch: Expected Array node");
+      return null;
+    };
+  });
+  JsRuntime_GetCulture = (function (name)
+  {
+    return null;
+  });
+  JsRuntime_GetProperty = (function (json, name)
+  {
+    return json[name];
+  });
+  JsRuntime_Identity = (function (arg)
+  {
+    return arg;
+  });
+  JsRuntime_Identity2 = (function (arg, culture)
+  {
+    return arg;
+  });
+  JsRuntime_Parse = (function (source, culture)
+  {
+    var it = source; return (typeof(it)=="string") ? eval("(function(a){return a;})(" + it + ")") : it;
+  });
+  JsRuntime_TryGetArrayChildByTypeTag = (function (doc, tag, pack, f)
+  {
+    var arr = JsRuntime_GetArrayChildrenByTypeTag(doc, tag, pack, f);
+    if ((Array_BoxedLength(arr).CompareTo(1.000000) == 0.000000)) 
+    {
+      return {Tag: "Some", Value: arr[0.000000]};
+    }
+    else
+    {
+      if ((Array_BoxedLength(arr).CompareTo(0.000000) == 0.000000)) 
+      {
+        return {Tag: "None"};
+      }
+      else
+      {
+        throw ("JSON mismatch: Expected Array with single or no elements.");
+        return null;
+      };
+    };
+  });
+  JsRuntime_TryGetValueByTypeTag = (function (value, tag, pack, f)
+  {
+    var arrayValue = [value];
+    return JsRuntime_TryGetArrayChildByTypeTag(arrayValue, tag, pack, f);
+  });
+  LanguagePrimitives_UnboxGeneric = (function (x)
+  {
+    return x;
+  });
+  List_CreateCons = (function (x, xs)
+  {
+    return (new list_1_Cons(x, xs));
+  });
+  List_Empty = (function ()
+  {
+    return (new list_1_Nil());
+  });
+  List_Fold = (function (f, seed, xs)
+  {
+    return List_FoldIndexed((function (_arg1)
+    {
+      return (function (acc)
+      {
+        return (function (x)
+        {
+          return f(acc)(x);
+        });
+      });
+    }), seed, xs);
+  });
+  List_FoldIndexed = (function (f, seed, xs)
+  {
+    return List_FoldIndexedAux(f, 0.000000, seed, xs);
+  });
+  List_FoldIndexedAux = (function (f, i, acc, _arg1)
+  {
+    if ((_arg1.Tag == "Cons")) 
+    {
+      var xs = _arg1.Item2;
+      var x = _arg1.Item1;
+      return List_FoldIndexedAux(f, (i + 1.000000), f(i)(acc)(x), xs);
+    }
+    else
+    {
+      return acc;
+    };
+  });
+  List_Head = (function (_arg1)
+  {
+    if ((_arg1.Tag == "Cons")) 
+    {
+      var xs = _arg1.Item2;
+      var x = _arg1.Item1;
+      return x;
+    }
+    else
+    {
+      throw ("List was empty");
+      return null;
+    };
+  });
+  List_Map = (function (f, xs)
+  {
+    return (function (_xs)
+    {
+      return List_Reverse(_xs);
+    })(List_Fold((function (acc)
+    {
+      return (function (x)
+      {
+        return (new list_1_Cons(f(x), acc));
+      });
+    }), (new list_1_Nil()), xs));
+  });
+  List_MapIndexed = (function (f, xs)
+  {
+    return (function (_xs)
+    {
+      return List_Reverse(_xs);
+    })(List_FoldIndexed((function (i)
+    {
+      return (function (acc)
+      {
+        return (function (x)
+        {
+          return (new list_1_Cons(f(i)(x), acc));
+        });
+      });
+    }), (new list_1_Nil()), xs));
+  });
+  List_OfArray = (function (xs)
+  {
+    return Array_FoldBack((function (x)
+    {
+      return (function (acc)
+      {
+        return (new list_1_Cons(x, acc));
+      });
+    }), xs, (new list_1_Nil()));
+  });
+  List_Reverse = (function (xs)
+  {
+    return List_Fold((function (acc)
+    {
+      return (function (x)
+      {
+        return (new list_1_Cons(x, acc));
+      });
+    }), (new list_1_Nil()), xs);
+  });
+  List_Tail = (function (_arg1)
+  {
+    if ((_arg1.Tag == "Cons")) 
+    {
+      var xs = _arg1.Item2;
+      var x = _arg1.Item1;
+      return xs;
+    }
+    else
+    {
+      throw ("List was empty");
+      return null;
+    };
+  });
+  Program_countries = (function (unitVar0)
+  {
+    var _temp2;
+    var var0 = WorldBankRuntime_GetCountries(Program_data);
+    _temp2 = WorldBankRuntime_GetCountry(var0, "ARB", "Arab World");
+    var _temp3;
+    var _var0 = WorldBankRuntime_GetCountries(Program_data);
+    _temp3 = WorldBankRuntime_GetCountry(_var0, "EUU", "European Union");
+    var _temp4;
+    var __var0 = WorldBankRuntime_GetCountries(Program_data);
+    _temp4 = WorldBankRuntime_GetCountry(__var0, "AUS", "Australia");
+    var _temp5;
+    var ___var0 = WorldBankRuntime_GetCountries(Program_data);
+    _temp5 = WorldBankRuntime_GetCountry(___var0, "BRA", "Brazil");
+    var _temp6;
+    var ____var0 = WorldBankRuntime_GetCountries(Program_data);
+    _temp6 = WorldBankRuntime_GetCountry(____var0, "CAN", "Canada");
+    var _temp7;
+    var _____var0 = WorldBankRuntime_GetCountries(Program_data);
+    _temp7 = WorldBankRuntime_GetCountry(_____var0, "CHL", "Chile");
+    var _temp8;
+    var ______var0 = WorldBankRuntime_GetCountries(Program_data);
+    _temp8 = WorldBankRuntime_GetCountry(______var0, "CZE", "Czech Republic");
+    var _temp9;
+    var _______var0 = WorldBankRuntime_GetCountries(Program_data);
+    _temp9 = WorldBankRuntime_GetCountry(_______var0, "DNK", "Denmark");
+    var _temp10;
+    var ________var0 = WorldBankRuntime_GetCountries(Program_data);
+    _temp10 = WorldBankRuntime_GetCountry(________var0, "FRA", "France");
+    var _temp11;
+    var _________var0 = WorldBankRuntime_GetCountries(Program_data);
+    _temp11 = WorldBankRuntime_GetCountry(_________var0, "GRC", "Greece");
+    var _temp12;
+    var __________var0 = WorldBankRuntime_GetCountries(Program_data);
+    _temp12 = WorldBankRuntime_GetCountry(__________var0, "LIC", "Low income");
+    var _temp13;
+    var ___________var0 = WorldBankRuntime_GetCountries(Program_data);
+    _temp13 = WorldBankRuntime_GetCountry(___________var0, "HIC", "High income");
+    var _temp14;
+    var ____________var0 = WorldBankRuntime_GetCountries(Program_data);
+    _temp14 = WorldBankRuntime_GetCountry(____________var0, "GBR", "United Kingdom");
+    var _temp15;
+    var _____________var0 = WorldBankRuntime_GetCountries(Program_data);
+    _temp15 = WorldBankRuntime_GetCountry(_____________var0, "USA", "United States");
+    return [_temp2, _temp3, _temp4, _temp5, _temp6, _temp7, _temp8, _temp9, _temp10, _temp11, _temp12, _temp13, _temp14, _temp15];
+  });
+  Program_get_data = (function ()
+  {
+    return {ServiceUrl: "http://api.worldbank.org", Source: "World Development Indicators"};
+  });
+  Program_jQuery = (function (command)
+  {
+    return jQuery(command);
+  });
+  Program_main = (function (unitVar0)
+  {
+    var _temp16;
+    var _temp17;
+    var mapping = (function (index)
+    {
+      return (function (country)
+      {
+        var input = Program_jQuery("\u003cinput\u003e");
+        (function (value)
+        {
+          ;
+        })(input.attr("type", "checkbox"));
+        var label = Program_jQuery("\u003clabel\u003e");
+        (function (value)
+        {
+          ;
+        })(label.append([input]));
+        (function (value)
+        {
+          ;
+        })(label.append([country.Name]));
+        var panel = (FunScriptExtensions_floor((index % 3.000000)) + 1.000000);
+        (function (value)
+        {
+          ;
+        })(label.appendTo(Program_jQuery(("#countryList" + panel.toString()))));
+        return {CompareTo: (function (that)
+        {
+          var diff;
+          return 0.000000;
+        }), Item1: country, Item2: input};
+      });
+    });
+    _temp17 = (function (list)
+    {
+      return List_MapIndexed(mapping, list);
+    });
+    _temp16 = _temp17((function (array)
+    {
+      return List_OfArray(array);
+    })(Program_countries()));
+    var infos = _temp16;
+    var render = (function (_unitVar0)
+    {
+      return (function (builder_)
+      {
+        return builder_.Delay((function (unitVar)
+        {
+          var opts = {};
+          var _temp18;
+          var returnVal = {};
+          returnVal.renderTo = "chart";
+          null;
+          returnVal.type = "line";
+          null;
+          _temp18 = returnVal;
+          opts.chart = _temp18;
+          null;
+          var _temp19;
+          var _returnVal = {};
+          _returnVal.text = "School enrollment, tertiary (% gross)";
+          null;
+          _temp19 = _returnVal;
+          opts.title = _temp19;
+          null;
+          opts.series = [];
+          null;
+          var series = {contents: List_Empty()};
+          return builder_.Combine(builder_.For(Seq_OfList(infos), (function (_arg1)
+          {
+            var country = _arg1.Item1;
+            var check = _arg1.Item2;
+            if ((function (value)
+            {
+              return value;
+            })(check.is(":checked"))) 
+            {
+              var _temp188;
+              var var0 = WorldBankRuntime_GetIndicators(country);
+              _temp188 = WorldBankRuntime_AsyncGetIndicator(var0, "SE.TER.ENRR");
+              return builder_.Bind(_temp188, (function (_arg2)
+              {
+                var vals = _arg2;
+                var _temp193;
+                var _temp195;
+                var _temp196;
+                var _mapping = (function (tupledArg)
+                {
+                  var k = tupledArg.Item1;
+                  var v = tupledArg.Item2;
+                  return [FunScriptExtensions_number(k), FunScriptExtensions_number(v)];
+                });
+                _temp196 = (function (source)
+                {
+                  return Seq_Map(_mapping, source);
+                });
+                _temp195 = _temp196(vals);
+                _temp193 = (function (source)
+                {
+                  return Seq_ToArray(source);
+                })(_temp195);
+                var data = _temp193;
+                var _temp197;
+                var __returnVal = {};
+                __returnVal.data = data;
+                null;
+                __returnVal.name = country.Name;
+                null;
+                _temp197 = __returnVal;
+                FunScriptExtensions_Array_push(opts.series, _temp197);
+                return builder_.Zero();
+              }));
+            }
+            else
+            {
+              return builder_.Zero();
+            };
+          })), builder_.Delay((function (_unitVar)
+          {
+            (function (value)
+            {
+              ;
+            })(FunScriptExtensions_clone(Highcharts.Chart, opts));
+            return builder_.Zero();
+          })));
+        }));
+      })(Async_get_async());
+    });
+    var _temp210;
+    var _temp211;
+    _temp210 = render(_temp211);
+    (function (arg00)
+    {
+      return Async_StartImmediate(arg00, {Tag: "None"});
+    })(_temp210);
+    var enumerator = Seq_OfList(infos).GetEnumerator();
+    try
+    {
+      while (enumerator.MoveNext())
+      {
+        var forLoopVar = enumerator.get_Current();
+        var check = forLoopVar.Item2;
+        (function (value)
+        {
+          ;
+        })(check.click((function (_arg1)
+        {
+          var _temp215;
+          var _temp217;
+          var _temp218;
+          _temp217 = render(_temp218);
+          _temp215 = (function (arg00)
+          {
+            return Async_StartImmediate(arg00, {Tag: "None"});
+          })(_temp217);
+          return (function (value)
+          {
+            return value;
+          })(_temp215);
+        })));
+      };
+    }
+    finally{
+      if (false) 
+      {
+        LanguagePrimitives_UnboxGeneric(enumerator).Dispose();
+      }
+      else
+      {
+        ;
+      };
+    };
+  });
+  Runtime_worldBankUrl = (function (wb, functions, props)
+  {
+    var _temp58;
+    var _temp68;
+    var _temp73;
+    var _temp74;
+    var sep = "";
+    _temp74 = (function (strings)
+    {
+      return FSharpString_Concat(sep, Seq_OfList(strings));
+    });
+    var _temp76;
+    var _temp77;
+    var mapping = (function (m)
+    {
+      return ("/" + Utils_encodeURIComponent(m));
+    });
+    _temp77 = (function (list)
+    {
+      return List_Map(mapping, list);
+    });
+    _temp76 = _temp77(functions);
+    _temp73 = _temp74(_temp76);
+    _temp68 = ((wb.ServiceUrl + "/") + _temp73);
+    _temp58 = (_temp68 + "?per_page=1000");
+    var _temp82;
+    var _temp83;
+    var _sep = "";
+    _temp83 = (function (strings)
+    {
+      return FSharpString_Concat(_sep, Seq_OfList(strings));
+    });
+    var _temp85;
+    var _temp86;
+    var _mapping = (function (tupledArg)
+    {
+      var key = tupledArg.Item1;
+      var value = tupledArg.Item2;
+      return ((("\u0026" + key) + "=") + Utils_encodeURIComponent(value));
+    });
+    _temp86 = (function (list)
+    {
+      return List_Map(_mapping, list);
+    });
+    _temp85 = _temp86(props);
+    _temp82 = _temp83(_temp85);
+    return (_temp58 + _temp82);
+  });
+  Seq_Choose = (function (f, xs)
+  {
+    var trySkipToNext;
+    trySkipToNext = (function (_enum)
+    {
+      if (_enum.MoveNext()) 
+      {
+        var matchValue = f(_enum.get_Current());
+        if ((matchValue.Tag == "Some")) 
+        {
+          var value = matchValue.Value;
+          return {Tag: "Some", Value: {CompareTo: (function (that)
+          {
+            var diff;
+            return 0.000000;
+          }), Item1: value, Item2: _enum}};
+        }
+        else
+        {
+          return trySkipToNext(_enum);
+        };
+      }
+      else
+      {
+        return {Tag: "None"};
+      };
+    });
+    return (function (_f)
+    {
+      return Seq_Delay(_f);
+    })((function (unitVar0)
+    {
+      var _temp114;
+      var _f = trySkipToNext;
+      _temp114 = (function (seed)
+      {
+        return Seq_Unfold(_f, seed);
+      });
+      return _temp114(Seq_Enumerator(xs));
+    }));
+  });
+  Seq_CompareWith = (function (f, xs, ys)
+  {
+    var _temp33;
+    var _temp34;
+    var _f = (function (i)
+    {
+      return (i.CompareTo(0.000000) != 0.000000);
+    });
+    _temp34 = (function (_xs)
+    {
+      return Seq_TryFind(_f, _xs);
+    });
+    _temp33 = _temp34(Seq_Map2((function (x)
+    {
+      return (function (y)
+      {
+        return f(x)(y);
+      });
+    }), xs, ys));
+    var nonZero = _temp33;
+    if ((nonZero.Tag == "None")) 
+    {
+      return (Seq_Length(xs) - Seq_Length(ys));
+    }
+    else
+    {
+      var diff = nonZero.Value;
+      return diff;
+    };
+  });
+  Seq_Delay = (function (f)
+  {
+    return Seq_FromFactory((function (unitVar0)
+    {
+      var _temp23;
+      var _temp24;
+      _temp23 = f(_temp24);
+      return Seq_Enumerator(_temp23);
+    }));
+  });
+  Seq_Enumerator = (function (xs)
+  {
+    return xs.GetEnumerator();
+  });
+  Seq_Fold = (function (f, seed, xs)
+  {
+    return Seq_FoldIndexed((function (_arg1)
+    {
+      return (function (acc)
+      {
+        return (function (x)
+        {
+          return f(acc)(x);
+        });
+      });
+    }), seed, xs);
+  });
+  Seq_FoldIndexed = (function (f, seed, xs)
+  {
+    return Seq_FoldIndexedAux(f, 0.000000, seed, Seq_Enumerator(xs));
+  });
+  Seq_FoldIndexedAux = (function (f, i, acc, xs)
+  {
+    if (xs.MoveNext()) 
+    {
+      return Seq_FoldIndexedAux(f, (i + 1.000000), f(i)(acc)(xs.get_Current()), xs);
+    }
+    else
+    {
+      return acc;
+    };
+  });
+  Seq_FromFactory = (function (f)
+  {
+    return (new i_CreateEnumerable_1__ctor(f));
+  });
+  Seq_IterateIndexed = (function (f, xs)
+  {
+    var _temp37;
+    return Seq_FoldIndexed((function (i)
+    {
+      return (function (unitVar1)
+      {
+        return (function (x)
+        {
+          return f(i)(x);
+        });
+      });
+    }), _temp37, xs);
+  });
+  Seq_Length = (function (xs)
+  {
+    return Seq_Fold((function (count)
+    {
+      return (function (_arg1)
+      {
+        return (count + 1.000000);
+      });
+    }), 0.000000, xs);
+  });
+  Seq_Map = (function (f, xs)
+  {
+    return (function (_f)
+    {
+      return Seq_Delay(_f);
+    })((function (unitVar0)
+    {
+      var _temp189;
+      var _f = (function (_enum)
+      {
+        if (_enum.MoveNext()) 
+        {
+          return {Tag: "Some", Value: {CompareTo: (function (that)
+          {
+            var diff;
+            return 0.000000;
+          }), Item1: f(_enum.get_Current()), Item2: _enum}};
+        }
+        else
+        {
+          return {Tag: "None"};
+        };
+      });
+      _temp189 = (function (seed)
+      {
+        return Seq_Unfold(_f, seed);
+      });
+      return _temp189(Seq_Enumerator(xs));
+    }));
+  });
+  Seq_Map2 = (function (f, xs, ys)
+  {
+    return (function (_f)
+    {
+      return Seq_Delay(_f);
+    })((function (unitVar0)
+    {
+      var _xs = Seq_Enumerator(xs);
+      var _ys = Seq_Enumerator(ys);
+      var _temp28;
+      var _f = (function (_unitVar0)
+      {
+        if ((_xs.MoveNext() && _ys.MoveNext())) 
+        {
+          var _temp30;
+          var _temp31;
+          _temp30 = {CompareTo: (function (that)
+          {
+            var diff;
+            return 0.000000;
+          }), Item1: f(_xs.get_Current())(_ys.get_Current()), Item2: _temp31};
+          return {Tag: "Some", Value: _temp30};
+        }
+        else
+        {
+          return {Tag: "None"};
+        };
+      });
+      _temp28 = (function (seed)
+      {
+        return Seq_Unfold(_f, seed);
+      });
+      var _temp32;
+      return _temp28(_temp32);
+    }));
+  });
+  Seq_OfArray = (function (xs)
+  {
+    var _temp139;
+    var f = (function (i)
+    {
+      if ((i.CompareTo(Array_BoxedLength(xs)) < 0.000000)) 
+      {
+        return {Tag: "Some", Value: {CompareTo: (function (that)
+        {
+          var diff;
+          return 0.000000;
+        }), Item1: xs[i], Item2: (i + 1.000000)}};
+      }
+      else
+      {
+        return {Tag: "None"};
+      };
+    });
+    _temp139 = (function (seed)
+    {
+      return Seq_Unfold(f, seed);
+    });
+    return _temp139(0.000000);
+  });
+  Seq_OfList = (function (xs)
+  {
+    var _temp36;
+    var f = (function (_arg1)
+    {
+      if ((_arg1.Tag == "Cons")) 
+      {
+        var _xs = List_Tail(_arg1);
+        var x = List_Head(_arg1);
+        return {Tag: "Some", Value: {CompareTo: (function (that)
+        {
+          var diff;
+          return 0.000000;
+        }), Item1: x, Item2: _xs}};
+      }
+      else
+      {
+        return {Tag: "None"};
+      };
+    });
+    _temp36 = (function (seed)
+    {
+      return Seq_Unfold(f, seed);
+    });
+    return _temp36(xs);
+  });
+  Seq_ToArray = (function (xs)
+  {
+    var ys = Array_ZeroCreate(Seq_Length(xs));
+    var _temp38;
+    var f = (function (i)
+    {
+      return (function (x)
+      {
+        ys[i] = x;
+        return null;
+      });
+    });
+    _temp38 = (function (_xs)
+    {
+      return Seq_IterateIndexed(f, _xs);
+    });
+    _temp38(xs);
+    return ys;
+  });
+  Seq_TryFind = (function (f, xs)
+  {
+    return Seq_TryPickIndexed((function (_arg1)
+    {
+      return (function (x)
+      {
+        if (f(x)) 
+        {
+          return {Tag: "Some", Value: x};
+        }
+        else
+        {
+          return {Tag: "None"};
+        };
+      });
+    }), xs);
+  });
+  Seq_TryPickIndexed = (function (f, xs)
+  {
+    return Seq_TryPickIndexedAux(f, 0.000000, Seq_Enumerator(xs));
+  });
+  Seq_TryPickIndexedAux = (function (f, i, xs)
+  {
+    if (xs.MoveNext()) 
+    {
+      var result = f(i)(xs.get_Current());
+      if ((result.Tag == "None")) 
+      {
+        return Seq_TryPickIndexedAux(f, (i + 1.000000), xs);
+      }
+      else
+      {
+        return result;
+      };
+    }
+    else
+    {
+      return {Tag: "None"};
+    };
+  });
+  Seq_Unfold = (function (f, seed)
+  {
+    return Seq_FromFactory((function (unitVar0)
+    {
+      return (new i_UnfoldEnumerator_2__ctor(seed, f));
+    }));
+  });
+  String_Join = (function (separator, s)
+  {
+    return s.join(separator);
+  });
+  Utils_encodeURIComponent = (function (s)
+  {
+    return encodeURIComponent(s);
+  });
+  Utils_getJSON = (function (url, callback)
+  {
+    return $.getJSON(url, callback);
+  });
+  WorldBankRuntime_AsyncGetIndicator = (function (country, indicator)
+  {
+    return Async_FromContinuations((function (tupledArg)
+    {
+      var cont = tupledArg.Item1;
+      var econt = tupledArg.Item2;
+      var ccont = tupledArg.Item3;
+      var wb = country.Context;
+      var countryCode = country.Code;
+      var url = Runtime_worldBankUrl(wb, List_CreateCons("countries", List_CreateCons(countryCode, List_CreateCons("indicators", List_CreateCons(indicator, List_Empty())))), List_CreateCons({CompareTo: (function (that)
+      {
+        var diff;
+        return 0.000000;
+      }), Item1: "date", Item2: "1900:2050"}, List_CreateCons({CompareTo: (function (that)
+      {
+        var diff;
+        return 0.000000;
+      }), Item1: "format", Item2: "jsonp"}, List_Empty())));
+      return Utils_getJSON((url + "\u0026prefix=?"), (function (json)
+      {
+        var data = JsRuntime_Identity(JsRuntime_Parse(json, null));
+        var _temp140;
+        var _temp164;
+        var chooser = (function (v)
+        {
+          if (JsHelpers_isNull(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(v), "value")))) 
+          {
+            return {Tag: "None"};
+          }
+          else
+          {
+            var _temp176;
+            var _temp182;
+            var _temp185;
+            var _temp187;
+            var var0 = JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(v), "value"));
+            _temp187 = JsRuntime_TryGetValueByTypeTag(JsRuntime_Identity(var0), "Number", (function (t)
+            {
+              return JsRuntime_Identity(t);
+            }), (function (t)
+            {
+              return JsRuntime_Identity2(JsRuntime_Identity(t), "");
+            }));
+            _temp185 = _temp187.Value;
+            _temp182 = _temp185;
+            _temp176 = {CompareTo: (function (that)
+            {
+              var diff;
+              return 0.000000;
+            }), Item1: JsRuntime_Identity2(JsRuntime_Identity(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(v), "date"))), ""), Item2: _temp182};
+            return {Tag: "Some", Value: _temp176};
+          };
+        });
+        _temp164 = (function (source)
+        {
+          return Seq_Choose(chooser, source);
+        });
+        _temp140 = _temp164((function (source)
+        {
+          return Seq_OfArray(source);
+        })(JsRuntime_ConvertArray(JsRuntime_Identity(JsRuntime_Identity(JsRuntime_GetArrayChildByTypeTag(JsRuntime_Identity(data), "Array"))), (function (t)
+        {
+          return JsRuntime_Identity(t);
+        }), (function (t)
+        {
+          return t;
+        }))));
+        var res = _temp140;
+        return cont(res);
+      }));
+    }));
+  });
+  WorldBankRuntime_GetCountries = (function (data)
+  {
+    return data;
+  });
+  WorldBankRuntime_GetCountry = (function (countries, code, name)
+  {
+    return (new i_WorldBankCountry__ctor(countries, code, name));
+  });
+  WorldBankRuntime_GetIndicators = (function (country)
+  {
+    return country;
+  });
+  i_AsyncBuilder__ctor = (function (unitVar0)
+  {
+    ;
+  });
+  i_AsyncBuilder__ctor.prototype.Bind = (function (_arg1, f)
+  {
+    var x = this;
+    var v = _arg1.Item;
+    return (function (_f)
+    {
+      return Async_protectedCont(_f);
+    })((function (k)
+    {
+      var cont = (function (a)
+      {
+        var patternInput = f(a);
+        var r = patternInput.Item;
+        return r(k);
+      });
+      return v((new i_AsyncParams_1__ctor(cont, k.Aux)));
+    }));
+  });
+  i_AsyncBuilder__ctor.prototype.Delay = (function (f)
+  {
+    var x = this;
+    return (function (_f)
+    {
+      return Async_protectedCont(_f);
+    })((function (k)
+    {
+      var _temp199;
+      var _temp200;
+      _temp199 = f(_temp200);
+      var patternInput = _temp199;
+      var r = patternInput.Item;
+      return r(k);
+    }));
+  });
+  i_AsyncBuilder__ctor.prototype.Zero = (function (unitVar1)
+  {
+    var x = this;
+    return (function (f)
+    {
+      return Async_protectedCont(f);
+    })((function (k)
+    {
+      var _temp201;
+      return Async_invokeCont(k, _temp201);
+    }));
+  });
+  i_AsyncBuilder__ctor.prototype.ReturnFrom = (function (w)
+  {
+    var x = this;
+    return w;
+  });
+  i_AsyncBuilder__ctor.prototype.Return = (function (v)
+  {
+    var x = this;
+    return (function (f)
+    {
+      return Async_protectedCont(f);
+    })((function (k)
+    {
+      return Async_invokeCont(k, v);
+    }));
+  });
+  i_AsyncBuilder__ctor.prototype.While = (function (cond, body)
+  {
+    var __ = this;
+    var x = __;
+    var loop;
+    loop = (function (unitVar0)
+    {
+      var _temp204;
+      var _temp205;
+      _temp204 = cond(_temp205);
+      if (_temp204) 
+      {
+        return x.Bind(body, loop);
+      }
+      else
+      {
+        return x.Zero();
+      };
+    });
+    var _temp202;
+    return loop(_temp202);
+  });
+  i_AsyncBuilder__ctor.prototype.Combine = (function (work1, work2)
+  {
+    var __ = this;
+    return __.Bind(work1, (function (unitVar0)
+    {
+      return work2;
+    }));
+  });
+  i_AsyncBuilder__ctor.prototype.For = (function (seq, body)
+  {
+    var __ = this;
+    var en = seq.GetEnumerator();
+    var x = __;
+    var loop;
+    loop = (function (unitVar0)
+    {
+      if (en.MoveNext()) 
+      {
+        return x.Bind(body(en.get_Current()), loop);
+      }
+      else
+      {
+        return x.Zero();
+      };
+    });
+    var _temp206;
+    return loop(_temp206);
+  });
+  i_AsyncParamsAux__ctor = (function (StackCounter, ExceptionCont, CancelledCont, CancellationToken)
+  {
+    this.StackCounter = StackCounter;
+    this.ExceptionCont = ExceptionCont;
+    this.CancelledCont = CancelledCont;
+    this.CancellationToken = CancellationToken;
+  });
+  i_AsyncParams_1__ctor = (function (Cont, Aux)
+  {
+    this.Cont = Cont;
+    this.Aux = Aux;
+  });
+  i_CancellationToken__ctor = (function (Cell)
+  {
+    this.Cell = Cell;
+  });
+  i_CancellationToken__ctor.prototype.ThrowIfCancellationRequested = (function (unitVar1)
+  {
+    var x = this;
+    var matchValue = x.Cell;
+    if ((matchValue.Tag == "Some")) 
+    {
+      var _temp207;
+      var cell = matchValue.Value;
+      _temp207 = cell.contents;
+      if (_temp207) 
+      {
+        var _cell = matchValue.Value;
+        throw ("OperationCancelledException");
+        return null;
+      }
+      else
+      {
+        ;
+      };
+    }
+    else
+    {
+      ;
+    };
+  });
+  i_CreateEnumerable_1__ctor = (function (factory)
+  {
+    this.factory = factory;
+  });
+  i_CreateEnumerable_1__ctor.prototype.CompareTo = (function (ys)
+  {
+    var __ = this;
+    var xs = __;
+    return Seq_CompareWith((function (x)
+    {
+      return (function (y)
+      {
+        return LanguagePrimitives_UnboxGeneric(x).CompareTo(y);
+      });
+    }), xs, ys);
+  });
+  i_CreateEnumerable_1__ctor.prototype.GetEnumerator = (function (unitVar1)
+  {
+    var __ = this;
+    var _temp35;
+    return __.factory(_temp35);
+  });
+  i_UnfoldEnumerator_2__ctor = (function (seed, unfold)
+  {
+    this.seed = seed;
+    this.unfold = unfold;
+    this.acc = {Tag: "Some", Value: this.seed};
+    this.current = null;
+  });
+  i_UnfoldEnumerator_2__ctor.prototype.Reset = (function (unitVar1)
+  {
+    var __ = this;
+    __.acc = {Tag: "Some", Value: __.seed};
+    __.current = null;
+  });
+  i_UnfoldEnumerator_2__ctor.prototype.get_Current = (function (unitVar1)
+  {
+    var __ = this;
+    return __.current;
+  });
+  i_UnfoldEnumerator_2__ctor.prototype.MoveNext = (function (unitVar1)
+  {
+    var __ = this;
+    var matchValue = __.acc;
+    var _temp20;
+    var currAcc = matchValue.Value;
+    var _matchValue = __.unfold(currAcc);
+    if ((_matchValue.Tag == "Some")) 
+    {
+      var value = _matchValue.Value.Item1;
+      var nextAcc = _matchValue.Value.Item2;
+      __.acc = {Tag: "Some", Value: nextAcc};
+      __.current = value;
+      _temp20 = true;
+    }
+    else
+    {
+      __.acc = {Tag: "None"};
+      __.current = null;
+      _temp20 = false;
+    };
+    return ((matchValue.Tag == "Some") && _temp20);
+  });
+  i_UnfoldEnumerator_2__ctor.prototype.Dispose = (function (unitVar1)
+  {
+    var __ = this;
+  });
+  i_WorldBankCountry__ctor = (function (Context, Code, Name)
+  {
+    this.Context = Context;
+    this.Code = Code;
+    this.Name = Name;
+  });
+  list_1_Cons = (function (Item1, Item2)
+  {
+    this.Tag = "Cons";
+    this.Item1 = Item1;
+    this.Item2 = Item2;
+  });
+  list_1_Cons.prototype.CompareTo = (function (that)
+  {
+    var diff;
+    return 0.000000;
+  });
+  list_1_Nil = (function ()
+  {
+    this.Tag = "Nil";
+  });
+  list_1_Nil.prototype.CompareTo = (function (that)
+  {
+    var diff;
+    return 0.000000;
+  });
+  Program_data = Program_get_data();
+  return Program_main()
+});
+  </script>
+
+</body>
+</html>
