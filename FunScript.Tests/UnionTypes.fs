@@ -3,9 +3,30 @@ module FunScript.Tests.UnionTypes
 
 open NUnit.Framework
 
+type Gender = Male | Female
 
 [<Test>]
-let ``Union case constructions with no arguments can be generated``() =
+let ``Union case constructions with no arguments can be generated (user)``() =
+   check 
+      <@@ 
+         let x = Male
+         let y = Female
+         true
+      @@>
+
+[<Test>]
+let ``Union cases matches with no arguments can be generated (user)``() =
+   check 
+      <@@ 
+         let x = Male
+         match x with
+         | Female -> true
+         | Male -> false
+      @@>
+
+
+[<Test>]
+let ``Union case constructions with no arguments can be generated (option)``() =
    check 
       <@@ 
          let x: unit Option = None
@@ -13,7 +34,7 @@ let ``Union case constructions with no arguments can be generated``() =
       @@>
 
 [<Test>]
-let ``Union cases matches with no arguments can be generated``() =
+let ``Union cases matches with no arguments can be generated (option)``() =
    check 
       <@@ 
          let x: bool Option = None

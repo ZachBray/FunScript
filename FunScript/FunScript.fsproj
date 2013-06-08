@@ -81,11 +81,11 @@
     <Compile Include="Sets.fs" />
     <Compile Include="Maps.fs" />
     <Compile Include="Objects.fs" />
-    <Compile Include="Tuples.fs" />
     <Compile Include="Strings.fs" />
     <Compile Include="Asyncs.fs" />
     <Compile Include="UnionTypes.fs" />
     <Compile Include="RecordTypes.fs" />
+    <Compile Include="Tuples.fs" />
     <Compile Include="ReflectedDefinitions.fs" />
     <Compile Include="Compiler.fs" />
   </ItemGroup>

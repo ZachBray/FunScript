@@ -39,11 +39,14 @@ Number.prototype.CompareTo = function(that) {
 };
 
 String.prototype.CompareTo = function(that) {
-   return this > that
-      ? 1
-      : this < that
-         ? -1
-         : 0;
+   if (this > that) {
+      return 1;
+   } else if (this < that) {
+      return -1;
+   }
+   else {
+      return 0;
+   }
 };
 
 Array.prototype.CompareTo = function(that) {

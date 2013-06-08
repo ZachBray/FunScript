@@ -6,16 +6,6 @@ open Microsoft.FSharp.Reflection
 open System.Reflection
 open System
 
-let private isUnionOrRecord t =
-   let isUnionOrRecord t = 
-      FSharpType.IsUnion t || FSharpType.IsRecord t
-   let result = 
-      isUnionOrRecord t || (
-         t.IsGenericType && 
-         isUnionOrRecord <| t.GetGenericTypeDefinition()
-      )
-   result  
-
 let private propertyGetter =
    CompilerComponent.create <| fun (|Split|) _ returnStategy ->
       function
@@ -109,10 +99,14 @@ let getInstanceMethods t =
       | _ -> None)
    |> Seq.distinctBy (fun (name, _, _) -> name)
    |> Seq.toArray
-
-let private hasIComparableImplementation (t:System.Type) =
-   t.GetInterfaces() 
-   |> Array.exists (fun t -> t.Name = typeof<IComparable>.Name)
+      
+let genInstanceMethods t (compiler:InternalCompiler.ICompiler) =
+   let methods = getInstanceMethods t
+   [  for name, vars, bodyExpr in methods do
+         let methodRef = PropertyGet(This, name) 
+         let body = compiler.Compile ReturnStrategies.returnFrom bodyExpr
+         yield name, Lambda(vars, Block body)
+   ]
 
 let getFields (t:Type) =
    t.GetProperties(BindingFlags.NonPublic ||| BindingFlags.Public ||| BindingFlags.Instance)
@@ -122,46 +116,6 @@ let getFields (t:Type) =
    |> Seq.sortBy (fun (p, attr) -> attr.SequenceNumber)
    |> Seq.map (fun (p, attr) -> JavaScriptNameMapper.sanitize p.Name, p.PropertyType)
    |> Seq.toList
-
-let genComparisonFunc t =
-   let fields = getFields t
-   let that = Var("that", typeof<obj>)
-   let diff = Var("diff", typeof<obj>)
-      
-   let body =
-      List.foldBack (fun (name, t) acc ->
-         let thisField = PropertyGet(This, name)
-         let thatField = PropertyGet(Reference that, name)
-         let compareExpr = Comparison.compareCall thisField thatField
-         [  Assign(Reference diff, compareExpr)
-            IfThenElse(
-               BinaryOp(Reference diff, "!=", Number 0.),
-               Block [ Return <| Reference diff ],
-               Block acc)
-         ]) fields [ Return <| Number 0. ]
-      
-   Lambda(
-      [that],
-      Block <| Declare [diff] :: body
-   )
-
-let genComparisonMethods t =
-   let isGeneratedCompareRequired = 
-      isUnionOrRecord t && hasIComparableImplementation t
-   if not isGeneratedCompareRequired then []
-   else
-      let func = genComparisonFunc t
-      [ "CompareTo", func ]
-      
-let genInstanceMethods t (compiler:InternalCompiler.ICompiler) =
-   let methods = getInstanceMethods t
-   let comparisonMethods = genComparisonMethods t
-   [  for name, vars, bodyExpr in methods do
-         let methodRef = PropertyGet(This, name) 
-         let body = compiler.Compile ReturnStrategies.returnFrom bodyExpr
-         yield name, Lambda(vars, Block body)
-      yield! comparisonMethods
-   ]
 
 let components = [ 
    propertyGetter
