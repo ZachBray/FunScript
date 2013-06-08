@@ -161,6 +161,15 @@ let ``the ignore function works``() =
       @@>
 
 [<Test>]
+let ``the ignore function evaluates its arguments``() =
+   check  
+      <@@ 
+         let wasEvaluated = ref false
+         ignore ((fun () -> wasEvaluated := true)())
+         !wasEvaluated
+      @@>
+
+[<Test>]
 let ``the .. operator works``() =
    check
       <@@
