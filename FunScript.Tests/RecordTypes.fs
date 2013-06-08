@@ -32,3 +32,15 @@ let ``Record expression constructors can be generated``() =
          let soon = { now with Age = 25. }
          soon.Age
       @@>
+
+type JSKiller =
+   { ``for`` : float
+     ``class`` : float }
+
+[<Test>]
+let ``Records with key/reserved words are mapped correctly``() =
+   check 
+      <@@ 
+         let x = { ``for`` = 1.0; ``class`` = 2.0 }
+         x.``class``
+      @@>

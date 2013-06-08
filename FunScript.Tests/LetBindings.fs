@@ -63,3 +63,12 @@ let ``Inner-scope let-bindings do not destroy outer-scope let-bindings``() =
             x * 1.
          y * x
       @@>
+
+
+[<Test>]
+let ``key/reserved words are protected``() =
+   check 
+      <@@
+         let ``for`` = true
+         ``for``
+      @@>
