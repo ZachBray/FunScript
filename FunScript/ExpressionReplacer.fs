@@ -100,11 +100,11 @@ let createMethodMap mi callType replacementMi =
 
 let createTypeMethodMappings (fromType:Type) (toType:Type) =
    let methodLookup = 
-      toType.GetMethods() 
+      toType.GetMethods(BindingFlags.Instance ||| BindingFlags.Static ||| BindingFlags.NonPublic ||| BindingFlags.Public)
       |> Array.map (fun mi -> mi.Name, mi)
       |> Map.ofArray
    let availableMethods =
-      fromType.GetMethods(BindingFlags.Static ||| BindingFlags.NonPublic ||| BindingFlags.Public)
+      fromType.GetMethods(BindingFlags.Instance ||| BindingFlags.Static ||| BindingFlags.NonPublic ||| BindingFlags.Public)
       |> Array.choose (fun mi ->
          match methodLookup.TryFind mi.Name with
          | Some replacementMi -> 
