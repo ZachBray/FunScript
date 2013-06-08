@@ -4,9 +4,11 @@
 
 #I "../ThirdParty/FSharp.Formatting/lib/net40"
 #load "../ThirdParty/FSharp.Formatting/literate/literate.fsx"
+#r "../ThirdParty/Ionic.Zip.dll"
 open System.IO
 open System.Text.RegularExpressions
 open FSharp.Literate
+open Ionic.Zip
 
 /// Concantenate path using the right separator
 let (++) p1 p2 = Path.Combine(p1, p2)
@@ -78,14 +80,27 @@ let outputPath = source ++ "output"   // Where to save generated output
 let staticFiles = source ++ "static"  // Copy all files from here to output
 let funScriptRoot = source ++ "../"   // Root with FunScript projects
 
+let funScriptFiles = [
+   funScriptRoot ++ "FunScript/bin/Debug/FunScript.dll"
+   funScriptRoot ++ "FunScript.TypeScript.Interop/bin/Debug/FunScript.TypeScript.Interop.dll"
+   funScriptRoot ++ "FunScript.TypeScript/bin/Debug/FunScript.TypeScript.dll"
+   funScriptRoot ++ "ThirdParty/FSharp.Data.dll"
+   funScriptRoot ++ "ThirdParty/FSharp.Data.Experimental.dll"
+   funScriptRoot ++ "FunScript.Data/bin/Debug/FunScript.Data.dll"
+]
+
+let createDownloadZip() =
+   let downloadPath = outputPath ++ "downloads/funscript.zip"
+   File.Delete downloadPath
+   use zip = new ZipFile()
+   zip.AddFiles funScriptFiles
+   zip.Save(downloadPath)
+
+createDownloadZip()
+
 /// Command line options needed when type-checking sample FunScript projects
 let funScriptReferences = 
-  "-r:\"" + (funScriptRoot ++ "FunScript/bin/Debug/FunScript.dll") + "\" " +
-  "-r:\"" + (funScriptRoot ++ "FunScript.TypeScript.Interop/bin/Debug/FunScript.TypeScript.Interop.dll") + "\" " +
-  "-r:\"" + (funScriptRoot ++ "FunScript.TypeScript/bin/Debug/FunScript.TypeScript.dll") + "\" " +
-  "-r:\"" + (funScriptRoot ++ "ThirdParty/FSharp.Data.dll") + "\" " +
-  "-r:\"" + (funScriptRoot ++ "ThirdParty/FSharp.Data.Experimental.dll") + "\" " +
-  "-r:\"" + (funScriptRoot ++ "FunScript.Data/bin/Debug/FunScript.Data.dll") + "\""
+   funScriptFiles |> Seq.map (sprintf "-r:\"%s\"") |> String.concat " "
 
 let pageTemplate = source ++ "template" ++ "page-template.html"     // General page template
 let sampleTemplate = source ++ "template" ++ "sample-template.html" // Sample with live preview
