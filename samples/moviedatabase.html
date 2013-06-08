@@ -451,11 +451,14 @@ Number.prototype.CompareTo = function(that) {
 };
 
 String.prototype.CompareTo = function(that) {
-   return this > that
-      ? 1
-      : this < that
-         ? -1
-         : 0;
+   if (this > that) {
+      return 1;
+   } else if (this < that) {
+      return -1;
+   }
+   else {
+      return 0;
+   }
 };
 
 Array.prototype.CompareTo = function(that) {
@@ -470,14 +473,10 @@ Array.prototype.CompareTo = function(that) {
    return this.length - that.length;
 };
 
-var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__ctor, i_CreateEnumerable_1__ctor, i_CancellationToken__ctor, i_AsyncParams_1__ctor, i_AsyncParamsAux__ctor, i_AsyncBuilder__ctor, i_ApiaryJsContext__ctor, Utils_newXMLHttpRequest, Utils_encodeURIComponent, Utils_emptyIfNull, String_splitSingle, String_replaceSingle, String_ToLowerCase, String_Split, String_Replace, String_Join, String_IsNullOrEmpty, String_IndexOf, Seq_Unfold, Seq_TryPickIndexedAux, Seq_TryPickIndexed, Seq_TryFind, Seq_ToArray, Seq_Take, Seq_OfArray, Seq_Map2, Seq_Length, Seq_IterateIndexed, Seq_FromFactory, Seq_FoldIndexedAux, Seq_FoldIndexed, Seq_Fold, Seq_Enumerator, Seq_Delay, Seq_CompareWith, Runtime_setContext, Runtime_getContext, Program_op_Dynamic, Program_main, Program_jQuery, Program_Object_asJQuery, List_ToArray, List_Length, List_IterateIndexed, List_FoldIndexedAux, List_FoldIndexed, List_Fold, List_Empty, List_CreateCons, LanguagePrimitives_UnboxGeneric, JsRuntime_TryGetValueByTypeTag, JsRuntime_TryGetArrayChildByTypeTag, JsRuntime_Parse, JsRuntime_Identity2, JsRuntime_Identity, JsRuntime_GetProperty, JsRuntime_GetArrayChildrenByTypeTag, JsRuntime_ConvertArray, JsHelpers_jstypeof, JsHelpers_isNull, JsHelpers_isArray, FSharpString_Concat, Async_setTimeout, Async_protectedCont, Async_invokeCont, Async_get_async, Async_StartImmediate, Async_FromContinuations, Async_1_Cont, Array_ZeroCreate, Array_SortInPlaceWith, Array_SortInPlaceBy, Array_SortBy, Array_MapIndexed, Array_Map, Array_Length, Array_Iterate, Array_FoldIndexed, Array_Fold, Array_Copy, Array_ConcatImpl, Array_Concat, Array_Choose, Array_BoxedLength, Array_Append, ApiaryJsRuntime_ProcessParameters, ApiaryJsRuntime_ParseHeaders, ApiaryJsRuntime_AsyncMap, ApiaryJsRuntime_AsyncInvokeOperation, ApiaryJsRuntime_AddQueryParam;
+var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__ctor, i_CreateEnumerable_1__ctor, i_CancellationToken__ctor, i_AsyncParams_1__ctor, i_AsyncParamsAux__ctor, i_AsyncBuilder__ctor, i_ApiaryJsContext__ctor, Utils_newXMLHttpRequest, Utils_encodeURIComponent, Utils_emptyIfNull, Tuple3, Tuple2, String_splitSingle, String_replaceSingle, String_ToLowerCase, String_Split, String_Replace, String_Join, String_IsNullOrEmpty, String_IndexOf, Seq_Unfold, Seq_TryPickIndexedAux, Seq_TryPickIndexed, Seq_TryFind, Seq_ToArray, Seq_Take, Seq_OfArray, Seq_Map2, Seq_Length, Seq_IterateIndexed, Seq_FromFactory, Seq_FoldIndexedAux, Seq_FoldIndexed, Seq_Fold, Seq_Enumerator, Seq_Delay, Seq_CompareWith, Runtime_setContext, Runtime_getContext, Program_op_Dynamic, Program_main, Program_jQuery, Program_Object_asJQuery, List_ToArray, List_Length, List_IterateIndexed, List_FoldIndexedAux, List_FoldIndexed, List_Fold, List_Empty, List_CreateCons, LanguagePrimitives_UnboxGeneric, JsRuntime_TryGetValueByTypeTag, JsRuntime_TryGetArrayChildByTypeTag, JsRuntime_Parse, JsRuntime_Identity2, JsRuntime_Identity, JsRuntime_GetProperty, JsRuntime_GetArrayChildrenByTypeTag, JsRuntime_ConvertArray, JsHelpers_jstypeof, JsHelpers_isNull, JsHelpers_isArray, FSharpString_Concat, Async_setTimeout, Async_protectedCont, Async_invokeCont, Async_get_async, Async_StartImmediate, Async_FromContinuations, Async_1_Cont, Array_ZeroCreate, Array_SortInPlaceWith, Array_SortInPlaceBy, Array_SortBy, Array_MapIndexed, Array_Map, Array_Length, Array_Iterate, Array_FoldIndexed, Array_Fold, Array_Copy, Array_ConcatImpl, Array_Concat, Array_Choose, Array_BoxedLength, Array_Append, ApiaryJsRuntime_ProcessParameters, ApiaryJsRuntime_ParseHeaders, ApiaryJsRuntime_AsyncMap, ApiaryJsRuntime_AsyncInvokeOperation, ApiaryJsRuntime_AddQueryParam;
   ApiaryJsRuntime_AddQueryParam = (function (x, key, value)
   {
-    x.GlobalQuery = Array_Append(x.GlobalQuery, [{CompareTo: (function (that)
-    {
-      var diff;
-      return 0.000000;
-    }), Item1: key, Item2: value}]);
+    x.GlobalQuery = Array_Append(x.GlobalQuery, [(new Tuple2(key, value))]);
   });
   ApiaryJsRuntime_AsyncInvokeOperation = (function (x, _arg1)
   {
@@ -601,11 +600,7 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
         var arr = String_Split(h, [":"]);
         if ((Array_BoxedLength(arr).CompareTo(2.000000) == 0.000000)) 
         {
-          return {Tag: "Some", Value: {CompareTo: (function (that)
-          {
-            var diff;
-            return 0.000000;
-          }), Item1: arr[0.000000], Item2: arr[1.000000]}};
+          return {Tag: "Some", Value: (new Tuple2(arr[0.000000], arr[1.000000]))};
         }
         else
         {
@@ -624,11 +619,7 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
   {
     var _headers = Array_Append(ApiaryJsRuntime_ParseHeaders(reqHeaders), List_ToArray(Utils_emptyIfNull(headers)));
     var _query = Utils_emptyIfNull(query);
-    return {CompareTo: (function (that)
-    {
-      var diff;
-      return 0.000000;
-    }), Item1: _headers, Item2: List_ToArray(_query)};
+    return (new Tuple2(_headers, List_ToArray(_query)));
   });
   Array_Append = (function (xs, ys)
   {
@@ -768,6 +759,27 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
     this.Tag = "Cont";
     this.Item = Item;
   });
+  Async_1_Cont.prototype.CompareTo = (function (that)
+  {
+    var diff;
+    diff = this.Tag.CompareTo(that.Tag);
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      diff = this.Item.CompareTo(that.Item);
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
   Async_FromContinuations = (function (f)
   {
     return (function (_f)
@@ -775,11 +787,7 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
       return Async_protectedCont(_f);
     })((function (k)
     {
-      return f({CompareTo: (function (that)
-      {
-        var diff;
-        return 0.000000;
-      }), Item1: k.Cont, Item2: k.Aux.ExceptionCont, Item3: k.Aux.CancelledCont});
+      return f((new Tuple3(k.Cont, k.Aux.ExceptionCont, k.Aux.CancelledCont)));
     }));
   });
   Async_StartImmediate = (function (workflow, cancellationToken)
@@ -798,14 +806,14 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
     var f = workflow.Item;
     var aux = (new i_AsyncParamsAux__ctor({contents: 0.000000}, (function (value)
     {
-      ;
+      var ignored0 = value;
     }), (function (value)
     {
-      ;
+      var ignored0 = value;
     }), token));
     return f((new i_AsyncParams_1__ctor((function (value)
     {
-      ;
+      var ignored0 = value;
     }), aux)));
   });
   Async_get_async = (function ()
@@ -1108,15 +1116,7 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
           var patternInput = ApiaryJsRuntime_ProcessParameters("Accept:application/json", var3, var2);
           var query = patternInput.Item2;
           var headers = patternInput.Item1;
-          _temp59 = {CompareTo: (function (that)
-          {
-            var diff;
-            return 0.000000;
-          }), Item1: _var0, Item2: (new i_OperationArguments__ctor("GET", "/3/movie/{id}", [{CompareTo: (function (that)
-          {
-            var diff;
-            return 0.000000;
-          }), Item1: "{id}", Item2: var1}], headers, query))};
+          _temp59 = (new Tuple2(_var0, (new i_OperationArguments__ctor("GET", "/3/movie/{id}", [(new Tuple2("{id}", var1))], headers, query))));
           var _patternInput = _temp59;
           var args = _patternInput.Item2;
           var apiCtx = _patternInput.Item1;
@@ -1130,21 +1130,21 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
             var movie = _arg1;
             (function (value)
             {
-              ;
+              var ignored0 = value;
             })(Program_op_Dynamic((function (command)
             {
               return Program_jQuery(command);
             }), "dialogOverview").text(JsRuntime_Identity(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(movie), "overview")))));
             (function (value)
             {
-              ;
+              var ignored0 = value;
             })(Program_op_Dynamic((function (command)
             {
               return Program_jQuery(command);
             }), "dialogTitle").text(JsRuntime_Identity(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(movie), "title")))));
             (function (value)
             {
-              ;
+              var ignored0 = value;
             })(Program_op_Dynamic((function (command)
             {
               return Program_jQuery(command);
@@ -1158,11 +1158,7 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
             var _query = __patternInput.Item2;
             var _headers = __patternInput.Item1;
             var _apiCtx = Runtime_getContext(movie);
-            _temp66 = {CompareTo: (function (that)
-            {
-              var diff;
-              return 0.000000;
-            }), Item1: _apiCtx, Item2: (new i_OperationArguments__ctor("GET", "/3/movie/{id}/casts", [], _headers, _query))};
+            _temp66 = (new Tuple2(_apiCtx, (new i_OperationArguments__ctor("GET", "/3/movie/{id}/casts", [], _headers, _query))));
             var ___patternInput = _temp66;
             var _args = ___patternInput.Item2;
             var __apiCtx = ___patternInput.Item1;
@@ -1216,7 +1212,7 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
               var _sorted = _temp72;
               (function (value)
               {
-                ;
+                var ignored0 = value;
               })(Program_op_Dynamic((function (command)
               {
                 return Program_jQuery(command);
@@ -1234,11 +1230,11 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
                 var li = Program_jQuery("\u003cli\u003e");
                 (function (value)
                 {
-                  ;
+                  var ignored0 = value;
                 })(li.html(html));
                 (function (value)
                 {
-                  ;
+                  var ignored0 = value;
                 })(li.appendTo(Program_op_Dynamic((function (command)
                 {
                   return Program_jQuery(command);
@@ -1258,22 +1254,14 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
         {
           var _temp77;
           var _var0 = db;
-          var var1 = List_CreateCons({CompareTo: (function (that)
-          {
-            var diff;
-            return 0.000000;
-          }), Item1: "query", Item2: term}, List_Empty());
+          var var1 = List_CreateCons((new Tuple2("query", term)), List_Empty());
           var var2 = null;
           var _temp79;
           var _temp80;
           var patternInput = ApiaryJsRuntime_ProcessParameters("Accept:application/json", var2, var1);
           var query = patternInput.Item2;
           var headers = patternInput.Item1;
-          _temp80 = {CompareTo: (function (that)
-          {
-            var diff;
-            return 0.000000;
-          }), Item1: _var0, Item2: (new i_OperationArguments__ctor("GET", "/3/search/movie", [], headers, query))};
+          _temp80 = (new Tuple2(_var0, (new i_OperationArguments__ctor("GET", "/3/search/movie", [], headers, query))));
           var _patternInput = _temp80;
           var args = _patternInput.Item2;
           var apiCtx = _patternInput.Item1;
@@ -1287,7 +1275,7 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
             var res = _arg4;
             (function (value)
             {
-              ;
+              var ignored0 = value;
             })(Program_op_Dynamic((function (command)
             {
               return Program_jQuery(command);
@@ -1328,7 +1316,7 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
                 var date = _temp155;
                 (function (value)
                 {
-                  ;
+                  var ignored0 = value;
                 })(Program_Object_asJQuery(Program_jQuery("\u003cli\u003e").html(("\u003cstrong\u003eReleased:\u003c/strong\u003e " + date))).appendTo(details));
                 var _temp172;
                 var _temp180;
@@ -1343,7 +1331,7 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
                 _temp172 = _temp180.appendTo(details);
                 (function (value)
                 {
-                  ;
+                  var ignored0 = value;
                 })(_temp172);
                 var _temp203;
                 var _temp211;
@@ -1358,28 +1346,28 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
                 _temp203 = _temp211.appendTo(details);
                 (function (value)
                 {
-                  ;
+                  var ignored0 = value;
                 })(_temp203);
                 var body = Program_Object_asJQuery(Program_jQuery("\u003cdiv\u003e").addClass("searchResult"));
                 (function (value)
                 {
-                  ;
+                  var ignored0 = value;
                 })(Program_Object_asJQuery(Program_jQuery("\u003ch3\u003e").append([link])).appendTo(body));
                 (function (value)
                 {
-                  ;
+                  var ignored0 = value;
                 })(Program_Object_asJQuery(Program_jQuery("\u003cimg\u003e").attr("src", (root + JsRuntime_Identity(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(item), "poster_path")))))).appendTo(body));
                 (function (value)
                 {
-                  ;
+                  var ignored0 = value;
                 })(details.appendTo(body));
                 (function (value)
                 {
-                  ;
+                  var ignored0 = value;
                 })(Program_Object_asJQuery(Program_jQuery("\u003cdiv\u003e").addClass("clearer")).appendTo(body));
                 return (function (value)
                 {
-                  ;
+                  var ignored0 = value;
                 })(body.appendTo(Program_op_Dynamic((function (command)
                 {
                   return Program_jQuery(command);
@@ -1548,11 +1536,7 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
         {
           var _temp12;
           var _temp13;
-          _temp12 = {CompareTo: (function (that)
-          {
-            var diff;
-            return 0.000000;
-          }), Item1: f(_xs.get_Current())(_ys.get_Current()), Item2: _temp13};
+          _temp12 = (new Tuple2(f(_xs.get_Current())(_ys.get_Current()), _temp13));
           return {Tag: "Some", Value: _temp12};
         }
         else
@@ -1575,11 +1559,7 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
     {
       if ((i.CompareTo(Array_BoxedLength(xs)) < 0.000000)) 
       {
-        return {Tag: "Some", Value: {CompareTo: (function (that)
-        {
-          var diff;
-          return 0.000000;
-        }), Item1: xs[i], Item2: (i + 1.000000)}};
+        return {Tag: "Some", Value: (new Tuple2(xs[i], (i + 1.000000)))};
       }
       else
       {
@@ -1605,11 +1585,7 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
       {
         if (((i.CompareTo(n) < 0.000000) && _xs.MoveNext())) 
         {
-          return {Tag: "Some", Value: {CompareTo: (function (that)
-          {
-            var diff;
-            return 0.000000;
-          }), Item1: _xs.get_Current(), Item2: (i + 1.000000)}};
+          return {Tag: "Some", Value: (new Tuple2(_xs.get_Current(), (i + 1.000000)))};
         }
         else
         {
@@ -1754,6 +1730,67 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
   {
     return s.split(delimiter);
   });
+  Tuple2 = (function (Item1, Item2)
+  {
+    this.Item1 = Item1;
+    this.Item2 = Item2;
+  });
+  Tuple2.prototype.CompareTo = (function (that)
+  {
+    var diff;
+    diff = this.Item1.CompareTo(that.Item1);
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      diff = this.Item2.CompareTo(that.Item2);
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  Tuple3 = (function (Item1, Item2, Item3)
+  {
+    this.Item1 = Item1;
+    this.Item2 = Item2;
+    this.Item3 = Item3;
+  });
+  Tuple3.prototype.CompareTo = (function (that)
+  {
+    var diff;
+    diff = this.Item1.CompareTo(that.Item1);
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      diff = this.Item2.CompareTo(that.Item2);
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        diff = this.Item3.CompareTo(that.Item3);
+        if ((diff != 0.000000)) 
+        {
+          return diff;
+        }
+        else
+        {
+          return 0.000000;
+        };
+      };
+    };
+  });
   Utils_emptyIfNull = (function (list)
   {
     return list==null?List_Empty():list;
@@ -1791,6 +1828,43 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
     this.GlobalQuery = GlobalQuery;
     this.GlobalHeaders = GlobalHeaders;
     this.GlobalArguments = GlobalArguments;
+  });
+  i_ApiaryJsContext__ctor.prototype.CompareTo = (function (that)
+  {
+    var diff;
+    diff = this.Root.CompareTo(that.Root);
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      diff = this.GlobalQuery.CompareTo(that.GlobalQuery);
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        diff = this.GlobalHeaders.CompareTo(that.GlobalHeaders);
+        if ((diff != 0.000000)) 
+        {
+          return diff;
+        }
+        else
+        {
+          diff = this.GlobalArguments.CompareTo(that.GlobalArguments);
+          if ((diff != 0.000000)) 
+          {
+            return diff;
+          }
+          else
+          {
+            return 0.000000;
+          };
+        };
+      };
+    };
   });
   i_AsyncBuilder__ctor = (function (unitVar0)
   {
@@ -1915,10 +1989,68 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
     this.CancelledCont = CancelledCont;
     this.CancellationToken = CancellationToken;
   });
+  i_AsyncParamsAux__ctor.prototype.CompareTo = (function (that)
+  {
+    var diff;
+    diff = this.StackCounter.CompareTo(that.StackCounter);
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      diff = this.ExceptionCont.CompareTo(that.ExceptionCont);
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        diff = this.CancelledCont.CompareTo(that.CancelledCont);
+        if ((diff != 0.000000)) 
+        {
+          return diff;
+        }
+        else
+        {
+          diff = this.CancellationToken.CompareTo(that.CancellationToken);
+          if ((diff != 0.000000)) 
+          {
+            return diff;
+          }
+          else
+          {
+            return 0.000000;
+          };
+        };
+      };
+    };
+  });
   i_AsyncParams_1__ctor = (function (Cont, Aux)
   {
     this.Cont = Cont;
     this.Aux = Aux;
+  });
+  i_AsyncParams_1__ctor.prototype.CompareTo = (function (that)
+  {
+    var diff;
+    diff = this.Cont.CompareTo(that.Cont);
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      diff = this.Aux.CompareTo(that.Aux);
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
   });
   i_CancellationToken__ctor = (function (Cell)
   {
@@ -1947,6 +2079,19 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
     else
     {
       ;
+    };
+  });
+  i_CancellationToken__ctor.prototype.CompareTo = (function (that)
+  {
+    var diff;
+    diff = this.Cell.CompareTo(that.Cell);
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      return 0.000000;
     };
   });
   i_CreateEnumerable_1__ctor = (function (factory)
@@ -2078,7 +2223,31 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
   list_1_Cons.prototype.CompareTo = (function (that)
   {
     var diff;
-    return 0.000000;
+    diff = this.Tag.CompareTo(that.Tag);
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      diff = this.Item1.CompareTo(that.Item1);
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        diff = this.Item2.CompareTo(that.Item2);
+        if ((diff != 0.000000)) 
+        {
+          return diff;
+        }
+        else
+        {
+          return 0.000000;
+        };
+      };
+    };
   });
   list_1_Nil = (function ()
   {
@@ -2087,7 +2256,15 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
   list_1_Nil.prototype.CompareTo = (function (that)
   {
     var diff;
-    return 0.000000;
+    diff = this.Tag.CompareTo(that.Tag);
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      return 0.000000;
+    };
   });
   return Program_main()
 });

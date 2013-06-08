@@ -391,11 +391,14 @@ Number.prototype.CompareTo = function(that) {
 };
 
 String.prototype.CompareTo = function(that) {
-   return this > that
-      ? 1
-      : this < that
-         ? -1
-         : 0;
+   if (this > that) {
+      return 1;
+   } else if (this < that) {
+      return -1;
+   }
+   else {
+      return 0;
+   }
 };
 
 Array.prototype.CompareTo = function(that) {
@@ -410,7 +413,7 @@ Array.prototype.CompareTo = function(that) {
    return this.length - that.length;
 };
 
-var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__ctor, i_CreateEnumerable_1__ctor, i_CancellationToken__ctor, i_AsyncParams_1__ctor, i_AsyncParamsAux__ctor, i_AsyncBuilder__ctor, WorldBankRuntime_GetIndicators, WorldBankRuntime_GetCountry, WorldBankRuntime_GetCountries, WorldBankRuntime_AsyncGetIndicator, Utils_getJSON, Utils_encodeURIComponent, String_Join, Seq_Unfold, Seq_TryPickIndexedAux, Seq_TryPickIndexed, Seq_TryFind, Seq_ToArray, Seq_OfList, Seq_OfArray, Seq_Map2, Seq_Map, Seq_Length, Seq_IterateIndexed, Seq_FromFactory, Seq_FoldIndexedAux, Seq_FoldIndexed, Seq_Fold, Seq_Enumerator, Seq_Delay, Seq_CompareWith, Seq_Choose, Runtime_worldBankUrl, Program_main, Program_jQuery, Program_get_data, Program_data, Program_countries, List_Tail, List_Reverse, List_OfArray, List_MapIndexed, List_Map, List_Head, List_FoldIndexedAux, List_FoldIndexed, List_Fold, List_Empty, List_CreateCons, LanguagePrimitives_UnboxGeneric, JsRuntime_TryGetValueByTypeTag, JsRuntime_TryGetArrayChildByTypeTag, JsRuntime_Parse, JsRuntime_Identity2, JsRuntime_Identity, JsRuntime_GetProperty, JsRuntime_GetCulture, JsRuntime_GetArrayChildrenByTypeTag, JsRuntime_GetArrayChildByTypeTag, JsRuntime_ConvertArray, JsHelpers_jstypeof, JsHelpers_isNull, JsHelpers_isArray, FunScriptExtensions_number, FunScriptExtensions_floor, FunScriptExtensions_clone, FunScriptExtensions_Array_push, FSharpString_Concat, Async_setTimeout, Async_protectedCont, Async_invokeCont, Async_get_async, Async_StartImmediate, Async_FromContinuations, Async_1_Cont, Array_ZeroCreate, Array_MapIndexed, Array_Map, Array_Length, Array_FoldBackIndexed, Array_FoldBack, Array_Choose, Array_BoxedLength;
+var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__ctor, i_CreateEnumerable_1__ctor, i_CancellationToken__ctor, i_AsyncParams_1__ctor, i_AsyncParamsAux__ctor, i_AsyncBuilder__ctor, WorldBankRuntime_GetIndicators, WorldBankRuntime_GetCountry, WorldBankRuntime_GetCountries, WorldBankRuntime_AsyncGetIndicator, Utils_getJSON, Utils_encodeURIComponent, Tuple3, Tuple2, String_Join, Seq_Unfold, Seq_TryPickIndexedAux, Seq_TryPickIndexed, Seq_TryFind, Seq_ToArray, Seq_OfList, Seq_OfArray, Seq_Map2, Seq_Map, Seq_Length, Seq_IterateIndexed, Seq_FromFactory, Seq_FoldIndexedAux, Seq_FoldIndexed, Seq_Fold, Seq_Enumerator, Seq_Delay, Seq_CompareWith, Seq_Choose, Runtime_worldBankUrl, Program_main, Program_jQuery, Program_get_data, Program_data, Program_countries, List_Tail, List_Reverse, List_OfArray, List_MapIndexed, List_Map, List_Head, List_FoldIndexedAux, List_FoldIndexed, List_Fold, List_Empty, List_CreateCons, LanguagePrimitives_UnboxGeneric, JsRuntime_TryGetValueByTypeTag, JsRuntime_TryGetArrayChildByTypeTag, JsRuntime_Parse, JsRuntime_Identity2, JsRuntime_Identity, JsRuntime_GetProperty, JsRuntime_GetCulture, JsRuntime_GetArrayChildrenByTypeTag, JsRuntime_GetArrayChildByTypeTag, JsRuntime_ConvertArray, JsHelpers_jstypeof, JsHelpers_isNull, JsHelpers_isArray, FunScriptExtensions_number, FunScriptExtensions_floor, FunScriptExtensions_clone, FunScriptExtensions_Array_push, FSharpString_Concat, Async_setTimeout, Async_protectedCont, Async_invokeCont, Async_get_async, Async_StartImmediate, Async_FromContinuations, Async_1_Cont, Array_ZeroCreate, Array_MapIndexed, Array_Map, Array_Length, Array_FoldBackIndexed, Array_FoldBack, Array_Choose, Array_BoxedLength;
   Array_BoxedLength = (function (xs)
   {
     return xs.length;
@@ -494,6 +497,27 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
     this.Tag = "Cont";
     this.Item = Item;
   });
+  Async_1_Cont.prototype.CompareTo = (function (that)
+  {
+    var diff;
+    diff = this.Tag.CompareTo(that.Tag);
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      diff = this.Item.CompareTo(that.Item);
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
   Async_FromContinuations = (function (f)
   {
     return (function (_f)
@@ -501,11 +525,7 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
       return Async_protectedCont(_f);
     })((function (k)
     {
-      return f({CompareTo: (function (that)
-      {
-        var diff;
-        return 0.000000;
-      }), Item1: k.Cont, Item2: k.Aux.ExceptionCont, Item3: k.Aux.CancelledCont});
+      return f((new Tuple3(k.Cont, k.Aux.ExceptionCont, k.Aux.CancelledCont)));
     }));
   });
   Async_StartImmediate = (function (workflow, cancellationToken)
@@ -524,14 +544,14 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
     var f = workflow.Item;
     var aux = (new i_AsyncParamsAux__ctor({contents: 0.000000}, (function (value)
     {
-      ;
+      var ignored0 = value;
     }), (function (value)
     {
-      ;
+      var ignored0 = value;
     }), token));
     return f((new i_AsyncParams_1__ctor((function (value)
     {
-      ;
+      var ignored0 = value;
     }), aux)));
   });
   Async_get_async = (function ()
@@ -943,27 +963,23 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
         var input = Program_jQuery("\u003cinput\u003e");
         (function (value)
         {
-          ;
+          var ignored0 = value;
         })(input.attr("type", "checkbox"));
         var label = Program_jQuery("\u003clabel\u003e");
         (function (value)
         {
-          ;
+          var ignored0 = value;
         })(label.append([input]));
         (function (value)
         {
-          ;
+          var ignored0 = value;
         })(label.append([country.Name]));
         var panel = (FunScriptExtensions_floor((index % 3.000000)) + 1.000000);
         (function (value)
         {
-          ;
+          var ignored0 = value;
         })(label.appendTo(Program_jQuery(("#countryList" + panel.toString()))));
-        return {CompareTo: (function (that)
-        {
-          var diff;
-          return 0.000000;
-        }), Item1: country, Item2: input};
+        return (new Tuple2(country, input));
       });
     });
     _temp17 = (function (list)
@@ -1054,7 +1070,7 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
           {
             (function (value)
             {
-              ;
+              var ignored0 = value;
             })(FunScriptExtensions_clone(Highcharts.Chart, opts));
             return builder_.Zero();
           })));
@@ -1077,7 +1093,7 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
         var check = forLoopVar.Item2;
         (function (value)
         {
-          ;
+          var ignored0 = value;
         })(check.click((function (_arg1)
         {
           var _temp215;
@@ -1157,23 +1173,19 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
   Seq_Choose = (function (f, xs)
   {
     var trySkipToNext;
-    trySkipToNext = (function (_enum)
+    trySkipToNext = (function (enum_reserved)
     {
-      if (_enum.MoveNext()) 
+      if (enum_reserved.MoveNext()) 
       {
-        var matchValue = f(_enum.get_Current());
+        var matchValue = f(enum_reserved.get_Current());
         if ((matchValue.Tag == "Some")) 
         {
           var value = matchValue.Value;
-          return {Tag: "Some", Value: {CompareTo: (function (that)
-          {
-            var diff;
-            return 0.000000;
-          }), Item1: value, Item2: _enum}};
+          return {Tag: "Some", Value: (new Tuple2(value, enum_reserved))};
         }
         else
         {
-          return trySkipToNext(_enum);
+          return trySkipToNext(enum_reserved);
         };
       }
       else
@@ -1303,15 +1315,11 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
     })((function (unitVar0)
     {
       var _temp189;
-      var _f = (function (_enum)
+      var _f = (function (enum_reserved)
       {
-        if (_enum.MoveNext()) 
+        if (enum_reserved.MoveNext()) 
         {
-          return {Tag: "Some", Value: {CompareTo: (function (that)
-          {
-            var diff;
-            return 0.000000;
-          }), Item1: f(_enum.get_Current()), Item2: _enum}};
+          return {Tag: "Some", Value: (new Tuple2(f(enum_reserved.get_Current()), enum_reserved))};
         }
         else
         {
@@ -1341,11 +1349,7 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
         {
           var _temp30;
           var _temp31;
-          _temp30 = {CompareTo: (function (that)
-          {
-            var diff;
-            return 0.000000;
-          }), Item1: f(_xs.get_Current())(_ys.get_Current()), Item2: _temp31};
+          _temp30 = (new Tuple2(f(_xs.get_Current())(_ys.get_Current()), _temp31));
           return {Tag: "Some", Value: _temp30};
         }
         else
@@ -1368,11 +1372,7 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
     {
       if ((i.CompareTo(Array_BoxedLength(xs)) < 0.000000)) 
       {
-        return {Tag: "Some", Value: {CompareTo: (function (that)
-        {
-          var diff;
-          return 0.000000;
-        }), Item1: xs[i], Item2: (i + 1.000000)}};
+        return {Tag: "Some", Value: (new Tuple2(xs[i], (i + 1.000000)))};
       }
       else
       {
@@ -1394,11 +1394,7 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
       {
         var _xs = List_Tail(_arg1);
         var x = List_Head(_arg1);
-        return {Tag: "Some", Value: {CompareTo: (function (that)
-        {
-          var diff;
-          return 0.000000;
-        }), Item1: x, Item2: _xs}};
+        return {Tag: "Some", Value: (new Tuple2(x, _xs))};
       }
       else
       {
@@ -1481,6 +1477,67 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
   {
     return s.join(separator);
   });
+  Tuple2 = (function (Item1, Item2)
+  {
+    this.Item1 = Item1;
+    this.Item2 = Item2;
+  });
+  Tuple2.prototype.CompareTo = (function (that)
+  {
+    var diff;
+    diff = this.Item1.CompareTo(that.Item1);
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      diff = this.Item2.CompareTo(that.Item2);
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  Tuple3 = (function (Item1, Item2, Item3)
+  {
+    this.Item1 = Item1;
+    this.Item2 = Item2;
+    this.Item3 = Item3;
+  });
+  Tuple3.prototype.CompareTo = (function (that)
+  {
+    var diff;
+    diff = this.Item1.CompareTo(that.Item1);
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      diff = this.Item2.CompareTo(that.Item2);
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        diff = this.Item3.CompareTo(that.Item3);
+        if ((diff != 0.000000)) 
+        {
+          return diff;
+        }
+        else
+        {
+          return 0.000000;
+        };
+      };
+    };
+  });
   Utils_encodeURIComponent = (function (s)
   {
     return encodeURIComponent(s);
@@ -1498,15 +1555,7 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
       var ccont = tupledArg.Item3;
       var wb = country.Context;
       var countryCode = country.Code;
-      var url = Runtime_worldBankUrl(wb, List_CreateCons("countries", List_CreateCons(countryCode, List_CreateCons("indicators", List_CreateCons(indicator, List_Empty())))), List_CreateCons({CompareTo: (function (that)
-      {
-        var diff;
-        return 0.000000;
-      }), Item1: "date", Item2: "1900:2050"}, List_CreateCons({CompareTo: (function (that)
-      {
-        var diff;
-        return 0.000000;
-      }), Item1: "format", Item2: "jsonp"}, List_Empty())));
+      var url = Runtime_worldBankUrl(wb, List_CreateCons("countries", List_CreateCons(countryCode, List_CreateCons("indicators", List_CreateCons(indicator, List_Empty())))), List_CreateCons((new Tuple2("date", "1900:2050")), List_CreateCons((new Tuple2("format", "jsonp")), List_Empty())));
       return Utils_getJSON((url + "\u0026prefix=?"), (function (json)
       {
         var data = JsRuntime_Identity(JsRuntime_Parse(json, null));
@@ -1534,11 +1583,7 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
             }));
             _temp185 = _temp187.Value;
             _temp182 = _temp185;
-            _temp176 = {CompareTo: (function (that)
-            {
-              var diff;
-              return 0.000000;
-            }), Item1: JsRuntime_Identity2(JsRuntime_Identity(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(v), "date"))), ""), Item2: _temp182};
+            _temp176 = (new Tuple2(JsRuntime_Identity2(JsRuntime_Identity(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(v), "date"))), ""), _temp182));
             return {Tag: "Some", Value: _temp176};
           };
         });
@@ -1696,10 +1741,68 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
     this.CancelledCont = CancelledCont;
     this.CancellationToken = CancellationToken;
   });
+  i_AsyncParamsAux__ctor.prototype.CompareTo = (function (that)
+  {
+    var diff;
+    diff = this.StackCounter.CompareTo(that.StackCounter);
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      diff = this.ExceptionCont.CompareTo(that.ExceptionCont);
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        diff = this.CancelledCont.CompareTo(that.CancelledCont);
+        if ((diff != 0.000000)) 
+        {
+          return diff;
+        }
+        else
+        {
+          diff = this.CancellationToken.CompareTo(that.CancellationToken);
+          if ((diff != 0.000000)) 
+          {
+            return diff;
+          }
+          else
+          {
+            return 0.000000;
+          };
+        };
+      };
+    };
+  });
   i_AsyncParams_1__ctor = (function (Cont, Aux)
   {
     this.Cont = Cont;
     this.Aux = Aux;
+  });
+  i_AsyncParams_1__ctor.prototype.CompareTo = (function (that)
+  {
+    var diff;
+    diff = this.Cont.CompareTo(that.Cont);
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      diff = this.Aux.CompareTo(that.Aux);
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
   });
   i_CancellationToken__ctor = (function (Cell)
   {
@@ -1728,6 +1831,19 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
     else
     {
       ;
+    };
+  });
+  i_CancellationToken__ctor.prototype.CompareTo = (function (that)
+  {
+    var diff;
+    diff = this.Cell.CompareTo(that.Cell);
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      return 0.000000;
     };
   });
   i_CreateEnumerable_1__ctor = (function (factory)
@@ -1803,6 +1919,35 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
     this.Code = Code;
     this.Name = Name;
   });
+  i_WorldBankCountry__ctor.prototype.CompareTo = (function (that)
+  {
+    var diff;
+    diff = this.Context.CompareTo(that.Context);
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      diff = this.Code.CompareTo(that.Code);
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        diff = this.Name.CompareTo(that.Name);
+        if ((diff != 0.000000)) 
+        {
+          return diff;
+        }
+        else
+        {
+          return 0.000000;
+        };
+      };
+    };
+  });
   list_1_Cons = (function (Item1, Item2)
   {
     this.Tag = "Cons";
@@ -1812,7 +1957,31 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
   list_1_Cons.prototype.CompareTo = (function (that)
   {
     var diff;
-    return 0.000000;
+    diff = this.Tag.CompareTo(that.Tag);
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      diff = this.Item1.CompareTo(that.Item1);
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        diff = this.Item2.CompareTo(that.Item2);
+        if ((diff != 0.000000)) 
+        {
+          return diff;
+        }
+        else
+        {
+          return 0.000000;
+        };
+      };
+    };
   });
   list_1_Nil = (function ()
   {
@@ -1821,7 +1990,15 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
   list_1_Nil.prototype.CompareTo = (function (that)
   {
     var diff;
-    return 0.000000;
+    diff = this.Tag.CompareTo(that.Tag);
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      return 0.000000;
+    };
   });
   Program_data = Program_get_data();
   return Program_main()
