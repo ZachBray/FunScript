@@ -28,6 +28,7 @@ let components =
    [
       [
          toSeq
+         //ExpressionReplacer.create <@ seq @> <@ (fun xs -> xs :> seq<_>) @>
       ]
       ExpressionReplacer.createModuleMapping 
          "FSharp.Core" "Microsoft.FSharp.Collections.SeqModule"
