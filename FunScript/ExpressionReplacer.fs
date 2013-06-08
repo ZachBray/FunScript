@@ -16,12 +16,27 @@ let private buildInlineReplacement (mi:MethodBase) (args:_ list) =
          vars |> List.concat |> Seq.skip args.Length
          |> Seq.toList
       let varValues = List.zip appliedVars args |> Map.ofList
-      let inlinedBody = bodyExpr.Substitute(varValues.TryFind)
+      // This is to fix the problem where the inlined function
+      // doesn't use all its arguments and they might not be evaluated
+      let varValuesUsed = ref Set.empty
+      let inlinedBody = bodyExpr.Substitute(fun x -> 
+         match varValues.TryFind x with
+         | Some expr -> 
+            varValuesUsed := !varValuesUsed |> Set.add x
+            Some expr
+         | None -> None)
+      let varValuesUsed = !varValuesUsed
+      let varValuesIgnored = 
+         varValues |> Map.filter (fun var _ -> not (varValuesUsed.Contains var))
+      let _, wholeBody =
+         varValuesIgnored |> Map.fold (fun (n,rest) v expr ->
+            n+1, Expr.Let(Var(sprintf "ignored%i" n, expr.Type), expr, rest)
+         ) (0, inlinedBody)
       let rec buildLambda expr args =
          match args with
          | [] -> expr
          | x::xs -> buildLambda (Expr.Lambda(x, expr)) xs
-      buildLambda inlinedBody unappliedVars
+      buildLambda wholeBody unappliedVars
    | _ -> failwith "Expected a method"
    
 
