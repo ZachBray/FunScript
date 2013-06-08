@@ -73,8 +73,8 @@ and take a look at our tutorials and samples:
 </div><div class="large-5 columns">
 
 **FunScript** is a lightweight F# library that lets you rapidly develop single-page 
-applications. You can connect to external data sources and call REST APIs in a type 
-safe way, produce dashboards using JavaScript visualization libraries and write 
+applications. You can connect to external data sources and call REST APIs with intellisense, 
+produce dashboards using JavaScript visualization libraries and write 
 asynchronous computations easily without explicit callbacks.
 
 <div style="margin-left:auto;margin-right:auto;text-align:center;">
@@ -85,7 +85,7 @@ asynchronous computations easily without explicit callbacks.
 
  * Write **client-side code in F#** with the full comfort of MonoDevelop, Visual Studio or Emacs 
  * Get **autocomplete and tooltips** for the HTML DOM, jQuery and other popular JavaScript libraries
- * Use language with **sound generics** and support for **asynchronous** programming 
+ * Use language with **generics** and support for **asynchronous** programming 
  * Process JSON and call REST APIs using F# 3.0 type providers with no hassle!
 
 ## FunScript on Channel 9
