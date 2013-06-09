@@ -10,19 +10,39 @@ module X =
 
    let printName2 (x : 'a) = x.GetType().Name
 
-//[<Test>]
-//let ``typeof<ConcreteT>.Name works``() =
-//   check  
-//      <@@ 
-//         typeof<int>.Name
-//      @@>
-//
-//[<Test>]
-//let ``typeof<'genericT>.Name works``() =
-//   check  
-//      <@@ 
-//         X.printName<int>()
-//      @@>
+   let printNames<'a, 'b>() =
+      printName2 "abc" + printName<'a>() + printName<'b>()
+
+   let printName3 (x : 'a) (f : 'a -> 'b) =
+      printName<'b>() + printName<'a>()
+
+[<Test>]
+let ``typeof<ConcreteT>.Name works``() =
+   check  
+      <@@ 
+         typeof<float>.Name
+      @@>
+
+[<Test>]
+let ``typeof<'genericT>.Name works``() =
+   check  
+      <@@ 
+         X.printName<float>() + X.printName<bool>()
+      @@>
+
+[<Test>]
+let ``threaded typeof<'genericT>.Name works``() =
+   check  
+      <@@ 
+         X.printNames<float,bool>()
+      @@>
+
+[<Test>]
+let ``threaded partially applied typeof<'genericT>.Name works``() =
+   check  
+      <@@ 
+         X.printName3 1 (fun x -> float x)
+      @@>
 //
 //[<Test>]
 //let ``type test works``() =

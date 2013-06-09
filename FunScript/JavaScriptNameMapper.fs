@@ -75,13 +75,37 @@ let filterUnsafe str =
       str + "_reserved"
    else str
 
-let sanitize(str:string) =
-   str.Replace('.', '_')
-      .Replace('+', '_')
-      .Replace('`', '_')
-      .Replace('@', '_')
-      .Replace(''', '_')
+let sanitizeAux(str:string) =
+   str |> Seq.map (function
+      | c when (c >= 'a' && c <= 'z') || 
+               (c >= '0' && c <= '9') ||
+               (c >= 'A' && c <= 'Z') ||
+               c = '_' -> c
+      | _ -> '_')
+   |> Seq.toArray
+   |> fun chars -> System.String(chars)
    |> filterUnsafe
+
+let replacements = ref Map.empty
+let used = ref Set.empty
+
+let sanitize str =
+   let replacement = sanitizeAux str
+   let rec sanitize n =
+      match !replacements |> Map.tryFind str with
+      | Some replacement -> replacement
+      | None ->
+         let replacement =
+            match n with
+            | 0 -> replacement
+            | n -> sprintf "%s%i" replacement n
+         if !used |> Set.contains replacement then
+            sanitize (n+1)
+         else
+            used := !used |> Set.add replacement
+            replacements := !replacements |> Map.add str replacement
+            replacement
+   sanitize 0
 
 let (*internal*) mapType(t:System.Type) =
    sanitize t.Name

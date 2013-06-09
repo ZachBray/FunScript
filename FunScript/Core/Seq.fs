@@ -325,14 +325,6 @@ let Initialize n f =
       if i < n then Some(f i, i+1)
       else None)
 
-let Concat (xs: seq<'a :> seq<'b>>) =
-   let first = Head xs
-   let rest = Skip 1 xs
-   Fold Append (first :> _ seq) rest
-
-let Collect f xs =
-   Map f xs |> Concat
-
 let Cast<'a> (xs:IEnumerable) =
    xs :?> 'a seq
 
@@ -429,3 +421,15 @@ let CountBy f xs =
    GroupBy f xs
    |> Map (fun (k, vs) -> k, Length vs)
 
+
+//// Unsafe because of type constraints?
+//let Concat<'a, 'b> (xs : obj) : obj =
+//   let first = Head (unbox xs)
+//   let rest = Skip 1 (unbox xs)
+//   Fold Append (first :> _ seq) rest
+//   |> box
+//
+//// Unsafe because of type constraints?
+//let Collect<'a, 'b, 'c> f xs : obj  =
+//   Map (unbox f) (unbox xs) |> Concat
+//   |> box

@@ -49,36 +49,38 @@ let generateArityWithCompiler quote (|ArgMatch|_|) =
    let mi, callType = Quote.toMethodBaseFromLambdas quote
    createCallerReplacer mi callType None <| fun split compiler returnStategy ->
       function
-      | None, _, ArgMatch split compiler (decls, code) ->
-         [ yield! decls |> List.concat
-           yield returnStategy.Return code
-         ]
-      | Some obj, _, args ->
-         match obj::args with
-         | ArgMatch split compiler (decls, code) ->
+      | None, typeArgs, expr ->
+         match expr with
+         | ArgMatch mi typeArgs split compiler (decls, code) ->
             [ yield! decls |> List.concat
               yield returnStategy.Return code
             ]
          | _ -> []
-      | _ -> []
+      | Some obj, typeArgs, args ->
+         match obj::args with
+         | ArgMatch mi typeArgs split compiler (decls, code) ->
+            [ yield! decls |> List.concat
+              yield returnStategy.Return code
+            ]
+         | _ -> []
 
 let generateArity quote argMatch = 
-   generateArityWithCompiler quote (fun x _ -> argMatch x)
+   generateArityWithCompiler quote (fun mi _ x _ -> argMatch mi x)
 
 let nullary quote code =
-   generateArity quote (fun (|Split|) ->
+   generateArity quote (fun _ (|Split|) ->
       function
       | [] -> Some([], code)
       | _ -> None)
 
 let unary quote genCode =
-   generateArity quote (fun (|Split|) ->
+   generateArity quote (fun _ (|Split|) ->
       function
       | [Split(decl, ref)] -> Some([decl], genCode ref)
       | _ -> None)
 
 let unaryStatement quote genCode =
-   generateArity quote (fun (|Split|) ->
+   generateArity quote (fun _ (|Split|) ->
       function
       | [Split(decl, ref)] -> Some([decl; [genCode ref]], Null)
       | _ -> None)
@@ -87,18 +89,18 @@ let unaryOp quote symbol =
    unary quote (fun refArg -> UnaryOp(symbol, refArg))
 
 let binaryTyped quote genCode =
-   generateArity quote (fun (|Split|) ->
+   generateArity quote (fun mi (|Split|) ->
       function
       | [Split(declLHS, refLHS) as exprA; Split(declRHS, refRHS) as exprB] ->
-         match genCode exprA.Type refLHS exprB.Type refRHS with
+         match genCode mi exprA.Type refLHS exprB.Type refRHS with
          | Some code -> Some ([declLHS; declRHS], code)   
          | None -> None      
       | _ -> None)
 
-let binary quote genCode = binaryTyped quote (fun _ a _ b -> Some(genCode a b))
+let binary quote genCode = binaryTyped quote (fun _ _ a _ b -> Some(genCode a b))
 
 let binaryStatement quote genCode =
-   generateArity quote (fun (|Split|) ->
+   generateArity quote (fun _ (|Split|) ->
       function
       | [Split(declLHS, refLHS); Split(declRHS, refRHS)] ->
          Some ([declLHS; declRHS; [genCode refLHS refRHS]], Null)         
@@ -108,21 +110,21 @@ let binaryOp quote symbol =
    binary quote (fun refLHS refRHS -> BinaryOp(refLHS, symbol, refRHS))
 
 let ternary quote genCode =
-   generateArity quote (fun (|Split|) ->
+   generateArity quote (fun _ (|Split|) ->
       function
       | [Split(declA, refA); Split(declB, refB); Split(declC, refC)] ->
          Some ([declA; declB; declC], genCode refA refB refC)         
       | _ -> None)
 
 let ternaryStatement quote genCode =
-   generateArity quote (fun (|Split|) ->
+   generateArity quote (fun _ (|Split|) ->
       function
       | [Split(declA, refA); Split(declB, refB); Split(declC, refC)] ->
          Some ([declA; declB; declC; [genCode refA refB refC]], Null)         
       | _ -> None)
 
 let nary4 quote genCode =
-   generateArity quote (fun (|Split|) ->
+   generateArity quote (fun _ (|Split|) ->
       function
       | [Split(declA, refA); 
          Split(declB, refB); 
@@ -132,7 +134,7 @@ let nary4 quote genCode =
       | _ -> None)
 
 let nary5 quote genCode =
-   generateArity quote (fun (|Split|) ->
+   generateArity quote (fun _ (|Split|) ->
       function
       | [Split(declA, refA); 
          Split(declB, refB); 

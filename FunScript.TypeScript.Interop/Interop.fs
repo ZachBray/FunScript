@@ -47,7 +47,7 @@ open Microsoft.FSharp.Quotations
 
 module Components =
    let private replace quote f =
-      CompilerComponent.generateArity quote (fun split -> 
+      CompilerComponent.generateArity quote (fun _ split -> 
          function
          | Patterns.Value(:? bool as isStatic, _)::
            Patterns.Value(:? string as meth, _):: 

@@ -19,7 +19,17 @@ let private (|ReflectedDefinition|_|) (mi:MethodBase) =
       | Some _ -> Some(JavaScriptNameMapper.mapMethod mi)
       | _ -> None
 
+let private getGenericArgs (mb : MethodBase) =
+   if mb.IsGenericMethod || mb.IsGenericMethodDefinition then 
+      mb.GetGenericArguments()
+   else [||]
+
 let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list) bodyExpr var (compiler:InternalCompiler.ICompiler) =
+   //TODO: Only add type vars when they are used? 
+   // We'd have to check the body for a typeof<'a>... or threading to another method though?
+   // Sounds too hard for now!
+   let typeSpecVars = 
+      (getGenericArgs replacementMi) |> Array.map Reflection.genTypeVar |> Array.toList
    match replacementMi.GetCustomAttribute<JSEmitAttribute>() with
    | meth when meth <> Unchecked.defaultof<_> ->
       let code =
@@ -28,10 +38,11 @@ let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list)
          |> List.fold (fun (acc:string) (i,v) ->
             acc.Replace(sprintf "{%i}" i, v.Name)
             ) meth.Emit
-      [ Assign(Reference var, Lambda(vars, EmitBlock code)) ]
+      [ Assign(Reference var, Lambda(typeSpecVars @ vars, EmitBlock code)) ]
    | _ when mb.IsConstructor ->
       [  
-         yield Assign(Reference var, Lambda(vars, Block(compiler.Compile ReturnStrategies.inplace bodyExpr)))
+         // Here we should really pass in the type context into Compile(...).
+         yield Assign(Reference var, Lambda(typeSpecVars @ vars, Block(compiler.Compile ReturnStrategies.inplace bodyExpr)))
          let methods = compiler |> Objects.genInstanceMethods mb.DeclaringType
          let proto = PropertyGet(Reference var, "prototype")
          for name, lambda in methods do
@@ -40,22 +51,28 @@ let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list)
    | _ -> 
       [ Assign(
          Reference var, 
-         Lambda(vars, 
+         Lambda(typeSpecVars @ vars, 
+            // Here we should really pass in the type context into Compile(...).
             Block(compiler.Compile ReturnStrategies.returnFrom bodyExpr))) ] 
 
    
 
-let private replaceIfAvailable (compiler:InternalCompiler.ICompiler) mb callType =
-   match compiler.ReplacementFor mb callType with
-   | None -> mb
-   | Some mi -> mi :> MethodBase
+let private replaceIfAvailable (compiler:InternalCompiler.ICompiler) (mb : MethodBase) callType =
+   let replacementMb =
+      match compiler.ReplacementFor mb callType with
+      | None -> mb //GetGenericMethod()...
+      | Some mi -> upcast mi
+   Reflection.specializeGeneric replacementMb
 
 let private (|CallPattern|_|) = Objects.methodCallPattern
 
-let private createGlobalMethod compiler mb callType var =
+let private createGlobalMethod name compiler mb callType =
    match replaceIfAvailable compiler mb callType with
-   | CallPattern(vars, bodyExpr) as replacementMi ->
-      genMethod mb replacementMi vars bodyExpr var compiler
+   | (CallPattern(vars, bodyExpr) as replacementMi), specialization ->
+      // TODO: We need to deal with generic type args from the type not just the method
+      getGenericArgs replacementMi,
+      compiler.DefineGlobal (name + specialization) (fun var ->
+         genMethod mb replacementMi vars bodyExpr var compiler)
    | _ -> failwithf "No reflected definition for method: %s" mb.Name
 
 let private createConstruction
@@ -70,8 +87,8 @@ let private createConstruction
       |> List.unzip
    match ci with
    | ReflectedDefinition name ->
-      let consRef = 
-         compiler.DefineGlobal name (createGlobalMethod compiler ci Quote.ConstructorCall)
+      //TODO: Generic types will have typeArgs we need to deal with here.
+      let _, consRef = createGlobalMethod name compiler ci Quote.ConstructorCall
       [ yield! decls |> List.concat
         yield returnStategy.Return <| New(consRef.Name, refs) ]
    | _ -> []
@@ -96,10 +113,23 @@ let private createCall
          [ yield! decls |> List.concat
            yield returnStategy.Return <| Apply(PropertyGet(objRef, mi.Name), argRefs) ]
       | true, exprs ->
-         let methRef = 
-            compiler.DefineGlobal name (createGlobalMethod compiler mi Quote.MethodCall)
+         let typeArgs, methRef = createGlobalMethod name compiler mi Quote.MethodCall
+         let typeArgRefs =
+            Array.map2 (fun (callT : System.Type) (receiveT : System.Type) ->
+               // It could be a threaded generic argument from one func to another.
+               let isRealType = not callT.IsGenericParameter
+               if isRealType then
+                  let runtimeTypeVar = Reflection.buildRuntimeType compiler callT
+                  Reference(runtimeTypeVar)
+               else
+                  //TODO: Here we should really have the type context passed in to
+                  // this createCall function. This is a bit hacky using Global vars.
+                  // It could cause problems if the type vars have the same name as real vars.
+                  Reference(Reflection.genTypeVar receiveT) 
+            ) (getGenericArgs mi) typeArgs
+            |> Array.toList
          [ yield! decls |> List.concat
-           yield returnStategy.Return <| Apply(Reference methRef, refs) ]
+           yield returnStategy.Return <| Apply(Reference methRef, typeArgRefs @ refs) ]
       | _ -> failwith "never"
    | _ -> []
 
