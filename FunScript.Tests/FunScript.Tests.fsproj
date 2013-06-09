@@ -59,6 +59,7 @@
     <Compile Include="Maps.fs" />
     <Compile Include="Strings.fs" />
     <Compile Include="Asyncs.fs" />
+    <Compile Include="Reflection.fs" />
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>

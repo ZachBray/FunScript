@@ -21,14 +21,14 @@ module PatternsExt =
 
    let (|NewObject|_|) = function
       | Patterns.NewObject(ctor, args) ->
-         if FSharpType.IsRecord ctor.DeclaringType then None
+         if FSharpType.IsRecord(ctor.DeclaringType, BindingFlags.Public ||| BindingFlags.NonPublic) then None
          else Some(ctor, args)
       | _ -> None
    
    let (|NewRecord|_|) = function
       | Patterns.NewRecord(typ, args) -> Some(typ, args)
       | Patterns.NewObject(ctor, args) ->
-         if FSharpType.IsRecord ctor.DeclaringType then 
+         if FSharpType.IsRecord(ctor.DeclaringType, BindingFlags.Public ||| BindingFlags.NonPublic) then 
            Some(ctor.DeclaringType, args)
          else None
       | _ -> None

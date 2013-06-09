@@ -59,6 +59,7 @@
     <Compile Include="Core\String.fs" />
     <Compile Include="Core\Events.fs" />
     <Compile Include="Core\Async.fs" />
+    <Compile Include="Core\Type.fs" />
     <Compile Include="JavaScriptNameMapper.fs" />
     <Compile Include="AST.fs" />
     <Compile Include="QuoteExtensions.fs" />
@@ -66,6 +67,7 @@
     <Compile Include="ReturnStrategies.fs" />
     <Compile Include="CompilerComponent.fs" />
     <Compile Include="ExpressionReplacer.fs" />
+    <Compile Include="Reflection.fs" />
     <Compile Include="PrimitiveTypes.fs" />
     <Compile Include="Comparison.fs" />
     <Compile Include="Arithmetic.fs" />

@@ -17,6 +17,7 @@ let private numericTypes =
       typeof<single>.Name
       typeof<float32>.Name
 
+      // Huh?
       typeof<string>.Name
       typeof<char>.Name
       typeof<bool>.Name

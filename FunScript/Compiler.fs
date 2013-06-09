@@ -26,6 +26,7 @@ let private allComponents =
       ControlFlow.components
       CommonOperators.components
       Objects.components
+      Reflection.components
    ] |> List.concat
 
 let private comparerPrototypes = """
