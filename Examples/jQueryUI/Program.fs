@@ -40,7 +40,7 @@ let initDragAndDrop () =
     // Setup the drop zone elements
     let dropSettings = ts.Droppable(hoverClass = "ui-state-active", accept = ".draggable")
     // A few helpers from the FunScript.FunctionHelpers module make it a little easier to setup the Drop callback function. We use one of the overloaded TupledDelegate
-    // types to specify the expected signature of the callback function. A standard F# function is then use to all the element that is being dragged to be appended to the
+    // types to specify the expected signature of the callback function. A standard F# function is then use to allow the element that is being dragged to be appended to the
     // target element. The TupledDelegate type is then turned into an immediate function so that when the event fires the TupledDelegate function executes immediately. 
     dropSettings.drop <- immediateFn 
                          <| TupledDelegate<ts.Event, ts.DroppableEventUIParam, ts.JQuery>(fun e ui -> ui.draggable.appendTo(e.target))
