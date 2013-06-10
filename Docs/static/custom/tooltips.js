@@ -10,10 +10,6 @@ function hideTip(evt, name, unique)
 
 function findPos(obj)
 {
-  // no idea why, but it behaves differently in webbrowser component
-  if (window.location.search == "?inapp")
-    return [obj.offsetLeft + 10, obj.offsetTop + 30];
-
   var curleft = 0;
   var curtop = obj.offsetHeight;
   while (obj)
@@ -44,6 +40,7 @@ function showTip(evt, name, unique, owner)
 
   var el = document.getElementById(name);
   var parent = (document.documentElement == null) ? document.body : document.documentElement;
+  parent.appendChild(el);
   el.style.position = "absolute";
   el.style.left = posx + "px";
   el.style.top = posy + "px";
