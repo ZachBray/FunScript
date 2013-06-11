@@ -91,7 +91,8 @@ let funScriptFiles = [
 
 let createDownloadZip() =
    let downloadPath = outputPath ++ "downloads/funscript.zip"
-   File.Delete downloadPath
+   if File.Exists downloadPath then
+      File.Delete downloadPath
    use zip = new ZipFile()
    zip.AddFiles funScriptFiles
    zip.Save(downloadPath)
@@ -113,6 +114,7 @@ let samples =
     "WorldBank", funScriptRoot ++ "Examples/WorldBank/", "Web"
     "MovieDatabase", funScriptRoot ++ "Examples/MovieDatabase/", "Web"
     "Canvas", funScriptRoot ++ "Examples/Canvas/", "Web"
+    "Mandelbrot", funScriptRoot ++ "Examples/Mandelbrot/", "Web"
     "SimpleAsync", funScriptRoot ++ "Examples/SimpleAsync/", "" ]
 
 // --------------------------------------------------------------------------------------

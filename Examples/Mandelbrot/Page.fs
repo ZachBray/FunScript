@@ -1,4 +1,9 @@
-﻿[<ReflectedDefinition>]
+﻿// ---
+// header: Mandelbrot
+// tagline: Using HTML5 canvas
+// ---
+
+[<ReflectedDefinition>]
 module Program
 
 open FunScript
