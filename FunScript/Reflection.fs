@@ -20,14 +20,10 @@ let primitiveTypes =
       typeof<single>.FullName
       typeof<float32>.FullName
 
-      // Huh?
       typeof<string>.FullName
       typeof<char>.FullName
       typeof<bool>.FullName
    ]
-   
-let genTypeVar (t : System.Type) =
-    Var.Global(sprintf "type_arg_%s" t.Name, typeof<obj>)
 
 let isGenericParameter (t : System.Type) =
    t.IsGenericParameter
@@ -36,56 +32,46 @@ let isGenericParameter (t : System.Type) =
 let isPrimitive (t : Type) =
    primitiveTypes.Contains t.FullName
 
-let specializeGeneric (mb : MethodBase) =
-   if mb.IsGenericMethod (*|| mb.IsGenericMethodDefinition *) then
-      let realArgs = mb.GetGenericArguments()
-      match mb with
-      | :? MethodInfo as mi -> 
-         let genericMb = mi.GetGenericMethodDefinition()
-         let genericArgs = genericMb.GetGenericArguments()
-         let appliedArgs =
-            Array.map2 (fun realT genericT ->
-               //TODO: It would be nice to share "real"/JS type methods
-               // but it doesn't work with typeof<'a> because it is specialized.
-               if isPrimitive realT then realT, realT.Name
-               else genericT, genericT.Name
-            ) realArgs genericArgs
-         let specialization =
-            appliedArgs |> Seq.map snd |> String.concat ""
-         let appliedArgs = appliedArgs |> Array.map fst
-         let appliedMi = genericMb.MakeGenericMethod appliedArgs
-         let genericLeftovers = appliedArgs |> Array.filter isGenericParameter
-         appliedMi :> MethodBase, specialization
-      | _ -> mb, ""
-   else mb, ""
+let getGenericTypeArgs (t : Type) =
+   let isGeneric = t.IsGenericType || t.IsGenericTypeDefinition
+   if isGeneric then t.GetGenericArguments()
+   else [||]
 
-let private netTypeExpr (t : Type) =
+let getGenericMethodArgs (mb : MethodBase) =
+   let isGeneric = mb.IsGenericMethod || mb.IsGenericMethodDefinition
+   let methodTypeArgs =
+      if isGeneric then mb.GetGenericArguments()
+      else [||]
+   Array.append (getGenericTypeArgs mb.DeclaringType) methodTypeArgs
+
+let getSpecializationString (compiler : InternalCompiler.ICompiler) ts =
+   "_" + (
+      ts |> Seq.map (fun (t : Type) ->
+         //TODO: Name isn't safe. We really need to keep a dictionary around
+         // to make this safer. Using only the short names if there are no collisions.
+         if isPrimitive t then t.Name
+         elif compiler.ShouldFlattenGenericsForReflection then JavaScriptNameMapper.mapType t
+         else "obj"
+      ) |> String.concat "_")
+   |> JavaScriptNameMapper.sanitizeAux
+   
+
+let rec private netTypeExpr (t : Type) =
    let name = t.Name
-   <@ Core.Type.Type(name) @>
-       
-let private knownJSTypes =
-   Map [
-      //TODO: Might need to fill out with all representations, e.g., int, uint32...
-      typeof<float>.FullName, "Number"
-      typeof<string>.FullName, "String"
-      typeof<char>.FullName, "Char"
-      typeof<bool>.FullName, "Boolean"
-   ]
+   let fullName = t.FullName
+   let typeArgs =
+      let isGeneric = t.IsGenericType || t.IsGenericTypeDefinition
+      if isGeneric then t.GetGenericArguments()
+      else [||]
+   let typeArgExprs = typeArgs |> Array.toList |> List.map netTypeExpr
+   let typeArgsArrayExpr = Expr.NewArray(typeof<Core.Type.Type>, typeArgExprs)
+   <@@ Core.Type.Type(name, fullName, %%typeArgsArrayExpr) @@>
 
 let buildRuntimeType (compiler : InternalCompiler.ICompiler) (t : System.Type) =
-   let typeName = sprintf "runtime_type_%s_%s" t.Namespace t.Name |> JavaScriptNameMapper.sanitize
+   let typeName = sprintf "t_%s" (JavaScriptNameMapper.mapType t)
    compiler.DefineGlobal typeName (fun var ->
-      [
-         let expr = netTypeExpr t
-         yield! compiler.Compile (ReturnStrategies.assignVar var) expr
-         match knownJSTypes |> Map.tryFind t.FullName with
-         | None -> ()
-         | Some jsT ->
-            let jsTVar = Var(jsT, typeof<obj>)
-            let getTypeMeth = PropertyGet(PropertyGet(Reference jsTVar, "prototype"), "GetType")
-            let getTypeImpl = AST.Lambda([], Block [AST.Return(Reference var)])
-            yield Assign(getTypeMeth, getTypeImpl)
-      ]
+      let expr = netTypeExpr t
+      compiler.Compile (ReturnStrategies.assignVar var) expr
    )
 
 let components = 
@@ -96,9 +82,11 @@ let components =
             (fun _ _ (|Split|) compiler -> 
                function
                | [Split(decls, ref) as expr] ->
-                  if not (isGenericParameter expr.Type) then
-                     buildRuntimeType compiler expr.Type |> ignore<Var>
-                  Some([decls], Apply(PropertyGet(ref, "GetType"), []))
+                  let typeVar =
+                     if isGenericParameter expr.Type then
+                        failwith "Expected all types to be flattened"
+                     else buildRuntimeType compiler expr.Type
+                  Some([decls], Reference typeVar)
                | _ -> None)
 
          CompilerComponent.generateArityWithCompiler
@@ -109,8 +97,9 @@ let components =
                   match typeArgs with
                   | [|t|] -> 
                      let typeVar =
-                        if not(isGenericParameter t) then buildRuntimeType compiler t
-                        else genTypeVar t
+                        if isGenericParameter t then 
+                           failwith "Expected all types to be flattened"
+                        else buildRuntimeType compiler t
                      Some([], Reference typeVar)
                   | _ -> None
                | _ -> None)

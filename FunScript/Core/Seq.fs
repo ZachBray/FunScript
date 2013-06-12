@@ -64,12 +64,13 @@ type UnfoldEnumerator<'acc, 'a>(seed:'acc, unfold) =
             
       member __.Dispose() = ()
 
-type CreateEnumerable<'a>(factory) =
+
+type CreateEnumerable<[<EqualityConditionalOnAttribute; ComparisonConditionalOnAttribute>] 'a>(factory) =
 
    interface System.IComparable<'a seq> with 
       member this.CompareTo ys =
          let xs = this :> IEnumerable<'a>
-         Seq.compareWith (fun x y -> (x :> obj :?> IComparable<'a>).CompareTo y) 
+         Seq.compareWith (fun x y -> Unchecked.compare x y) 
             xs ys
 
    interface IEnumerable<'a> with
@@ -388,8 +389,7 @@ let Singleton x =
       | None -> None)
 
 let Compare xs ys =
-   CompareWith (fun (x:'a) (y:'a) ->
-      (x :> obj :?> IComparable<'a>).CompareTo y) xs ys
+   CompareWith compare xs ys
 
 let SortBy f xs =
    let ys = xs |> ToArray
@@ -408,28 +408,23 @@ let DistinctBy f xs =
 let Distinct xs =
    DistinctBy id xs
 
-let GroupBy f xs =
+let GroupBy (f : 'a -> 'b) (xs : 'a seq) =
    Fold (fun (acc:Map<_,_>) x ->
       let k = f x
       match acc.TryFind k with
       | Some vs -> acc.Add(k, x::vs)
       | None -> acc.Add(k, [x])) Collections.Map.empty xs
    |> Collections.Map.toSeq
-   |> Map (fun (k, vs) -> k, vs :> _ seq)
+   |> Map (fun (k, vs) -> k, vs :> 'a seq)
 
 let CountBy f xs =
    GroupBy f xs
    |> Map (fun (k, vs) -> k, Length vs)
 
+let Concat xs =
+   let first = Head xs
+   let rest = Skip 1 xs
+   Fold Append (first :> _ seq) rest
 
-//// Unsafe because of type constraints?
-//let Concat<'a, 'b> (xs : obj) : obj =
-//   let first = Head (unbox xs)
-//   let rest = Skip 1 (unbox xs)
-//   Fold Append (first :> _ seq) rest
-//   |> box
-//
-//// Unsafe because of type constraints?
-//let Collect<'a, 'b, 'c> f xs : obj  =
-//   Map (unbox f) (unbox xs) |> Concat
-//   |> box
+let Collect f xs =
+   Map f xs |> Concat

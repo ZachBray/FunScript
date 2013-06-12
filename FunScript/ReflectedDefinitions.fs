@@ -19,17 +19,7 @@ let private (|ReflectedDefinition|_|) (mi:MethodBase) =
       | Some _ -> Some(JavaScriptNameMapper.mapMethod mi)
       | _ -> None
 
-let private getGenericArgs (mb : MethodBase) =
-   if mb.IsGenericMethod || mb.IsGenericMethodDefinition then 
-      mb.GetGenericArguments()
-   else [||]
-
 let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list) bodyExpr var (compiler:InternalCompiler.ICompiler) =
-   //TODO: Only add type vars when they are used? 
-   // We'd have to check the body for a typeof<'a>... or threading to another method though?
-   // Sounds too hard for now!
-   let typeSpecVars = 
-      (getGenericArgs replacementMi) |> Array.map Reflection.genTypeVar |> Array.toList
    match replacementMi.GetCustomAttribute<JSEmitAttribute>() with
    | meth when meth <> Unchecked.defaultof<_> ->
       let code =
@@ -38,39 +28,24 @@ let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list)
          |> List.fold (fun (acc:string) (i,v) ->
             acc.Replace(sprintf "{%i}" i, v.Name)
             ) meth.Emit
-      [ Assign(Reference var, Lambda(typeSpecVars @ vars, EmitBlock code)) ]
+      [ Assign(Reference var, Lambda(vars, EmitBlock code)) ]
    | _ when mb.IsConstructor ->
       [  
-         // Here we should really pass in the type context into Compile(...).
-         yield Assign(Reference var, Lambda(typeSpecVars @ vars, Block(compiler.Compile ReturnStrategies.inplace bodyExpr)))
-         let methods = compiler |> Objects.genInstanceMethods mb.DeclaringType
-         let proto = PropertyGet(Reference var, "prototype")
-         for name, lambda in methods do
-            yield Assign(PropertyGet(proto, name), lambda)
+         yield Assign(Reference var, Lambda(vars, Block(compiler.Compile ReturnStrategies.inplace bodyExpr)))
       ]
    | _ -> 
       [ Assign(
          Reference var, 
-         Lambda(typeSpecVars @ vars, 
-            // Here we should really pass in the type context into Compile(...).
+         Lambda(vars, 
             Block(compiler.Compile ReturnStrategies.returnFrom bodyExpr))) ] 
-
-   
-
-let private replaceIfAvailable (compiler:InternalCompiler.ICompiler) (mb : MethodBase) callType =
-   let replacementMb =
-      match compiler.ReplacementFor mb callType with
-      | None -> mb //GetGenericMethod()...
-      | Some mi -> upcast mi
-   Reflection.specializeGeneric replacementMb
 
 let private (|CallPattern|_|) = Objects.methodCallPattern
 
 let private createGlobalMethod name compiler mb callType =
-   match replaceIfAvailable compiler mb callType with
-   | (CallPattern(vars, bodyExpr) as replacementMi), specialization ->
-      // TODO: We need to deal with generic type args from the type not just the method
-      getGenericArgs replacementMi,
+   match Objects.replaceIfAvailable compiler mb callType with
+   | (CallPattern(vars, bodyExpr) as replacementMi) ->
+      let typeArgs = Reflection.getGenericMethodArgs replacementMi
+      let specialization = Reflection.getSpecializationString compiler typeArgs
       compiler.DefineGlobal (name + specialization) (fun var ->
          genMethod mb replacementMi vars bodyExpr var compiler)
    | _ -> failwithf "No reflected definition for method: %s" mb.Name
@@ -88,7 +63,9 @@ let private createConstruction
    match ci with
    | ReflectedDefinition name ->
       //TODO: Generic types will have typeArgs we need to deal with here.
-      let _, consRef = createGlobalMethod name compiler ci Quote.ConstructorCall
+      let typeArgs = Reflection.getGenericMethodArgs ci
+      let specialization = Reflection.getSpecializationString compiler typeArgs
+      let consRef = createGlobalMethod (name + specialization) compiler ci Quote.ConstructorCall
       [ yield! decls |> List.concat
         yield returnStategy.Return <| New(consRef.Name, refs) ]
    | _ -> []
@@ -107,30 +84,20 @@ let private createCall
       |> List.unzip
    match mi with
    | SpecialOp((ReflectedDefinition name) as mi)
+   | (ReflectedDefinition name as mi) when mi.DeclaringType.IsInterface ->
+      match refs with
+      | [] -> []
+      | objRef::argRefs ->
+         [  yield! decls |> List.concat
+            yield returnStategy.Return <| Apply(PropertyGet(objRef, name), argRefs) ]
+   | SpecialOp((ReflectedDefinition name) as mi)
    | (ReflectedDefinition name as mi) ->
-      match mi.IsStatic, refs with
-      | false, objRef::argRefs ->
-         [ yield! decls |> List.concat
-           yield returnStategy.Return <| Apply(PropertyGet(objRef, mi.Name), argRefs) ]
-      | true, exprs ->
-         let typeArgs, methRef = createGlobalMethod name compiler mi Quote.MethodCall
-         let typeArgRefs =
-            Array.map2 (fun (callT : System.Type) (receiveT : System.Type) ->
-               // It could be a threaded generic argument from one func to another.
-               let isRealType = not callT.IsGenericParameter
-               if isRealType then
-                  let runtimeTypeVar = Reflection.buildRuntimeType compiler callT
-                  Reference(runtimeTypeVar)
-               else
-                  //TODO: Here we should really have the type context passed in to
-                  // this createCall function. This is a bit hacky using Global vars.
-                  // It could cause problems if the type vars have the same name as real vars.
-                  Reference(Reflection.genTypeVar receiveT) 
-            ) (getGenericArgs mi) typeArgs
-            |> Array.toList
-         [ yield! decls |> List.concat
-           yield returnStategy.Return <| Apply(Reference methRef, typeArgRefs @ refs) ]
-      | _ -> failwith "never"
+      // TODO: What about interfaces!
+      let typeArgs = Reflection.getGenericMethodArgs mi
+      let specialization = Reflection.getSpecializationString compiler typeArgs
+      let methRef = createGlobalMethod (name + specialization) compiler mi Quote.MethodCall
+      [  yield! decls |> List.concat
+         yield returnStategy.Return <| Apply(Reference methRef, refs) ]
    | _ -> []
 
 let private methodCalling =
@@ -141,9 +108,10 @@ let private methodCalling =
       | _ -> []
 
 let private getPropertyField split (compiler:InternalCompiler.ICompiler) (pi:PropertyInfo) objExpr exprs =
+   let specialization = Reflection.getSpecializationString compiler (Reflection.getGenericTypeArgs pi.DeclaringType)
    let name = 
-      JavaScriptNameMapper.sanitize 
-         (JavaScriptNameMapper.mapType pi.DeclaringType + "_" + pi.Name)
+      JavaScriptNameMapper.sanitizeAux
+         (JavaScriptNameMapper.mapType pi.DeclaringType + "_" + pi.Name + specialization)
    compiler.DefineGlobal name (fun var ->
       // TODO: wrap in function scope?
       compiler.DefineGlobalInitialization <|
@@ -188,10 +156,10 @@ let private fieldGetting =
       function
       | Patterns.FieldGet(Some(Split(objDecl, objRef)), fi) ->
          [ yield! objDecl
-           yield returnStategy.Return <| PropertyGet(objRef, JavaScriptNameMapper.sanitize fi.Name) ]
+           yield returnStategy.Return <| PropertyGet(objRef, JavaScriptNameMapper.sanitizeAux fi.Name) ]
       | Patterns.FieldGet(None, fi) ->
          let name = JavaScriptNameMapper.mapType fi.DeclaringType
-         [ yield returnStategy.Return <| PropertyGet(Reference (Var.Global(name, typeof<obj>)), JavaScriptNameMapper.sanitize fi.Name) ]
+         [ yield returnStategy.Return <| PropertyGet(Reference (Var.Global(name, typeof<obj>)), JavaScriptNameMapper.sanitizeAux fi.Name) ]
       | _ -> []
 
 let private fieldSetting =
@@ -200,11 +168,11 @@ let private fieldSetting =
       | Patterns.FieldSet(Some(Split(objDecl, objRef)), fi, Split(valDecl, valRef)) ->
          [ yield! objDecl
            yield! valDecl
-           yield Assign(PropertyGet(objRef, JavaScriptNameMapper.sanitize fi.Name), valRef) ]
+           yield Assign(PropertyGet(objRef, JavaScriptNameMapper.sanitizeAux fi.Name), valRef) ]
       | Patterns.FieldSet(None, fi, Split(valDecl, valRef)) ->
          let name = JavaScriptNameMapper.mapType fi.DeclaringType
          [ yield! valDecl
-           yield Assign(PropertyGet(Reference (Var.Global(name, typeof<obj>)), JavaScriptNameMapper.sanitize fi.Name), valRef) ]
+           yield Assign(PropertyGet(Reference (Var.Global(name, typeof<obj>)), JavaScriptNameMapper.sanitizeAux fi.Name), valRef) ]
       | _ -> []
 
 let private objectGuid = typeof<obj>.GUID

@@ -29,52 +29,18 @@ let private allComponents =
       Reflection.components
    ] |> List.concat
 
-let private comparerPrototypes = """
-
-Boolean.prototype.CompareTo = function(that) {
-   return this - that;
-};
-
-Number.prototype.CompareTo = function(that) {
-   return this - that;
-};
-
-String.prototype.CompareTo = function(that) {
-   if (this > that) {
-      return 1;
-   } else if (this < that) {
-      return -1;
-   }
-   else {
-      return 0;
-   }
-};
-
-Array.prototype.CompareTo = function(that) {
-   var i = 0;
-   while(i < this.length && i < that.length) {
-      var diff = this[i].CompareTo(that[i]);
-      if(diff != 0) {
-         return diff;
-      }
-      i = i + 1;
-   };
-   return this.length - that.length;
-};
-
-"""
-
 type Compiler =
-   static member Compile(expression, ?components, ?noReturn) = 
+   static member Compile(expression, ?components, ?noReturn, ?shouldFlattenGenericsForReflection) = 
       let components = defaultArg components []
+      let shouldFlattenGenericsForReflection = defaultArg shouldFlattenGenericsForReflection true
       let returnStrat = 
          if defaultArg noReturn false then ReturnStrategies.inplace
          else ReturnStrategies.returnFrom
-      let compiler = InternalCompiler.Compiler(allComponents @ components)
+      let compiler = InternalCompiler.Compiler(allComponents @ components, shouldFlattenGenericsForReflection)
       let program = compiler.Compile returnStrat expression
       let reflectedDefs = compiler.Globals
       let block = List.append reflectedDefs program 
-      comparerPrototypes + (AST.Block block).Print()
+      (AST.Block block).Print()
       
 let compile expr = Compiler.Compile(expr)
 let compileWithoutReturn expr = Compiler.Compile(expr, noReturn=true)

@@ -12,29 +12,34 @@ let getPropNames n =
 let getTupleVars n =
    getPropNames n |> List.map (fun name -> Var(name, typeof<obj>))
 
-let genComparisonFunc n =
+let genComparisonFunc ts =
    let that = Var("that", typeof<obj>)
    let diff = Var("diff", typeof<obj>)
       
+   let fields =
+      let propNames = ts |> List.length |> getPropNames
+      List.zip propNames ts
+
    let body =
-      List.foldBack (fun name acc ->
+      List.foldBack (fun (name, t) acc ->
          let thisField = PropertyGet(This, name)
          let thatField = PropertyGet(Reference that, name)
-         let compareExpr = Comparison.compareCall thisField thatField
-         [  Assign(Reference diff, compareExpr)
-            IfThenElse(
+         let decls, compareExpr = Comparison.compareCall t thisField t thatField |> Option.get
+         [  yield! decls
+            yield Assign(Reference diff, compareExpr)
+            yield IfThenElse(
                BinaryOp(Reference diff, "!=", Number 0.),
                Block [ Return <| Reference diff ],
                Block acc)
-         ]) (getPropNames n) [ Return <| Number 0. ]
+         ]) fields [ Return <| Number 0. ]
       
    Lambda(
       [that],
-      Block <| Declare [diff] :: body
+      Block <| DeclareAndAssign(diff, Number 0.) :: body
    )
 
-let genComparisonMethods n =
-    let func = genComparisonFunc n
+let genComparisonMethods ts =
+    let func = genComparisonFunc ts
     [ "CompareTo", func ]
 
 let private createConstructor n compiler =
@@ -52,10 +57,13 @@ let private creation =
             |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
             |> List.unzip
          let n = exprs.Length
+         let typeArgs = exprs |> List.map (fun expr -> expr.Type)
+         let specialization = Reflection.getSpecializationString compiler typeArgs
+         let name = sprintf "Tuple%s" specialization
          let cons = 
-            compiler.DefineGlobal (sprintf "Tuple%i" n) (fun var -> 
+            compiler.DefineGlobal name (fun var -> 
                [  yield Assign(Reference var, Lambda <| createConstructor n compiler) 
-                  let methods = genComparisonMethods n
+                  let methods = genComparisonMethods typeArgs
                   let proto = PropertyGet(Reference var, "prototype")
                   for name, lambda in methods do
                      yield Assign(PropertyGet(proto, name), lambda)

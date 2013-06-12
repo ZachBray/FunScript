@@ -18,6 +18,7 @@ type ICompiler =
    abstract DefineGlobal: string -> (Var -> JSStatement list) -> Var
    abstract DefineGlobalInitialization: JSStatement list -> unit
    abstract Globals: JSStatement list
+   abstract ShouldFlattenGenericsForReflection: bool
 
 type ICompilerComponent =
    abstract TryCompile: compiler:ICompiler -> returnStategy:IReturnStrategy -> expr:Expr -> JSStatement list
@@ -32,7 +33,7 @@ type CompilerComponent =
    | CallReplacer of CallReplacer
    | CompilerComponent of ICompilerComponent
 
-type Compiler(components) as this = 
+type Compiler(components, shouldFlattenGenericsForReflection) as this = 
    let key (mb:MethodBase) tt =
       mb.Name, mb.DeclaringType.Name, mb.DeclaringType.Namespace, tt
  
@@ -159,4 +160,6 @@ type Compiler(components) as this =
          initialization <- List.append initialization stmts
 
       member __.Globals = getGlobals()
+
+      member __.ShouldFlattenGenericsForReflection = shouldFlattenGenericsForReflection
          

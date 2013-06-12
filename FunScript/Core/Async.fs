@@ -59,19 +59,19 @@ type AsyncBuilder() =
    member x.Return(v) : Async<'T> = protectedCont <| fun k -> 
       invokeCont k v
 
-   member this.While(cond, body) = 
-      let x = this
+   member x.While(cond, body) = 
+      let x = x
       let rec loop() = 
          if cond() then x.Bind(body, loop)
          else x.Zero()
       loop()
 
-   member this.Combine(work1, work2) = 
-      this.Bind(work1, fun () -> work2)
+   member x.Combine(work1, work2) = 
+      x.Bind(work1, fun () -> work2)
 
-   member this.For(seq:seq<_>, body) = 
+   member x.For(seq:seq<_>, body) = 
       let en = seq.GetEnumerator()
-      let x = this
+      let x = x
       let rec loop() = 
          if en.MoveNext() then x.Bind(body en.Current, loop)
          else x.Zero()

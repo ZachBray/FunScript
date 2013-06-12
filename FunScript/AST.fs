@@ -8,14 +8,39 @@ let (|Newline|) padding =
    System.Environment.NewLine +
    indent padding
 
-let getNameScope (var:Var) scope =
-   let rec getNameScope prefix =
-      let name = prefix + JavaScriptNameMapper.sanitize var.Name
-      match scope |> Map.tryFind name with
-      | Some v when v = var -> name, scope
-      | Some _ -> getNameScope (prefix + "_")
-      | None -> name, scope |> Map.add name var
-   getNameScope ""
+type Site =
+   | FromDeclaration
+   | FromReference
+
+type VariableScope =
+   {  ByName : Map<string, Var>
+      ByVar : Map<Var, string> }
+      static member Empty =
+         { ByName = Map.empty; ByVar = Map.empty }
+
+      member scope.ObtainNameScope var site =
+         match scope.ByVar.TryFind var with
+         | Some name -> name, scope
+         | None ->
+            match site with
+            | FromReference -> 
+               match var.Name with
+               | "this" -> "this", scope
+               | _ -> failwithf "Variable '%A' is not within scope." var
+            | FromDeclaration ->
+               let baseName =
+                  match var.Name with
+                  | "this" -> "_this"
+                  | name -> JavaScriptNameMapper.sanitizeAux name
+               let rec obtainFreeName name =
+                  match scope.ByName.TryFind name with
+                  | None -> name
+                  | Some _ -> obtainFreeName ("_" + name)
+               let finalName = obtainFreeName baseName
+               let newScope =
+                  {  ByName = scope.ByName |> Map.add finalName var
+                     ByVar = scope.ByVar |> Map.add var finalName    }
+               finalName, newScope
 
 type JSRef = string
 
@@ -37,13 +62,13 @@ type JSExpr =
    | UnaryOp of string * JSExpr
    | BinaryOp of JSExpr * string * JSExpr
    | TernaryOp of JSExpr * string * JSExpr * string * JSExpr
-   member value.Print((Newline newL) as padding, scope:_ ref) =
+   member value.Print((Newline newL) as padding, scope:VariableScope ref) =
       match value with
       | Null -> "null"
       | Boolean b -> b.ToString().ToLower()
       | Number f -> sprintf "%f" f
       | String str -> sprintf @"""%s""" (System.Web.HttpUtility.JavaScriptStringEncode(str))
-      | Reference ref -> getNameScope ref !scope |> fst
+      | Reference ref -> (!scope).ObtainNameScope ref FromReference |> fst
       | UnsafeReference ref -> ref
       | This -> "this"
       | Object propExprs ->
@@ -78,8 +103,8 @@ type JSExpr =
          let oldScope = !scope
          let newScope, names = 
             vars 
-            |> Seq.fold (fun (scope, acc) v -> 
-               let name, scope = getNameScope v scope
+            |> Seq.fold (fun (scope : VariableScope, acc) v -> 
+               let name, scope = scope.ObtainNameScope v FromDeclaration
                scope, name::acc) (oldScope, [])
          let filling = names |> List.rev |> String.concat ", "
          scope := newScope
@@ -120,13 +145,13 @@ and JSStatement =
       | Declare vars ->
          let newScope, names = 
             vars 
-            |> Seq.fold (fun (scope, acc) v -> 
-               let name, scope = getNameScope v scope
+            |> Seq.fold (fun (scope : VariableScope, acc) v -> 
+               let name, scope = scope.ObtainNameScope v FromDeclaration
                scope, name::acc) (!scope, [])
          scope := newScope
          sprintf "var %s" (names |> String.concat ", ")
       | DeclareAndAssign(var, valExpr) ->
-         let name, newScope = getNameScope var !scope
+         let name, newScope = (!scope).ObtainNameScope var FromDeclaration
          scope := newScope
          sprintf "var %s = %s" name (valExpr.Print(padding, scope))
       | Assign(varExpr, valExpr) ->
@@ -144,7 +169,7 @@ and JSStatement =
          + newL
          + block.Print(padding, scope)
       | ForLoop(var, fromExpr, toExpr, block) ->
-         let name, newScope = getNameScope var !scope
+         let name, newScope = (!scope).ObtainNameScope var FromDeclaration
          scope := newScope
          sprintf "for (var %s = %s; %s <= %s; %s++)" name (fromExpr.Print(padding, scope)) name (toExpr.Print(padding, scope)) name
          + newL
@@ -199,9 +224,4 @@ and JSBlock =
          sprintf "{%s%s%s}" paddedNewL code newL
 
    member block.Print() =
-      let keyword = Var.Global("__keyword__", typeof<obj>)
-      let reservedWords =
-         Map [
-            "enum", keyword
-         ]
-      block.Print(0, ref reservedWords)
+      block.Print(0, ref VariableScope.Empty)

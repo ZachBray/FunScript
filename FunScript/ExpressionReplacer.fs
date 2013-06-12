@@ -98,10 +98,23 @@ let createMethodMap mi callType replacementMi =
             if isInlined then buildInlineReplacement mi (obj::exprs)
             else buildCall mi (obj::exprs)
 
+let rec getInterfaces (t : System.Type) = 
+   [|
+      if t.IsInterface then
+         yield t
+         for i in t.GetInterfaces() do
+            yield! getInterfaces i
+   |]
+
 let createTypeMethodMappings (fromType:Type) (toType:Type) =
    let methodLookup = 
-      toType.GetMethods(BindingFlags.Instance ||| BindingFlags.Static ||| BindingFlags.NonPublic ||| BindingFlags.Public)
-      |> Array.map (fun mi -> mi.Name, mi)
+      let methods =
+         toType.GetMethods(BindingFlags.Instance ||| BindingFlags.Static ||| BindingFlags.NonPublic ||| BindingFlags.Public)
+      let interfaceMethods =
+         getInterfaces toType
+         |> Array.collect (fun it -> toType.GetInterfaceMap(it).TargetMethods)
+      Array.append methods interfaceMethods 
+      |> Array.map (fun mi -> mi.Name, mi) 
       |> Map.ofArray
    let availableMethods =
       fromType.GetMethods(BindingFlags.Instance ||| BindingFlags.Static ||| BindingFlags.NonPublic ||| BindingFlags.Public)

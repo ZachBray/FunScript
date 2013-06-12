@@ -21,7 +21,7 @@ let private propertyGetter =
             when isAvailable compiler (pi.GetGetMethod(true))
             ->
          [ yield! objDecl 
-           yield returnStategy.Return <| PropertyGet(objRef, JavaScriptNameMapper.sanitize pi.Name)
+           yield returnStategy.Return <| PropertyGet(objRef, JavaScriptNameMapper.sanitizeAux pi.Name)
          ]
       | _ -> []
 
@@ -33,16 +33,16 @@ let private propertySetter =
             ->
          [ yield! objDecl 
            yield! valDecl
-           yield Assign(PropertyGet(objRef, JavaScriptNameMapper.sanitize pi.Name), valRef)
+           yield Assign(PropertyGet(objRef, JavaScriptNameMapper.sanitizeAux pi.Name), valRef)
            if returnStategy = ReturnStrategies.inplace then
                yield returnStategy.Return Null 
          ]
       | _ -> []
 
 
-let private localized (name:string) =
+let localized (name:string) =
    let sections = name.Split '-'
-   JavaScriptNameMapper.sanitize sections.[sections.Length - 1]
+   JavaScriptNameMapper.sanitize name sections.[sections.Length - 1]
 
 let private getAllMethods (t:System.Type) =
    t.GetMethods(
@@ -50,6 +50,11 @@ let private getAllMethods (t:System.Type) =
       BindingFlags.NonPublic ||| 
       BindingFlags.FlattenHierarchy ||| 
       BindingFlags.Instance)
+
+let replaceIfAvailable (compiler:InternalCompiler.ICompiler) (mb : MethodBase) callType =
+   match compiler.ReplacementFor mb callType with
+   | None -> mb //GetGenericMethod()...
+   | Some mi -> upcast mi
 
 let methodCallPattern (mb:MethodBase) =
    let argCounts = mb.GetCustomAttribute<CompilationArgumentCountsAttribute>()
@@ -88,41 +93,13 @@ let methodCallPattern (mb:MethodBase) =
 
 let (|CallPattern|_|) = methodCallPattern
 
-let getInstanceMethods t =
-   getAllMethods t
-   |> Array.choose (fun mi ->
-      match mi with
-      | CallPattern(objVar::vars, bodyExpr) ->
-         let this = Var("this", objVar.Type, objVar.IsMutable)
-         let objVar, exprWithoutThis =
-            if objVar.Name = "this" then
-               let replacementThis = Var("__", objVar.Type, objVar.IsMutable)
-               replacementThis, bodyExpr.Substitute(function
-                  | v when v = objVar -> Some <| Expr.Var replacementThis
-                  | _ -> None)
-            else objVar, bodyExpr
-         let updatedBodyExpr = 
-            Expr.Let(objVar, Expr.Var this, exprWithoutThis)
-         Some(localized mi.Name, vars, updatedBodyExpr)
-      | _ -> None)
-   |> Seq.distinctBy (fun (name, _, _) -> name)
-   |> Seq.toArray
-      
-let genInstanceMethods t (compiler:InternalCompiler.ICompiler) =
-   let methods = getInstanceMethods t
-   [  for name, vars, bodyExpr in methods do
-         let methodRef = PropertyGet(This, name) 
-         let body = compiler.Compile ReturnStrategies.returnFrom bodyExpr
-         yield name, Lambda(vars, Block body)
-   ]
-
 let getFields (t:Type) =
    t.GetProperties(BindingFlags.NonPublic ||| BindingFlags.Public ||| BindingFlags.Instance)
    |> Seq.map (fun p -> p, p.GetCustomAttribute<CompilationMappingAttribute>())
    |> Seq.filter (fun (p, attr) -> not <| obj.ReferenceEquals(null, attr)) 
    |> Seq.filter (fun (p, attr) -> SourceConstructFlags.Field = attr.SourceConstructFlags)
    |> Seq.sortBy (fun (p, attr) -> attr.SequenceNumber)
-   |> Seq.map (fun (p, attr) -> JavaScriptNameMapper.sanitize p.Name, p.PropertyType)
+   |> Seq.map (fun (p, attr) -> JavaScriptNameMapper.sanitizeAux p.Name, p.PropertyType)
    |> Seq.toList
 
 let components = [ 

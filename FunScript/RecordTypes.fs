@@ -14,9 +14,12 @@ let genComparisonFunc t =
       List.foldBack (fun (name, t) acc ->
          let thisField = PropertyGet(This, name)
          let thatField = PropertyGet(Reference that, name)
-         let compareExpr = Comparison.compareCall thisField thatField
-         [  Assign(Reference diff, compareExpr)
-            IfThenElse(
+         let compareDecls, compareExpr = 
+            Comparison.compareCall t thisField t thatField |> Option.get
+         [  
+            yield! compareDecls
+            yield Assign(Reference diff, compareExpr)
+            yield IfThenElse(
                BinaryOp(Reference diff, "!=", Number 0.),
                Block [ Return <| Reference diff ],
                Block acc)
@@ -24,7 +27,7 @@ let genComparisonFunc t =
       
    Lambda(
       [that],
-      Block <| Declare [diff] :: body
+      Block <| DeclareAndAssign(diff, Number 0.) :: body
    )
 
 let genComparisonMethods t =
@@ -67,15 +70,16 @@ let private creation =
                BindingFlags.Public ||| 
                BindingFlags.NonPublic ||| 
                BindingFlags.Instance).[0]
-         let name = JavaScriptNameMapper.mapMethod ci
+         let typeArgs = Reflection.getGenericTypeArgs recType
+         let specialization = Reflection.getSpecializationString compiler typeArgs
+         let name = JavaScriptNameMapper.mapMethod ci + specialization
          let cons = 
             compiler.DefineGlobal name (fun var -> 
                [ 
                   yield Assign(Reference var, Lambda <| createConstructor recType compiler) 
-                  let methods = compiler |> Objects.genInstanceMethods recType
                   let comparisonMethods = genComparisonMethods recType
                   let proto = PropertyGet(Reference var, "prototype")
-                  for name, lambda in Seq.append methods comparisonMethods do
+                  for name, lambda in comparisonMethods do
                      yield Assign(PropertyGet(proto, name), lambda)
                ]
             )

@@ -93,11 +93,11 @@ let binaryTyped quote genCode =
       function
       | [Split(declLHS, refLHS) as exprA; Split(declRHS, refRHS) as exprB] ->
          match genCode mi exprA.Type refLHS exprB.Type refRHS with
-         | Some code -> Some ([declLHS; declRHS], code)   
+         | Some (decls, code) -> Some ([declLHS; declRHS; decls], code)   
          | None -> None      
       | _ -> None)
 
-let binary quote genCode = binaryTyped quote (fun _ _ a _ b -> Some(genCode a b))
+let binary quote genCode = binaryTyped quote (fun _ _ a _ b -> Some([], genCode a b))
 
 let binaryStatement quote genCode =
    generateArity quote (fun _ (|Split|) ->

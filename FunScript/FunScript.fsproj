@@ -75,7 +75,6 @@
     <Compile Include="LetBindings.fs" />
     <Compile Include="LambdaApplication.fs" />
     <Compile Include="ControlFlow.fs" />
-    <Compile Include="CommonOperators.fs" />
     <Compile Include="Arrays.fs" />
     <Compile Include="Lists.fs" />
     <Compile Include="Seqs.fs" />
@@ -83,6 +82,7 @@
     <Compile Include="Sets.fs" />
     <Compile Include="Maps.fs" />
     <Compile Include="Objects.fs" />
+    <Compile Include="CommonOperators.fs" />
     <Compile Include="Strings.fs" />
     <Compile Include="Asyncs.fs" />
     <Compile Include="UnionTypes.fs" />

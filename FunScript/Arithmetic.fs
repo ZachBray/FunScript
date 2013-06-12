@@ -9,7 +9,7 @@ let private isNumericType (t:System.Type) =
 
 let private numericInfix op (mi : MethodBase) lhsT lhs rhsT rhs =
    if isNumericType lhsT && isNumericType rhsT then
-      Some(BinaryOp(lhs, op, rhs))
+      Some([], BinaryOp(lhs, op, rhs))
    else
       None
       //Some(Apply(PropertyGet(lhs, mi.Name), [rhs]))

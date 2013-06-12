@@ -19,8 +19,13 @@ let (|SpecificConstructor|_|) templateParameter =
       | _ -> None)
   | _ -> invalidArg "templateParameter" "Unrecognized quotation: Must be NewObject."
 
-[<JS; JSEmit("return {0}==null?List_Empty():{0};")>]
-let emptyIfNull (list:_ list) = list
+[<JS; JSEmit("return {0}==null;")>]
+let isNull x : bool = false
+
+[<JS>]
+let emptyIfNull (list:_ list) = 
+   if isNull list then List.empty
+   else list
 
 type XMLHttpRequest = 
   abstract ``open`` : string * string -> unit

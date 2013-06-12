@@ -1,6 +1,7 @@
 ﻿module internal FunScript.CommonOperators
 
 open AST
+open System.Reflection
 open Microsoft.FSharp.Quotations
 
 [<Inline; JS>]
@@ -25,8 +26,6 @@ module private Replacements =
 
    let defaultArg x y = match x with None -> y | Some v -> v
 
-   let id = fun x -> x
-
    let incr (x:int ref): unit = x := !x + 1
    let decr (x:int ref): unit = x := !x - 1
 
@@ -48,10 +47,61 @@ let private defaultValue =
       | _ -> []
 
 let private coerce =
-   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
-      let (|Return|) = compiler.Compile
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
       function
-      | Patterns.Coerce(Return returnStategy statements, _) -> statements
+      | Patterns.Coerce(expr, t) -> 
+         if expr.Type = t || t = typeof<obj> || (expr.Type.IsInterface && t.IsAssignableFrom expr.Type) then 
+            compiler.Compile returnStrategy expr
+         elif t.IsInterface then
+            let actualType = expr.Type
+            let targetMethods =
+               [
+                  for i in ExpressionReplacer.getInterfaces t do
+                     let mapping = actualType.GetInterfaceMap i
+                     yield! mapping.TargetMethods
+               ]
+            let members =
+               targetMethods
+               |> Seq.map (fun realMi -> 
+                  let replacementMi = Objects.replaceIfAvailable compiler realMi Quote.CallType.MethodCall
+                  Objects.localized replacementMi.Name, replacementMi)
+               |> Seq.groupBy fst
+               |> Seq.map (fun (name, mis) ->
+                  name, mis |> Seq.tryPick (snd >> Objects.methodCallPattern))
+               |> Seq.toArray
+            let hasAllMembers =
+               members |> Array.forall (snd >> Option.isSome)
+            if hasAllMembers then
+               let impl = Var("impl", typeof<obj>)
+               let members = 
+                  members
+                  |> Array.map (fun (name, expr) -> name, Option.get expr)
+                  |> Array.map (fun (name, (vars, lambdaExpr)) ->
+                     let objVar = List.head vars
+                     let vars = List.tail vars
+                     name,
+                     Lambda(
+                        vars,
+                        Block [
+                           Return(
+                              Apply(
+                                 Lambda(
+                                    objVar::vars,
+                                    Block(compiler.Compile ReturnStrategies.returnFrom lambdaExpr)),
+                                 (impl :: vars) |> List.map Reference))
+                        ]))
+                  |> Array.toList
+               [
+                  yield Declare [impl]
+                  yield! compiler.Compile (ReturnStrategies.assignVar impl) expr
+                  yield returnStrategy.Return(Object members)
+               ]
+            else compiler.Compile returnStrategy expr
+         else compiler.Compile returnStrategy expr
+
+         // For strictness when testing:
+         //   else []
+         // else []
       | _ -> []
 
 let private tryCatch =
@@ -92,7 +142,7 @@ let components =
          // Funcs
          ExpressionReplacer.create <@ ignore @> <@ Replacements.ignore @>
          ExpressionReplacer.create <@ defaultArg @> <@ Replacements.defaultArg @>
-         ExpressionReplacer.create <@ id @> <@ Replacements.id @>
+         CompilerComponent.unary <@ id @> id
          ExpressionReplacer.create <@ incr @> <@ Replacements.incr @>
          ExpressionReplacer.create <@ decr @> <@ Replacements.decr @>
 
@@ -114,16 +164,16 @@ let components =
          ExpressionReplacer.create <@ char @> <@ FunScript.Core.String.FromCharCode @>
           
          // Seq + ranges
-         ExpressionReplacer.create <@ seq @> <@ Replacements.id @>
+         CompilerComponent.unary <@ seq @> id
          ExpressionReplacer.create <@ op_Range @> <@ FunScript.Core.Range.oneStep @>
          ExpressionReplacer.create <@ op_RangeStep @> <@ FunScript.Core.Range.customStep @>
 
          // Casting
          coerce
          typeTest
-         ExpressionReplacer.create <@ box @> <@ Replacements.id @>
-         ExpressionReplacer.create <@ unbox @> <@ Replacements.id @>
-         ExpressionReplacer.create <@ InternalCompiler.Helpers.Cast @> <@ Replacements.id @>
+         CompilerComponent.unary <@ box @> id
+         CompilerComponent.unary <@ unbox @> id
+         CompilerComponent.unary <@ InternalCompiler.Helpers.Cast @> id
 
          // Exns 
          CompilerComponent.unaryStatement <@ raise @> Throw

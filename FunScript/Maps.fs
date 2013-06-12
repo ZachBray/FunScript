@@ -18,29 +18,12 @@ let components =
          ExpressionReplacer.createUnsafe 
             <@ fun (xs:_ seq) -> Map(xs) @> 
             <@ fun (xs:_ seq) -> Core.Map.ofSeq @>
-         ExpressionReplacer.createUnsafe 
-            <@ fun (xs:Map<_,_>) -> xs.Add @> 
-            <@ fun (xs:Core.Map.Map<_,_>) -> xs.Add @>
-         ExpressionReplacer.createUnsafe 
-            <@ fun (xs:Map<_,_>) -> xs.ContainsKey @> 
-            <@ fun (xs:Core.Map.Map<_,_>) -> xs.ContainsKey @>
-         ExpressionReplacer.createUnsafe 
-            <@ fun (xs:Map<_,_>) -> xs.Count @> 
-            <@ fun (xs:Core.Map.Map<_,_>) -> xs.Count @>
-         ExpressionReplacer.createUnsafe 
-            <@ fun (xs:Map<_,_>) -> xs.IsEmpty @> 
-            <@ fun (xs:Core.Map.Map<_,_>) -> xs.IsEmpty @>
-         ExpressionReplacer.createUnsafe 
-            <@ fun (xs:Map<_,_>) -> xs.TryFind @> 
-            <@ fun (xs:Core.Map.Map<_,_>) -> xs.TryFind @>
-         ExpressionReplacer.createUnsafe 
-            <@ fun (xs:Map<_,_>) k -> xs.[k] @> 
-            <@ fun (xs:Core.Map.Map<_,_>) k -> xs.[k] @>
-         ExpressionReplacer.createUnsafe 
-            <@ fun (xs:Map<_,_>) -> xs.Remove @> 
-            <@ fun (xs:Core.Map.Map<_,_>) -> xs.Remove @>
-         ExpressionReplacer.createUnsafe <@ fun xs -> set xs @> <@ fun xs -> FunScript.Core.Set.ofSeq xs @>
       ]
+
+      ExpressionReplacer.createTypeMethodMappings
+         typeof<Microsoft.FSharp.Collections.Map<_,_>>
+         typeof<Core.Map.Map<_,_>>
+
       ExpressionReplacer.createModuleMapping
          "FSharp.Core" "Microsoft.FSharp.Collections.MapModule"
          "FunScript" "FunScript.Core.Map"

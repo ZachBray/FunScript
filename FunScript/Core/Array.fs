@@ -28,13 +28,11 @@ let SortInPlaceBy f xs =
    SortInPlaceWith (fun (x:'a) (y:'a) -> 
       let x = f x
       let y = f y
-      let x = x :> obj :?> IComparable<'b>
-      x.CompareTo y) xs
+      compare x y) xs
 
 let SortInPlace xs =
    SortInPlaceWith (fun (x:'a) (y:'a) -> 
-      let comparable = x :> obj :?> IComparable<'a>
-      comparable.CompareTo y) xs
+      compare x y) xs
 
 let SortBy f xs =
    let ys = Copy xs

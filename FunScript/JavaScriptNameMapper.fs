@@ -72,7 +72,7 @@ let unsafeWords = keywords + reservedWords
 
 let filterUnsafe str =
    if unsafeWords.Contains str then
-      str + "_reserved"
+      "_" + str
    else str
 
 let sanitizeAux(str:string) =
@@ -80,6 +80,7 @@ let sanitizeAux(str:string) =
       | c when (c >= 'a' && c <= 'z') || 
                (c >= '0' && c <= '9') ||
                (c >= 'A' && c <= 'Z') ||
+               c = '$' ||
                c = '_' -> c
       | _ -> '_')
    |> Seq.toArray
@@ -89,29 +90,45 @@ let sanitizeAux(str:string) =
 let replacements = ref Map.empty
 let used = ref Set.empty
 
-let sanitize str =
-   let replacement = sanitizeAux str
+let sanitize key str =
+   let replacement = lazy sanitizeAux str
+   // This is for when multiple unsafe strings map onto the
+   // same safe string.
    let rec sanitize n =
-      match !replacements |> Map.tryFind str with
+      match !replacements |> Map.tryFind key with
       | Some replacement -> replacement
       | None ->
          let replacement =
             match n with
-            | 0 -> replacement
-            | n -> sprintf "%s%i" replacement n
+            | 0 -> replacement.Value
+            | n -> sprintf "%s%i" replacement.Value n
          if !used |> Set.contains replacement then
             sanitize (n+1)
          else
             used := !used |> Set.add replacement
-            replacements := !replacements |> Map.add str replacement
+            replacements := !replacements |> Map.add key replacement
             replacement
    sanitize 0
 
-let (*internal*) mapType(t:System.Type) =
-   sanitize t.Name
+let rec private getBestTypeName (t : System.Type) =
+   let args =
+      if t.IsGenericType || t.IsGenericTypeDefinition then
+         t.GetGenericArguments()
+      else [||]
+   t.Name + "$" + (args |> Seq.map getBestTypeName |> String.concat "_")
 
-let (*internal*) mapMethod(mi:MethodBase) =
-   let prefix = 
-      if mi.IsStatic then ""
-      else "i_"
-   prefix + mapType mi.DeclaringType + "_" + sanitize mi.Name
+let (*internal*) mapType (t : System.Type) =
+   sanitize t.FullName (getBestTypeName t)
+
+let getBestMethodName (mb : MethodBase) =
+   let args =
+      if mb.IsGenericMethod || mb.IsGenericMethodDefinition then
+         mb.GetGenericArguments()
+      else [||]
+   (mapType mb.DeclaringType) + "$M_" + mb.Name + "$" + (args |> Seq.map mapType |> String.concat "_")
+
+let (*internal*) mapMethod mb =
+   let suggestedName = getBestMethodName mb
+   let key =
+      mb.DeclaringType.FullName + suggestedName
+   sanitize key suggestedName
