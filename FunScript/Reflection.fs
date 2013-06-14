@@ -5,6 +5,7 @@ open Microsoft.FSharp.Quotations
 open System
 open System.Reflection
 open System.Collections.Generic
+open Microsoft.FSharp.Reflection
 
 let primitiveTypes =
    set [
@@ -55,22 +56,50 @@ let getSpecializationString (compiler : InternalCompiler.ICompiler) ts =
       ) |> String.concat "_")
    |> JavaScriptNameMapper.sanitizeAux
    
+// TODO: memoize for recursive types!
+let rec private getPropertyInfoExpr (getTypeVar : Type -> Var) (pi : PropertyInfo) =
+   let name = pi.Name
+   let objArg = Var("obj", typeof<obj>)
+   let caller = Expr.Lambda(objArg, Expr.Coerce(Expr.PropertyGet(Expr.Coerce(Expr.Var objArg, pi.DeclaringType), pi), typeof<obj>))
+   let typeVar = Expr.Coerce(Expr.Var(getTypeVar pi.PropertyType), typeof<Core.Type.Type>)
+   <@@ Core.Type.PropertyInfo(name, %%caller, fun () -> %%typeVar) @@>
 
-let rec private netTypeExpr (t : Type) =
+and private getUnionCaseInfo getTypeVar (uci : UnionCaseInfo) =
+    let name = uci.Name
+    let exprs = uci.GetFields() |> Array.map (getPropertyInfoExpr getTypeVar) |> Array.toList
+    let arrayExpr = Expr.NewArray(typeof<Core.Type.PropertyInfo>, exprs)
+    <@@ Core.Type.UnionCaseInfo(name, %%arrayExpr) @@>
+
+and private getKind getTypeVar t =
+    if FSharpType.IsTuple t then <@ Core.Type.TupleType @>
+    elif FSharpType.IsRecord t then 
+        let pis = FSharpType.GetRecordFields t
+        let exprs = pis |> Array.map (getPropertyInfoExpr getTypeVar) |> Array.toList
+        let arrayExpr = Expr.NewArray(typeof<Core.Type.PropertyInfo>, exprs)
+        <@ Core.Type.RecordType %%arrayExpr @>
+    elif FSharpType.IsUnion t then
+        let ucis = FSharpType.GetUnionCases t
+        let exprs = ucis |> Array.map (getUnionCaseInfo getTypeVar) |> Array.toList
+        let arrayExpr = Expr.NewArray(typeof<Core.Type.UnionCaseInfo>, exprs)
+        <@ Core.Type.UnionType %%arrayExpr @>
+    else <@ Core.Type.ClassType @>
+
+and private netTypeExpr getTypeVar (t : Type) =
    let name = t.Name
    let fullName = t.FullName
    let typeArgs =
       let isGeneric = t.IsGenericType || t.IsGenericTypeDefinition
       if isGeneric then t.GetGenericArguments()
       else [||]
-   let typeArgExprs = typeArgs |> Array.toList |> List.map netTypeExpr
+   let typeArgExprs = typeArgs |> Array.toList |> List.map (netTypeExpr getTypeVar)
    let typeArgsArrayExpr = Expr.NewArray(typeof<Core.Type.Type>, typeArgExprs)
-   <@@ Core.Type.Type(name, fullName, %%typeArgsArrayExpr) @@>
+   let kindExpr = getKind getTypeVar t
+   <@@ Core.Type.Type(name, fullName, %%typeArgsArrayExpr, %kindExpr) @@>
 
-let buildRuntimeType (compiler : InternalCompiler.ICompiler) (t : System.Type) =
+let rec buildRuntimeType (compiler : InternalCompiler.ICompiler) (t : System.Type) =
    let typeName = sprintf "t_%s" (JavaScriptNameMapper.mapType t)
    compiler.DefineGlobal typeName (fun var ->
-      let expr = netTypeExpr t
+      let expr = netTypeExpr (buildRuntimeType compiler) t
       compiler.Compile (ReturnStrategies.assignVar var) expr
    )
 
@@ -106,6 +135,10 @@ let components =
 
       ]
 
+      ExpressionReplacer.createTypeMethodMappings typeof<System.Reflection.PropertyInfo> typeof<Core.Type.PropertyInfo>
+      ExpressionReplacer.createTypeMethodMappings typeof<Microsoft.FSharp.Reflection.UnionCaseInfo> typeof<Core.Type.UnionCaseInfo>
+      ExpressionReplacer.createTypeMethodMappings typeof<Microsoft.FSharp.Reflection.FSharpType> typeof<Core.Type.FSharpType>
+      ExpressionReplacer.createTypeMethodMappings typeof<Microsoft.FSharp.Reflection.FSharpValue> typeof<Core.Type.FSharpValue>
       ExpressionReplacer.createTypeMethodMappings typeof<System.Type> typeof<Core.Type.Type>
 
    ] |> List.concat
