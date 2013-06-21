@@ -83,7 +83,7 @@ asynchronous computations easily without explicit callbacks.
 
 ## What do you get
 
- * Write **client-side code in F#** with the full comfort of MonoDevelop, Visual Studio or Emacs 
+ * Write **client-side code in F#** with the full comfort of MonoDevelop, Visual Studio, Vim or Emacs 
  * Get **autocomplete and tooltips** for the HTML DOM, jQuery and other popular JavaScript libraries
  * Use language with **generics** and support for **asynchronous** programming 
  * Process JSON and call REST APIs using F# 3.0 type providers with no hassle!
