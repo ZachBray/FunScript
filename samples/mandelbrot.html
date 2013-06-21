@@ -49,6 +49,19 @@
     </div>
   </header>
 
+  <!-- Some more Foundation references (always load jQuery, because samples use it) -->
+  <script src="http://www.funscript.info/js/vendor/jquery.js"></script>
+  <script src="http://www.funscript.info/js/foundation.min.js"></script>  
+  <script src="http://www.funscript.info/js/foundation/foundation.reveal.js"></script>
+  <script>
+    $(document).foundation();
+  </script>
+  
+  <!-- Some references the samples might need. TODO: Import these ,e.g., {sample-scripts}. -->
+  <script src="http://code.jquery.com/jquery-1.8.0.js"></script>
+  <script src="http://code.jquery.com/ui/1.8.23/jquery-ui.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/highcharts/2.3.1/highcharts.js"></script>
+  
   <!-- Foundation dialog that appears when "Open Sample"  is clicked -->
   <div id="sampleDialog" class="reveal-modal medium">
     <h2>Mandelbrot</h2>
@@ -291,11 +304,10 @@
       <p>Browse other samples to learn more about FunScript</p>
       <ul>
         <li><a href="tutorial.html">Getting started tutorial</a></li>
-        <li><a href="canvas.html">Using HTML5 canvas</a></li>
-        <li><a href="simpleasync.html">Asynchornous computations</a></li>
         <li><a href="worldbank.html">Visualizing World Bank data</a></li>
         <li><a href="moviedatabase.html">Calling The Movie Database</a></li>
-        <li><a href="brainfuck.html">Brainfuck interpreter!!</a></li>
+        <li><a href="canvas.html">Using HTML5 canvas</a></li>
+        <li><a href="simpleasync.html">Asynchornous computations</a></li>
       </ul>
 
     </div>
@@ -308,13 +320,7 @@
   <!-- Fork me on GitHub link -->
   <a href="https://github.com/ZachBray/FunScript"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
    
-  <!-- Some more Foundation references (always load jQuery, because samples use it) -->
-  <script src="http://www.funscript.info/js/vendor/jquery.js"></script>
-  <script src="http://www.funscript.info/js/foundation.min.js"></script>  
-  <script src="http://www.funscript.info/js/foundation/foundation.reveal.js"></script>
-  <script>
-    $(document).foundation();
-  </script>
+
   
   <script>
 	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -329,180 +335,47 @@
   <!-- JavaScript code from the sample goes here... -->
   <script type="text/javascript">
     $(document).ready(function () {
-
-
-Boolean.prototype.CompareTo = function(that) {
-   return this - that;
-};
-
-Number.prototype.CompareTo = function(that) {
-   return this - that;
-};
-
-String.prototype.CompareTo = function(that) {
-   if (this > that) {
-      return 1;
-   } else if (this < that) {
-      return -1;
-   }
-   else {
-      return 0;
-   }
-};
-
-Array.prototype.CompareTo = function(that) {
-   var i = 0;
-   while(i < this.length && i < that.length) {
-      var diff = this[i].CompareTo(that[i]);
-      if(diff != 0) {
-         return diff;
-      }
-      i = i + 1;
-   };
-   return this.length - that.length;
-};
-
-var runtime_type_System_Object, i_Type__ctor, i_Complex__ctor, i_Color__ctor, Program_showSet, Program_setPixel, Program_putImageData, Program_main, Program_iteratePoint, Program_iterCountToColor, Program_inBound, Program_get_width, Program_get_minY, Program_get_minX, Program_get_maxY, Program_get_maxX, Program_get_maxIter, Program_get_height, Program_getIterationCount, Program_getElementa, Program_getCoordColor, Program_getContexta, Program_createImageDataa;
-  Program_createImageDataa = (function (type_arg_a, ctx, width, height)
-  {
-    return ctx.createImageData(width,height);
-  });
-  Program_getContexta = (function (type_arg_a, o)
-  {
-    return o.getContext("2d");
-  });
-  Program_getCoordColor = (function (x, y)
-  {
-    var p = (new i_Complex__ctor((((x * (Program_get_maxX() - Program_get_minX())) / Program_get_width()) + Program_get_minX()), (((y * (Program_get_maxY() - Program_get_minY())) / Program_get_height()) + Program_get_minY())));
-    var i = Program_getIterationCount(p);
-    return Program_iterCountToColor(i);
-  });
-  Program_getElementa = (function (type_arg_a, x)
-  {
-    return document.getElementById(x);
-  });
-  Program_getIterationCount = (function (p)
-  {
-    var z = p;
-    var i = 0.000000;
-    while (((i < Program_get_maxIter()) && Program_inBound(z)))
-    {
-      z = Program_iteratePoint(p, z);
-      null;
-      i = (i + 1.000000);
-      null;
-    };
-    return i;
-  });
-  Program_get_height = (function ()
-  {
-    return 800.000000;
-  });
-  Program_get_maxIter = (function ()
-  {
-    return 512.000000;
-  });
-  Program_get_maxX = (function ()
-  {
-    return 0.500000;
-  });
-  Program_get_maxY = (function ()
-  {
-    return 1.400000;
-  });
-  Program_get_minX = (function ()
-  {
-    return -2.100000;
-  });
-  Program_get_minY = (function ()
-  {
-    return -1.400000;
-  });
-  Program_get_width = (function ()
-  {
-    return 1000.000000;
-  });
-  Program_inBound = (function (p)
-  {
-    return (((p.r * p.r) + (p.i * p.i)) < 4.000000);
-  });
-  Program_iterCountToColor = (function (i)
-  {
-    var _i = (Program_get_maxIter() - i);
-    return (new i_Color__ctor(0.000000, (_i % 256.000000), (100.000000 * (_i / 256.000000)), 255.000000));
-  });
-  Program_iteratePoint = (function (s, p)
-  {
-    return (new i_Complex__ctor(((s.r + (p.r * p.r)) - (p.i * p.i)), (s.i + ((2.000000 * p.i) * p.r))));
-  });
-  Program_main = (function (unitVar0)
-  {
-    return Program_showSet();
-  });
-  Program_putImageData = (function (ctx, data)
-  {
-    ctx.putImageData(data,0,0);
-  });
-  Program_setPixel = (function (img, index, value)
-  {
-    img.data[index]=value;
-  });
-  Program_showSet = (function (unitVar0)
-  {
-    var ctx = (function (o)
-    {
-      return Program_getContexta(runtime_type_System_Object, o);
-    })(Program_getElementa(runtime_type_System_Object, "canvas"));
-    var img = Program_createImageDataa(runtime_type_System_Object, ctx, Program_get_width(), Program_get_height());
-    for (var _temp1 = 0.000000; _temp1 <= (Program_get_height() - 1.000000); _temp1++)
-    {
-      (function (y)
-      {
-        for (var x = 0.000000; x <= (Program_get_width() - 1.000000); x++)
-        {
-          var index = ((x + (y * Program_get_width())) * 4.000000);
-          var color = Program_getCoordColor(x, y);
-          Program_setPixel(img, (index + 0.000000), color.r);
-          Program_setPixel(img, (index + 1.000000), color.g);
-          Program_setPixel(img, (index + 2.000000), color.b);
-          Program_setPixel(img, (index + 3.000000), color.a);
-        };
-      })(_temp1);
-    };
-    return Program_putImageData(ctx, img);
-  });
-  i_Color__ctor = (function (r, g, b, a)
+var Program$$M_showSet$__, Program$$M_setPixel$__, Program$$M_putImageData$__, Program$$M_main$__, Program$$M_iteratePoint$__, Program$$M_iterCountToColor$__, Program$$M_inBound$__, Program$$M_get_width$__, Program$$M_get_minY$__, Program$$M_get_minX$__, Program$$M_get_maxY$__, Program$$M_get_maxX$__, Program$$M_get_maxIter$__, Program$$M_get_height$__, Program$$M_getIterationCount$__, Program$$M_getElement$Object$_Object$_Object$, Program$$M_getCoordColor$__, Program$$M_getContext$Object$_Object$_Object$, Program$$M_createImageData$Object$_Object$_Object$, Complex$$M__ctor$_, Color$$M__ctor$_;
+  Color$$M__ctor$_ = (function (r, g, b, a)
   {
     this.r = r;
     this.g = g;
     this.b = b;
     this.a = a;
   });
-  i_Color__ctor.prototype.CompareTo = (function (that)
+  Color$$M__ctor$_.prototype.CompareTo = (function (that)
   {
-    var diff;
-    diff = this.r.CompareTo(that.r);
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.r < that.r) ? -1.000000 : ((this.r == that.r) ? 0.000000 : 1.000000));
+    diff = _diff;
     if ((diff != 0.000000)) 
     {
       return diff;
     }
     else
     {
-      diff = this.g.CompareTo(that.g);
+      var __diff = 0.000000;
+      __diff = ((this.g < that.g) ? -1.000000 : ((this.g == that.g) ? 0.000000 : 1.000000));
+      diff = __diff;
       if ((diff != 0.000000)) 
       {
         return diff;
       }
       else
       {
-        diff = this.b.CompareTo(that.b);
+        var ___diff = 0.000000;
+        ___diff = ((this.b < that.b) ? -1.000000 : ((this.b == that.b) ? 0.000000 : 1.000000));
+        diff = ___diff;
         if ((diff != 0.000000)) 
         {
           return diff;
         }
         else
         {
-          diff = this.a.CompareTo(that.a);
+          var ____diff = 0.000000;
+          ____diff = ((this.a < that.a) ? -1.000000 : ((this.a == that.a) ? 0.000000 : 1.000000));
+          diff = ____diff;
           if ((diff != 0.000000)) 
           {
             return diff;
@@ -515,22 +388,26 @@ var runtime_type_System_Object, i_Type__ctor, i_Complex__ctor, i_Color__ctor, Pr
       };
     };
   });
-  i_Complex__ctor = (function (r, i)
+  Complex$$M__ctor$_ = (function (r, i)
   {
     this.r = r;
     this.i = i;
   });
-  i_Complex__ctor.prototype.CompareTo = (function (that)
+  Complex$$M__ctor$_.prototype.CompareTo = (function (that)
   {
-    var diff;
-    diff = this.r.CompareTo(that.r);
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.r < that.r) ? -1.000000 : ((this.r == that.r) ? 0.000000 : 1.000000));
+    diff = _diff;
     if ((diff != 0.000000)) 
     {
       return diff;
     }
     else
     {
-      diff = this.i.CompareTo(that.i);
+      var __diff = 0.000000;
+      __diff = ((this.i < that.i) ? -1.000000 : ((this.i == that.i) ? 0.000000 : 1.000000));
+      diff = __diff;
       if ((diff != 0.000000)) 
       {
         return diff;
@@ -541,17 +418,115 @@ var runtime_type_System_Object, i_Type__ctor, i_Complex__ctor, i_Color__ctor, Pr
       };
     };
   });
-  i_Type__ctor = (function (name)
+  Program$$M_createImageData$Object$_Object$_Object$ = (function (ctx, width, height)
   {
-    this.name = name;
+    return ctx.createImageData(width,height);
   });
-  i_Type__ctor.prototype.get_Name = (function (unitVar1)
+  Program$$M_getContext$Object$_Object$_Object$ = (function (o)
   {
-    var __ = this;
-    return __.name;
+    return o.getContext("2d");
   });
-  runtime_type_System_Object = (new i_Type__ctor("Object"));
-  return Program_main()
+  Program$$M_getCoordColor$__ = (function (x, y)
+  {
+    var p = (new Complex$$M__ctor$_((((x * (Program$$M_get_maxX$__() - Program$$M_get_minX$__())) / Program$$M_get_width$__()) + Program$$M_get_minX$__()), (((y * (Program$$M_get_maxY$__() - Program$$M_get_minY$__())) / Program$$M_get_height$__()) + Program$$M_get_minY$__())));
+    var i = Program$$M_getIterationCount$__(p);
+    return Program$$M_iterCountToColor$__(i);
+  });
+  Program$$M_getElement$Object$_Object$_Object$ = (function (x)
+  {
+    return document.getElementById(x);
+  });
+  Program$$M_getIterationCount$__ = (function (p)
+  {
+    var z = p;
+    var i = 0.000000;
+    while (((i < Program$$M_get_maxIter$__()) && Program$$M_inBound$__(z)))
+    {
+      z = Program$$M_iteratePoint$__(p, z);
+      null;
+      i = (i + 1.000000);
+      null;
+    };
+    return i;
+  });
+  Program$$M_get_height$__ = (function ()
+  {
+    return 800.000000;
+  });
+  Program$$M_get_maxIter$__ = (function ()
+  {
+    return 512.000000;
+  });
+  Program$$M_get_maxX$__ = (function ()
+  {
+    return 0.500000;
+  });
+  Program$$M_get_maxY$__ = (function ()
+  {
+    return 1.400000;
+  });
+  Program$$M_get_minX$__ = (function ()
+  {
+    return -2.100000;
+  });
+  Program$$M_get_minY$__ = (function ()
+  {
+    return -1.400000;
+  });
+  Program$$M_get_width$__ = (function ()
+  {
+    return 1000.000000;
+  });
+  Program$$M_inBound$__ = (function (p)
+  {
+    return (((p.r * p.r) + (p.i * p.i)) < 4.000000);
+  });
+  Program$$M_iterCountToColor$__ = (function (i)
+  {
+    var _i = (Program$$M_get_maxIter$__() - i);
+    return (new Color$$M__ctor$_(0.000000, (_i % 256.000000), (100.000000 * (_i / 256.000000)), 255.000000));
+  });
+  Program$$M_iteratePoint$__ = (function (s, p)
+  {
+    return (new Complex$$M__ctor$_(((s.r + (p.r * p.r)) - (p.i * p.i)), (s.i + ((2.000000 * p.i) * p.r))));
+  });
+  Program$$M_main$__ = (function (unitVar0)
+  {
+    return Program$$M_showSet$__();
+  });
+  Program$$M_putImageData$__ = (function (ctx, data)
+  {
+    ctx.putImageData(data,0,0);
+  });
+  Program$$M_setPixel$__ = (function (img, index, value)
+  {
+    img.data[index]=value;
+  });
+  Program$$M_showSet$__ = (function (unitVar0)
+  {
+    var ctx = (function (o)
+    {
+      return Program$$M_getContext$Object$_Object$_Object$(o);
+    })(Program$$M_getElement$Object$_Object$_Object$("canvas"));
+    var img = Program$$M_createImageData$Object$_Object$_Object$(ctx, Program$$M_get_width$__(), Program$$M_get_height$__());
+    for (var _temp1 = 0.000000; _temp1 <= (Program$$M_get_height$__() - 1.000000); _temp1++)
+    {
+      (function (y)
+      {
+        for (var x = 0.000000; x <= (Program$$M_get_width$__() - 1.000000); x++)
+        {
+          var index = ((x + (y * Program$$M_get_width$__())) * 4.000000);
+          var color = Program$$M_getCoordColor$__(x, y);
+          Program$$M_setPixel$__(img, (index + 0.000000), color.r);
+          Program$$M_setPixel$__(img, (index + 1.000000), color.g);
+          Program$$M_setPixel$__(img, (index + 2.000000), color.b);
+          Program$$M_setPixel$__(img, (index + 3.000000), color.a);
+        };
+      })(_temp1);
+    };
+    return Program$$M_putImageData$__(ctx, img);
+  });
+  return Program$$M_main$__()
 });
   </script>
 

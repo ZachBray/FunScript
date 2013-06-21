@@ -49,6 +49,19 @@
     </div>
   </header>
 
+  <!-- Some more Foundation references (always load jQuery, because samples use it) -->
+  <script src="http://www.funscript.info/js/vendor/jquery.js"></script>
+  <script src="http://www.funscript.info/js/foundation.min.js"></script>  
+  <script src="http://www.funscript.info/js/foundation/foundation.reveal.js"></script>
+  <script>
+    $(document).foundation();
+  </script>
+  
+  <!-- Some references the samples might need. TODO: Import these ,e.g., {sample-scripts}. -->
+  <script src="http://code.jquery.com/jquery-1.8.0.js"></script>
+  <script src="http://code.jquery.com/ui/1.8.23/jquery-ui.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/highcharts/2.3.1/highcharts.js"></script>
+  
   <!-- Foundation dialog that appears when "Open Sample"  is clicked -->
   <div id="sampleDialog" class="reveal-modal medium">
     <h2>Searching The Movie Database with F#</h2>
@@ -412,11 +425,10 @@
       <p>Browse other samples to learn more about FunScript</p>
       <ul>
         <li><a href="tutorial.html">Getting started tutorial</a></li>
-        <li><a href="canvas.html">Using HTML5 canvas</a></li>
-        <li><a href="simpleasync.html">Asynchornous computations</a></li>
         <li><a href="worldbank.html">Visualizing World Bank data</a></li>
         <li><a href="moviedatabase.html">Calling The Movie Database</a></li>
-        <li><a href="brainfuck.html">Brainfuck interpreter!!</a></li>
+        <li><a href="canvas.html">Using HTML5 canvas</a></li>
+        <li><a href="simpleasync.html">Asynchornous computations</a></li>
       </ul>
 
     </div>
@@ -429,13 +441,7 @@
   <!-- Fork me on GitHub link -->
   <a href="https://github.com/ZachBray/FunScript"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
    
-  <!-- Some more Foundation references (always load jQuery, because samples use it) -->
-  <script src="http://www.funscript.info/js/vendor/jquery.js"></script>
-  <script src="http://www.funscript.info/js/foundation.min.js"></script>  
-  <script src="http://www.funscript.info/js/foundation/foundation.reveal.js"></script>
-  <script>
-    $(document).foundation();
-  </script>
+
   
   <script>
 	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -450,122 +456,159 @@
   <!-- JavaScript code from the sample goes here... -->
   <script type="text/javascript">
     $(document).ready(function () {
-
-
-Boolean.prototype.CompareTo = function(that) {
-   return this - that;
-};
-
-Number.prototype.CompareTo = function(that) {
-   return this - that;
-};
-
-String.prototype.CompareTo = function(that) {
-   if (this > that) {
-      return 1;
-   } else if (this < that) {
-      return -1;
-   }
-   else {
-      return 0;
-   }
-};
-
-Array.prototype.CompareTo = function(that) {
-   var i = 0;
-   while(i < this.length && i < that.length) {
-      var diff = this[i].CompareTo(that[i]);
-      if(diff != 0) {
-         return diff;
-      }
-      i = i + 1;
-   };
-   return this.length - that.length;
-};
-
-var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__ctor, i_CreateEnumerable_1__ctor, i_CancellationToken__ctor, i_AsyncParams_1__ctor, i_AsyncParamsAux__ctor, i_AsyncBuilder__ctor, i_ApiaryJsContext__ctor, Utils_newXMLHttpRequest, Utils_encodeURIComponent, Utils_emptyIfNull, Tuple3, Tuple2, String_splitSingle, String_replaceSingle, String_ToLowerCase, String_Split, String_Replace, String_Join, String_IsNullOrEmpty, String_IndexOf, Seq_Unfold, Seq_TryPickIndexedAux, Seq_TryPickIndexed, Seq_TryFind, Seq_ToArray, Seq_Take, Seq_OfArray, Seq_Map2, Seq_Length, Seq_IterateIndexed, Seq_FromFactory, Seq_FoldIndexedAux, Seq_FoldIndexed, Seq_Fold, Seq_Enumerator, Seq_Delay, Seq_CompareWith, Runtime_setContext, Runtime_getContext, Program_op_Dynamic, Program_main, Program_jQuery, Program_Object_asJQuery, List_ToArray, List_Length, List_IterateIndexed, List_FoldIndexedAux, List_FoldIndexed, List_Fold, List_Empty, List_CreateCons, LanguagePrimitives_UnboxGeneric, JsRuntime_TryGetValueByTypeTag, JsRuntime_TryGetArrayChildByTypeTag, JsRuntime_Parse, JsRuntime_Identity2, JsRuntime_Identity, JsRuntime_GetProperty, JsRuntime_GetArrayChildrenByTypeTag, JsRuntime_ConvertArray, JsHelpers_jstypeof, JsHelpers_isNull, JsHelpers_isArray, FSharpString_Concat, Async_setTimeout, Async_protectedCont, Async_invokeCont, Async_get_async, Async_StartImmediate, Async_FromContinuations, Async_1_Cont, Array_ZeroCreate, Array_SortInPlaceWith, Array_SortInPlaceBy, Array_SortBy, Array_MapIndexed, Array_Map, Array_Length, Array_Iterate, Array_FoldIndexed, Array_Fold, Array_Copy, Array_ConcatImpl, Array_Concat, Array_Choose, Array_BoxedLength, Array_Append, ApiaryJsRuntime_ProcessParameters, ApiaryJsRuntime_ParseHeaders, ApiaryJsRuntime_AsyncMap, ApiaryJsRuntime_AsyncInvokeOperation, ApiaryJsRuntime_AddQueryParam;
-  ApiaryJsRuntime_AddQueryParam = (function (x, key, value)
+var list_1$Tuple_2$String$_String$_Nil_Tuple_2$String$_String$, list_1$Tuple_2$String$_String$_Cons_Tuple_2$String$_String$, Utils$$M_newXMLHttpRequest$__, Utils$$M_isNull$FSharpList_1$Tuple_2$String$_String$_FSharpList_1$Tuple_2$String$_String$_FSharpList_1$Tuple_2$String$_String$, Utils$$M_encodeURIComponent$__, Utils$$M_emptyIfNull$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$, UnfoldEnumerator_2$Int32$_Tuple_2$String$_String$$M__ctor$_Int32_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$, UnfoldEnumerator_2$Int32$_String__$$M__ctor$_Int32_String__$_Int32_String__$, UnfoldEnumerator_2$Int32$_String$$M__ctor$_Int32_String_Int32_String, UnfoldEnumerator_2$Int32$_ApiaryDocument$$M__ctor$_Int32_ApiaryDocument$_Int32_ApiaryDocument$, Tuple_Tuple_2__$_Tuple_2__$, Tuple_Tuple_2$String$_String$_Int32, Tuple_String__$_Int32, Tuple_String_String, Tuple_String_Int32, Tuple_FSharpFunc_2$JsonDocument$_Unit$_FSharpFunc_2$String$_Unit$_FSharpFunc_2$String$_Unit$, Tuple_ApiaryOperations$_OperationArguments$, Tuple_ApiaryDocument$_Int32, String$$M_splitSingle$__, String$$M_replaceSingle$__, String$$M_ToLowerCase$__, String$$M_Split$__, String$$M_Replace$__, String$$M_Join$__, String$$M_IsNullOrEmpty$__, String$$M_IndexOf$__, Seq$$M_Unfold$Int32$_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$, Seq$$M_Unfold$Int32$_String__$_Int32_String__$_Int32_String__$, Seq$$M_Unfold$Int32$_String$1_Int32_String_Int32_String, Seq$$M_Unfold$Int32$_ApiaryDocument$_Int32_ApiaryDocument$_Int32_ApiaryDocument$, Seq$$M_ToArray$String__$_String__$_String__$, Seq$$M_ToArray$String$1_String_String, Seq$$M_Take$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$, Seq$$M_OfArray$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$, Seq$$M_OfArray$String__$_String__$_String__$, Seq$$M_OfArray$String$1_String_String, Seq$$M_OfArray$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$, Seq$$M_Length$String__$_String__$_String__$, Seq$$M_Length$String$1_String_String, Seq$$M_IterateIndexed$String__$_String__$_String__$, Seq$$M_IterateIndexed$String$1_String_String, Seq$$M_IterateIndexed$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$, Seq$$M_FromFactory$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$, Seq$$M_FromFactory$String__$_String__$_String__$, Seq$$M_FromFactory$String$1_String_String, Seq$$M_FromFactory$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$, Seq$$M_FoldIndexedAux$Unit$_String__$_Unit$_String__$_Unit$_String__$, Seq$$M_FoldIndexedAux$Unit$_String$1_Unit$_String_Unit$_String, Seq$$M_FoldIndexedAux$Unit$_ApiaryDocument$_Unit$_ApiaryDocument$_Unit$_ApiaryDocument$, Seq$$M_FoldIndexedAux$String$1_Tuple_2$String$_String$_String_Tuple_2$String$_String$_String_Tuple_2$String$_String$, Seq$$M_FoldIndexedAux$Int32$_String__$_Int32_String__$_Int32_String__$, Seq$$M_FoldIndexedAux$Int32$_String$1_Int32_String_Int32_String, Seq$$M_FoldIndexed$Tuple_2$String$_String$_String$1_Tuple_2$String$_String$_String_Tuple_2$String$_String$_String, Seq$$M_FoldIndexed$String__$_Unit$_String__$_Unit$_String__$_Unit$, Seq$$M_FoldIndexed$String__$_Int32$_String__$_Int32_String__$_Int32, Seq$$M_FoldIndexed$String$1_Unit$_String_Unit$_String_Unit$, Seq$$M_FoldIndexed$String$1_Int32$_String_Int32_String_Int32, Seq$$M_FoldIndexed$ApiaryDocument$_Unit$_ApiaryDocument$_Unit$_ApiaryDocument$_Unit$, Seq$$M_Fold$Tuple_2$String$_String$_String$1_Tuple_2$String$_String$_String_Tuple_2$String$_String$_String, Seq$$M_Fold$String__$_Int32$_String__$_Int32_String__$_Int32, Seq$$M_Fold$String$1_Int32$_String_Int32_String_Int32, Seq$$M_Enumerator$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$, Seq$$M_Enumerator$String__$_String__$_String__$, Seq$$M_Enumerator$String$1_String_String, Seq$$M_Enumerator$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$, Seq$$M_Delay$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$, Runtime$$M_setContext$__, Runtime$$M_getContext$__, Program$$M_op_Dynamic$FSharpFunc_2$String$_Object$_FSharpFunc_2$String$_Object$_FSharpFunc_2$String$_Object$, Program$$M_main$__, Program$$M_jQuery$__, Program$$M_Object_asJQuery$__, OperationArguments$$M__ctor$_, List$$M_ToArray$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$, List$$M_Length$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$, List$$M_IterateIndexed$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$, List$$M_FoldIndexedAux$Unit$_Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$, List$$M_FoldIndexedAux$Int32$_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$, List$$M_FoldIndexed$Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$_Unit$, List$$M_FoldIndexed$Tuple_2$String$_String$_Int32$_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$_Int32, List$$M_Fold$Tuple_2$String$_String$_Int32$_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$_Int32, List$$M_Empty$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$, List$$M_CreateCons$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$, LanguagePrimitives$$M_UnboxGeneric$String$1_String_String, JsRuntime$$M_TryGetValueByTypeTag$ApiaryDocument$_DateTime$_ApiaryDocument$_DateTime$_ApiaryDocument$_DateTime$, JsRuntime$$M_TryGetArrayChildByTypeTag$Object$_DateTime$_Object$_DateTime$_Object$_DateTime$, JsRuntime$$M_Parse$__, JsRuntime$$M_Identity2$__, JsRuntime$$M_Identity$__, JsRuntime$$M_GetProperty$__, JsRuntime$$M_GetArrayChildrenByTypeTag$Object$_DateTime$_Object$_DateTime$_Object$_DateTime$, JsRuntime$$M_ConvertArray$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$, JsHelpers$$M_jstypeof$__, JsHelpers$$M_isNull$__, JsHelpers$$M_isArray$__, FSharpString$$M_Concat$__, CreateEnumerable_1$Tuple_2$String$_String$$M__ctor$_Tuple_2$String$_String$_Tuple_2$String$_String$, CreateEnumerable_1$String__$$M__ctor$_String__$_String__$, CreateEnumerable_1$String$$M__ctor$_String_String, CreateEnumerable_1$ApiaryDocument$$M__ctor$_ApiaryDocument$_ApiaryDocument$, CancellationToken$$M__ctor$_, CancellationToken$$M_ThrowIfCancellationRequested$__, Async_1$Unit$_Cont_Unit$, Async_1$JsonDocument$_Cont_JsonDocument$, Async_1$ApiaryDocument$_Cont_ApiaryDocument$, AsyncParams_1$Unit$$M__ctor$_Unit$, AsyncParams_1$ApiaryDocument$$M__ctor$_ApiaryDocument$, AsyncParamsAux$$M__ctor$_, AsyncBuilder$$M__ctor$__, AsyncBuilder$$M_Zero$__, AsyncBuilder$$M_Return$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$, AsyncBuilder$$M_For$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$, AsyncBuilder$$M_Delay$Unit$_Unit$_Unit$, AsyncBuilder$$M_Delay$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$, AsyncBuilder$$M_Bind$Unit$_Unit$_Unit$_Unit$_Unit$_Unit$, AsyncBuilder$$M_Bind$ApiaryDocument$_Unit$_ApiaryDocument$_Unit$_ApiaryDocument$_Unit$, AsyncBuilder$$M_Bind$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$, Async$1$M_setTimeout$Unit$_Unit$_Unit$, Async$1$M_protectedCont$Unit$_Unit$_Unit$, Async$1$M_protectedCont$JsonDocument$_JsonDocument$_JsonDocument$, Async$1$M_protectedCont$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$, Async$1$M_invokeCont$Unit$_Unit$_Unit$, Async$1$M_invokeCont$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$, Async$1$M_get_async$__, Async$$M_StartImmediate$__, Async$$M_FromContinuations$JsonDocument$_JsonDocument$_JsonDocument$, Array$$M_ZeroCreate$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$, Array$$M_ZeroCreate$String__$_String__$_String__$, Array$$M_ZeroCreate$String$1_String_String, Array$$M_ZeroCreate$Object$_Object$_Object$, Array$$M_ZeroCreate$DateTime$_DateTime$_DateTime$, Array$$M_SortInPlaceWith$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$, Array$$M_SortInPlaceBy$ApiaryDocument$_Int32$_ApiaryDocument$_Int32_ApiaryDocument$_Int32, Array$$M_SortBy$ApiaryDocument$_Int32$_ApiaryDocument$_Int32_ApiaryDocument$_Int32, Array$$M_MapIndexed$Tuple_2$String$_String$_String$1_Tuple_2$String$_String$_String_Tuple_2$String$_String$_String, Array$$M_MapIndexed$String$1_String__$_String_String__$_String_String__$, Array$$M_MapIndexed$Object$_DateTime$_Object$_DateTime$_Object$_DateTime$, Array$$M_Map$Tuple_2$String$_String$_String$1_Tuple_2$String$_String$_String_Tuple_2$String$_String$_String, Array$$M_Map$String$1_String__$_String_String__$_String_String__$, Array$$M_Map$Object$_DateTime$_Object$_DateTime$_Object$_DateTime$, Array$$M_Length$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$, Array$$M_Length$String$1_String_String, Array$$M_Length$Object$_Object$_Object$, Array$$M_Iterate$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$, Array$$M_FoldIndexed$Unit$_Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$, Array$$M_FoldIndexed$String__$_String$1_String__$_String_String__$_String, Array$$M_Fold$Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$_Unit$, Array$$M_Fold$String$1_String__$_String_String__$_String_String__$, Array$$M_Copy$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$, Array$$M_ConcatImpl$String$1_String_String, Array$$M_Concat$String$1_String_String, Array$$M_Choose$String$1_Tuple_2$String$_String$_String_Tuple_2$String$_String$_String_Tuple_2$String$_String$, Array$$M_Choose$Object$_Object$_Object$_Object$_Object$_Object$, Array$$M_BoxedLength$__, Array$$M_Append$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$, ApiaryJsRuntime$$M_ProcessParameters$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$, ApiaryJsRuntime$$M_ParseHeaders$__, ApiaryJsRuntime$$M_AsyncMap$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$, ApiaryJsRuntime$$M_AsyncInvokeOperation$__, ApiaryJsRuntime$$M_AddQueryParam$__, ApiaryJsContext$$M__ctor$_;
+  ApiaryJsContext$$M__ctor$_ = (function (Root, GlobalQuery, GlobalHeaders, GlobalArguments)
   {
-    x.GlobalQuery = Array_Append(x.GlobalQuery, [(new Tuple2(key, value))]);
+    this.Root = Root;
+    this.GlobalQuery = GlobalQuery;
+    this.GlobalHeaders = GlobalHeaders;
+    this.GlobalArguments = GlobalArguments;
   });
-  ApiaryJsRuntime_AsyncInvokeOperation = (function (x, _arg1)
+  ApiaryJsContext$$M__ctor$_.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Root < that.Root) ? -1.000000 : ((this.Root == that.Root) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      var i = 0.000000;
+      while (((__diff == 0.000000) && ((i < this.GlobalQuery.length) && (i < that.GlobalQuery.length))))
+      {
+        __diff = this.GlobalQuery[i].CompareTo(that.GlobalQuery[i]);
+        i = (i + 1.000000);
+      };
+      __diff = ((__diff == 0.000000) ? (this.GlobalQuery.length - that.GlobalQuery.length) : __diff);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        var ___diff = 0.000000;
+        var _i = 0.000000;
+        while (((___diff == 0.000000) && ((_i < this.GlobalHeaders.length) && (_i < that.GlobalHeaders.length))))
+        {
+          ___diff = this.GlobalHeaders[_i].CompareTo(that.GlobalHeaders[_i]);
+          _i = (_i + 1.000000);
+        };
+        ___diff = ((___diff == 0.000000) ? (this.GlobalHeaders.length - that.GlobalHeaders.length) : ___diff);
+        diff = ___diff;
+        if ((diff != 0.000000)) 
+        {
+          return diff;
+        }
+        else
+        {
+          var ____diff = 0.000000;
+          var __i = 0.000000;
+          while (((____diff == 0.000000) && ((__i < this.GlobalArguments.length) && (__i < that.GlobalArguments.length))))
+          {
+            ____diff = this.GlobalArguments[__i].CompareTo(that.GlobalArguments[__i]);
+            __i = (__i + 1.000000);
+          };
+          ____diff = ((____diff == 0.000000) ? (this.GlobalArguments.length - that.GlobalArguments.length) : ____diff);
+          diff = ____diff;
+          if ((diff != 0.000000)) 
+          {
+            return diff;
+          }
+          else
+          {
+            return 0.000000;
+          };
+        };
+      };
+    };
+  });
+  ApiaryJsRuntime$$M_AddQueryParam$__ = (function (x, key, value)
+  {
+    x.GlobalQuery = Array$$M_Append$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$(x.GlobalQuery, [(new Tuple_String_String(key, value))]);
+  });
+  ApiaryJsRuntime$$M_AsyncInvokeOperation$__ = (function (x, _arg1)
   {
     var query = _arg1.Query;
     var path = _arg1.Path;
     var meth = _arg1.Method;
     var headers = _arg1.Headers;
     var args = _arg1.Arguments;
-    return Async_FromContinuations((function (tupledArg)
+    return Async$$M_FromContinuations$JsonDocument$_JsonDocument$_JsonDocument$((function (tupledArg)
     {
       var cont = tupledArg.Item1;
       var econt = tupledArg.Item2;
       var ccont = tupledArg.Item3;
-      var allArguments = Array_Append(x.GlobalArguments, args);
-      var _temp32;
-      var _temp33;
+      var allArguments = Array$$M_Append$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$(x.GlobalArguments, args);
+      var _temp23;
+      var _temp24;
       var folder = (function (_path)
       {
         return (function (_tupledArg)
         {
           var key = _tupledArg.Item1;
           var value = _tupledArg.Item2;
-          return String_Replace(_path, key, value);
+          return String$$M_Replace$__(_path, key, value);
         });
       });
-      _temp33 = (function (source)
+      _temp24 = (function (source)
       {
-        return Seq_Fold(folder, path, Seq_OfArray(source));
+        return Seq$$M_Fold$Tuple_2$String$_String$_String$1_Tuple_2$String$_String$_String_Tuple_2$String$_String$_String(folder, path, Seq$$M_OfArray$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$(source));
       });
-      _temp32 = _temp33(allArguments);
-      var _path = _temp32;
-      var allheaders = Array_Append(headers, x.GlobalHeaders);
-      var allquery = Array_Append(query, x.GlobalQuery);
-      if ((String_ToLowerCase(meth).CompareTo("get") == 0.000000)) 
+      _temp23 = _temp24(allArguments);
+      var _path = _temp23;
+      var allheaders = Array$$M_Append$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$(headers, x.GlobalHeaders);
+      var allquery = Array$$M_Append$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$(query, x.GlobalQuery);
+      if ((String$$M_ToLowerCase$__(meth) == "get")) 
       {
         var url = (x.Root + _path);
+        var _temp35;
+        var _temp36;
+        var sep = "\u0026";
+        _temp36 = (function (strings)
+        {
+          return FSharpString$$M_Concat$__(sep, Seq$$M_OfArray$String$1_String_String(strings));
+        });
         var _temp38;
         var _temp39;
-        var sep = "\u0026";
-        _temp39 = (function (strings)
-        {
-          return FSharpString_Concat(sep, Seq_OfArray(strings));
-        });
-        var _temp41;
-        var _temp42;
         var mapping = (function (_tupledArg)
         {
           var k = _tupledArg.Item1;
           var v = _tupledArg.Item2;
-          return ((k + "=") + Utils_encodeURIComponent(v));
+          return ((k + "=") + Utils$$M_encodeURIComponent$__(v));
         });
-        _temp42 = (function (array)
+        _temp39 = (function (array)
         {
-          return Array_Map(mapping, array);
+          return Array$$M_Map$Tuple_2$String$_String$_String$1_Tuple_2$String$_String$_String_Tuple_2$String$_String$_String(mapping, array);
         });
-        _temp41 = _temp42(allquery);
-        _temp38 = _temp39(_temp41);
-        var queryString = _temp38;
-        var xhr = Utils_newXMLHttpRequest();
+        _temp38 = _temp39(allquery);
+        _temp35 = _temp36(_temp38);
+        var queryString = _temp35;
+        var xhr = Utils$$M_newXMLHttpRequest$__();
         xhr.open("GET", ((url + "?") + queryString));
-        var _temp44;
+        var _temp41;
         var action = (function (_tupledArg)
         {
           var header = _tupledArg.Item1;
           var value = _tupledArg.Item2;
           return xhr.setRequestHeader(header, value);
         });
-        _temp44 = (function (array)
+        _temp41 = (function (array)
         {
-          return Array_Iterate(action, array);
+          return Array$$M_Iterate$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$(action, array);
         });
-        _temp44(allheaders);
+        _temp41(allheaders);
         xhr.set_onreadystatechange((function (unitVar0)
         {
-          if ((xhr.get_readyState().CompareTo(4.000000) == 0.000000)) 
+          if ((xhr.get_readyState() == 4.000000)) 
           {
             var source = xhr.get_responseText();
-            var doc = JsRuntime_Identity(JsRuntime_Parse(source, {Tag: "None"}));
-            Runtime_setContext(doc, (new i_ApiaryJsContext__ctor(x.Root, x.GlobalQuery, x.GlobalHeaders, allArguments)));
+            var doc = JsRuntime$$M_Identity$__(JsRuntime$$M_Parse$__(source, {Tag: "None"}));
+            Runtime$$M_setContext$__(doc, (new ApiaryJsContext$$M__ctor$_(x.Root, x.GlobalQuery, x.GlobalHeaders, allArguments)));
             return cont(doc);
           }
           else
@@ -582,35 +625,35 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
       };
     }));
   });
-  ApiaryJsRuntime_AsyncMap = (function (work, f)
+  ApiaryJsRuntime$$M_AsyncMap$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$ = (function (work, f)
   {
     return (function (builder_)
     {
-      return builder_.Delay((function (unitVar)
+      return AsyncBuilder$$M_Delay$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(builder_, (function (unitVar)
       {
-        return builder_.Bind(work, (function (_arg2)
+        return AsyncBuilder$$M_Bind$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(builder_, work, (function (_arg2)
         {
           var v = _arg2;
-          return builder_.Return(f(v));
+          return AsyncBuilder$$M_Return$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(builder_, f(v));
         }));
       }));
-    })(Async_get_async());
+    })(Async$1$M_get_async$__());
   });
-  ApiaryJsRuntime_ParseHeaders = (function (headers)
+  ApiaryJsRuntime$$M_ParseHeaders$__ = (function (headers)
   {
-    var _temp28;
+    var _temp15;
     var chooser = (function (h)
     {
-      if (String_IsNullOrEmpty(h)) 
+      if (String$$M_IsNullOrEmpty$__(h)) 
       {
         return {Tag: "None"};
       }
       else
       {
-        var arr = String_Split(h, [":"]);
-        if ((Array_BoxedLength(arr).CompareTo(2.000000) == 0.000000)) 
+        var arr = String$$M_Split$__(h, [":"]);
+        if ((Array$$M_BoxedLength$__(arr) == 2.000000)) 
         {
-          return {Tag: "Some", Value: (new Tuple2(arr[0.000000], arr[1.000000]))};
+          return {Tag: "Some", Value: (new Tuple_String_String(arr[0.000000], arr[1.000000]))};
         }
         else
         {
@@ -619,31 +662,31 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
         };
       };
     });
-    _temp28 = (function (array)
+    _temp15 = (function (array)
     {
-      return Array_Choose(chooser, array);
+      return Array$$M_Choose$String$1_Tuple_2$String$_String$_String_Tuple_2$String$_String$_String_Tuple_2$String$_String$(chooser, array);
     });
-    return _temp28(String_Split(headers, ["\n"]));
+    return _temp15(String$$M_Split$__(headers, ["\n"]));
   });
-  ApiaryJsRuntime_ProcessParameters = (function (reqHeaders, headers, query)
+  ApiaryJsRuntime$$M_ProcessParameters$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$ = (function (reqHeaders, headers, query)
   {
-    var _headers = Array_Append(ApiaryJsRuntime_ParseHeaders(reqHeaders), List_ToArray(Utils_emptyIfNull(headers)));
-    var _query = Utils_emptyIfNull(query);
-    return (new Tuple2(_headers, List_ToArray(_query)));
+    var _headers = Array$$M_Append$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$(ApiaryJsRuntime$$M_ParseHeaders$__(reqHeaders), List$$M_ToArray$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$(Utils$$M_emptyIfNull$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$(headers)));
+    var _query = Utils$$M_emptyIfNull$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$(query);
+    return (new Tuple_Tuple_2__$_Tuple_2__$(_headers, List$$M_ToArray$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$(_query)));
   });
-  Array_Append = (function (xs, ys)
+  Array$$M_Append$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$ = (function (xs, ys)
   {
     return xs.concat(ys);
   });
-  Array_BoxedLength = (function (xs)
+  Array$$M_BoxedLength$__ = (function (xs)
   {
     return xs.length;
   });
-  Array_Choose = (function (f, xs)
+  Array$$M_Choose$Object$_Object$_Object$_Object$_Object$_Object$ = (function (f, xs)
   {
-    var ys = Array_ZeroCreate(0.000000);
+    var ys = Array$$M_ZeroCreate$Object$_Object$_Object$(0.000000);
     var j = 0.000000;
-    for (var i = 0.000000; i <= (Array_Length(xs) - 1.000000); i++)
+    for (var i = 0.000000; i <= (Array$$M_Length$Object$_Object$_Object$(xs) - 1.000000); i++)
     {
       var matchValue = f(xs[i]);
       if ((matchValue.Tag == "None")) 
@@ -661,27 +704,49 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
     };
     return ys;
   });
-  Array_Concat = (function (xs)
+  Array$$M_Choose$String$1_Tuple_2$String$_String$_String_Tuple_2$String$_String$_String_Tuple_2$String$_String$ = (function (f, xs)
+  {
+    var ys = Array$$M_ZeroCreate$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$(0.000000);
+    var j = 0.000000;
+    for (var i = 0.000000; i <= (Array$$M_Length$String$1_String_String(xs) - 1.000000); i++)
+    {
+      var matchValue = f(xs[i]);
+      if ((matchValue.Tag == "None")) 
+      {
+        ;
+      }
+      else
+      {
+        var y = matchValue.Value;
+        ys[j] = y;
+        null;
+        j = (j + 1.000000);
+        null;
+      };
+    };
+    return ys;
+  });
+  Array$$M_Concat$String$1_String_String = (function (xs)
   {
     return (function (xss)
     {
-      return Array_ConcatImpl(xss);
+      return Array$$M_ConcatImpl$String$1_String_String(xss);
     })((function (source)
     {
-      return Seq_ToArray(source);
+      return Seq$$M_ToArray$String__$_String__$_String__$(source);
     })(xs));
   });
-  Array_ConcatImpl = (function (xss)
+  Array$$M_ConcatImpl$String$1_String_String = (function (xss)
   {
     return [].concat.apply([], xss);
   });
-  Array_Copy = (function (xs)
+  Array$$M_Copy$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$ = (function (xs)
   {
     return xs.slice(0);
   });
-  Array_Fold = (function (f, seed, xs)
+  Array$$M_Fold$String$1_String__$_String_String__$_String_String__$ = (function (f, seed, xs)
   {
-    return Array_FoldIndexed((function (_arg1)
+    return Array$$M_FoldIndexed$String__$_String$1_String__$_String_String__$_String((function (_arg1)
     {
       return (function (acc)
       {
@@ -692,34 +757,65 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
       });
     }), seed, xs);
   });
-  Array_FoldIndexed = (function (f, seed, xs)
+  Array$$M_Fold$Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$_Unit$ = (function (f, seed, xs)
+  {
+    return Array$$M_FoldIndexed$Unit$_Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$((function (_arg1)
+    {
+      return (function (acc)
+      {
+        return (function (x)
+        {
+          return f(acc)(x);
+        });
+      });
+    }), seed, xs);
+  });
+  Array$$M_FoldIndexed$String__$_String$1_String__$_String_String__$_String = (function (f, seed, xs)
   {
     var acc = seed;
-    for (var i = 0.000000; i <= (Array_Length(xs) - 1.000000); i++)
+    for (var i = 0.000000; i <= (Array$$M_Length$String$1_String_String(xs) - 1.000000); i++)
     {
       acc = f(i)(acc)(xs[i]);
       null;
     };
     return acc;
   });
-  Array_Iterate = (function (f, xs)
+  Array$$M_FoldIndexed$Unit$_Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$ = (function (f, seed, xs)
   {
-    var _temp43;
-    return Array_Fold((function (unitVar0)
+    var acc = seed;
+    for (var i = 0.000000; i <= (Array$$M_Length$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$(xs) - 1.000000); i++)
+    {
+      acc = f(i)(acc)(xs[i]);
+      null;
+    };
+    return acc;
+  });
+  Array$$M_Iterate$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$ = (function (f, xs)
+  {
+    var _temp40;
+    return Array$$M_Fold$Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$_Unit$((function (unitVar0)
     {
       return (function (x)
       {
         return f(x);
       });
-    }), _temp43, xs);
+    }), _temp40, xs);
   });
-  Array_Length = (function (xs)
+  Array$$M_Length$Object$_Object$_Object$ = (function (xs)
   {
     return xs.length;
   });
-  Array_Map = (function (f, xs)
+  Array$$M_Length$String$1_String_String = (function (xs)
   {
-    return Array_MapIndexed((function (_arg1)
+    return xs.length;
+  });
+  Array$$M_Length$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$ = (function (xs)
+  {
+    return xs.length;
+  });
+  Array$$M_Map$Object$_DateTime$_Object$_DateTime$_Object$_DateTime$ = (function (f, xs)
+  {
+    return Array$$M_MapIndexed$Object$_DateTime$_Object$_DateTime$_Object$_DateTime$((function (_arg1)
     {
       return (function (x)
       {
@@ -727,125 +823,160 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
       });
     }), xs);
   });
-  Array_MapIndexed = (function (f, xs)
+  Array$$M_Map$String$1_String__$_String_String__$_String_String__$ = (function (f, xs)
   {
-    var ys = Array_ZeroCreate(Array_Length(xs));
-    for (var i = 0.000000; i <= (Array_Length(xs) - 1.000000); i++)
+    return Array$$M_MapIndexed$String$1_String__$_String_String__$_String_String__$((function (_arg1)
+    {
+      return (function (x)
+      {
+        return f(x);
+      });
+    }), xs);
+  });
+  Array$$M_Map$Tuple_2$String$_String$_String$1_Tuple_2$String$_String$_String_Tuple_2$String$_String$_String = (function (f, xs)
+  {
+    return Array$$M_MapIndexed$Tuple_2$String$_String$_String$1_Tuple_2$String$_String$_String_Tuple_2$String$_String$_String((function (_arg1)
+    {
+      return (function (x)
+      {
+        return f(x);
+      });
+    }), xs);
+  });
+  Array$$M_MapIndexed$Object$_DateTime$_Object$_DateTime$_Object$_DateTime$ = (function (f, xs)
+  {
+    var ys = Array$$M_ZeroCreate$DateTime$_DateTime$_DateTime$(Array$$M_Length$Object$_Object$_Object$(xs));
+    for (var i = 0.000000; i <= (Array$$M_Length$Object$_Object$_Object$(xs) - 1.000000); i++)
     {
       ys[i] = f(i)(xs[i]);
       null;
     };
     return ys;
   });
-  Array_SortBy = (function (f, xs)
+  Array$$M_MapIndexed$String$1_String__$_String_String__$_String_String__$ = (function (f, xs)
   {
-    var ys = Array_Copy(xs);
-    Array_SortInPlaceBy(f, ys);
+    var ys = Array$$M_ZeroCreate$String__$_String__$_String__$(Array$$M_Length$String$1_String_String(xs));
+    for (var i = 0.000000; i <= (Array$$M_Length$String$1_String_String(xs) - 1.000000); i++)
+    {
+      ys[i] = f(i)(xs[i]);
+      null;
+    };
     return ys;
   });
-  Array_SortInPlaceBy = (function (f, xs)
+  Array$$M_MapIndexed$Tuple_2$String$_String$_String$1_Tuple_2$String$_String$_String_Tuple_2$String$_String$_String = (function (f, xs)
   {
-    return Array_SortInPlaceWith((function (x)
+    var ys = Array$$M_ZeroCreate$String$1_String_String(Array$$M_Length$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$(xs));
+    for (var i = 0.000000; i <= (Array$$M_Length$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$(xs) - 1.000000); i++)
+    {
+      ys[i] = f(i)(xs[i]);
+      null;
+    };
+    return ys;
+  });
+  Array$$M_SortBy$ApiaryDocument$_Int32$_ApiaryDocument$_Int32_ApiaryDocument$_Int32 = (function (f, xs)
+  {
+    var ys = Array$$M_Copy$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(xs);
+    Array$$M_SortInPlaceBy$ApiaryDocument$_Int32$_ApiaryDocument$_Int32_ApiaryDocument$_Int32(f, ys);
+    return ys;
+  });
+  Array$$M_SortInPlaceBy$ApiaryDocument$_Int32$_ApiaryDocument$_Int32_ApiaryDocument$_Int32 = (function (f, xs)
+  {
+    return Array$$M_SortInPlaceWith$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$((function (x)
     {
       return (function (y)
       {
         var _x = f(x);
         var _y = f(y);
-        var __x = LanguagePrimitives_UnboxGeneric(_x);
-        return __x.CompareTo(_y);
+        var diff = 0.000000;
+        diff = ((_x < _y) ? -1.000000 : ((_x == _y) ? 0.000000 : 1.000000));
+        return diff;
       });
     }), xs);
   });
-  Array_SortInPlaceWith = (function (f, xs)
+  Array$$M_SortInPlaceWith$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$ = (function (f, xs)
   {
     xs.sort(function(a,b) { return f(a)(b); });
   });
-  Array_ZeroCreate = (function (size)
+  Array$$M_ZeroCreate$DateTime$_DateTime$_DateTime$ = (function (size)
   {
     return new Array(size);
   });
-  Async_1_Cont = (function (Item)
+  Array$$M_ZeroCreate$Object$_Object$_Object$ = (function (size)
   {
-    this.Tag = "Cont";
-    this.Item = Item;
+    return new Array(size);
   });
-  Async_1_Cont.prototype.CompareTo = (function (that)
+  Array$$M_ZeroCreate$String$1_String_String = (function (size)
   {
-    var diff;
-    diff = this.Tag.CompareTo(that.Tag);
-    if ((diff != 0.000000)) 
-    {
-      return diff;
-    }
-    else
-    {
-      diff = this.Item.CompareTo(that.Item);
-      if ((diff != 0.000000)) 
-      {
-        return diff;
-      }
-      else
-      {
-        return 0.000000;
-      };
-    };
+    return new Array(size);
   });
-  Async_FromContinuations = (function (f)
+  Array$$M_ZeroCreate$String__$_String__$_String__$ = (function (size)
+  {
+    return new Array(size);
+  });
+  Array$$M_ZeroCreate$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$ = (function (size)
+  {
+    return new Array(size);
+  });
+  Async$$M_FromContinuations$JsonDocument$_JsonDocument$_JsonDocument$ = (function (f)
   {
     return (function (_f)
     {
-      return Async_protectedCont(_f);
+      return Async$1$M_protectedCont$JsonDocument$_JsonDocument$_JsonDocument$(_f);
     })((function (k)
     {
-      return f((new Tuple3(k.Cont, k.Aux.ExceptionCont, k.Aux.CancelledCont)));
+      return f((new Tuple_FSharpFunc_2$JsonDocument$_Unit$_FSharpFunc_2$String$_Unit$_FSharpFunc_2$String$_Unit$(k.Cont, k.Aux.ExceptionCont, k.Aux.CancelledCont)));
     }));
   });
-  Async_StartImmediate = (function (workflow, cancellationToken)
+  Async$$M_StartImmediate$__ = (function (workflow, cancellationToken)
   {
-    var _temp83;
+    var _temp158;
     if ((cancellationToken.Tag == "Some")) 
     {
       var v = cancellationToken.Value;
-      _temp83 = v;
+      _temp158 = v;
     }
     else
     {
-      _temp83 = (new i_CancellationToken__ctor({Tag: "None"}));
+      _temp158 = (new CancellationToken$$M__ctor$_({Tag: "None"}));
     };
-    var token = _temp83;
+    var token = _temp158;
     var f = workflow.Item;
-    var aux = (new i_AsyncParamsAux__ctor({contents: 0.000000}, (function (value)
+    var aux = (new AsyncParamsAux$$M__ctor$_({contents: 0.000000}, (function (value)
     {
       var ignored0 = value;
     }), (function (value)
     {
       var ignored0 = value;
     }), token));
-    return f((new i_AsyncParams_1__ctor((function (value)
+    return f((new AsyncParams_1$Unit$$M__ctor$_Unit$((function (value)
     {
       var ignored0 = value;
     }), aux)));
   });
-  Async_get_async = (function ()
+  Async$1$M_get_async$__ = (function ()
   {
-    return (new i_AsyncBuilder__ctor());
+    return (new AsyncBuilder$$M__ctor$__());
   });
-  Async_invokeCont = (function (k, value)
+  Async$1$M_invokeCont$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$ = (function (k, value)
   {
     return k.Cont(value);
   });
-  Async_protectedCont = (function (f)
+  Async$1$M_invokeCont$Unit$_Unit$_Unit$ = (function (k, value)
   {
-    return (new Async_1_Cont((function (args)
+    return k.Cont(value);
+  });
+  Async$1$M_protectedCont$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$ = (function (f)
+  {
+    return (new Async_1$ApiaryDocument$_Cont_ApiaryDocument$((function (args)
     {
-      args.Aux.CancellationToken.ThrowIfCancellationRequested();
+      CancellationToken$$M_ThrowIfCancellationRequested$__(args.Aux.CancellationToken);
       args.Aux.StackCounter.contents = (args.Aux.StackCounter.contents + 1.000000);
       null;
-      if ((args.Aux.StackCounter.contents.CompareTo(1000.000000) > 0.000000)) 
+      if ((args.Aux.StackCounter.contents > 1000.000000)) 
       {
         args.Aux.StackCounter.contents = 0.000000;
         null;
-        return Async_setTimeout((function (unitVar0)
+        return Async$1$M_setTimeout$Unit$_Unit$_Unit$((function (unitVar0)
         {
           return f(args);
         }), 1.000000);
@@ -856,71 +987,501 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
       };
     })));
   });
-  Async_setTimeout = (function (handler, milliseconds)
+  Async$1$M_protectedCont$JsonDocument$_JsonDocument$_JsonDocument$ = (function (f)
+  {
+    return (new Async_1$JsonDocument$_Cont_JsonDocument$((function (args)
+    {
+      CancellationToken$$M_ThrowIfCancellationRequested$__(args.Aux.CancellationToken);
+      args.Aux.StackCounter.contents = (args.Aux.StackCounter.contents + 1.000000);
+      null;
+      if ((args.Aux.StackCounter.contents > 1000.000000)) 
+      {
+        args.Aux.StackCounter.contents = 0.000000;
+        null;
+        return Async$1$M_setTimeout$Unit$_Unit$_Unit$((function (unitVar0)
+        {
+          return f(args);
+        }), 1.000000);
+      }
+      else
+      {
+        return f(args);
+      };
+    })));
+  });
+  Async$1$M_protectedCont$Unit$_Unit$_Unit$ = (function (f)
+  {
+    return (new Async_1$Unit$_Cont_Unit$((function (args)
+    {
+      CancellationToken$$M_ThrowIfCancellationRequested$__(args.Aux.CancellationToken);
+      args.Aux.StackCounter.contents = (args.Aux.StackCounter.contents + 1.000000);
+      null;
+      if ((args.Aux.StackCounter.contents > 1000.000000)) 
+      {
+        args.Aux.StackCounter.contents = 0.000000;
+        null;
+        return Async$1$M_setTimeout$Unit$_Unit$_Unit$((function (unitVar0)
+        {
+          return f(args);
+        }), 1.000000);
+      }
+      else
+      {
+        return f(args);
+      };
+    })));
+  });
+  Async$1$M_setTimeout$Unit$_Unit$_Unit$ = (function (handler, milliseconds)
   {
     return setTimeout(handler, milliseconds);
   });
-  FSharpString_Concat = (function (sep, strings)
+  AsyncBuilder$$M_Bind$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$ = (function (x, _arg1, f)
   {
-    return String_Join(sep, Seq_ToArray(strings));
+    var v = _arg1.Item;
+    return (function (_f)
+    {
+      return Async$1$M_protectedCont$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(_f);
+    })((function (k)
+    {
+      var cont = (function (a)
+      {
+        var patternInput = f(a);
+        var r = patternInput.Item;
+        return r(k);
+      });
+      return v((new AsyncParams_1$ApiaryDocument$$M__ctor$_ApiaryDocument$(cont, k.Aux)));
+    }));
   });
-  JsHelpers_isArray = (function (o)
+  AsyncBuilder$$M_Bind$ApiaryDocument$_Unit$_ApiaryDocument$_Unit$_ApiaryDocument$_Unit$ = (function (x, _arg1, f)
+  {
+    var v = _arg1.Item;
+    return (function (_f)
+    {
+      return Async$1$M_protectedCont$Unit$_Unit$_Unit$(_f);
+    })((function (k)
+    {
+      var cont = (function (a)
+      {
+        var patternInput = f(a);
+        var r = patternInput.Item;
+        return r(k);
+      });
+      return v((new AsyncParams_1$ApiaryDocument$$M__ctor$_ApiaryDocument$(cont, k.Aux)));
+    }));
+  });
+  AsyncBuilder$$M_Bind$Unit$_Unit$_Unit$_Unit$_Unit$_Unit$ = (function (x, _arg1, f)
+  {
+    var v = _arg1.Item;
+    return (function (_f)
+    {
+      return Async$1$M_protectedCont$Unit$_Unit$_Unit$(_f);
+    })((function (k)
+    {
+      var cont = (function (a)
+      {
+        var patternInput = f(a);
+        var r = patternInput.Item;
+        return r(k);
+      });
+      return v((new AsyncParams_1$Unit$$M__ctor$_Unit$(cont, k.Aux)));
+    }));
+  });
+  AsyncBuilder$$M_Delay$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$ = (function (x, f)
+  {
+    return (function (_f)
+    {
+      return Async$1$M_protectedCont$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(_f);
+    })((function (k)
+    {
+      var _temp50;
+      var _temp51;
+      _temp50 = f(_temp51);
+      var patternInput = _temp50;
+      var r = patternInput.Item;
+      return r(k);
+    }));
+  });
+  AsyncBuilder$$M_Delay$Unit$_Unit$_Unit$ = (function (x, f)
+  {
+    return (function (_f)
+    {
+      return Async$1$M_protectedCont$Unit$_Unit$_Unit$(_f);
+    })((function (k)
+    {
+      var _temp124;
+      var _temp125;
+      _temp124 = f(_temp125);
+      var patternInput = _temp124;
+      var r = patternInput.Item;
+      return r(k);
+    }));
+  });
+  AsyncBuilder$$M_For$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$ = (function (x, seq, body)
+  {
+    var en = seq.GetEnumerator();
+    var _x = x;
+    var loop;
+    loop = (function (unitVar0)
+    {
+      if (en.MoveNext()) 
+      {
+        return AsyncBuilder$$M_Bind$Unit$_Unit$_Unit$_Unit$_Unit$_Unit$(_x, body(en.get_Current()), loop);
+      }
+      else
+      {
+        return AsyncBuilder$$M_Zero$__(_x);
+      };
+    });
+    var _temp122;
+    return loop(_temp122);
+  });
+  AsyncBuilder$$M_Return$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$ = (function (x, v)
+  {
+    return (function (f)
+    {
+      return Async$1$M_protectedCont$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(f);
+    })((function (k)
+    {
+      return Async$1$M_invokeCont$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(k, v);
+    }));
+  });
+  AsyncBuilder$$M_Zero$__ = (function (x, unitVar1)
+  {
+    return (function (f)
+    {
+      return Async$1$M_protectedCont$Unit$_Unit$_Unit$(f);
+    })((function (k)
+    {
+      var _temp121;
+      return Async$1$M_invokeCont$Unit$_Unit$_Unit$(k, _temp121);
+    }));
+  });
+  AsyncBuilder$$M__ctor$__ = (function (unitVar0)
+  {
+    ;
+  });
+  AsyncParamsAux$$M__ctor$_ = (function (StackCounter, ExceptionCont, CancelledCont, CancellationToken)
+  {
+    this.StackCounter = StackCounter;
+    this.ExceptionCont = ExceptionCont;
+    this.CancelledCont = CancelledCont;
+    this.CancellationToken = CancellationToken;
+  });
+  AsyncParamsAux$$M__ctor$_.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.StackCounter.CompareTo(that.StackCounter);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.ExceptionCont.CompareTo(that.ExceptionCont);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        var ___diff = 0.000000;
+        ___diff = this.CancelledCont.CompareTo(that.CancelledCont);
+        diff = ___diff;
+        if ((diff != 0.000000)) 
+        {
+          return diff;
+        }
+        else
+        {
+          var ____diff = 0.000000;
+          ____diff = this.CancellationToken.CompareTo(that.CancellationToken);
+          diff = ____diff;
+          if ((diff != 0.000000)) 
+          {
+            return diff;
+          }
+          else
+          {
+            return 0.000000;
+          };
+        };
+      };
+    };
+  });
+  AsyncParams_1$ApiaryDocument$$M__ctor$_ApiaryDocument$ = (function (Cont, Aux)
+  {
+    this.Cont = Cont;
+    this.Aux = Aux;
+  });
+  AsyncParams_1$ApiaryDocument$$M__ctor$_ApiaryDocument$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Cont.CompareTo(that.Cont);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Aux.CompareTo(that.Aux);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  AsyncParams_1$Unit$$M__ctor$_Unit$ = (function (Cont, Aux)
+  {
+    this.Cont = Cont;
+    this.Aux = Aux;
+  });
+  AsyncParams_1$Unit$$M__ctor$_Unit$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Cont.CompareTo(that.Cont);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Aux.CompareTo(that.Aux);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  Async_1$ApiaryDocument$_Cont_ApiaryDocument$ = (function (Item)
+  {
+    this.Tag = "Cont";
+    this.Item = Item;
+  });
+  Async_1$ApiaryDocument$_Cont_ApiaryDocument$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Tag < that.Tag) ? -1.000000 : ((this.Tag == that.Tag) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Item.CompareTo(that.Item);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  Async_1$JsonDocument$_Cont_JsonDocument$ = (function (Item)
+  {
+    this.Tag = "Cont";
+    this.Item = Item;
+  });
+  Async_1$JsonDocument$_Cont_JsonDocument$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Tag < that.Tag) ? -1.000000 : ((this.Tag == that.Tag) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Item.CompareTo(that.Item);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  Async_1$Unit$_Cont_Unit$ = (function (Item)
+  {
+    this.Tag = "Cont";
+    this.Item = Item;
+  });
+  Async_1$Unit$_Cont_Unit$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Tag < that.Tag) ? -1.000000 : ((this.Tag == that.Tag) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Item.CompareTo(that.Item);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  CancellationToken$$M_ThrowIfCancellationRequested$__ = (function (x, unitVar1)
+  {
+    var matchValue = x.Cell;
+    if ((matchValue.Tag == "Some")) 
+    {
+      var _temp42;
+      var cell = matchValue.Value;
+      _temp42 = cell.contents;
+      if (_temp42) 
+      {
+        var _cell = matchValue.Value;
+        throw ("OperationCancelledException");
+        return null;
+      }
+      else
+      {
+        ;
+      };
+    }
+    else
+    {
+      ;
+    };
+  });
+  CancellationToken$$M__ctor$_ = (function (Cell)
+  {
+    this.Cell = Cell;
+  });
+  CancellationToken$$M__ctor$_.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Cell.CompareTo(that.Cell);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      return 0.000000;
+    };
+  });
+  CreateEnumerable_1$ApiaryDocument$$M__ctor$_ApiaryDocument$_ApiaryDocument$ = (function (factory)
+  {
+    this.factory = factory;
+  });
+  CreateEnumerable_1$String$$M__ctor$_String_String = (function (factory)
+  {
+    this.factory = factory;
+  });
+  CreateEnumerable_1$String__$$M__ctor$_String__$_String__$ = (function (factory)
+  {
+    this.factory = factory;
+  });
+  CreateEnumerable_1$Tuple_2$String$_String$$M__ctor$_Tuple_2$String$_String$_Tuple_2$String$_String$ = (function (factory)
+  {
+    this.factory = factory;
+  });
+  FSharpString$$M_Concat$__ = (function (sep, strings)
+  {
+    return String$$M_Join$__(sep, Seq$$M_ToArray$String$1_String_String(strings));
+  });
+  JsHelpers$$M_isArray$__ = (function (o)
   {
     return Array.isArray(o);
   });
-  JsHelpers_isNull = (function (o)
+  JsHelpers$$M_isNull$__ = (function (o)
   {
     return o==null;
   });
-  JsHelpers_jstypeof = (function (o)
+  JsHelpers$$M_jstypeof$__ = (function (o)
   {
     return typeof(o);
   });
-  JsRuntime_ConvertArray = (function (value, packer, f)
+  JsRuntime$$M_ConvertArray$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$ = (function (value, packer, f)
   {
     return value;
   });
-  JsRuntime_GetArrayChildrenByTypeTag = (function (doc, tag, pack, f)
+  JsRuntime$$M_GetArrayChildrenByTypeTag$Object$_DateTime$_Object$_DateTime$_Object$_DateTime$ = (function (doc, tag, pack, f)
   {
     var matchTag = (function (value)
     {
-      if (JsHelpers_isNull(value)) 
+      if (JsHelpers$$M_isNull$__(value)) 
       {
         return {Tag: "None"};
       }
       else
       {
-        if (((JsHelpers_jstypeof(value).CompareTo("boolean") == 0.000000) && (tag.CompareTo("Boolean") == 0.000000))) 
+        if (((JsHelpers$$M_jstypeof$__(value) == "boolean") && (tag == "Boolean"))) 
         {
           return {Tag: "Some", Value: value};
         }
         else
         {
-          if (((JsHelpers_jstypeof(value).CompareTo("number") == 0.000000) && (tag.CompareTo("Number") == 0.000000))) 
+          if (((JsHelpers$$M_jstypeof$__(value) == "number") && (tag == "Number"))) 
           {
             return {Tag: "Some", Value: value};
           }
           else
           {
-            if (((JsHelpers_jstypeof(value).CompareTo("string") == 0.000000) && (tag.CompareTo("Number") == 0.000000))) 
+            if (((JsHelpers$$M_jstypeof$__(value) == "string") && (tag == "Number"))) 
             {
               return {Tag: "Some", Value: (1.000000 * value)};
             }
             else
             {
-              if (((JsHelpers_jstypeof(value).CompareTo("string") == 0.000000) && (tag.CompareTo("String") == 0.000000))) 
+              if (((JsHelpers$$M_jstypeof$__(value) == "string") && (tag == "String"))) 
               {
                 return {Tag: "Some", Value: value};
               }
               else
               {
-                if ((JsHelpers_isArray(value) && (tag.CompareTo("Array") == 0.000000))) 
+                if ((JsHelpers$$M_isArray$__(value) && (tag == "Array"))) 
                 {
                   return {Tag: "Some", Value: value};
                 }
                 else
                 {
-                  if (((JsHelpers_jstypeof(value).CompareTo("object") == 0.000000) && (tag.CompareTo("Record") == 0.000000))) 
+                  if (((JsHelpers$$M_jstypeof$__(value) == "object") && (tag == "Record"))) 
                   {
                     return {Tag: "Some", Value: value};
                   }
@@ -935,9 +1496,9 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
         };
       };
     });
-    if (JsHelpers_isArray(doc)) 
+    if (JsHelpers$$M_isArray$__(doc)) 
     {
-      var _temp84;
+      var _temp159;
       var mapping = (function (x)
       {
         return f((function (_x)
@@ -948,22 +1509,22 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
           })(_x));
         })(x));
       });
-      _temp84 = (function (array)
+      _temp159 = (function (array)
       {
-        return Array_Map(mapping, array);
+        return Array$$M_Map$Object$_DateTime$_Object$_DateTime$_Object$_DateTime$(mapping, array);
       });
-      var _temp86;
-      var _temp87;
+      var _temp161;
+      var _temp162;
       var chooser = matchTag;
-      _temp87 = (function (array)
+      _temp162 = (function (array)
       {
-        return Array_Choose(chooser, array);
+        return Array$$M_Choose$Object$_Object$_Object$_Object$_Object$_Object$(chooser, array);
       });
-      _temp86 = _temp87((function (value)
+      _temp161 = _temp162((function (value)
       {
         return value;
       })(doc));
-      return _temp84(_temp86);
+      return _temp159(_temp161);
     }
     else
     {
@@ -971,32 +1532,32 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
       return null;
     };
   });
-  JsRuntime_GetProperty = (function (json, name)
+  JsRuntime$$M_GetProperty$__ = (function (json, name)
   {
     return json[name];
   });
-  JsRuntime_Identity = (function (arg)
+  JsRuntime$$M_Identity$__ = (function (arg)
   {
     return arg;
   });
-  JsRuntime_Identity2 = (function (arg, culture)
+  JsRuntime$$M_Identity2$__ = (function (arg, culture)
   {
     return arg;
   });
-  JsRuntime_Parse = (function (source, culture)
+  JsRuntime$$M_Parse$__ = (function (source, culture)
   {
     var it = source; return (typeof(it)=="string") ? eval("(function(a){return a;})(" + it + ")") : it;
   });
-  JsRuntime_TryGetArrayChildByTypeTag = (function (doc, tag, pack, f)
+  JsRuntime$$M_TryGetArrayChildByTypeTag$Object$_DateTime$_Object$_DateTime$_Object$_DateTime$ = (function (doc, tag, pack, f)
   {
-    var arr = JsRuntime_GetArrayChildrenByTypeTag(doc, tag, pack, f);
-    if ((Array_BoxedLength(arr).CompareTo(1.000000) == 0.000000)) 
+    var arr = JsRuntime$$M_GetArrayChildrenByTypeTag$Object$_DateTime$_Object$_DateTime$_Object$_DateTime$(doc, tag, pack, f);
+    if ((Array$$M_BoxedLength$__(arr) == 1.000000)) 
     {
       return {Tag: "Some", Value: arr[0.000000]};
     }
     else
     {
-      if ((Array_BoxedLength(arr).CompareTo(0.000000) == 0.000000)) 
+      if ((Array$$M_BoxedLength$__(arr) == 0.000000)) 
       {
         return {Tag: "None"};
       }
@@ -1007,26 +1568,26 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
       };
     };
   });
-  JsRuntime_TryGetValueByTypeTag = (function (value, tag, pack, f)
+  JsRuntime$$M_TryGetValueByTypeTag$ApiaryDocument$_DateTime$_ApiaryDocument$_DateTime$_ApiaryDocument$_DateTime$ = (function (value, tag, pack, f)
   {
     var arrayValue = [value];
-    return JsRuntime_TryGetArrayChildByTypeTag(arrayValue, tag, pack, f);
+    return JsRuntime$$M_TryGetArrayChildByTypeTag$Object$_DateTime$_Object$_DateTime$_Object$_DateTime$(arrayValue, tag, pack, f);
   });
-  LanguagePrimitives_UnboxGeneric = (function (x)
+  LanguagePrimitives$$M_UnboxGeneric$String$1_String_String = (function (x)
   {
     return x;
   });
-  List_CreateCons = (function (x, xs)
+  List$$M_CreateCons$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$ = (function (x, xs)
   {
-    return (new list_1_Cons(x, xs));
+    return (new list_1$Tuple_2$String$_String$_Cons_Tuple_2$String$_String$(x, xs));
   });
-  List_Empty = (function ()
+  List$$M_Empty$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$ = (function ()
   {
-    return (new list_1_Nil());
+    return (new list_1$Tuple_2$String$_String$_Nil_Tuple_2$String$_String$());
   });
-  List_Fold = (function (f, seed, xs)
+  List$$M_Fold$Tuple_2$String$_String$_Int32$_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$_Int32 = (function (f, seed, xs)
   {
-    return List_FoldIndexed((function (_arg1)
+    return List$$M_FoldIndexed$Tuple_2$String$_String$_Int32$_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$_Int32((function (_arg1)
     {
       return (function (acc)
       {
@@ -1037,27 +1598,762 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
       });
     }), seed, xs);
   });
-  List_FoldIndexed = (function (f, seed, xs)
+  List$$M_FoldIndexed$Tuple_2$String$_String$_Int32$_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$_Int32 = (function (f, seed, xs)
   {
-    return List_FoldIndexedAux(f, 0.000000, seed, xs);
+    return List$$M_FoldIndexedAux$Int32$_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$(f, 0.000000, seed, xs);
   });
-  List_FoldIndexedAux = (function (f, i, acc, _arg1)
+  List$$M_FoldIndexed$Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$_Unit$ = (function (f, seed, xs)
+  {
+    return List$$M_FoldIndexedAux$Unit$_Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$(f, 0.000000, seed, xs);
+  });
+  List$$M_FoldIndexedAux$Int32$_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$ = (function (f, i, acc, _arg1)
   {
     if ((_arg1.Tag == "Cons")) 
     {
       var xs = _arg1.Item2;
       var x = _arg1.Item1;
-      return List_FoldIndexedAux(f, (i + 1.000000), f(i)(acc)(x), xs);
+      return List$$M_FoldIndexedAux$Int32$_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$(f, (i + 1.000000), f(i)(acc)(x), xs);
     }
     else
     {
       return acc;
     };
   });
-  List_IterateIndexed = (function (f, xs)
+  List$$M_FoldIndexedAux$Unit$_Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$ = (function (f, i, acc, _arg1)
+  {
+    if ((_arg1.Tag == "Cons")) 
+    {
+      var xs = _arg1.Item2;
+      var x = _arg1.Item1;
+      return List$$M_FoldIndexedAux$Unit$_Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$(f, (i + 1.000000), f(i)(acc)(x), xs);
+    }
+    else
+    {
+      return acc;
+    };
+  });
+  List$$M_IterateIndexed$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$ = (function (f, xs)
+  {
+    var _temp16;
+    return List$$M_FoldIndexed$Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$_Unit$_Tuple_2$String$_String$_Unit$((function (i)
+    {
+      return (function (unitVar1)
+      {
+        return (function (x)
+        {
+          return f(i)(x);
+        });
+      });
+    }), _temp16, xs);
+  });
+  List$$M_Length$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$ = (function (xs)
+  {
+    return List$$M_Fold$Tuple_2$String$_String$_Int32$_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$_Int32((function (acc)
+    {
+      return (function (_arg1)
+      {
+        return (acc + 1.000000);
+      });
+    }), 0.000000, xs);
+  });
+  List$$M_ToArray$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$ = (function (xs)
+  {
+    var size = List$$M_Length$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$(xs);
+    var ys = Array$$M_ZeroCreate$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$(size);
+    List$$M_IterateIndexed$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$((function (i)
+    {
+      return (function (x)
+      {
+        ys[i] = x;
+        return null;
+      });
+    }), xs);
+    return ys;
+  });
+  OperationArguments$$M__ctor$_ = (function (Method, Path, Arguments, Headers, Query)
+  {
+    this.Method = Method;
+    this.Path = Path;
+    this.Arguments = Arguments;
+    this.Headers = Headers;
+    this.Query = Query;
+  });
+  OperationArguments$$M__ctor$_.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Method < that.Method) ? -1.000000 : ((this.Method == that.Method) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = ((this.Path < that.Path) ? -1.000000 : ((this.Path == that.Path) ? 0.000000 : 1.000000));
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        var ___diff = 0.000000;
+        var i = 0.000000;
+        while (((___diff == 0.000000) && ((i < this.Arguments.length) && (i < that.Arguments.length))))
+        {
+          ___diff = this.Arguments[i].CompareTo(that.Arguments[i]);
+          i = (i + 1.000000);
+        };
+        ___diff = ((___diff == 0.000000) ? (this.Arguments.length - that.Arguments.length) : ___diff);
+        diff = ___diff;
+        if ((diff != 0.000000)) 
+        {
+          return diff;
+        }
+        else
+        {
+          var ____diff = 0.000000;
+          var _i = 0.000000;
+          while (((____diff == 0.000000) && ((_i < this.Headers.length) && (_i < that.Headers.length))))
+          {
+            ____diff = this.Headers[_i].CompareTo(that.Headers[_i]);
+            _i = (_i + 1.000000);
+          };
+          ____diff = ((____diff == 0.000000) ? (this.Headers.length - that.Headers.length) : ____diff);
+          diff = ____diff;
+          if ((diff != 0.000000)) 
+          {
+            return diff;
+          }
+          else
+          {
+            var _____diff = 0.000000;
+            var __i = 0.000000;
+            while (((_____diff == 0.000000) && ((__i < this.Query.length) && (__i < that.Query.length))))
+            {
+              _____diff = this.Query[__i].CompareTo(that.Query[__i]);
+              __i = (__i + 1.000000);
+            };
+            _____diff = ((_____diff == 0.000000) ? (this.Query.length - that.Query.length) : _____diff);
+            diff = _____diff;
+            if ((diff != 0.000000)) 
+            {
+              return diff;
+            }
+            else
+            {
+              return 0.000000;
+            };
+          };
+        };
+      };
+    };
+  });
+  Program$$M_Object_asJQuery$__ = (function (x)
+  {
+    var _temp157;
+    var unitVar1 = _temp157;
+    return x;
+  });
+  Program$$M_jQuery$__ = (function (command)
+  {
+    return jQuery(command);
+  });
+  Program$$M_main$__ = (function (unitVar0)
+  {
+    var _temp1;
+    var var0 = "http://api.themoviedb.org";
+    _temp1 = {Root: var0, GlobalQuery: [], GlobalHeaders: [], GlobalArguments: []};
+    var db = _temp1;
+    ApiaryJsRuntime$$M_AddQueryParam$__(db, "api_key", "6ce0ef5b176501f8c07c634dfa933cff");
+    var root = "http://cf2.imgobject.com/t/p/w92/";
+    var showDetails = (function (id)
+    {
+      return (function (builder_)
+      {
+        return AsyncBuilder$$M_Delay$Unit$_Unit$_Unit$(builder_, (function (unitVar)
+        {
+          var _temp60;
+          var _temp68;
+          var _var0 = db;
+          var var1 = id.toString();
+          var var2 = null;
+          var var3 = null;
+          var _temp72;
+          var _temp74;
+          var _temp75;
+          var patternInput = ApiaryJsRuntime$$M_ProcessParameters$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$("Accept:application/json", var3, var2);
+          var query = patternInput.Item2;
+          var headers = patternInput.Item1;
+          _temp75 = (new Tuple_ApiaryOperations$_OperationArguments$(_var0, (new OperationArguments$$M__ctor$_("GET", "/3/movie/{id}", [(new Tuple_String_String("{id}", var1))], headers, query))));
+          var _patternInput = _temp75;
+          var args = _patternInput.Item2;
+          var apiCtx = _patternInput.Item1;
+          _temp74 = ApiaryJsRuntime$$M_AsyncInvokeOperation$__(apiCtx, args);
+          _temp72 = _temp74;
+          _temp68 = ApiaryJsRuntime$$M_AsyncMap$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(_temp72, (function (t)
+          {
+            return t;
+          }));
+          _temp60 = _temp68;
+          return AsyncBuilder$$M_Bind$ApiaryDocument$_Unit$_ApiaryDocument$_Unit$_ApiaryDocument$_Unit$(builder_, _temp60, (function (_arg1)
+          {
+            var movie = _arg1;
+            (function (value)
+            {
+              var ignored0 = value;
+            })(Program$$M_op_Dynamic$FSharpFunc_2$String$_Object$_FSharpFunc_2$String$_Object$_FSharpFunc_2$String$_Object$((function (command)
+            {
+              return Program$$M_jQuery$__(command);
+            }), "dialogOverview").text(JsRuntime$$M_Identity$__(JsRuntime$$M_Identity$__(JsRuntime$$M_GetProperty$__(JsRuntime$$M_Identity$__(movie), "overview")))));
+            (function (value)
+            {
+              var ignored0 = value;
+            })(Program$$M_op_Dynamic$FSharpFunc_2$String$_Object$_FSharpFunc_2$String$_Object$_FSharpFunc_2$String$_Object$((function (command)
+            {
+              return Program$$M_jQuery$__(command);
+            }), "dialogTitle").text(JsRuntime$$M_Identity$__(JsRuntime$$M_Identity$__(JsRuntime$$M_GetProperty$__(JsRuntime$$M_Identity$__(movie), "title")))));
+            (function (value)
+            {
+              var ignored0 = value;
+            })(Program$$M_op_Dynamic$FSharpFunc_2$String$_Object$_FSharpFunc_2$String$_Object$_FSharpFunc_2$String$_Object$((function (command)
+            {
+              return Program$$M_jQuery$__(command);
+            }), "dialogImage").attr("src", (root + JsRuntime$$M_Identity$__(JsRuntime$$M_Identity$__(JsRuntime$$M_GetProperty$__(JsRuntime$$M_Identity$__(movie), "poster_path"))))));
+            var _temp91;
+            var _temp99;
+            var _var1 = null;
+            var _var2 = null;
+            var _temp103;
+            var _temp105;
+            var _temp106;
+            var __patternInput = ApiaryJsRuntime$$M_ProcessParameters$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$("Accept:application/json", _var2, _var1);
+            var _query = __patternInput.Item2;
+            var _headers = __patternInput.Item1;
+            var _apiCtx = Runtime$$M_getContext$__(movie);
+            _temp106 = (new Tuple_ApiaryOperations$_OperationArguments$(_apiCtx, (new OperationArguments$$M__ctor$_("GET", "/3/movie/{id}/casts", [], _headers, _query))));
+            var ___patternInput = _temp106;
+            var _args = ___patternInput.Item2;
+            var __apiCtx = ___patternInput.Item1;
+            _temp105 = ApiaryJsRuntime$$M_AsyncInvokeOperation$__(__apiCtx, _args);
+            _temp103 = _temp105;
+            _temp99 = ApiaryJsRuntime$$M_AsyncMap$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(_temp103, (function (t)
+            {
+              return t;
+            }));
+            _temp91 = _temp99;
+            return AsyncBuilder$$M_Bind$ApiaryDocument$_Unit$_ApiaryDocument$_Unit$_ApiaryDocument$_Unit$(builder_, _temp91, (function (_arg2)
+            {
+              var casts = _arg2;
+              var _temp108;
+              var _temp109;
+              var projection = (function (c)
+              {
+                return JsRuntime$$M_Identity2$__(JsRuntime$$M_Identity$__(JsRuntime$$M_GetProperty$__(JsRuntime$$M_Identity$__(c), "order")), "");
+              });
+              _temp109 = (function (array)
+              {
+                return Array$$M_SortBy$ApiaryDocument$_Int32$_ApiaryDocument$_Int32_ApiaryDocument$_Int32(projection, array);
+              });
+              _temp108 = _temp109(JsRuntime$$M_ConvertArray$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(JsRuntime$$M_Identity$__(JsRuntime$$M_GetProperty$__(JsRuntime$$M_Identity$__(casts), "cast")), (function (t)
+              {
+                return t;
+              }), (function (t)
+              {
+                return t;
+              })));
+              var sorted = _temp108;
+              var _temp119;
+              if ((Array$$M_BoxedLength$__(sorted) <= 10.000000)) 
+              {
+                _temp119 = (function (source)
+                {
+                  return Seq$$M_OfArray$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(source);
+                })(sorted);
+              }
+              else
+              {
+                var _temp120;
+                var count = 10.000000;
+                _temp120 = (function (source)
+                {
+                  return Seq$$M_Take$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(count, source);
+                });
+                _temp119 = _temp120((function (source)
+                {
+                  return Seq$$M_OfArray$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(source);
+                })(sorted));
+              };
+              var _sorted = _temp119;
+              (function (value)
+              {
+                var ignored0 = value;
+              })(Program$$M_op_Dynamic$FSharpFunc_2$String$_Object$_FSharpFunc_2$String$_Object$_FSharpFunc_2$String$_Object$((function (command)
+              {
+                return Program$$M_jQuery$__(command);
+              }), "dialogCast").html(""));
+              return AsyncBuilder$$M_For$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(builder_, Seq$$M_OfArray$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(JsRuntime$$M_ConvertArray$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(JsRuntime$$M_Identity$__(JsRuntime$$M_GetProperty$__(JsRuntime$$M_Identity$__(casts), "cast")), (function (t)
+              {
+                return t;
+              }), (function (t)
+              {
+                return t;
+              }))), (function (_arg3)
+              {
+                var cast = _arg3;
+                var html = (((("\u003cstrong\u003e" + JsRuntime$$M_Identity$__(JsRuntime$$M_Identity$__(JsRuntime$$M_GetProperty$__(JsRuntime$$M_Identity$__(cast), "name")))) + "\u003c/strong\u003e (") + JsRuntime$$M_Identity$__(JsRuntime$$M_Identity$__(JsRuntime$$M_GetProperty$__(JsRuntime$$M_Identity$__(cast), "character")))) + ")");
+                var li = Program$$M_jQuery$__("\u003cli\u003e");
+                (function (value)
+                {
+                  var ignored0 = value;
+                })(li.html(html));
+                (function (value)
+                {
+                  var ignored0 = value;
+                })(li.appendTo(Program$$M_op_Dynamic$FSharpFunc_2$String$_Object$_FSharpFunc_2$String$_Object$_FSharpFunc_2$String$_Object$((function (command)
+                {
+                  return Program$$M_jQuery$__(command);
+                }), "dialogCast")));
+                return AsyncBuilder$$M_Zero$__(builder_);
+              }));
+            }));
+          }));
+        }));
+      })(Async$1$M_get_async$__());
+    });
+    var search = (function (term)
+    {
+      return (function (builder_)
+      {
+        return AsyncBuilder$$M_Delay$Unit$_Unit$_Unit$(builder_, (function (unitVar)
+        {
+          var _temp141;
+          var _temp149;
+          var _var0 = db;
+          var var1 = List$$M_CreateCons$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$((new Tuple_String_String("query", term)), List$$M_Empty$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$());
+          var var2 = null;
+          var _temp153;
+          var _temp155;
+          var _temp156;
+          var patternInput = ApiaryJsRuntime$$M_ProcessParameters$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$("Accept:application/json", var2, var1);
+          var query = patternInput.Item2;
+          var headers = patternInput.Item1;
+          _temp156 = (new Tuple_ApiaryOperations$_OperationArguments$(_var0, (new OperationArguments$$M__ctor$_("GET", "/3/search/movie", [], headers, query))));
+          var _patternInput = _temp156;
+          var args = _patternInput.Item2;
+          var apiCtx = _patternInput.Item1;
+          _temp155 = ApiaryJsRuntime$$M_AsyncInvokeOperation$__(apiCtx, args);
+          _temp153 = _temp155;
+          _temp149 = ApiaryJsRuntime$$M_AsyncMap$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(_temp153, (function (t)
+          {
+            return t;
+          }));
+          _temp141 = _temp149;
+          return AsyncBuilder$$M_Bind$ApiaryDocument$_Unit$_ApiaryDocument$_Unit$_ApiaryDocument$_Unit$(builder_, _temp141, (function (_arg4)
+          {
+            var res = _arg4;
+            (function (value)
+            {
+              var ignored0 = value;
+            })(Program$$M_op_Dynamic$FSharpFunc_2$String$_Object$_FSharpFunc_2$String$_Object$_FSharpFunc_2$String$_Object$((function (command)
+            {
+              return Program$$M_jQuery$__(command);
+            }), "results").html(""));
+            var _temp229;
+            var action = (function (index)
+            {
+              return (function (item)
+              {
+                var link = Program$$M_Object_asJQuery$__(Program$$M_Object_asJQuery$__(Program$$M_Object_asJQuery$__(Program$$M_Object_asJQuery$__(Program$$M_jQuery$__("\u003ca\u003e").attr("data-toggle", "modal")).attr("href", "#detailsDialog")).text(JsRuntime$$M_Identity$__(JsRuntime$$M_Identity$__(JsRuntime$$M_GetProperty$__(JsRuntime$$M_Identity$__(item), "title"))))).click((function (_arg1)
+                {
+                  return (function (arg00)
+                  {
+                    return Async$$M_StartImmediate$__(arg00, {Tag: "None"});
+                  })(showDetails(JsRuntime$$M_Identity2$__(JsRuntime$$M_Identity$__(JsRuntime$$M_GetProperty$__(JsRuntime$$M_Identity$__(item), "id")), "")));
+                })));
+                var details = Program$$M_jQuery$__("\u003cul\u003e");
+                var _temp231;
+                var _temp232;
+                var __var0 = JsRuntime$$M_GetProperty$__(JsRuntime$$M_Identity$__(item), "release_date");
+                _temp232 = JsRuntime$$M_TryGetValueByTypeTag$ApiaryDocument$_DateTime$_ApiaryDocument$_DateTime$_ApiaryDocument$_DateTime$(JsRuntime$$M_Identity$__(__var0), "DateTime", (function (t)
+                {
+                  return t;
+                }), (function (t)
+                {
+                  return JsRuntime$$M_Identity2$__(JsRuntime$$M_Identity$__(t), "");
+                }));
+                var matchValue = _temp232;
+                if ((matchValue.Tag == "Some")) 
+                {
+                  var dt = matchValue.Value;
+                  _temp231 = dt.toString();
+                }
+                else
+                {
+                  _temp231 = "(not known)";
+                };
+                var date = _temp231;
+                (function (value)
+                {
+                  var ignored0 = value;
+                })(Program$$M_Object_asJQuery$__(Program$$M_jQuery$__("\u003cli\u003e").html(("\u003cstrong\u003eReleased:\u003c/strong\u003e " + date))).appendTo(details));
+                var _temp248;
+                var _temp256;
+                var _temp260;
+                var _temp262;
+                var _temp263;
+                var copyOfStruct = JsRuntime$$M_Identity2$__(JsRuntime$$M_Identity$__(JsRuntime$$M_GetProperty$__(JsRuntime$$M_Identity$__(item), "vote_average")), "");
+                _temp263 = copyOfStruct.toString();
+                _temp262 = ("\u003cstrong\u003eAverage vote:\u003c/strong\u003e " + _temp263);
+                _temp260 = Program$$M_jQuery$__("\u003cli\u003e").html(_temp262);
+                _temp256 = Program$$M_Object_asJQuery$__(_temp260);
+                _temp248 = _temp256.appendTo(details);
+                (function (value)
+                {
+                  var ignored0 = value;
+                })(_temp248);
+                var _temp279;
+                var _temp287;
+                var _temp291;
+                var _temp293;
+                var _temp294;
+                var _copyOfStruct = JsRuntime$$M_Identity2$__(JsRuntime$$M_Identity$__(JsRuntime$$M_GetProperty$__(JsRuntime$$M_Identity$__(item), "popularity")), "");
+                _temp294 = _copyOfStruct.toString();
+                _temp293 = ("\u003cstrong\u003ePopularity:\u003c/strong\u003e " + _temp294);
+                _temp291 = Program$$M_jQuery$__("\u003cli\u003e").html(_temp293);
+                _temp287 = Program$$M_Object_asJQuery$__(_temp291);
+                _temp279 = _temp287.appendTo(details);
+                (function (value)
+                {
+                  var ignored0 = value;
+                })(_temp279);
+                var body = Program$$M_Object_asJQuery$__(Program$$M_jQuery$__("\u003cdiv\u003e").addClass("searchResult"));
+                (function (value)
+                {
+                  var ignored0 = value;
+                })(Program$$M_Object_asJQuery$__(Program$$M_jQuery$__("\u003ch3\u003e").append([link])).appendTo(body));
+                (function (value)
+                {
+                  var ignored0 = value;
+                })(Program$$M_Object_asJQuery$__(Program$$M_jQuery$__("\u003cimg\u003e").attr("src", (root + JsRuntime$$M_Identity$__(JsRuntime$$M_Identity$__(JsRuntime$$M_GetProperty$__(JsRuntime$$M_Identity$__(item), "poster_path")))))).appendTo(body));
+                (function (value)
+                {
+                  var ignored0 = value;
+                })(details.appendTo(body));
+                (function (value)
+                {
+                  var ignored0 = value;
+                })(Program$$M_Object_asJQuery$__(Program$$M_jQuery$__("\u003cdiv\u003e").addClass("clearer")).appendTo(body));
+                return (function (value)
+                {
+                  var ignored0 = value;
+                })(body.appendTo(Program$$M_op_Dynamic$FSharpFunc_2$String$_Object$_FSharpFunc_2$String$_Object$_FSharpFunc_2$String$_Object$((function (command)
+                {
+                  return Program$$M_jQuery$__(command);
+                }), "results")));
+              });
+            });
+            _temp229 = (function (source)
+            {
+              return Seq$$M_IterateIndexed$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(action, source);
+            });
+            _temp229((function (source)
+            {
+              return Seq$$M_OfArray$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(source);
+            })(JsRuntime$$M_ConvertArray$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(JsRuntime$$M_Identity$__(JsRuntime$$M_GetProperty$__(JsRuntime$$M_Identity$__(res), "results")), (function (t)
+            {
+              return t;
+            }), (function (t)
+            {
+              return t;
+            }))));
+            return AsyncBuilder$$M_Zero$__(builder_);
+          }));
+        }));
+      })(Async$1$M_get_async$__());
+    });
+    return Program$$M_op_Dynamic$FSharpFunc_2$String$_Object$_FSharpFunc_2$String$_Object$_FSharpFunc_2$String$_Object$((function (command)
+    {
+      return Program$$M_jQuery$__(command);
+    }), "searchButton").click((function (_unitVar0)
+    {
+      var id = LanguagePrimitives$$M_UnboxGeneric$String$1_String_String(Program$$M_op_Dynamic$FSharpFunc_2$String$_Object$_FSharpFunc_2$String$_Object$_FSharpFunc_2$String$_Object$((function (command)
+      {
+        return Program$$M_jQuery$__(command);
+      }), "searchInput").val());
+      return (function (arg00)
+      {
+        return Async$$M_StartImmediate$__(arg00, {Tag: "None"});
+      })(search(id));
+    }));
+  });
+  Program$$M_op_Dynamic$FSharpFunc_2$String$_Object$_FSharpFunc_2$String$_Object$_FSharpFunc_2$String$_Object$ = (function (jq, name)
+  {
+    return Program$$M_jQuery$__(("#" + name));
+  });
+  Runtime$$M_getContext$__ = (function (o)
+  {
+    return o.get_Context();
+  });
+  Runtime$$M_setContext$__ = (function (o, ctx)
+  {
+    o.get_Context = function() { return ctx; };
+  });
+  Seq$$M_Delay$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$ = (function (f)
+  {
+    return Seq$$M_FromFactory$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$((function (unitVar0)
+    {
+      var _temp115;
+      var _temp116;
+      _temp115 = f(_temp116);
+      return Seq$$M_Enumerator$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(_temp115);
+    }));
+  });
+  Seq$$M_Enumerator$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$ = (function (xs)
+  {
+    return xs.GetEnumerator();
+  });
+  Seq$$M_Enumerator$String$1_String_String = (function (xs)
+  {
+    return xs.GetEnumerator();
+  });
+  Seq$$M_Enumerator$String__$_String__$_String__$ = (function (xs)
+  {
+    return xs.GetEnumerator();
+  });
+  Seq$$M_Enumerator$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$ = (function (xs)
+  {
+    return xs.GetEnumerator();
+  });
+  Seq$$M_Fold$String$1_Int32$_String_Int32_String_Int32 = (function (f, seed, xs)
+  {
+    return Seq$$M_FoldIndexed$String$1_Int32$_String_Int32_String_Int32((function (_arg1)
+    {
+      return (function (acc)
+      {
+        return (function (x)
+        {
+          return f(acc)(x);
+        });
+      });
+    }), seed, xs);
+  });
+  Seq$$M_Fold$String__$_Int32$_String__$_Int32_String__$_Int32 = (function (f, seed, xs)
+  {
+    return Seq$$M_FoldIndexed$String__$_Int32$_String__$_Int32_String__$_Int32((function (_arg1)
+    {
+      return (function (acc)
+      {
+        return (function (x)
+        {
+          return f(acc)(x);
+        });
+      });
+    }), seed, xs);
+  });
+  Seq$$M_Fold$Tuple_2$String$_String$_String$1_Tuple_2$String$_String$_String_Tuple_2$String$_String$_String = (function (f, seed, xs)
+  {
+    return Seq$$M_FoldIndexed$Tuple_2$String$_String$_String$1_Tuple_2$String$_String$_String_Tuple_2$String$_String$_String((function (_arg1)
+    {
+      return (function (acc)
+      {
+        return (function (x)
+        {
+          return f(acc)(x);
+        });
+      });
+    }), seed, xs);
+  });
+  Seq$$M_FoldIndexed$ApiaryDocument$_Unit$_ApiaryDocument$_Unit$_ApiaryDocument$_Unit$ = (function (f, seed, xs)
+  {
+    return Seq$$M_FoldIndexedAux$Unit$_ApiaryDocument$_Unit$_ApiaryDocument$_Unit$_ApiaryDocument$(f, 0.000000, seed, Seq$$M_Enumerator$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(xs));
+  });
+  Seq$$M_FoldIndexed$String$1_Int32$_String_Int32_String_Int32 = (function (f, seed, xs)
+  {
+    return Seq$$M_FoldIndexedAux$Int32$_String$1_Int32_String_Int32_String(f, 0.000000, seed, Seq$$M_Enumerator$String$1_String_String(xs));
+  });
+  Seq$$M_FoldIndexed$String$1_Unit$_String_Unit$_String_Unit$ = (function (f, seed, xs)
+  {
+    return Seq$$M_FoldIndexedAux$Unit$_String$1_Unit$_String_Unit$_String(f, 0.000000, seed, Seq$$M_Enumerator$String$1_String_String(xs));
+  });
+  Seq$$M_FoldIndexed$String__$_Int32$_String__$_Int32_String__$_Int32 = (function (f, seed, xs)
+  {
+    return Seq$$M_FoldIndexedAux$Int32$_String__$_Int32_String__$_Int32_String__$(f, 0.000000, seed, Seq$$M_Enumerator$String__$_String__$_String__$(xs));
+  });
+  Seq$$M_FoldIndexed$String__$_Unit$_String__$_Unit$_String__$_Unit$ = (function (f, seed, xs)
+  {
+    return Seq$$M_FoldIndexedAux$Unit$_String__$_Unit$_String__$_Unit$_String__$(f, 0.000000, seed, Seq$$M_Enumerator$String__$_String__$_String__$(xs));
+  });
+  Seq$$M_FoldIndexed$Tuple_2$String$_String$_String$1_Tuple_2$String$_String$_String_Tuple_2$String$_String$_String = (function (f, seed, xs)
+  {
+    return Seq$$M_FoldIndexedAux$String$1_Tuple_2$String$_String$_String_Tuple_2$String$_String$_String_Tuple_2$String$_String$(f, 0.000000, seed, Seq$$M_Enumerator$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$(xs));
+  });
+  Seq$$M_FoldIndexedAux$Int32$_String$1_Int32_String_Int32_String = (function (f, i, acc, xs)
+  {
+    if (xs.MoveNext()) 
+    {
+      return Seq$$M_FoldIndexedAux$Int32$_String$1_Int32_String_Int32_String(f, (i + 1.000000), f(i)(acc)(xs.get_Current()), xs);
+    }
+    else
+    {
+      return acc;
+    };
+  });
+  Seq$$M_FoldIndexedAux$Int32$_String__$_Int32_String__$_Int32_String__$ = (function (f, i, acc, xs)
+  {
+    if (xs.MoveNext()) 
+    {
+      return Seq$$M_FoldIndexedAux$Int32$_String__$_Int32_String__$_Int32_String__$(f, (i + 1.000000), f(i)(acc)(xs.get_Current()), xs);
+    }
+    else
+    {
+      return acc;
+    };
+  });
+  Seq$$M_FoldIndexedAux$String$1_Tuple_2$String$_String$_String_Tuple_2$String$_String$_String_Tuple_2$String$_String$ = (function (f, i, acc, xs)
+  {
+    if (xs.MoveNext()) 
+    {
+      return Seq$$M_FoldIndexedAux$String$1_Tuple_2$String$_String$_String_Tuple_2$String$_String$_String_Tuple_2$String$_String$(f, (i + 1.000000), f(i)(acc)(xs.get_Current()), xs);
+    }
+    else
+    {
+      return acc;
+    };
+  });
+  Seq$$M_FoldIndexedAux$Unit$_ApiaryDocument$_Unit$_ApiaryDocument$_Unit$_ApiaryDocument$ = (function (f, i, acc, xs)
+  {
+    if (xs.MoveNext()) 
+    {
+      return Seq$$M_FoldIndexedAux$Unit$_ApiaryDocument$_Unit$_ApiaryDocument$_Unit$_ApiaryDocument$(f, (i + 1.000000), f(i)(acc)(xs.get_Current()), xs);
+    }
+    else
+    {
+      return acc;
+    };
+  });
+  Seq$$M_FoldIndexedAux$Unit$_String$1_Unit$_String_Unit$_String = (function (f, i, acc, xs)
+  {
+    if (xs.MoveNext()) 
+    {
+      return Seq$$M_FoldIndexedAux$Unit$_String$1_Unit$_String_Unit$_String(f, (i + 1.000000), f(i)(acc)(xs.get_Current()), xs);
+    }
+    else
+    {
+      return acc;
+    };
+  });
+  Seq$$M_FoldIndexedAux$Unit$_String__$_Unit$_String__$_Unit$_String__$ = (function (f, i, acc, xs)
+  {
+    if (xs.MoveNext()) 
+    {
+      return Seq$$M_FoldIndexedAux$Unit$_String__$_Unit$_String__$_Unit$_String__$(f, (i + 1.000000), f(i)(acc)(xs.get_Current()), xs);
+    }
+    else
+    {
+      return acc;
+    };
+  });
+  Seq$$M_FromFactory$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$ = (function (f)
+  {
+    var impl;
+    impl = (new CreateEnumerable_1$ApiaryDocument$$M__ctor$_ApiaryDocument$_ApiaryDocument$(f));
+    return {GetEnumerator: (function (unitVar1)
+    {
+      return (function (__, unitVar1)
+      {
+        var _temp111;
+        return __.factory(_temp111);
+      })(impl, unitVar1);
+    }), GetEnumerator1: (function (unitVar1)
+    {
+      return (function (__, unitVar1)
+      {
+        var _temp112;
+        return __.factory(_temp112);
+      })(impl, unitVar1);
+    })};
+  });
+  Seq$$M_FromFactory$String$1_String_String = (function (f)
+  {
+    var impl;
+    impl = (new CreateEnumerable_1$String$$M__ctor$_String_String(f));
+    return {GetEnumerator: (function (unitVar1)
+    {
+      return (function (__, unitVar1)
+      {
+        var _temp26;
+        return __.factory(_temp26);
+      })(impl, unitVar1);
+    }), GetEnumerator1: (function (unitVar1)
+    {
+      return (function (__, unitVar1)
+      {
+        var _temp27;
+        return __.factory(_temp27);
+      })(impl, unitVar1);
+    })};
+  });
+  Seq$$M_FromFactory$String__$_String__$_String__$ = (function (f)
+  {
+    var impl;
+    impl = (new CreateEnumerable_1$String__$$M__ctor$_String__$_String__$(f));
+    return {GetEnumerator: (function (unitVar1)
+    {
+      return (function (__, unitVar1)
+      {
+        var _temp3;
+        return __.factory(_temp3);
+      })(impl, unitVar1);
+    }), GetEnumerator1: (function (unitVar1)
+    {
+      return (function (__, unitVar1)
+      {
+        var _temp4;
+        return __.factory(_temp4);
+      })(impl, unitVar1);
+    })};
+  });
+  Seq$$M_FromFactory$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$ = (function (f)
+  {
+    var impl;
+    impl = (new CreateEnumerable_1$Tuple_2$String$_String$$M__ctor$_Tuple_2$String$_String$_Tuple_2$String$_String$(f));
+    return {GetEnumerator: (function (unitVar1)
+    {
+      return (function (__, unitVar1)
+      {
+        var _temp19;
+        return __.factory(_temp19);
+      })(impl, unitVar1);
+    }), GetEnumerator1: (function (unitVar1)
+    {
+      return (function (__, unitVar1)
+      {
+        var _temp20;
+        return __.factory(_temp20);
+      })(impl, unitVar1);
+    })};
+  });
+  Seq$$M_IterateIndexed$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$ = (function (f, xs)
+  {
+    var _temp228;
+    return Seq$$M_FoldIndexed$ApiaryDocument$_Unit$_ApiaryDocument$_Unit$_ApiaryDocument$_Unit$((function (i)
+    {
+      return (function (unitVar1)
+      {
+        return (function (x)
+        {
+          return f(i)(x);
+        });
+      });
+    }), _temp228, xs);
+  });
+  Seq$$M_IterateIndexed$String$1_String_String = (function (f, xs)
   {
     var _temp29;
-    return List_FoldIndexed((function (i)
+    return Seq$$M_FoldIndexed$String$1_Unit$_String_Unit$_String_Unit$((function (i)
     {
       return (function (unitVar1)
       {
@@ -1068,448 +2364,10 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
       });
     }), _temp29, xs);
   });
-  List_Length = (function (xs)
+  Seq$$M_IterateIndexed$String__$_String__$_String__$ = (function (f, xs)
   {
-    return List_Fold((function (acc)
-    {
-      return (function (_arg1)
-      {
-        return (acc + 1.000000);
-      });
-    }), 0.000000, xs);
-  });
-  List_ToArray = (function (xs)
-  {
-    var size = List_Length(xs);
-    var ys = Array_ZeroCreate(size);
-    List_IterateIndexed((function (i)
-    {
-      return (function (x)
-      {
-        ys[i] = x;
-        return null;
-      });
-    }), xs);
-    return ys;
-  });
-  Program_Object_asJQuery = (function (x)
-  {
-    var _temp81;
-    var unitVar1 = _temp81;
-    return x;
-  });
-  Program_jQuery = (function (command)
-  {
-    return jQuery(command);
-  });
-  Program_main = (function (unitVar0)
-  {
-    var _temp1;
-    var var0 = "http://api.themoviedb.org";
-    _temp1 = {Root: var0, GlobalQuery: [], GlobalHeaders: [], GlobalArguments: []};
-    var db = _temp1;
-    ApiaryJsRuntime_AddQueryParam(db, "api_key", "6ce0ef5b176501f8c07c634dfa933cff");
-    var root = "http://cf2.imgobject.com/t/p/w92/";
-    var showDetails = (function (id)
-    {
-      return (function (builder_)
-      {
-        return builder_.Delay((function (unitVar)
-        {
-          var _temp56;
-          var _var0 = db;
-          var var1 = id.toString();
-          var var2 = null;
-          var var3 = null;
-          var _temp58;
-          var _temp59;
-          var patternInput = ApiaryJsRuntime_ProcessParameters("Accept:application/json", var3, var2);
-          var query = patternInput.Item2;
-          var headers = patternInput.Item1;
-          _temp59 = (new Tuple2(_var0, (new i_OperationArguments__ctor("GET", "/3/movie/{id}", [(new Tuple2("{id}", var1))], headers, query))));
-          var _patternInput = _temp59;
-          var args = _patternInput.Item2;
-          var apiCtx = _patternInput.Item1;
-          _temp58 = ApiaryJsRuntime_AsyncInvokeOperation(apiCtx, args);
-          _temp56 = ApiaryJsRuntime_AsyncMap(_temp58, (function (t)
-          {
-            return t;
-          }));
-          return builder_.Bind(_temp56, (function (_arg1)
-          {
-            var movie = _arg1;
-            (function (value)
-            {
-              var ignored0 = value;
-            })(Program_op_Dynamic((function (command)
-            {
-              return Program_jQuery(command);
-            }), "dialogOverview").text(JsRuntime_Identity(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(movie), "overview")))));
-            (function (value)
-            {
-              var ignored0 = value;
-            })(Program_op_Dynamic((function (command)
-            {
-              return Program_jQuery(command);
-            }), "dialogTitle").text(JsRuntime_Identity(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(movie), "title")))));
-            (function (value)
-            {
-              var ignored0 = value;
-            })(Program_op_Dynamic((function (command)
-            {
-              return Program_jQuery(command);
-            }), "dialogImage").attr("src", (root + JsRuntime_Identity(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(movie), "poster_path"))))));
-            var _temp63;
-            var _var1 = null;
-            var _var2 = null;
-            var _temp65;
-            var _temp66;
-            var __patternInput = ApiaryJsRuntime_ProcessParameters("Accept:application/json", _var2, _var1);
-            var _query = __patternInput.Item2;
-            var _headers = __patternInput.Item1;
-            var _apiCtx = Runtime_getContext(movie);
-            _temp66 = (new Tuple2(_apiCtx, (new i_OperationArguments__ctor("GET", "/3/movie/{id}/casts", [], _headers, _query))));
-            var ___patternInput = _temp66;
-            var _args = ___patternInput.Item2;
-            var __apiCtx = ___patternInput.Item1;
-            _temp65 = ApiaryJsRuntime_AsyncInvokeOperation(__apiCtx, _args);
-            _temp63 = ApiaryJsRuntime_AsyncMap(_temp65, (function (t)
-            {
-              return t;
-            }));
-            return builder_.Bind(_temp63, (function (_arg2)
-            {
-              var casts = _arg2;
-              var _temp68;
-              var _temp69;
-              var projection = (function (c)
-              {
-                return JsRuntime_Identity2(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(c), "order")), "");
-              });
-              _temp69 = (function (array)
-              {
-                return Array_SortBy(projection, array);
-              });
-              _temp68 = _temp69(JsRuntime_ConvertArray(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(casts), "cast")), (function (t)
-              {
-                return t;
-              }), (function (t)
-              {
-                return t;
-              })));
-              var sorted = _temp68;
-              var _temp72;
-              if ((Array_BoxedLength(sorted).CompareTo(10.000000) <= 0.000000)) 
-              {
-                _temp72 = (function (source)
-                {
-                  return Seq_OfArray(source);
-                })(sorted);
-              }
-              else
-              {
-                var _temp73;
-                var count = 10.000000;
-                _temp73 = (function (source)
-                {
-                  return Seq_Take(count, source);
-                });
-                _temp72 = _temp73((function (source)
-                {
-                  return Seq_OfArray(source);
-                })(sorted));
-              };
-              var _sorted = _temp72;
-              (function (value)
-              {
-                var ignored0 = value;
-              })(Program_op_Dynamic((function (command)
-              {
-                return Program_jQuery(command);
-              }), "dialogCast").html(""));
-              return builder_.For(Seq_OfArray(JsRuntime_ConvertArray(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(casts), "cast")), (function (t)
-              {
-                return t;
-              }), (function (t)
-              {
-                return t;
-              }))), (function (_arg3)
-              {
-                var cast = _arg3;
-                var html = (((("\u003cstrong\u003e" + JsRuntime_Identity(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(cast), "name")))) + "\u003c/strong\u003e (") + JsRuntime_Identity(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(cast), "character")))) + ")");
-                var li = Program_jQuery("\u003cli\u003e");
-                (function (value)
-                {
-                  var ignored0 = value;
-                })(li.html(html));
-                (function (value)
-                {
-                  var ignored0 = value;
-                })(li.appendTo(Program_op_Dynamic((function (command)
-                {
-                  return Program_jQuery(command);
-                }), "dialogCast")));
-                return builder_.Zero();
-              }));
-            }));
-          }));
-        }));
-      })(Async_get_async());
-    });
-    var search = (function (term)
-    {
-      return (function (builder_)
-      {
-        return builder_.Delay((function (unitVar)
-        {
-          var _temp77;
-          var _var0 = db;
-          var var1 = List_CreateCons((new Tuple2("query", term)), List_Empty());
-          var var2 = null;
-          var _temp79;
-          var _temp80;
-          var patternInput = ApiaryJsRuntime_ProcessParameters("Accept:application/json", var2, var1);
-          var query = patternInput.Item2;
-          var headers = patternInput.Item1;
-          _temp80 = (new Tuple2(_var0, (new i_OperationArguments__ctor("GET", "/3/search/movie", [], headers, query))));
-          var _patternInput = _temp80;
-          var args = _patternInput.Item2;
-          var apiCtx = _patternInput.Item1;
-          _temp79 = ApiaryJsRuntime_AsyncInvokeOperation(apiCtx, args);
-          _temp77 = ApiaryJsRuntime_AsyncMap(_temp79, (function (t)
-          {
-            return t;
-          }));
-          return builder_.Bind(_temp77, (function (_arg4)
-          {
-            var res = _arg4;
-            (function (value)
-            {
-              var ignored0 = value;
-            })(Program_op_Dynamic((function (command)
-            {
-              return Program_jQuery(command);
-            }), "results").html(""));
-            var _temp153;
-            var action = (function (index)
-            {
-              return (function (item)
-              {
-                var link = Program_Object_asJQuery(Program_Object_asJQuery(Program_Object_asJQuery(Program_Object_asJQuery(Program_jQuery("\u003ca\u003e").attr("data-toggle", "modal")).attr("href", "#detailsDialog")).text(JsRuntime_Identity(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(item), "title"))))).click((function (_arg1)
-                {
-                  return (function (arg00)
-                  {
-                    return Async_StartImmediate(arg00, {Tag: "None"});
-                  })(showDetails(JsRuntime_Identity2(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(item), "id")), "")));
-                })));
-                var details = Program_jQuery("\u003cul\u003e");
-                var _temp155;
-                var _temp156;
-                var __var0 = JsRuntime_GetProperty(JsRuntime_Identity(item), "release_date");
-                _temp156 = JsRuntime_TryGetValueByTypeTag(JsRuntime_Identity(__var0), "DateTime", (function (t)
-                {
-                  return t;
-                }), (function (t)
-                {
-                  return JsRuntime_Identity2(JsRuntime_Identity(t), "");
-                }));
-                var matchValue = _temp156;
-                if ((matchValue.Tag == "Some")) 
-                {
-                  var dt = matchValue.Value;
-                  _temp155 = dt.toString();
-                }
-                else
-                {
-                  _temp155 = "(not known)";
-                };
-                var date = _temp155;
-                (function (value)
-                {
-                  var ignored0 = value;
-                })(Program_Object_asJQuery(Program_jQuery("\u003cli\u003e").html(("\u003cstrong\u003eReleased:\u003c/strong\u003e " + date))).appendTo(details));
-                var _temp172;
-                var _temp180;
-                var _temp184;
-                var _temp186;
-                var _temp187;
-                var copyOfStruct = JsRuntime_Identity2(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(item), "vote_average")), "");
-                _temp187 = copyOfStruct.toString();
-                _temp186 = ("\u003cstrong\u003eAverage vote:\u003c/strong\u003e " + _temp187);
-                _temp184 = Program_jQuery("\u003cli\u003e").html(_temp186);
-                _temp180 = Program_Object_asJQuery(_temp184);
-                _temp172 = _temp180.appendTo(details);
-                (function (value)
-                {
-                  var ignored0 = value;
-                })(_temp172);
-                var _temp203;
-                var _temp211;
-                var _temp215;
-                var _temp217;
-                var _temp218;
-                var _copyOfStruct = JsRuntime_Identity2(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(item), "popularity")), "");
-                _temp218 = _copyOfStruct.toString();
-                _temp217 = ("\u003cstrong\u003ePopularity:\u003c/strong\u003e " + _temp218);
-                _temp215 = Program_jQuery("\u003cli\u003e").html(_temp217);
-                _temp211 = Program_Object_asJQuery(_temp215);
-                _temp203 = _temp211.appendTo(details);
-                (function (value)
-                {
-                  var ignored0 = value;
-                })(_temp203);
-                var body = Program_Object_asJQuery(Program_jQuery("\u003cdiv\u003e").addClass("searchResult"));
-                (function (value)
-                {
-                  var ignored0 = value;
-                })(Program_Object_asJQuery(Program_jQuery("\u003ch3\u003e").append([link])).appendTo(body));
-                (function (value)
-                {
-                  var ignored0 = value;
-                })(Program_Object_asJQuery(Program_jQuery("\u003cimg\u003e").attr("src", (root + JsRuntime_Identity(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(item), "poster_path")))))).appendTo(body));
-                (function (value)
-                {
-                  var ignored0 = value;
-                })(details.appendTo(body));
-                (function (value)
-                {
-                  var ignored0 = value;
-                })(Program_Object_asJQuery(Program_jQuery("\u003cdiv\u003e").addClass("clearer")).appendTo(body));
-                return (function (value)
-                {
-                  var ignored0 = value;
-                })(body.appendTo(Program_op_Dynamic((function (command)
-                {
-                  return Program_jQuery(command);
-                }), "results")));
-              });
-            });
-            _temp153 = (function (source)
-            {
-              return Seq_IterateIndexed(action, source);
-            });
-            _temp153((function (source)
-            {
-              return Seq_OfArray(source);
-            })(JsRuntime_ConvertArray(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(res), "results")), (function (t)
-            {
-              return t;
-            }), (function (t)
-            {
-              return t;
-            }))));
-            return builder_.Zero();
-          }));
-        }));
-      })(Async_get_async());
-    });
-    return Program_op_Dynamic((function (command)
-    {
-      return Program_jQuery(command);
-    }), "searchButton").click((function (_unitVar0)
-    {
-      var id = LanguagePrimitives_UnboxGeneric(Program_op_Dynamic((function (command)
-      {
-        return Program_jQuery(command);
-      }), "searchInput").val());
-      return (function (arg00)
-      {
-        return Async_StartImmediate(arg00, {Tag: "None"});
-      })(search(id));
-    }));
-  });
-  Program_op_Dynamic = (function (jq, name)
-  {
-    return Program_jQuery(("#" + name));
-  });
-  Runtime_getContext = (function (o)
-  {
-    return o.get_Context();
-  });
-  Runtime_setContext = (function (o, ctx)
-  {
-    o.get_Context = function() { return ctx; };
-  });
-  Seq_CompareWith = (function (f, xs, ys)
-  {
-    var _temp15;
-    var _temp16;
-    var _f = (function (i)
-    {
-      return (i.CompareTo(0.000000) != 0.000000);
-    });
-    _temp16 = (function (_xs)
-    {
-      return Seq_TryFind(_f, _xs);
-    });
-    _temp15 = _temp16(Seq_Map2((function (x)
-    {
-      return (function (y)
-      {
-        return f(x)(y);
-      });
-    }), xs, ys));
-    var nonZero = _temp15;
-    if ((nonZero.Tag == "None")) 
-    {
-      return (Seq_Length(xs) - Seq_Length(ys));
-    }
-    else
-    {
-      var diff = nonZero.Value;
-      return diff;
-    };
-  });
-  Seq_Delay = (function (f)
-  {
-    return Seq_FromFactory((function (unitVar0)
-    {
-      var _temp5;
-      var _temp6;
-      _temp5 = f(_temp6);
-      return Seq_Enumerator(_temp5);
-    }));
-  });
-  Seq_Enumerator = (function (xs)
-  {
-    return xs.GetEnumerator();
-  });
-  Seq_Fold = (function (f, seed, xs)
-  {
-    return Seq_FoldIndexed((function (_arg1)
-    {
-      return (function (acc)
-      {
-        return (function (x)
-        {
-          return f(acc)(x);
-        });
-      });
-    }), seed, xs);
-  });
-  Seq_FoldIndexed = (function (f, seed, xs)
-  {
-    return Seq_FoldIndexedAux(f, 0.000000, seed, Seq_Enumerator(xs));
-  });
-  Seq_FoldIndexedAux = (function (f, i, acc, xs)
-  {
-    if (xs.MoveNext()) 
-    {
-      return Seq_FoldIndexedAux(f, (i + 1.000000), f(i)(acc)(xs.get_Current()), xs);
-    }
-    else
-    {
-      return acc;
-    };
-  });
-  Seq_FromFactory = (function (f)
-  {
-    return (new i_CreateEnumerable_1__ctor(f));
-  });
-  Seq_IterateIndexed = (function (f, xs)
-  {
-    var _temp19;
-    return Seq_FoldIndexed((function (i)
+    var _temp6;
+    return Seq$$M_FoldIndexed$String__$_Unit$_String__$_Unit$_String__$_Unit$((function (i)
     {
       return (function (unitVar1)
       {
@@ -1518,11 +2376,11 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
           return f(i)(x);
         });
       });
-    }), _temp19, xs);
+    }), _temp6, xs);
   });
-  Seq_Length = (function (xs)
+  Seq$$M_Length$String$1_String_String = (function (xs)
   {
-    return Seq_Fold((function (count)
+    return Seq$$M_Fold$String$1_Int32$_String_Int32_String_Int32((function (count)
     {
       return (function (_arg1)
       {
@@ -1530,89 +2388,127 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
       });
     }), 0.000000, xs);
   });
-  Seq_Map2 = (function (f, xs, ys)
+  Seq$$M_Length$String__$_String__$_String__$ = (function (xs)
   {
-    return (function (_f)
+    return Seq$$M_Fold$String__$_Int32$_String__$_Int32_String__$_Int32((function (count)
     {
-      return Seq_Delay(_f);
-    })((function (unitVar0)
-    {
-      var _xs = Seq_Enumerator(xs);
-      var _ys = Seq_Enumerator(ys);
-      var _temp10;
-      var _f = (function (_unitVar0)
+      return (function (_arg1)
       {
-        if ((_xs.MoveNext() && _ys.MoveNext())) 
-        {
-          var _temp12;
-          var _temp13;
-          _temp12 = (new Tuple2(f(_xs.get_Current())(_ys.get_Current()), _temp13));
-          return {Tag: "Some", Value: _temp12};
-        }
-        else
-        {
-          return {Tag: "None"};
-        };
+        return (count + 1.000000);
       });
-      _temp10 = (function (seed)
-      {
-        return Seq_Unfold(_f, seed);
-      });
-      var _temp14;
-      return _temp10(_temp14);
-    }));
+    }), 0.000000, xs);
   });
-  Seq_OfArray = (function (xs)
+  Seq$$M_OfArray$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$ = (function (xs)
   {
-    var _temp18;
+    var _temp113;
     var f = (function (i)
     {
-      if ((i.CompareTo(Array_BoxedLength(xs)) < 0.000000)) 
+      if ((i < Array$$M_BoxedLength$__(xs))) 
       {
-        return {Tag: "Some", Value: (new Tuple2(xs[i], (i + 1.000000)))};
+        return {Tag: "Some", Value: (new Tuple_ApiaryDocument$_Int32(xs[i], (i + 1.000000)))};
       }
       else
       {
         return {Tag: "None"};
       };
     });
-    _temp18 = (function (seed)
+    _temp113 = (function (seed)
     {
-      return Seq_Unfold(f, seed);
+      return Seq$$M_Unfold$Int32$_ApiaryDocument$_Int32_ApiaryDocument$_Int32_ApiaryDocument$(f, seed);
     });
-    return _temp18(0.000000);
+    return _temp113(0.000000);
   });
-  Seq_Take = (function (n, xs)
+  Seq$$M_OfArray$String$1_String_String = (function (xs)
+  {
+    var _temp28;
+    var f = (function (i)
+    {
+      if ((i < Array$$M_BoxedLength$__(xs))) 
+      {
+        return {Tag: "Some", Value: (new Tuple_String_Int32(xs[i], (i + 1.000000)))};
+      }
+      else
+      {
+        return {Tag: "None"};
+      };
+    });
+    _temp28 = (function (seed)
+    {
+      return Seq$$M_Unfold$Int32$_String$1_Int32_String_Int32_String(f, seed);
+    });
+    return _temp28(0.000000);
+  });
+  Seq$$M_OfArray$String__$_String__$_String__$ = (function (xs)
+  {
+    var _temp5;
+    var f = (function (i)
+    {
+      if ((i < Array$$M_BoxedLength$__(xs))) 
+      {
+        return {Tag: "Some", Value: (new Tuple_String__$_Int32(xs[i], (i + 1.000000)))};
+      }
+      else
+      {
+        return {Tag: "None"};
+      };
+    });
+    _temp5 = (function (seed)
+    {
+      return Seq$$M_Unfold$Int32$_String__$_Int32_String__$_Int32_String__$(f, seed);
+    });
+    return _temp5(0.000000);
+  });
+  Seq$$M_OfArray$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$ = (function (xs)
+  {
+    var _temp21;
+    var f = (function (i)
+    {
+      if ((i < Array$$M_BoxedLength$__(xs))) 
+      {
+        return {Tag: "Some", Value: (new Tuple_Tuple_2$String$_String$_Int32(xs[i], (i + 1.000000)))};
+      }
+      else
+      {
+        return {Tag: "None"};
+      };
+    });
+    _temp21 = (function (seed)
+    {
+      return Seq$$M_Unfold$Int32$_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$(f, seed);
+    });
+    return _temp21(0.000000);
+  });
+  Seq$$M_Take$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$ = (function (n, xs)
   {
     return (function (f)
     {
-      return Seq_Delay(f);
+      return Seq$$M_Delay$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(f);
     })((function (unitVar0)
     {
-      var _xs = Seq_Enumerator(xs);
-      var _temp70;
+      var _xs = Seq$$M_Enumerator$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$(xs);
+      var _temp117;
       var f = (function (i)
       {
-        if (((i.CompareTo(n) < 0.000000) && _xs.MoveNext())) 
+        if (((i < n) && _xs.MoveNext())) 
         {
-          return {Tag: "Some", Value: (new Tuple2(_xs.get_Current(), (i + 1.000000)))};
+          return {Tag: "Some", Value: (new Tuple_ApiaryDocument$_Int32(_xs.get_Current(), (i + 1.000000)))};
         }
         else
         {
           return {Tag: "None"};
         };
       });
-      _temp70 = (function (seed)
+      _temp117 = (function (seed)
       {
-        return Seq_Unfold(f, seed);
+        return Seq$$M_Unfold$Int32$_ApiaryDocument$_Int32_ApiaryDocument$_Int32_ApiaryDocument$(f, seed);
       });
-      return _temp70(0.000000);
+      return _temp117(0.000000);
     }));
   });
-  Seq_ToArray = (function (xs)
+  Seq$$M_ToArray$String$1_String_String = (function (xs)
   {
-    var ys = Array_ZeroCreate(Seq_Length(xs));
-    var _temp20;
+    var ys = Array$$M_ZeroCreate$String$1_String_String(Seq$$M_Length$String$1_String_String(xs));
+    var _temp30;
     var f = (function (i)
     {
       return (function (x)
@@ -1621,141 +2517,349 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
         return null;
       });
     });
-    _temp20 = (function (_xs)
+    _temp30 = (function (_xs)
     {
-      return Seq_IterateIndexed(f, _xs);
+      return Seq$$M_IterateIndexed$String$1_String_String(f, _xs);
     });
-    _temp20(xs);
+    _temp30(xs);
     return ys;
   });
-  Seq_TryFind = (function (f, xs)
+  Seq$$M_ToArray$String__$_String__$_String__$ = (function (xs)
   {
-    return Seq_TryPickIndexed((function (_arg1)
+    var ys = Array$$M_ZeroCreate$String__$_String__$_String__$(Seq$$M_Length$String__$_String__$_String__$(xs));
+    var _temp7;
+    var f = (function (i)
     {
       return (function (x)
       {
-        if (f(x)) 
-        {
-          return {Tag: "Some", Value: x};
-        }
-        else
-        {
-          return {Tag: "None"};
-        };
+        ys[i] = x;
+        return null;
       });
-    }), xs);
-  });
-  Seq_TryPickIndexed = (function (f, xs)
-  {
-    return Seq_TryPickIndexedAux(f, 0.000000, Seq_Enumerator(xs));
-  });
-  Seq_TryPickIndexedAux = (function (f, i, xs)
-  {
-    if (xs.MoveNext()) 
+    });
+    _temp7 = (function (_xs)
     {
-      var result = f(i)(xs.get_Current());
-      if ((result.Tag == "None")) 
+      return Seq$$M_IterateIndexed$String__$_String__$_String__$(f, _xs);
+    });
+    _temp7(xs);
+    return ys;
+  });
+  Seq$$M_Unfold$Int32$_ApiaryDocument$_Int32_ApiaryDocument$_Int32_ApiaryDocument$ = (function (f, seed)
+  {
+    return Seq$$M_FromFactory$ApiaryDocument$_ApiaryDocument$_ApiaryDocument$((function (unitVar0)
+    {
+      var impl;
+      impl = (new UnfoldEnumerator_2$Int32$_ApiaryDocument$$M__ctor$_Int32_ApiaryDocument$_Int32_ApiaryDocument$(seed, f));
+      return {get_Current: (function (unitVar1)
       {
-        return Seq_TryPickIndexedAux(f, (i + 1.000000), xs);
-      }
-      else
+        return (function (__, unitVar1)
+        {
+          return __.current;
+        })(impl, unitVar1);
+      }), Dispose: (function (unitVar1)
       {
-        return result;
-      };
-    }
-    else
-    {
-      return {Tag: "None"};
-    };
-  });
-  Seq_Unfold = (function (f, seed)
-  {
-    return Seq_FromFactory((function (unitVar0)
-    {
-      return (new i_UnfoldEnumerator_2__ctor(seed, f));
+        return (function (__, unitVar1)
+        {
+          ;
+        })(impl, unitVar1);
+      }), MoveNext: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          var matchValue = __.acc;
+          var _temp110;
+          var currAcc = matchValue.Value;
+          var _matchValue = __.unfold(currAcc);
+          if ((_matchValue.Tag == "Some")) 
+          {
+            var value = _matchValue.Value.Item1;
+            var nextAcc = _matchValue.Value.Item2;
+            __.acc = {Tag: "Some", Value: nextAcc};
+            __.current = value;
+            _temp110 = true;
+          }
+          else
+          {
+            __.acc = {Tag: "None"};
+            __.current = null;
+            _temp110 = false;
+          };
+          return ((matchValue.Tag == "Some") && _temp110);
+        })(impl, unitVar1);
+      }), get_Current1: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          return __.current;
+        })(impl, unitVar1);
+      }), Reset: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          __.acc = {Tag: "Some", Value: __.seed};
+          __.current = null;
+        })(impl, unitVar1);
+      })};
     }));
   });
-  String_IndexOf = (function (s, search)
+  Seq$$M_Unfold$Int32$_String$1_Int32_String_Int32_String = (function (f, seed)
+  {
+    return Seq$$M_FromFactory$String$1_String_String((function (unitVar0)
+    {
+      var impl;
+      impl = (new UnfoldEnumerator_2$Int32$_String$$M__ctor$_Int32_String_Int32_String(seed, f));
+      return {get_Current: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          return __.current;
+        })(impl, unitVar1);
+      }), Dispose: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          ;
+        })(impl, unitVar1);
+      }), MoveNext: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          var matchValue = __.acc;
+          var _temp25;
+          var currAcc = matchValue.Value;
+          var _matchValue = __.unfold(currAcc);
+          if ((_matchValue.Tag == "Some")) 
+          {
+            var value = _matchValue.Value.Item1;
+            var nextAcc = _matchValue.Value.Item2;
+            __.acc = {Tag: "Some", Value: nextAcc};
+            __.current = value;
+            _temp25 = true;
+          }
+          else
+          {
+            __.acc = {Tag: "None"};
+            __.current = null;
+            _temp25 = false;
+          };
+          return ((matchValue.Tag == "Some") && _temp25);
+        })(impl, unitVar1);
+      }), get_Current1: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          return __.current;
+        })(impl, unitVar1);
+      }), Reset: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          __.acc = {Tag: "Some", Value: __.seed};
+          __.current = null;
+        })(impl, unitVar1);
+      })};
+    }));
+  });
+  Seq$$M_Unfold$Int32$_String__$_Int32_String__$_Int32_String__$ = (function (f, seed)
+  {
+    return Seq$$M_FromFactory$String__$_String__$_String__$((function (unitVar0)
+    {
+      var impl;
+      impl = (new UnfoldEnumerator_2$Int32$_String__$$M__ctor$_Int32_String__$_Int32_String__$(seed, f));
+      return {get_Current: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          return __.current;
+        })(impl, unitVar1);
+      }), Dispose: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          ;
+        })(impl, unitVar1);
+      }), MoveNext: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          var matchValue = __.acc;
+          var _temp2;
+          var currAcc = matchValue.Value;
+          var _matchValue = __.unfold(currAcc);
+          if ((_matchValue.Tag == "Some")) 
+          {
+            var value = _matchValue.Value.Item1;
+            var nextAcc = _matchValue.Value.Item2;
+            __.acc = {Tag: "Some", Value: nextAcc};
+            __.current = value;
+            _temp2 = true;
+          }
+          else
+          {
+            __.acc = {Tag: "None"};
+            __.current = null;
+            _temp2 = false;
+          };
+          return ((matchValue.Tag == "Some") && _temp2);
+        })(impl, unitVar1);
+      }), get_Current1: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          return __.current;
+        })(impl, unitVar1);
+      }), Reset: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          __.acc = {Tag: "Some", Value: __.seed};
+          __.current = null;
+        })(impl, unitVar1);
+      })};
+    }));
+  });
+  Seq$$M_Unfold$Int32$_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$ = (function (f, seed)
+  {
+    return Seq$$M_FromFactory$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$((function (unitVar0)
+    {
+      var impl;
+      impl = (new UnfoldEnumerator_2$Int32$_Tuple_2$String$_String$$M__ctor$_Int32_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$(seed, f));
+      return {get_Current: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          return __.current;
+        })(impl, unitVar1);
+      }), Dispose: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          ;
+        })(impl, unitVar1);
+      }), MoveNext: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          var matchValue = __.acc;
+          var _temp18;
+          var currAcc = matchValue.Value;
+          var _matchValue = __.unfold(currAcc);
+          if ((_matchValue.Tag == "Some")) 
+          {
+            var value = _matchValue.Value.Item1;
+            var nextAcc = _matchValue.Value.Item2;
+            __.acc = {Tag: "Some", Value: nextAcc};
+            __.current = value;
+            _temp18 = true;
+          }
+          else
+          {
+            __.acc = {Tag: "None"};
+            __.current = null;
+            _temp18 = false;
+          };
+          return ((matchValue.Tag == "Some") && _temp18);
+        })(impl, unitVar1);
+      }), get_Current1: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          return __.current;
+        })(impl, unitVar1);
+      }), Reset: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          __.acc = {Tag: "Some", Value: __.seed};
+          __.current = null;
+        })(impl, unitVar1);
+      })};
+    }));
+  });
+  String$$M_IndexOf$__ = (function (s, search)
   {
     return s.indexOf(search);
   });
-  String_IsNullOrEmpty = (function (s)
+  String$$M_IsNullOrEmpty$__ = (function (s)
   {
     return (s==null)||(s=="");
   });
-  String_Join = (function (separator, s)
+  String$$M_Join$__ = (function (separator, s)
   {
     return s.join(separator);
   });
-  String_Replace = (function (s, search, replace)
+  String$$M_Replace$__ = (function (s, search, replace)
   {
     var res = s;
-    while ((String_IndexOf(res, search).CompareTo(-1.000000) > 0.000000))
+    while ((String$$M_IndexOf$__(res, search) > -1.000000))
     {
-      res = String_replaceSingle(res, search, replace);
+      res = String$$M_replaceSingle$__(res, search, replace);
       null;
     };
     return res;
   });
-  String_Split = (function (s, delimiters)
+  String$$M_Split$__ = (function (s, delimiters)
   {
-    var _temp24;
+    var _temp11;
     var folder = (function (inputs)
     {
       return (function (delimiter)
       {
-        var _temp26;
-        var _temp27;
+        var _temp13;
+        var _temp14;
         var mapping = (function (inp)
         {
-          return String_splitSingle(inp, delimiter);
+          return String$$M_splitSingle$__(inp, delimiter);
         });
-        _temp27 = (function (array)
+        _temp14 = (function (array)
         {
-          return Array_Map(mapping, array);
+          return Array$$M_Map$String$1_String__$_String_String__$_String_String__$(mapping, array);
         });
-        _temp26 = _temp27(inputs);
+        _temp13 = _temp14(inputs);
         return (function (arrays)
         {
-          return Array_Concat(Seq_OfArray(arrays));
-        })(_temp26);
+          return Array$$M_Concat$String$1_String_String(Seq$$M_OfArray$String__$_String__$_String__$(arrays));
+        })(_temp13);
       });
     });
     var state = [s];
-    _temp24 = (function (array)
+    _temp11 = (function (array)
     {
-      return Array_Fold(folder, state, array);
+      return Array$$M_Fold$String$1_String__$_String_String__$_String_String__$(folder, state, array);
     });
-    return _temp24(delimiters);
+    return _temp11(delimiters);
   });
-  String_ToLowerCase = (function (s)
+  String$$M_ToLowerCase$__ = (function (s)
   {
     return s.toLowerCase();
   });
-  String_replaceSingle = (function (s, search, replace)
+  String$$M_replaceSingle$__ = (function (s, search, replace)
   {
     return s.replace(search, replace);
   });
-  String_splitSingle = (function (s, delimiter)
+  String$$M_splitSingle$__ = (function (s, delimiter)
   {
     return s.split(delimiter);
   });
-  Tuple2 = (function (Item1, Item2)
+  Tuple_ApiaryDocument$_Int32 = (function (Item1, Item2)
   {
     this.Item1 = Item1;
     this.Item2 = Item2;
   });
-  Tuple2.prototype.CompareTo = (function (that)
+  Tuple_ApiaryDocument$_Int32.prototype.CompareTo = (function (that)
   {
-    var diff;
-    diff = this.Item1.CompareTo(that.Item1);
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Item1.CompareTo(that.Item1);
+    diff = _diff;
     if ((diff != 0.000000)) 
     {
       return diff;
     }
     else
     {
-      diff = this.Item2.CompareTo(that.Item2);
+      var __diff = 0.000000;
+      __diff = ((this.Item2 < that.Item2) ? -1.000000 : ((this.Item2 == that.Item2) ? 0.000000 : 1.000000));
+      diff = __diff;
       if ((diff != 0.000000)) 
       {
         return diff;
@@ -1766,30 +2870,66 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
       };
     };
   });
-  Tuple3 = (function (Item1, Item2, Item3)
+  Tuple_ApiaryOperations$_OperationArguments$ = (function (Item1, Item2)
   {
     this.Item1 = Item1;
     this.Item2 = Item2;
-    this.Item3 = Item3;
   });
-  Tuple3.prototype.CompareTo = (function (that)
+  Tuple_ApiaryOperations$_OperationArguments$.prototype.CompareTo = (function (that)
   {
-    var diff;
-    diff = this.Item1.CompareTo(that.Item1);
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Item1.CompareTo(that.Item1);
+    diff = _diff;
     if ((diff != 0.000000)) 
     {
       return diff;
     }
     else
     {
-      diff = this.Item2.CompareTo(that.Item2);
+      var __diff = 0.000000;
+      __diff = this.Item2.CompareTo(that.Item2);
+      diff = __diff;
       if ((diff != 0.000000)) 
       {
         return diff;
       }
       else
       {
-        diff = this.Item3.CompareTo(that.Item3);
+        return 0.000000;
+      };
+    };
+  });
+  Tuple_FSharpFunc_2$JsonDocument$_Unit$_FSharpFunc_2$String$_Unit$_FSharpFunc_2$String$_Unit$ = (function (Item1, Item2, Item3)
+  {
+    this.Item1 = Item1;
+    this.Item2 = Item2;
+    this.Item3 = Item3;
+  });
+  Tuple_FSharpFunc_2$JsonDocument$_Unit$_FSharpFunc_2$String$_Unit$_FSharpFunc_2$String$_Unit$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Item1.CompareTo(that.Item1);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Item2.CompareTo(that.Item2);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        var ___diff = 0.000000;
+        ___diff = this.Item3.CompareTo(that.Item3);
+        diff = ___diff;
         if ((diff != 0.000000)) 
         {
           return diff;
@@ -1801,15 +2941,222 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
       };
     };
   });
-  Utils_emptyIfNull = (function (list)
+  Tuple_String_Int32 = (function (Item1, Item2)
   {
-    return list==null?List_Empty():list;
+    this.Item1 = Item1;
+    this.Item2 = Item2;
   });
-  Utils_encodeURIComponent = (function (s)
+  Tuple_String_Int32.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Item1 < that.Item1) ? -1.000000 : ((this.Item1 == that.Item1) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = ((this.Item2 < that.Item2) ? -1.000000 : ((this.Item2 == that.Item2) ? 0.000000 : 1.000000));
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  Tuple_String_String = (function (Item1, Item2)
+  {
+    this.Item1 = Item1;
+    this.Item2 = Item2;
+  });
+  Tuple_String_String.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Item1 < that.Item1) ? -1.000000 : ((this.Item1 == that.Item1) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = ((this.Item2 < that.Item2) ? -1.000000 : ((this.Item2 == that.Item2) ? 0.000000 : 1.000000));
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  Tuple_String__$_Int32 = (function (Item1, Item2)
+  {
+    this.Item1 = Item1;
+    this.Item2 = Item2;
+  });
+  Tuple_String__$_Int32.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    var i = 0.000000;
+    while (((_diff == 0.000000) && ((i < this.Item1.length) && (i < that.Item1.length))))
+    {
+      _diff = ((this.Item1[i] < that.Item1[i]) ? -1.000000 : ((this.Item1[i] == that.Item1[i]) ? 0.000000 : 1.000000));
+      i = (i + 1.000000);
+    };
+    _diff = ((_diff == 0.000000) ? (this.Item1.length - that.Item1.length) : _diff);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = ((this.Item2 < that.Item2) ? -1.000000 : ((this.Item2 == that.Item2) ? 0.000000 : 1.000000));
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  Tuple_Tuple_2$String$_String$_Int32 = (function (Item1, Item2)
+  {
+    this.Item1 = Item1;
+    this.Item2 = Item2;
+  });
+  Tuple_Tuple_2$String$_String$_Int32.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Item1.CompareTo(that.Item1);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = ((this.Item2 < that.Item2) ? -1.000000 : ((this.Item2 == that.Item2) ? 0.000000 : 1.000000));
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  Tuple_Tuple_2__$_Tuple_2__$ = (function (Item1, Item2)
+  {
+    this.Item1 = Item1;
+    this.Item2 = Item2;
+  });
+  Tuple_Tuple_2__$_Tuple_2__$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    var i = 0.000000;
+    while (((_diff == 0.000000) && ((i < this.Item1.length) && (i < that.Item1.length))))
+    {
+      _diff = this.Item1[i].CompareTo(that.Item1[i]);
+      i = (i + 1.000000);
+    };
+    _diff = ((_diff == 0.000000) ? (this.Item1.length - that.Item1.length) : _diff);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      var _i = 0.000000;
+      while (((__diff == 0.000000) && ((_i < this.Item2.length) && (_i < that.Item2.length))))
+      {
+        __diff = this.Item2[_i].CompareTo(that.Item2[_i]);
+        _i = (_i + 1.000000);
+      };
+      __diff = ((__diff == 0.000000) ? (this.Item2.length - that.Item2.length) : __diff);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  UnfoldEnumerator_2$Int32$_ApiaryDocument$$M__ctor$_Int32_ApiaryDocument$_Int32_ApiaryDocument$ = (function (seed, unfold)
+  {
+    this.seed = seed;
+    this.unfold = unfold;
+    this.acc = {Tag: "Some", Value: this.seed};
+    this.current = null;
+  });
+  UnfoldEnumerator_2$Int32$_String$$M__ctor$_Int32_String_Int32_String = (function (seed, unfold)
+  {
+    this.seed = seed;
+    this.unfold = unfold;
+    this.acc = {Tag: "Some", Value: this.seed};
+    this.current = null;
+  });
+  UnfoldEnumerator_2$Int32$_String__$$M__ctor$_Int32_String__$_Int32_String__$ = (function (seed, unfold)
+  {
+    this.seed = seed;
+    this.unfold = unfold;
+    this.acc = {Tag: "Some", Value: this.seed};
+    this.current = null;
+  });
+  UnfoldEnumerator_2$Int32$_Tuple_2$String$_String$$M__ctor$_Int32_Tuple_2$String$_String$_Int32_Tuple_2$String$_String$ = (function (seed, unfold)
+  {
+    this.seed = seed;
+    this.unfold = unfold;
+    this.acc = {Tag: "Some", Value: this.seed};
+    this.current = null;
+  });
+  Utils$$M_emptyIfNull$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$ = (function (list)
+  {
+    if (Utils$$M_isNull$FSharpList_1$Tuple_2$String$_String$_FSharpList_1$Tuple_2$String$_String$_FSharpList_1$Tuple_2$String$_String$(list)) 
+    {
+      return List$$M_Empty$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$();
+    }
+    else
+    {
+      return list;
+    };
+  });
+  Utils$$M_encodeURIComponent$__ = (function (s)
   {
     return encodeURIComponent(s);
   });
-  Utils_newXMLHttpRequest = (function (unitVar0)
+  Utils$$M_isNull$FSharpList_1$Tuple_2$String$_String$_FSharpList_1$Tuple_2$String$_String$_FSharpList_1$Tuple_2$String$_String$ = (function (x)
+  {
+    return x==null;
+  });
+  Utils$$M_newXMLHttpRequest$__ = (function (unitVar0)
   {
     
     var res;
@@ -1832,422 +3179,36 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
     res.get_responseText = function() { return res.responseText; }
     return res;
   });
-  i_ApiaryJsContext__ctor = (function (Root, GlobalQuery, GlobalHeaders, GlobalArguments)
-  {
-    this.Root = Root;
-    this.GlobalQuery = GlobalQuery;
-    this.GlobalHeaders = GlobalHeaders;
-    this.GlobalArguments = GlobalArguments;
-  });
-  i_ApiaryJsContext__ctor.prototype.CompareTo = (function (that)
-  {
-    var diff;
-    diff = this.Root.CompareTo(that.Root);
-    if ((diff != 0.000000)) 
-    {
-      return diff;
-    }
-    else
-    {
-      diff = this.GlobalQuery.CompareTo(that.GlobalQuery);
-      if ((diff != 0.000000)) 
-      {
-        return diff;
-      }
-      else
-      {
-        diff = this.GlobalHeaders.CompareTo(that.GlobalHeaders);
-        if ((diff != 0.000000)) 
-        {
-          return diff;
-        }
-        else
-        {
-          diff = this.GlobalArguments.CompareTo(that.GlobalArguments);
-          if ((diff != 0.000000)) 
-          {
-            return diff;
-          }
-          else
-          {
-            return 0.000000;
-          };
-        };
-      };
-    };
-  });
-  i_AsyncBuilder__ctor = (function (unitVar0)
-  {
-    ;
-  });
-  i_AsyncBuilder__ctor.prototype.Bind = (function (_arg1, f)
-  {
-    var x = this;
-    var v = _arg1.Item;
-    return (function (_f)
-    {
-      return Async_protectedCont(_f);
-    })((function (k)
-    {
-      var cont = (function (a)
-      {
-        var patternInput = f(a);
-        var r = patternInput.Item;
-        return r(k);
-      });
-      return v((new i_AsyncParams_1__ctor(cont, k.Aux)));
-    }));
-  });
-  i_AsyncBuilder__ctor.prototype.Delay = (function (f)
-  {
-    var x = this;
-    return (function (_f)
-    {
-      return Async_protectedCont(_f);
-    })((function (k)
-    {
-      var _temp48;
-      var _temp49;
-      _temp48 = f(_temp49);
-      var patternInput = _temp48;
-      var r = patternInput.Item;
-      return r(k);
-    }));
-  });
-  i_AsyncBuilder__ctor.prototype.Zero = (function (unitVar1)
-  {
-    var x = this;
-    return (function (f)
-    {
-      return Async_protectedCont(f);
-    })((function (k)
-    {
-      var _temp50;
-      return Async_invokeCont(k, _temp50);
-    }));
-  });
-  i_AsyncBuilder__ctor.prototype.ReturnFrom = (function (w)
-  {
-    var x = this;
-    return w;
-  });
-  i_AsyncBuilder__ctor.prototype.Return = (function (v)
-  {
-    var x = this;
-    return (function (f)
-    {
-      return Async_protectedCont(f);
-    })((function (k)
-    {
-      return Async_invokeCont(k, v);
-    }));
-  });
-  i_AsyncBuilder__ctor.prototype.While = (function (cond, body)
-  {
-    var __ = this;
-    var x = __;
-    var loop;
-    loop = (function (unitVar0)
-    {
-      var _temp53;
-      var _temp54;
-      _temp53 = cond(_temp54);
-      if (_temp53) 
-      {
-        return x.Bind(body, loop);
-      }
-      else
-      {
-        return x.Zero();
-      };
-    });
-    var _temp51;
-    return loop(_temp51);
-  });
-  i_AsyncBuilder__ctor.prototype.Combine = (function (work1, work2)
-  {
-    var __ = this;
-    return __.Bind(work1, (function (unitVar0)
-    {
-      return work2;
-    }));
-  });
-  i_AsyncBuilder__ctor.prototype.For = (function (seq, body)
-  {
-    var __ = this;
-    var en = seq.GetEnumerator();
-    var x = __;
-    var loop;
-    loop = (function (unitVar0)
-    {
-      if (en.MoveNext()) 
-      {
-        return x.Bind(body(en.get_Current()), loop);
-      }
-      else
-      {
-        return x.Zero();
-      };
-    });
-    var _temp55;
-    return loop(_temp55);
-  });
-  i_AsyncParamsAux__ctor = (function (StackCounter, ExceptionCont, CancelledCont, CancellationToken)
-  {
-    this.StackCounter = StackCounter;
-    this.ExceptionCont = ExceptionCont;
-    this.CancelledCont = CancelledCont;
-    this.CancellationToken = CancellationToken;
-  });
-  i_AsyncParamsAux__ctor.prototype.CompareTo = (function (that)
-  {
-    var diff;
-    diff = this.StackCounter.CompareTo(that.StackCounter);
-    if ((diff != 0.000000)) 
-    {
-      return diff;
-    }
-    else
-    {
-      diff = this.ExceptionCont.CompareTo(that.ExceptionCont);
-      if ((diff != 0.000000)) 
-      {
-        return diff;
-      }
-      else
-      {
-        diff = this.CancelledCont.CompareTo(that.CancelledCont);
-        if ((diff != 0.000000)) 
-        {
-          return diff;
-        }
-        else
-        {
-          diff = this.CancellationToken.CompareTo(that.CancellationToken);
-          if ((diff != 0.000000)) 
-          {
-            return diff;
-          }
-          else
-          {
-            return 0.000000;
-          };
-        };
-      };
-    };
-  });
-  i_AsyncParams_1__ctor = (function (Cont, Aux)
-  {
-    this.Cont = Cont;
-    this.Aux = Aux;
-  });
-  i_AsyncParams_1__ctor.prototype.CompareTo = (function (that)
-  {
-    var diff;
-    diff = this.Cont.CompareTo(that.Cont);
-    if ((diff != 0.000000)) 
-    {
-      return diff;
-    }
-    else
-    {
-      diff = this.Aux.CompareTo(that.Aux);
-      if ((diff != 0.000000)) 
-      {
-        return diff;
-      }
-      else
-      {
-        return 0.000000;
-      };
-    };
-  });
-  i_CancellationToken__ctor = (function (Cell)
-  {
-    this.Cell = Cell;
-  });
-  i_CancellationToken__ctor.prototype.ThrowIfCancellationRequested = (function (unitVar1)
-  {
-    var x = this;
-    var matchValue = x.Cell;
-    if ((matchValue.Tag == "Some")) 
-    {
-      var _temp82;
-      var cell = matchValue.Value;
-      _temp82 = cell.contents;
-      if (_temp82) 
-      {
-        var _cell = matchValue.Value;
-        throw ("OperationCancelledException");
-        return null;
-      }
-      else
-      {
-        ;
-      };
-    }
-    else
-    {
-      ;
-    };
-  });
-  i_CancellationToken__ctor.prototype.CompareTo = (function (that)
-  {
-    var diff;
-    diff = this.Cell.CompareTo(that.Cell);
-    if ((diff != 0.000000)) 
-    {
-      return diff;
-    }
-    else
-    {
-      return 0.000000;
-    };
-  });
-  i_CreateEnumerable_1__ctor = (function (factory)
-  {
-    this.factory = factory;
-  });
-  i_CreateEnumerable_1__ctor.prototype.CompareTo = (function (ys)
-  {
-    var __ = this;
-    var xs = __;
-    return Seq_CompareWith((function (x)
-    {
-      return (function (y)
-      {
-        return LanguagePrimitives_UnboxGeneric(x).CompareTo(y);
-      });
-    }), xs, ys);
-  });
-  i_CreateEnumerable_1__ctor.prototype.GetEnumerator = (function (unitVar1)
-  {
-    var __ = this;
-    var _temp17;
-    return __.factory(_temp17);
-  });
-  i_OperationArguments__ctor = (function (Method, Path, Arguments, Headers, Query)
-  {
-    this.Method = Method;
-    this.Path = Path;
-    this.Arguments = Arguments;
-    this.Headers = Headers;
-    this.Query = Query;
-  });
-  i_OperationArguments__ctor.prototype.CompareTo = (function (that)
-  {
-    var diff;
-    diff = this.Method.CompareTo(that.Method);
-    if ((diff != 0.000000)) 
-    {
-      return diff;
-    }
-    else
-    {
-      diff = this.Path.CompareTo(that.Path);
-      if ((diff != 0.000000)) 
-      {
-        return diff;
-      }
-      else
-      {
-        diff = this.Arguments.CompareTo(that.Arguments);
-        if ((diff != 0.000000)) 
-        {
-          return diff;
-        }
-        else
-        {
-          diff = this.Headers.CompareTo(that.Headers);
-          if ((diff != 0.000000)) 
-          {
-            return diff;
-          }
-          else
-          {
-            diff = this.Query.CompareTo(that.Query);
-            if ((diff != 0.000000)) 
-            {
-              return diff;
-            }
-            else
-            {
-              return 0.000000;
-            };
-          };
-        };
-      };
-    };
-  });
-  i_UnfoldEnumerator_2__ctor = (function (seed, unfold)
-  {
-    this.seed = seed;
-    this.unfold = unfold;
-    this.acc = {Tag: "Some", Value: this.seed};
-    this.current = null;
-  });
-  i_UnfoldEnumerator_2__ctor.prototype.Reset = (function (unitVar1)
-  {
-    var __ = this;
-    __.acc = {Tag: "Some", Value: __.seed};
-    __.current = null;
-  });
-  i_UnfoldEnumerator_2__ctor.prototype.get_Current = (function (unitVar1)
-  {
-    var __ = this;
-    return __.current;
-  });
-  i_UnfoldEnumerator_2__ctor.prototype.MoveNext = (function (unitVar1)
-  {
-    var __ = this;
-    var matchValue = __.acc;
-    var _temp2;
-    var currAcc = matchValue.Value;
-    var _matchValue = __.unfold(currAcc);
-    if ((_matchValue.Tag == "Some")) 
-    {
-      var value = _matchValue.Value.Item1;
-      var nextAcc = _matchValue.Value.Item2;
-      __.acc = {Tag: "Some", Value: nextAcc};
-      __.current = value;
-      _temp2 = true;
-    }
-    else
-    {
-      __.acc = {Tag: "None"};
-      __.current = null;
-      _temp2 = false;
-    };
-    return ((matchValue.Tag == "Some") && _temp2);
-  });
-  i_UnfoldEnumerator_2__ctor.prototype.Dispose = (function (unitVar1)
-  {
-    var __ = this;
-  });
-  list_1_Cons = (function (Item1, Item2)
+  list_1$Tuple_2$String$_String$_Cons_Tuple_2$String$_String$ = (function (Item1, Item2)
   {
     this.Tag = "Cons";
     this.Item1 = Item1;
     this.Item2 = Item2;
   });
-  list_1_Cons.prototype.CompareTo = (function (that)
+  list_1$Tuple_2$String$_String$_Cons_Tuple_2$String$_String$.prototype.CompareTo = (function (that)
   {
-    var diff;
-    diff = this.Tag.CompareTo(that.Tag);
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Tag < that.Tag) ? -1.000000 : ((this.Tag == that.Tag) ? 0.000000 : 1.000000));
+    diff = _diff;
     if ((diff != 0.000000)) 
     {
       return diff;
     }
     else
     {
-      diff = this.Item1.CompareTo(that.Item1);
+      var __diff = 0.000000;
+      __diff = this.Item1.CompareTo(that.Item1);
+      diff = __diff;
       if ((diff != 0.000000)) 
       {
         return diff;
       }
       else
       {
-        diff = this.Item2.CompareTo(that.Item2);
+        var ___diff = 0.000000;
+        ___diff = this.Item2.CompareTo(that.Item2);
+        diff = ___diff;
         if ((diff != 0.000000)) 
         {
           return diff;
@@ -2259,14 +3220,16 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
       };
     };
   });
-  list_1_Nil = (function ()
+  list_1$Tuple_2$String$_String$_Nil_Tuple_2$String$_String$ = (function ()
   {
     this.Tag = "Nil";
   });
-  list_1_Nil.prototype.CompareTo = (function (that)
+  list_1$Tuple_2$String$_String$_Nil_Tuple_2$String$_String$.prototype.CompareTo = (function (that)
   {
-    var diff;
-    diff = this.Tag.CompareTo(that.Tag);
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Tag < that.Tag) ? -1.000000 : ((this.Tag == that.Tag) ? 0.000000 : 1.000000));
+    diff = _diff;
     if ((diff != 0.000000)) 
     {
       return diff;
@@ -2276,7 +3239,7 @@ var list_1_Nil, list_1_Cons, i_UnfoldEnumerator_2__ctor, i_OperationArguments__c
       return 0.000000;
     };
   });
-  return Program_main()
+  return Program$$M_main$__()
 });
   </script>
 

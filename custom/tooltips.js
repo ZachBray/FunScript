@@ -44,6 +44,7 @@ function showTip(evt, name, unique, owner)
 
   var el = document.getElementById(name);
   var parent = (document.documentElement == null) ? document.body : document.documentElement;
+  parent.appendChild(el);
   el.style.position = "absolute";
   el.style.left = posx + "px";
   el.style.top = posy + "px";

@@ -49,6 +49,19 @@
     </div>
   </header>
 
+  <!-- Some more Foundation references (always load jQuery, because samples use it) -->
+  <script src="http://www.funscript.info/js/vendor/jquery.js"></script>
+  <script src="http://www.funscript.info/js/foundation.min.js"></script>  
+  <script src="http://www.funscript.info/js/foundation/foundation.reveal.js"></script>
+  <script>
+    $(document).foundation();
+  </script>
+  
+  <!-- Some references the samples might need. TODO: Import these ,e.g., {sample-scripts}. -->
+  <script src="http://code.jquery.com/jquery-1.8.0.js"></script>
+  <script src="http://code.jquery.com/ui/1.8.23/jquery-ui.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/highcharts/2.3.1/highcharts.js"></script>
+  
   <!-- Foundation dialog that appears when "Open Sample"  is clicked -->
   <div id="sampleDialog" class="reveal-modal medium">
     <h2>Charting World Bank data with F#</h2>
@@ -352,11 +365,10 @@
       <p>Browse other samples to learn more about FunScript</p>
       <ul>
         <li><a href="tutorial.html">Getting started tutorial</a></li>
-        <li><a href="canvas.html">Using HTML5 canvas</a></li>
-        <li><a href="simpleasync.html">Asynchornous computations</a></li>
         <li><a href="worldbank.html">Visualizing World Bank data</a></li>
         <li><a href="moviedatabase.html">Calling The Movie Database</a></li>
-        <li><a href="brainfuck.html">Brainfuck interpreter!!</a></li>
+        <li><a href="canvas.html">Using HTML5 canvas</a></li>
+        <li><a href="simpleasync.html">Asynchornous computations</a></li>
       </ul>
 
     </div>
@@ -369,13 +381,7 @@
   <!-- Fork me on GitHub link -->
   <a href="https://github.com/ZachBray/FunScript"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
    
-  <!-- Some more Foundation references (always load jQuery, because samples use it) -->
-  <script src="http://www.funscript.info/js/vendor/jquery.js"></script>
-  <script src="http://www.funscript.info/js/foundation.min.js"></script>  
-  <script src="http://www.funscript.info/js/foundation/foundation.reveal.js"></script>
-  <script>
-    $(document).foundation();
-  </script>
+
   
   <script>
 	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -390,49 +396,16 @@
   <!-- JavaScript code from the sample goes here... -->
   <script type="text/javascript">
     $(document).ready(function () {
-
-
-Boolean.prototype.CompareTo = function(that) {
-   return this - that;
-};
-
-Number.prototype.CompareTo = function(that) {
-   return this - that;
-};
-
-String.prototype.CompareTo = function(that) {
-   if (this > that) {
-      return 1;
-   } else if (this < that) {
-      return -1;
-   }
-   else {
-      return 0;
-   }
-};
-
-Array.prototype.CompareTo = function(that) {
-   var i = 0;
-   while(i < this.length && i < that.length) {
-      var diff = this[i].CompareTo(that[i]);
-      if(diff != 0) {
-         return diff;
-      }
-      i = i + 1;
-   };
-   return this.length - that.length;
-};
-
-var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__ctor, i_CreateEnumerable_1__ctor, i_CancellationToken__ctor, i_AsyncParams_1__ctor, i_AsyncParamsAux__ctor, i_AsyncBuilder__ctor, WorldBankRuntime_GetIndicators, WorldBankRuntime_GetCountry, WorldBankRuntime_GetCountries, WorldBankRuntime_AsyncGetIndicator, Utils_getJSON, Utils_encodeURIComponent, Tuple3, Tuple2, String_Join, Seq_Unfold, Seq_TryPickIndexedAux, Seq_TryPickIndexed, Seq_TryFind, Seq_ToArray, Seq_OfList, Seq_OfArray, Seq_Map2, Seq_Map, Seq_Length, Seq_IterateIndexed, Seq_FromFactory, Seq_FoldIndexedAux, Seq_FoldIndexed, Seq_Fold, Seq_Enumerator, Seq_Delay, Seq_CompareWith, Seq_Choose, Runtime_worldBankUrl, Program_main, Program_jQuery, Program_get_data, Program_data, Program_countries, List_Tail, List_Reverse, List_OfArray, List_MapIndexed, List_Map, List_Head, List_FoldIndexedAux, List_FoldIndexed, List_Fold, List_Empty, List_CreateCons, LanguagePrimitives_UnboxGeneric, JsRuntime_TryGetValueByTypeTag, JsRuntime_TryGetArrayChildByTypeTag, JsRuntime_Parse, JsRuntime_Identity2, JsRuntime_Identity, JsRuntime_GetProperty, JsRuntime_GetCulture, JsRuntime_GetArrayChildrenByTypeTag, JsRuntime_GetArrayChildByTypeTag, JsRuntime_ConvertArray, JsHelpers_jstypeof, JsHelpers_isNull, JsHelpers_isArray, FunScriptExtensions_number, FunScriptExtensions_floor, FunScriptExtensions_clone, FunScriptExtensions_Array_push, FSharpString_Concat, Async_setTimeout, Async_protectedCont, Async_invokeCont, Async_get_async, Async_StartImmediate, Async_FromContinuations, Async_1_Cont, Array_ZeroCreate, Array_MapIndexed, Array_Map, Array_Length, Array_FoldBackIndexed, Array_FoldBack, Array_Choose, Array_BoxedLength;
-  Array_BoxedLength = (function (xs)
+var list_1$Tuple_2$String$_String$_Nil_Tuple_2$String$_String$, list_1$Tuple_2$String$_String$_Cons_Tuple_2$String$_String$, list_1$Tuple_2$Country$_Object$_Nil_Tuple_2$Country$_Object$, list_1$Tuple_2$Country$_Object$_Cons_Tuple_2$Country$_Object$, list_1$String$_Nil_String, list_1$String$_Cons_String, list_1$Object$_Nil_Object$, list_1$Country$_Nil_Country$, list_1$Country$_Cons_Country$, WorldBankRuntime$$M_GetIndicators$__, WorldBankRuntime$$M_GetCountry$__, WorldBankRuntime$$M_GetCountries$__, WorldBankRuntime$$M_AsyncGetIndicator$__, WorldBankCountry$$M__ctor$_, Utils$$M_getJSON$__, Utils$$M_encodeURIComponent$__, UnfoldEnumerator_2$Int32$_JsonDocument$$M__ctor$_Int32_JsonDocument$_Int32_JsonDocument$, UnfoldEnumerator_2$IEnumerator_1$Tuple_2$Int32$_Double$_Double__$$M__ctor$_IEnumerator_1$Tuple_2$Int32$_Double$_Double__$_IEnumerator_1$Tuple_2$Int32$_Double$_Double__$, UnfoldEnumerator_2$IEnumerator_1$JsonDocument$_Tuple_2$Int32$_Double$$M__ctor$_IEnumerator_1$JsonDocument$_Tuple_2$Int32$_Double$_IEnumerator_1$JsonDocument$_Tuple_2$Int32$_Double$, UnfoldEnumerator_2$FSharpList_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$$M__ctor$_FSharpList_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_FSharpList_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$, UnfoldEnumerator_2$FSharpList_1$String$_String$$M__ctor$_FSharpList_1$String$_String_FSharpList_1$String$_String, Tuple_Tuple_2$Int32$_Double$_IEnumerator_1$JsonDocument$, Tuple_Tuple_2$Country$_Object$_FSharpList_1$Tuple_2$Country$_Object$, Tuple_String_String, Tuple_String_FSharpList_1$String$, Tuple_JsonDocument$_Int32, Tuple_Int32_Double, Tuple_FSharpFunc_2$IEnumerable_1$Tuple_2$Int32$_Double$_Unit$_FSharpFunc_2$String$_Unit$_FSharpFunc_2$String$_Unit$, Tuple_Double__$_IEnumerator_1$Tuple_2$Int32$_Double$, Tuple_Country$_Object$, String$1$M_Join$__, Seq$$M_Unfold$Int32$_JsonDocument$_Int32_JsonDocument$_Int32_JsonDocument$, Seq$$M_Unfold$IEnumerator_1$Tuple_2$Int32$_Double$_Double__$_IEnumerator_1$Tuple_2$Int32$_Double$_Double__$_IEnumerator_1$Tuple_2$Int32$_Double$_Double__$, Seq$$M_Unfold$IEnumerator_1$JsonDocument$_Tuple_2$Int32$_Double$_IEnumerator_1$JsonDocument$_Tuple_2$Int32$_Double$_IEnumerator_1$JsonDocument$_Tuple_2$Int32$_Double$, Seq$$M_Unfold$FSharpList_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_FSharpList_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_FSharpList_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$, Seq$$M_Unfold$FSharpList_1$String$_String$_FSharpList_1$String$_String_FSharpList_1$String$_String, Seq$$M_ToArray$String$_String_String, Seq$$M_ToArray$Double__$_Double__$_Double__$, Seq$$M_OfList$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_Tuple_2$Country$_Object$, Seq$$M_OfList$String$_String_String, Seq$$M_OfArray$JsonDocument$_JsonDocument$_JsonDocument$, Seq$$M_Map$Tuple_2$Int32$_Double$_Double__$_Tuple_2$Int32$_Double$_Double__$_Tuple_2$Int32$_Double$_Double__$, Seq$$M_Length$String$_String_String, Seq$$M_Length$Double__$_Double__$_Double__$, Seq$$M_IterateIndexed$String$_String_String, Seq$$M_IterateIndexed$Double__$_Double__$_Double__$, Seq$$M_FromFactory$Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$, Seq$$M_FromFactory$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_Tuple_2$Country$_Object$, Seq$$M_FromFactory$String$_String_String, Seq$$M_FromFactory$JsonDocument$_JsonDocument$_JsonDocument$, Seq$$M_FromFactory$Double__$_Double__$_Double__$, Seq$$M_FoldIndexedAux$Unit$_String$_Unit$_String_Unit$_String, Seq$$M_FoldIndexedAux$Unit$_Double__$_Unit$_Double__$_Unit$_Double__$, Seq$$M_FoldIndexedAux$Int32$_String$_Int32_String_Int32_String, Seq$$M_FoldIndexedAux$Int32$_Double__$_Int32_Double__$_Int32_Double__$, Seq$$M_FoldIndexed$String$_Unit$_String_Unit$_String_Unit$, Seq$$M_FoldIndexed$String$_Int32$_String_Int32_String_Int32, Seq$$M_FoldIndexed$Double__$_Unit$_Double__$_Unit$_Double__$_Unit$, Seq$$M_FoldIndexed$Double__$_Int32$_Double__$_Int32_Double__$_Int32, Seq$$M_Fold$String$_Int32$_String_Int32_String_Int32, Seq$$M_Fold$Double__$_Int32$_Double__$_Int32_Double__$_Int32, Seq$$M_Enumerator$Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$, Seq$$M_Enumerator$String$_String_String, Seq$$M_Enumerator$JsonDocument$_JsonDocument$_JsonDocument$, Seq$$M_Enumerator$Double__$_Double__$_Double__$, Seq$$M_Delay$Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$, Seq$$M_Delay$Double__$_Double__$_Double__$, Seq$$M_Choose$JsonDocument$_Tuple_2$Int32$_Double$_JsonDocument$_Tuple_2$Int32$_Double$_JsonDocument$_Tuple_2$Int32$_Double$, Runtime$$M_worldBankUrl$__, Program$_data_, Program$$M_main$__, Program$$M_jQuery$__, Program$$M_get_data$__, Program$$M_countries$__, List$$M_Tail$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_Tuple_2$Country$_Object$, List$$M_Tail$String$_String_String, List$$M_Reverse$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_Tuple_2$Country$_Object$, List$$M_Reverse$String$_String_String, List$$M_OfArray$Country$_Country$_Country$, List$$M_MapIndexed$Country$_Tuple_2$Country$_Object$_Country$_Tuple_2$Country$_Object$_Country$_Tuple_2$Country$_Object$, List$$M_Map$Tuple_2$String$_String$_String$_Tuple_2$String$_String$_String_Tuple_2$String$_String$_String, List$$M_Map$String$_String$_String_String_String_String, List$$M_Head$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_Tuple_2$Country$_Object$, List$$M_Head$String$_String_String, List$$M_FoldIndexedAux$list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$, List$$M_FoldIndexedAux$list_1$Tuple_2$Country$_Object$_Country$_list_1$Tuple_2$Country$_Object$_Country$_list_1$Tuple_2$Country$_Object$_Country$, List$$M_FoldIndexedAux$list_1$String$_Tuple_2$String$_String$_list_1$String$_Tuple_2$String$_String$_list_1$String$_Tuple_2$String$_String$, List$$M_FoldIndexedAux$list_1$String$_String$_list_1$String$_String_list_1$String$_String, List$$M_FoldIndexed$Tuple_2$String$_String$_list_1$String$_Tuple_2$String$_String$_list_1$String$_Tuple_2$String$_String$_list_1$String$, List$$M_FoldIndexed$Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$, List$$M_FoldIndexed$String$_list_1$String$_String_list_1$String$_String_list_1$String$, List$$M_FoldIndexed$Country$_list_1$Tuple_2$Country$_Object$_Country$_list_1$Tuple_2$Country$_Object$_Country$_list_1$Tuple_2$Country$_Object$, List$$M_Fold$Tuple_2$String$_String$_list_1$String$_Tuple_2$String$_String$_list_1$String$_Tuple_2$String$_String$_list_1$String$, List$$M_Fold$Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$, List$$M_Fold$String$_list_1$String$_String_list_1$String$_String_list_1$String$, List$$M_Empty$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$, List$$M_Empty$String$_String_String, List$$M_Empty$Object$_Object$_Object$, List$$M_CreateCons$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$, List$$M_CreateCons$String$_String_String, LanguagePrimitives$$M_UnboxGeneric$IDisposable$_IDisposable$_IDisposable$, JsRuntime$$M_TryGetValueByTypeTag$JsonDocument$_Decimal$_JsonDocument$_Decimal$_JsonDocument$_Decimal$, JsRuntime$$M_TryGetArrayChildByTypeTag$Object$_Decimal$_Object$_Decimal$_Object$_Decimal$, JsRuntime$$M_Parse$__, JsRuntime$$M_Identity2$__, JsRuntime$$M_Identity$__, JsRuntime$$M_GetProperty$__, JsRuntime$$M_GetCulture$__, JsRuntime$$M_GetArrayChildrenByTypeTag$Object$_Decimal$_Object$_Decimal$_Object$_Decimal$, JsRuntime$$M_GetArrayChildrenByTypeTag$JsonValue$_JsonValue$_JsonValue$_JsonValue$_JsonValue$_JsonValue$, JsRuntime$$M_GetArrayChildByTypeTag$__, JsRuntime$$M_ConvertArray$JsonDocument$_JsonDocument$_JsonDocument$_JsonDocument$_JsonDocument$_JsonDocument$, JsHelpers$$M_jstypeof$__, JsHelpers$$M_isNull$__, JsHelpers$$M_isArray$__, FunScriptExtensions$$M_number$__, FunScriptExtensions$$M_floor$__, FunScriptExtensions$$M_clone$Object$_Object$_Object$_Object$_Object$_Object$, FunScriptExtensions$$M_Array_push$__, FSharpString$$M_Concat$__, CreateEnumerable_1$Tuple_2$Int32$_Double$$M__ctor$_Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$, CreateEnumerable_1$Tuple_2$Country$_Object$$M__ctor$_Tuple_2$Country$_Object$_Tuple_2$Country$_Object$, CreateEnumerable_1$String$$M__ctor$_String_String, CreateEnumerable_1$JsonDocument$$M__ctor$_JsonDocument$_JsonDocument$, CreateEnumerable_1$Double__$$M__ctor$_Double__$_Double__$, CancellationToken$$M__ctor$_, CancellationToken$$M_ThrowIfCancellationRequested$__, Async_1$Unit$_Cont_Unit$, Async_1$IEnumerable_1$Tuple_2$Int32$_Double$_Cont_IEnumerable_1$Tuple_2$Int32$_Double$, AsyncParams_1$Unit$$M__ctor$_Unit$, AsyncParams_1$Indicator$$M__ctor$_Indicator$, AsyncParamsAux$$M__ctor$_, AsyncBuilder$$M__ctor$__, AsyncBuilder$$M_Zero$__, AsyncBuilder$$M_For$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_Tuple_2$Country$_Object$, AsyncBuilder$$M_Delay$Unit$_Unit$_Unit$, AsyncBuilder$$M_Combine$Unit$_Unit$_Unit$, AsyncBuilder$$M_Bind$Unit$_Unit$_Unit$_Unit$_Unit$_Unit$, AsyncBuilder$$M_Bind$Indicator$_Unit$_Indicator$_Unit$_Indicator$_Unit$, Async$1$M_setTimeout$Unit$_Unit$_Unit$, Async$1$M_protectedCont$Unit$_Unit$_Unit$, Async$1$M_protectedCont$IEnumerable_1$Tuple_2$Int32$_Double$_IEnumerable_1$Tuple_2$Int32$_Double$_IEnumerable_1$Tuple_2$Int32$_Double$, Async$1$M_invokeCont$Unit$_Unit$_Unit$, Async$1$M_get_async$__, Async$$M_StartImmediate$__, Async$$M_FromContinuations$IEnumerable_1$Tuple_2$Int32$_Double$_IEnumerable_1$Tuple_2$Int32$_Double$_IEnumerable_1$Tuple_2$Int32$_Double$, Array$$M_ZeroCreate$String$_String_String, Array$$M_ZeroCreate$Object$_Object$_Object$, Array$$M_ZeroCreate$JsonValue$_JsonValue$_JsonValue$, Array$$M_ZeroCreate$Double__$_Double__$_Double__$, Array$$M_ZeroCreate$Decimal$_Decimal$_Decimal$, Array$$M_MapIndexed$Object$_JsonValue$_Object$_JsonValue$_Object$_JsonValue$, Array$$M_MapIndexed$Object$_Decimal$_Object$_Decimal$_Object$_Decimal$, Array$$M_Map$Object$_JsonValue$_Object$_JsonValue$_Object$_JsonValue$, Array$$M_Map$Object$_Decimal$_Object$_Decimal$_Object$_Decimal$, Array$$M_Length$Object$_Object$_Object$, Array$$M_Length$Country$_Country$_Country$, Array$$M_FoldBackIndexed$Country$_list_1$Country$_Country$_list_1$Country$_Country$_list_1$Country$, Array$$M_FoldBack$Country$_list_1$Country$_Country$_list_1$Country$_Country$_list_1$Country$, Array$$M_Choose$Object$_Object$_Object$_Object$_Object$_Object$, Array$$M_BoxedLength$__;
+  Array$$M_BoxedLength$__ = (function (xs)
   {
     return xs.length;
   });
-  Array_Choose = (function (f, xs)
+  Array$$M_Choose$Object$_Object$_Object$_Object$_Object$_Object$ = (function (f, xs)
   {
-    var ys = Array_ZeroCreate(0.000000);
+    var ys = Array$$M_ZeroCreate$Object$_Object$_Object$(0.000000);
     var j = 0.000000;
-    for (var i = 0.000000; i <= (Array_Length(xs) - 1.000000); i++)
+    for (var i = 0.000000; i <= (Array$$M_Length$Object$_Object$_Object$(xs) - 1.000000); i++)
     {
       var matchValue = f(xs[i]);
       if ((matchValue.Tag == "None")) 
@@ -450,9 +423,9 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
     };
     return ys;
   });
-  Array_FoldBack = (function (f, xs, seed)
+  Array$$M_FoldBack$Country$_list_1$Country$_Country$_list_1$Country$_Country$_list_1$Country$ = (function (f, xs, seed)
   {
-    return Array_FoldBackIndexed((function (_arg1)
+    return Array$$M_FoldBackIndexed$Country$_list_1$Country$_Country$_list_1$Country$_Country$_list_1$Country$((function (_arg1)
     {
       return (function (x)
       {
@@ -463,10 +436,10 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
       });
     }), xs, seed);
   });
-  Array_FoldBackIndexed = (function (f, xs, seed)
+  Array$$M_FoldBackIndexed$Country$_list_1$Country$_Country$_list_1$Country$_Country$_list_1$Country$ = (function (f, xs, seed)
   {
     var acc = seed;
-    var size = Array_Length(xs);
+    var size = Array$$M_Length$Country$_Country$_Country$(xs);
     for (var i = 1.000000; i <= size; i++)
     {
       acc = f((i - 1.000000))(xs[(size - i)])(acc);
@@ -474,13 +447,17 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
     };
     return acc;
   });
-  Array_Length = (function (xs)
+  Array$$M_Length$Country$_Country$_Country$ = (function (xs)
   {
     return xs.length;
   });
-  Array_Map = (function (f, xs)
+  Array$$M_Length$Object$_Object$_Object$ = (function (xs)
   {
-    return Array_MapIndexed((function (_arg1)
+    return xs.length;
+  });
+  Array$$M_Map$Object$_Decimal$_Object$_Decimal$_Object$_Decimal$ = (function (f, xs)
+  {
+    return Array$$M_MapIndexed$Object$_Decimal$_Object$_Decimal$_Object$_Decimal$((function (_arg1)
     {
       return (function (x)
       {
@@ -488,102 +465,112 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
       });
     }), xs);
   });
-  Array_MapIndexed = (function (f, xs)
+  Array$$M_Map$Object$_JsonValue$_Object$_JsonValue$_Object$_JsonValue$ = (function (f, xs)
   {
-    var ys = Array_ZeroCreate(Array_Length(xs));
-    for (var i = 0.000000; i <= (Array_Length(xs) - 1.000000); i++)
+    return Array$$M_MapIndexed$Object$_JsonValue$_Object$_JsonValue$_Object$_JsonValue$((function (_arg1)
+    {
+      return (function (x)
+      {
+        return f(x);
+      });
+    }), xs);
+  });
+  Array$$M_MapIndexed$Object$_Decimal$_Object$_Decimal$_Object$_Decimal$ = (function (f, xs)
+  {
+    var ys = Array$$M_ZeroCreate$Decimal$_Decimal$_Decimal$(Array$$M_Length$Object$_Object$_Object$(xs));
+    for (var i = 0.000000; i <= (Array$$M_Length$Object$_Object$_Object$(xs) - 1.000000); i++)
     {
       ys[i] = f(i)(xs[i]);
       null;
     };
     return ys;
   });
-  Array_ZeroCreate = (function (size)
+  Array$$M_MapIndexed$Object$_JsonValue$_Object$_JsonValue$_Object$_JsonValue$ = (function (f, xs)
+  {
+    var ys = Array$$M_ZeroCreate$JsonValue$_JsonValue$_JsonValue$(Array$$M_Length$Object$_Object$_Object$(xs));
+    for (var i = 0.000000; i <= (Array$$M_Length$Object$_Object$_Object$(xs) - 1.000000); i++)
+    {
+      ys[i] = f(i)(xs[i]);
+      null;
+    };
+    return ys;
+  });
+  Array$$M_ZeroCreate$Decimal$_Decimal$_Decimal$ = (function (size)
   {
     return new Array(size);
   });
-  Async_1_Cont = (function (Item)
+  Array$$M_ZeroCreate$Double__$_Double__$_Double__$ = (function (size)
   {
-    this.Tag = "Cont";
-    this.Item = Item;
+    return new Array(size);
   });
-  Async_1_Cont.prototype.CompareTo = (function (that)
+  Array$$M_ZeroCreate$JsonValue$_JsonValue$_JsonValue$ = (function (size)
   {
-    var diff;
-    diff = this.Tag.CompareTo(that.Tag);
-    if ((diff != 0.000000)) 
-    {
-      return diff;
-    }
-    else
-    {
-      diff = this.Item.CompareTo(that.Item);
-      if ((diff != 0.000000)) 
-      {
-        return diff;
-      }
-      else
-      {
-        return 0.000000;
-      };
-    };
+    return new Array(size);
   });
-  Async_FromContinuations = (function (f)
+  Array$$M_ZeroCreate$Object$_Object$_Object$ = (function (size)
+  {
+    return new Array(size);
+  });
+  Array$$M_ZeroCreate$String$_String_String = (function (size)
+  {
+    return new Array(size);
+  });
+  Async$$M_FromContinuations$IEnumerable_1$Tuple_2$Int32$_Double$_IEnumerable_1$Tuple_2$Int32$_Double$_IEnumerable_1$Tuple_2$Int32$_Double$ = (function (f)
   {
     return (function (_f)
     {
-      return Async_protectedCont(_f);
+      return Async$1$M_protectedCont$IEnumerable_1$Tuple_2$Int32$_Double$_IEnumerable_1$Tuple_2$Int32$_Double$_IEnumerable_1$Tuple_2$Int32$_Double$(_f);
     })((function (k)
     {
-      return f((new Tuple3(k.Cont, k.Aux.ExceptionCont, k.Aux.CancelledCont)));
+      return f((new Tuple_FSharpFunc_2$IEnumerable_1$Tuple_2$Int32$_Double$_Unit$_FSharpFunc_2$String$_Unit$_FSharpFunc_2$String$_Unit$(k.Cont, k.Aux.ExceptionCont, k.Aux.CancelledCont)));
     }));
   });
-  Async_StartImmediate = (function (workflow, cancellationToken)
+  Async$$M_StartImmediate$__ = (function (workflow, cancellationToken)
   {
-    var _temp208;
+    var _temp218;
     if ((cancellationToken.Tag == "Some")) 
     {
       var v = cancellationToken.Value;
-      _temp208 = v;
+      _temp218 = v;
     }
     else
     {
-      _temp208 = (new i_CancellationToken__ctor({Tag: "None"}));
+      _temp218 = (new CancellationToken$$M__ctor$_({Tag: "None"}));
     };
-    var token = _temp208;
+    var token = _temp218;
     var f = workflow.Item;
-    var aux = (new i_AsyncParamsAux__ctor({contents: 0.000000}, (function (value)
+    var aux = (new AsyncParamsAux$$M__ctor$_({contents: 0.000000}, (function (value)
     {
       var ignored0 = value;
     }), (function (value)
     {
       var ignored0 = value;
     }), token));
-    return f((new i_AsyncParams_1__ctor((function (value)
+    return f((new AsyncParams_1$Unit$$M__ctor$_Unit$((function (value)
     {
       var ignored0 = value;
     }), aux)));
   });
-  Async_get_async = (function ()
+  Async$1$M_get_async$__ = (function ()
   {
-    return (new i_AsyncBuilder__ctor());
+    return (new AsyncBuilder$$M__ctor$__());
   });
-  Async_invokeCont = (function (k, value)
+  Async$1$M_invokeCont$Unit$_Unit$_Unit$ = (function (k, value)
   {
     return k.Cont(value);
   });
-  Async_protectedCont = (function (f)
+  Async$1$M_protectedCont$IEnumerable_1$Tuple_2$Int32$_Double$_IEnumerable_1$Tuple_2$Int32$_Double$_IEnumerable_1$Tuple_2$Int32$_Double$ = (function (f)
   {
-    return (new Async_1_Cont((function (args)
+    return (new Async_1$IEnumerable_1$Tuple_2$Int32$_Double$_Cont_IEnumerable_1$Tuple_2$Int32$_Double$((function (args)
     {
-      args.Aux.CancellationToken.ThrowIfCancellationRequested();
+      CancellationToken$$M_ThrowIfCancellationRequested$__(args.Aux.CancellationToken);
       args.Aux.StackCounter.contents = (args.Aux.StackCounter.contents + 1.000000);
       null;
-      if ((args.Aux.StackCounter.contents.CompareTo(1000.000000) > 0.000000)) 
+      if ((args.Aux.StackCounter.contents > 1000.000000)) 
       {
         args.Aux.StackCounter.contents = 0.000000;
         null;
-        return Async_setTimeout((function (unitVar0)
+        return Async$1$M_setTimeout$Unit$_Unit$_Unit$((function (unitVar0)
         {
           return f(args);
         }), 1.000000);
@@ -594,56 +581,403 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
       };
     })));
   });
-  Async_setTimeout = (function (handler, milliseconds)
+  Async$1$M_protectedCont$Unit$_Unit$_Unit$ = (function (f)
+  {
+    return (new Async_1$Unit$_Cont_Unit$((function (args)
+    {
+      CancellationToken$$M_ThrowIfCancellationRequested$__(args.Aux.CancellationToken);
+      args.Aux.StackCounter.contents = (args.Aux.StackCounter.contents + 1.000000);
+      null;
+      if ((args.Aux.StackCounter.contents > 1000.000000)) 
+      {
+        args.Aux.StackCounter.contents = 0.000000;
+        null;
+        return Async$1$M_setTimeout$Unit$_Unit$_Unit$((function (unitVar0)
+        {
+          return f(args);
+        }), 1.000000);
+      }
+      else
+      {
+        return f(args);
+      };
+    })));
+  });
+  Async$1$M_setTimeout$Unit$_Unit$_Unit$ = (function (handler, milliseconds)
   {
     return setTimeout(handler, milliseconds);
   });
-  FSharpString_Concat = (function (sep, strings)
+  AsyncBuilder$$M_Bind$Indicator$_Unit$_Indicator$_Unit$_Indicator$_Unit$ = (function (x, _arg1, f)
   {
-    return String_Join(sep, Seq_ToArray(strings));
+    var v = _arg1.Item;
+    return (function (_f)
+    {
+      return Async$1$M_protectedCont$Unit$_Unit$_Unit$(_f);
+    })((function (k)
+    {
+      var cont = (function (a)
+      {
+        var patternInput = f(a);
+        var r = patternInput.Item;
+        return r(k);
+      });
+      return v((new AsyncParams_1$Indicator$$M__ctor$_Indicator$(cont, k.Aux)));
+    }));
   });
-  FunScriptExtensions_Array_push = (function (x, element)
+  AsyncBuilder$$M_Bind$Unit$_Unit$_Unit$_Unit$_Unit$_Unit$ = (function (x, _arg1, f)
+  {
+    var v = _arg1.Item;
+    return (function (_f)
+    {
+      return Async$1$M_protectedCont$Unit$_Unit$_Unit$(_f);
+    })((function (k)
+    {
+      var cont = (function (a)
+      {
+        var patternInput = f(a);
+        var r = patternInput.Item;
+        return r(k);
+      });
+      return v((new AsyncParams_1$Unit$$M__ctor$_Unit$(cont, k.Aux)));
+    }));
+  });
+  AsyncBuilder$$M_Combine$Unit$_Unit$_Unit$ = (function (x, work1, work2)
+  {
+    return AsyncBuilder$$M_Bind$Unit$_Unit$_Unit$_Unit$_Unit$_Unit$(x, work1, (function (unitVar0)
+    {
+      return work2;
+    }));
+  });
+  AsyncBuilder$$M_Delay$Unit$_Unit$_Unit$ = (function (x, f)
+  {
+    return (function (_f)
+    {
+      return Async$1$M_protectedCont$Unit$_Unit$_Unit$(_f);
+    })((function (k)
+    {
+      var _temp216;
+      var _temp217;
+      _temp216 = f(_temp217);
+      var patternInput = _temp216;
+      var r = patternInput.Item;
+      return r(k);
+    }));
+  });
+  AsyncBuilder$$M_For$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_Tuple_2$Country$_Object$ = (function (x, seq, body)
+  {
+    var en = seq.GetEnumerator();
+    var _x = x;
+    var loop;
+    loop = (function (unitVar0)
+    {
+      if (en.MoveNext()) 
+      {
+        return AsyncBuilder$$M_Bind$Unit$_Unit$_Unit$_Unit$_Unit$_Unit$(_x, body(en.get_Current()), loop);
+      }
+      else
+      {
+        return AsyncBuilder$$M_Zero$__(_x);
+      };
+    });
+    var _temp214;
+    return loop(_temp214);
+  });
+  AsyncBuilder$$M_Zero$__ = (function (x, unitVar1)
+  {
+    return (function (f)
+    {
+      return Async$1$M_protectedCont$Unit$_Unit$_Unit$(f);
+    })((function (k)
+    {
+      var _temp213;
+      return Async$1$M_invokeCont$Unit$_Unit$_Unit$(k, _temp213);
+    }));
+  });
+  AsyncBuilder$$M__ctor$__ = (function (unitVar0)
+  {
+    ;
+  });
+  AsyncParamsAux$$M__ctor$_ = (function (StackCounter, ExceptionCont, CancelledCont, CancellationToken)
+  {
+    this.StackCounter = StackCounter;
+    this.ExceptionCont = ExceptionCont;
+    this.CancelledCont = CancelledCont;
+    this.CancellationToken = CancellationToken;
+  });
+  AsyncParamsAux$$M__ctor$_.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.StackCounter.CompareTo(that.StackCounter);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.ExceptionCont.CompareTo(that.ExceptionCont);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        var ___diff = 0.000000;
+        ___diff = this.CancelledCont.CompareTo(that.CancelledCont);
+        diff = ___diff;
+        if ((diff != 0.000000)) 
+        {
+          return diff;
+        }
+        else
+        {
+          var ____diff = 0.000000;
+          ____diff = this.CancellationToken.CompareTo(that.CancellationToken);
+          diff = ____diff;
+          if ((diff != 0.000000)) 
+          {
+            return diff;
+          }
+          else
+          {
+            return 0.000000;
+          };
+        };
+      };
+    };
+  });
+  AsyncParams_1$Indicator$$M__ctor$_Indicator$ = (function (Cont, Aux)
+  {
+    this.Cont = Cont;
+    this.Aux = Aux;
+  });
+  AsyncParams_1$Indicator$$M__ctor$_Indicator$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Cont.CompareTo(that.Cont);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Aux.CompareTo(that.Aux);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  AsyncParams_1$Unit$$M__ctor$_Unit$ = (function (Cont, Aux)
+  {
+    this.Cont = Cont;
+    this.Aux = Aux;
+  });
+  AsyncParams_1$Unit$$M__ctor$_Unit$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Cont.CompareTo(that.Cont);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Aux.CompareTo(that.Aux);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  Async_1$IEnumerable_1$Tuple_2$Int32$_Double$_Cont_IEnumerable_1$Tuple_2$Int32$_Double$ = (function (Item)
+  {
+    this.Tag = "Cont";
+    this.Item = Item;
+  });
+  Async_1$IEnumerable_1$Tuple_2$Int32$_Double$_Cont_IEnumerable_1$Tuple_2$Int32$_Double$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Tag < that.Tag) ? -1.000000 : ((this.Tag == that.Tag) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Item.CompareTo(that.Item);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  Async_1$Unit$_Cont_Unit$ = (function (Item)
+  {
+    this.Tag = "Cont";
+    this.Item = Item;
+  });
+  Async_1$Unit$_Cont_Unit$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Tag < that.Tag) ? -1.000000 : ((this.Tag == that.Tag) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Item.CompareTo(that.Item);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  CancellationToken$$M_ThrowIfCancellationRequested$__ = (function (x, unitVar1)
+  {
+    var matchValue = x.Cell;
+    if ((matchValue.Tag == "Some")) 
+    {
+      var _temp192;
+      var cell = matchValue.Value;
+      _temp192 = cell.contents;
+      if (_temp192) 
+      {
+        var _cell = matchValue.Value;
+        throw ("OperationCancelledException");
+        return null;
+      }
+      else
+      {
+        ;
+      };
+    }
+    else
+    {
+      ;
+    };
+  });
+  CancellationToken$$M__ctor$_ = (function (Cell)
+  {
+    this.Cell = Cell;
+  });
+  CancellationToken$$M__ctor$_.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Cell.CompareTo(that.Cell);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      return 0.000000;
+    };
+  });
+  CreateEnumerable_1$Double__$$M__ctor$_Double__$_Double__$ = (function (factory)
+  {
+    this.factory = factory;
+  });
+  CreateEnumerable_1$JsonDocument$$M__ctor$_JsonDocument$_JsonDocument$ = (function (factory)
+  {
+    this.factory = factory;
+  });
+  CreateEnumerable_1$String$$M__ctor$_String_String = (function (factory)
+  {
+    this.factory = factory;
+  });
+  CreateEnumerable_1$Tuple_2$Country$_Object$$M__ctor$_Tuple_2$Country$_Object$_Tuple_2$Country$_Object$ = (function (factory)
+  {
+    this.factory = factory;
+  });
+  CreateEnumerable_1$Tuple_2$Int32$_Double$$M__ctor$_Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$ = (function (factory)
+  {
+    this.factory = factory;
+  });
+  FSharpString$$M_Concat$__ = (function (sep, strings)
+  {
+    return String$1$M_Join$__(sep, Seq$$M_ToArray$String$_String_String(strings));
+  });
+  FunScriptExtensions$$M_Array_push$__ = (function (x, element)
   {
     return x.push(element);
   });
-  FunScriptExtensions_clone = (function (obj, args)
+  FunScriptExtensions$$M_clone$Object$_Object$_Object$_Object$_Object$_Object$ = (function (obj, args)
   {
     return new obj(args);
   });
-  FunScriptExtensions_floor = (function (n)
+  FunScriptExtensions$$M_floor$__ = (function (n)
   {
     return Math.floor(n);
   });
-  FunScriptExtensions_number = (function (a)
+  FunScriptExtensions$$M_number$__ = (function (a)
   {
     return a*1.0;
   });
-  JsHelpers_isArray = (function (o)
+  JsHelpers$$M_isArray$__ = (function (o)
   {
     return Array.isArray(o);
   });
-  JsHelpers_isNull = (function (o)
+  JsHelpers$$M_isNull$__ = (function (o)
   {
     return o==null;
   });
-  JsHelpers_jstypeof = (function (o)
+  JsHelpers$$M_jstypeof$__ = (function (o)
   {
     return typeof(o);
   });
-  JsRuntime_ConvertArray = (function (value, packer, f)
+  JsRuntime$$M_ConvertArray$JsonDocument$_JsonDocument$_JsonDocument$_JsonDocument$_JsonDocument$_JsonDocument$ = (function (value, packer, f)
   {
     return value;
   });
-  JsRuntime_GetArrayChildByTypeTag = (function (value, tag)
+  JsRuntime$$M_GetArrayChildByTypeTag$__ = (function (value, tag)
   {
-    var arr = JsRuntime_GetArrayChildrenByTypeTag(value, tag, (function (x)
+    var arr = JsRuntime$$M_GetArrayChildrenByTypeTag$JsonValue$_JsonValue$_JsonValue$_JsonValue$_JsonValue$_JsonValue$(value, tag, (function (x)
     {
       return x;
     }), (function (x)
     {
       return x;
     }));
-    if ((Array_BoxedLength(arr).CompareTo(1.000000) == 0.000000)) 
+    if ((Array$$M_BoxedLength$__(arr) == 1.000000)) 
     {
       return arr[0.000000];
     }
@@ -653,47 +987,47 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
       return null;
     };
   });
-  JsRuntime_GetArrayChildrenByTypeTag = (function (doc, tag, pack, f)
+  JsRuntime$$M_GetArrayChildrenByTypeTag$JsonValue$_JsonValue$_JsonValue$_JsonValue$_JsonValue$_JsonValue$ = (function (doc, tag, pack, f)
   {
     var matchTag = (function (value)
     {
-      if (JsHelpers_isNull(value)) 
+      if (JsHelpers$$M_isNull$__(value)) 
       {
         return {Tag: "None"};
       }
       else
       {
-        if (((JsHelpers_jstypeof(value).CompareTo("boolean") == 0.000000) && (tag.CompareTo("Boolean") == 0.000000))) 
+        if (((JsHelpers$$M_jstypeof$__(value) == "boolean") && (tag == "Boolean"))) 
         {
           return {Tag: "Some", Value: value};
         }
         else
         {
-          if (((JsHelpers_jstypeof(value).CompareTo("number") == 0.000000) && (tag.CompareTo("Number") == 0.000000))) 
+          if (((JsHelpers$$M_jstypeof$__(value) == "number") && (tag == "Number"))) 
           {
             return {Tag: "Some", Value: value};
           }
           else
           {
-            if (((JsHelpers_jstypeof(value).CompareTo("string") == 0.000000) && (tag.CompareTo("Number") == 0.000000))) 
+            if (((JsHelpers$$M_jstypeof$__(value) == "string") && (tag == "Number"))) 
             {
               return {Tag: "Some", Value: (1.000000 * value)};
             }
             else
             {
-              if (((JsHelpers_jstypeof(value).CompareTo("string") == 0.000000) && (tag.CompareTo("String") == 0.000000))) 
+              if (((JsHelpers$$M_jstypeof$__(value) == "string") && (tag == "String"))) 
               {
                 return {Tag: "Some", Value: value};
               }
               else
               {
-                if ((JsHelpers_isArray(value) && (tag.CompareTo("Array") == 0.000000))) 
+                if ((JsHelpers$$M_isArray$__(value) && (tag == "Array"))) 
                 {
                   return {Tag: "Some", Value: value};
                 }
                 else
                 {
-                  if (((JsHelpers_jstypeof(value).CompareTo("object") == 0.000000) && (tag.CompareTo("Record") == 0.000000))) 
+                  if (((JsHelpers$$M_jstypeof$__(value) == "object") && (tag == "Record"))) 
                   {
                     return {Tag: "Some", Value: value};
                   }
@@ -708,9 +1042,9 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
         };
       };
     });
-    if (JsHelpers_isArray(doc)) 
+    if (JsHelpers$$M_isArray$__(doc)) 
     {
-      var _temp87;
+      var _temp140;
       var mapping = (function (x)
       {
         return f((function (_x)
@@ -721,22 +1055,22 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
           })(_x));
         })(x));
       });
-      _temp87 = (function (array)
+      _temp140 = (function (array)
       {
-        return Array_Map(mapping, array);
+        return Array$$M_Map$Object$_JsonValue$_Object$_JsonValue$_Object$_JsonValue$(mapping, array);
       });
-      var _temp89;
-      var _temp90;
+      var _temp142;
+      var _temp143;
       var chooser = matchTag;
-      _temp90 = (function (array)
+      _temp143 = (function (array)
       {
-        return Array_Choose(chooser, array);
+        return Array$$M_Choose$Object$_Object$_Object$_Object$_Object$_Object$(chooser, array);
       });
-      _temp89 = _temp90((function (value)
+      _temp142 = _temp143((function (value)
       {
         return value;
       })(doc));
-      return _temp87(_temp89);
+      return _temp140(_temp142);
     }
     else
     {
@@ -744,36 +1078,127 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
       return null;
     };
   });
-  JsRuntime_GetCulture = (function (name)
+  JsRuntime$$M_GetArrayChildrenByTypeTag$Object$_Decimal$_Object$_Decimal$_Object$_Decimal$ = (function (doc, tag, pack, f)
+  {
+    var matchTag = (function (value)
+    {
+      if (JsHelpers$$M_isNull$__(value)) 
+      {
+        return {Tag: "None"};
+      }
+      else
+      {
+        if (((JsHelpers$$M_jstypeof$__(value) == "boolean") && (tag == "Boolean"))) 
+        {
+          return {Tag: "Some", Value: value};
+        }
+        else
+        {
+          if (((JsHelpers$$M_jstypeof$__(value) == "number") && (tag == "Number"))) 
+          {
+            return {Tag: "Some", Value: value};
+          }
+          else
+          {
+            if (((JsHelpers$$M_jstypeof$__(value) == "string") && (tag == "Number"))) 
+            {
+              return {Tag: "Some", Value: (1.000000 * value)};
+            }
+            else
+            {
+              if (((JsHelpers$$M_jstypeof$__(value) == "string") && (tag == "String"))) 
+              {
+                return {Tag: "Some", Value: value};
+              }
+              else
+              {
+                if ((JsHelpers$$M_isArray$__(value) && (tag == "Array"))) 
+                {
+                  return {Tag: "Some", Value: value};
+                }
+                else
+                {
+                  if (((JsHelpers$$M_jstypeof$__(value) == "object") && (tag == "Record"))) 
+                  {
+                    return {Tag: "Some", Value: value};
+                  }
+                  else
+                  {
+                    return {Tag: "None"};
+                  };
+                };
+              };
+            };
+          };
+        };
+      };
+    });
+    if (JsHelpers$$M_isArray$__(doc)) 
+    {
+      var _temp78;
+      var mapping = (function (x)
+      {
+        return f((function (_x)
+        {
+          return pack((function (value)
+          {
+            return value;
+          })(_x));
+        })(x));
+      });
+      _temp78 = (function (array)
+      {
+        return Array$$M_Map$Object$_Decimal$_Object$_Decimal$_Object$_Decimal$(mapping, array);
+      });
+      var _temp80;
+      var _temp81;
+      var chooser = matchTag;
+      _temp81 = (function (array)
+      {
+        return Array$$M_Choose$Object$_Object$_Object$_Object$_Object$_Object$(chooser, array);
+      });
+      _temp80 = _temp81((function (value)
+      {
+        return value;
+      })(doc));
+      return _temp78(_temp80);
+    }
+    else
+    {
+      throw ("JSON mismatch: Expected Array node");
+      return null;
+    };
+  });
+  JsRuntime$$M_GetCulture$__ = (function (name)
   {
     return null;
   });
-  JsRuntime_GetProperty = (function (json, name)
+  JsRuntime$$M_GetProperty$__ = (function (json, name)
   {
     return json[name];
   });
-  JsRuntime_Identity = (function (arg)
+  JsRuntime$$M_Identity$__ = (function (arg)
   {
     return arg;
   });
-  JsRuntime_Identity2 = (function (arg, culture)
+  JsRuntime$$M_Identity2$__ = (function (arg, culture)
   {
     return arg;
   });
-  JsRuntime_Parse = (function (source, culture)
+  JsRuntime$$M_Parse$__ = (function (source, culture)
   {
     var it = source; return (typeof(it)=="string") ? eval("(function(a){return a;})(" + it + ")") : it;
   });
-  JsRuntime_TryGetArrayChildByTypeTag = (function (doc, tag, pack, f)
+  JsRuntime$$M_TryGetArrayChildByTypeTag$Object$_Decimal$_Object$_Decimal$_Object$_Decimal$ = (function (doc, tag, pack, f)
   {
-    var arr = JsRuntime_GetArrayChildrenByTypeTag(doc, tag, pack, f);
-    if ((Array_BoxedLength(arr).CompareTo(1.000000) == 0.000000)) 
+    var arr = JsRuntime$$M_GetArrayChildrenByTypeTag$Object$_Decimal$_Object$_Decimal$_Object$_Decimal$(doc, tag, pack, f);
+    if ((Array$$M_BoxedLength$__(arr) == 1.000000)) 
     {
       return {Tag: "Some", Value: arr[0.000000]};
     }
     else
     {
-      if ((Array_BoxedLength(arr).CompareTo(0.000000) == 0.000000)) 
+      if ((Array$$M_BoxedLength$__(arr) == 0.000000)) 
       {
         return {Tag: "None"};
       }
@@ -784,26 +1209,38 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
       };
     };
   });
-  JsRuntime_TryGetValueByTypeTag = (function (value, tag, pack, f)
+  JsRuntime$$M_TryGetValueByTypeTag$JsonDocument$_Decimal$_JsonDocument$_Decimal$_JsonDocument$_Decimal$ = (function (value, tag, pack, f)
   {
     var arrayValue = [value];
-    return JsRuntime_TryGetArrayChildByTypeTag(arrayValue, tag, pack, f);
+    return JsRuntime$$M_TryGetArrayChildByTypeTag$Object$_Decimal$_Object$_Decimal$_Object$_Decimal$(arrayValue, tag, pack, f);
   });
-  LanguagePrimitives_UnboxGeneric = (function (x)
+  LanguagePrimitives$$M_UnboxGeneric$IDisposable$_IDisposable$_IDisposable$ = (function (x)
   {
     return x;
   });
-  List_CreateCons = (function (x, xs)
+  List$$M_CreateCons$String$_String_String = (function (x, xs)
   {
-    return (new list_1_Cons(x, xs));
+    return (new list_1$String$_Cons_String(x, xs));
   });
-  List_Empty = (function ()
+  List$$M_CreateCons$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$ = (function (x, xs)
   {
-    return (new list_1_Nil());
+    return (new list_1$Tuple_2$String$_String$_Cons_Tuple_2$String$_String$(x, xs));
   });
-  List_Fold = (function (f, seed, xs)
+  List$$M_Empty$Object$_Object$_Object$ = (function ()
   {
-    return List_FoldIndexed((function (_arg1)
+    return (new list_1$Object$_Nil_Object$());
+  });
+  List$$M_Empty$String$_String_String = (function ()
+  {
+    return (new list_1$String$_Nil_String());
+  });
+  List$$M_Empty$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$ = (function ()
+  {
+    return (new list_1$Tuple_2$String$_String$_Nil_Tuple_2$String$_String$());
+  });
+  List$$M_Fold$String$_list_1$String$_String_list_1$String$_String_list_1$String$ = (function (f, seed, xs)
+  {
+    return List$$M_FoldIndexed$String$_list_1$String$_String_list_1$String$_String_list_1$String$((function (_arg1)
     {
       return (function (acc)
       {
@@ -814,24 +1251,101 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
       });
     }), seed, xs);
   });
-  List_FoldIndexed = (function (f, seed, xs)
+  List$$M_Fold$Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$ = (function (f, seed, xs)
   {
-    return List_FoldIndexedAux(f, 0.000000, seed, xs);
+    return List$$M_FoldIndexed$Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$((function (_arg1)
+    {
+      return (function (acc)
+      {
+        return (function (x)
+        {
+          return f(acc)(x);
+        });
+      });
+    }), seed, xs);
   });
-  List_FoldIndexedAux = (function (f, i, acc, _arg1)
+  List$$M_Fold$Tuple_2$String$_String$_list_1$String$_Tuple_2$String$_String$_list_1$String$_Tuple_2$String$_String$_list_1$String$ = (function (f, seed, xs)
+  {
+    return List$$M_FoldIndexed$Tuple_2$String$_String$_list_1$String$_Tuple_2$String$_String$_list_1$String$_Tuple_2$String$_String$_list_1$String$((function (_arg1)
+    {
+      return (function (acc)
+      {
+        return (function (x)
+        {
+          return f(acc)(x);
+        });
+      });
+    }), seed, xs);
+  });
+  List$$M_FoldIndexed$Country$_list_1$Tuple_2$Country$_Object$_Country$_list_1$Tuple_2$Country$_Object$_Country$_list_1$Tuple_2$Country$_Object$ = (function (f, seed, xs)
+  {
+    return List$$M_FoldIndexedAux$list_1$Tuple_2$Country$_Object$_Country$_list_1$Tuple_2$Country$_Object$_Country$_list_1$Tuple_2$Country$_Object$_Country$(f, 0.000000, seed, xs);
+  });
+  List$$M_FoldIndexed$String$_list_1$String$_String_list_1$String$_String_list_1$String$ = (function (f, seed, xs)
+  {
+    return List$$M_FoldIndexedAux$list_1$String$_String$_list_1$String$_String_list_1$String$_String(f, 0.000000, seed, xs);
+  });
+  List$$M_FoldIndexed$Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$ = (function (f, seed, xs)
+  {
+    return List$$M_FoldIndexedAux$list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$(f, 0.000000, seed, xs);
+  });
+  List$$M_FoldIndexed$Tuple_2$String$_String$_list_1$String$_Tuple_2$String$_String$_list_1$String$_Tuple_2$String$_String$_list_1$String$ = (function (f, seed, xs)
+  {
+    return List$$M_FoldIndexedAux$list_1$String$_Tuple_2$String$_String$_list_1$String$_Tuple_2$String$_String$_list_1$String$_Tuple_2$String$_String$(f, 0.000000, seed, xs);
+  });
+  List$$M_FoldIndexedAux$list_1$String$_String$_list_1$String$_String_list_1$String$_String = (function (f, i, acc, _arg1)
   {
     if ((_arg1.Tag == "Cons")) 
     {
       var xs = _arg1.Item2;
       var x = _arg1.Item1;
-      return List_FoldIndexedAux(f, (i + 1.000000), f(i)(acc)(x), xs);
+      return List$$M_FoldIndexedAux$list_1$String$_String$_list_1$String$_String_list_1$String$_String(f, (i + 1.000000), f(i)(acc)(x), xs);
     }
     else
     {
       return acc;
     };
   });
-  List_Head = (function (_arg1)
+  List$$M_FoldIndexedAux$list_1$String$_Tuple_2$String$_String$_list_1$String$_Tuple_2$String$_String$_list_1$String$_Tuple_2$String$_String$ = (function (f, i, acc, _arg1)
+  {
+    if ((_arg1.Tag == "Cons")) 
+    {
+      var xs = _arg1.Item2;
+      var x = _arg1.Item1;
+      return List$$M_FoldIndexedAux$list_1$String$_Tuple_2$String$_String$_list_1$String$_Tuple_2$String$_String$_list_1$String$_Tuple_2$String$_String$(f, (i + 1.000000), f(i)(acc)(x), xs);
+    }
+    else
+    {
+      return acc;
+    };
+  });
+  List$$M_FoldIndexedAux$list_1$Tuple_2$Country$_Object$_Country$_list_1$Tuple_2$Country$_Object$_Country$_list_1$Tuple_2$Country$_Object$_Country$ = (function (f, i, acc, _arg1)
+  {
+    if ((_arg1.Tag == "Cons")) 
+    {
+      var xs = _arg1.Item2;
+      var x = _arg1.Item1;
+      return List$$M_FoldIndexedAux$list_1$Tuple_2$Country$_Object$_Country$_list_1$Tuple_2$Country$_Object$_Country$_list_1$Tuple_2$Country$_Object$_Country$(f, (i + 1.000000), f(i)(acc)(x), xs);
+    }
+    else
+    {
+      return acc;
+    };
+  });
+  List$$M_FoldIndexedAux$list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$ = (function (f, i, acc, _arg1)
+  {
+    if ((_arg1.Tag == "Cons")) 
+    {
+      var xs = _arg1.Item2;
+      var x = _arg1.Item1;
+      return List$$M_FoldIndexedAux$list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$(f, (i + 1.000000), f(i)(acc)(x), xs);
+    }
+    else
+    {
+      return acc;
+    };
+  });
+  List$$M_Head$String$_String_String = (function (_arg1)
   {
     if ((_arg1.Tag == "Cons")) 
     {
@@ -845,56 +1359,93 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
       return null;
     };
   });
-  List_Map = (function (f, xs)
+  List$$M_Head$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_Tuple_2$Country$_Object$ = (function (_arg1)
+  {
+    if ((_arg1.Tag == "Cons")) 
+    {
+      var xs = _arg1.Item2;
+      var x = _arg1.Item1;
+      return x;
+    }
+    else
+    {
+      throw ("List was empty");
+      return null;
+    };
+  });
+  List$$M_Map$String$_String$_String_String_String_String = (function (f, xs)
   {
     return (function (_xs)
     {
-      return List_Reverse(_xs);
-    })(List_Fold((function (acc)
+      return List$$M_Reverse$String$_String_String(_xs);
+    })(List$$M_Fold$String$_list_1$String$_String_list_1$String$_String_list_1$String$((function (acc)
     {
       return (function (x)
       {
-        return (new list_1_Cons(f(x), acc));
+        return (new list_1$String$_Cons_String(f(x), acc));
       });
-    }), (new list_1_Nil()), xs));
+    }), (new list_1$String$_Nil_String()), xs));
   });
-  List_MapIndexed = (function (f, xs)
+  List$$M_Map$Tuple_2$String$_String$_String$_Tuple_2$String$_String$_String_Tuple_2$String$_String$_String = (function (f, xs)
   {
     return (function (_xs)
     {
-      return List_Reverse(_xs);
-    })(List_FoldIndexed((function (i)
+      return List$$M_Reverse$String$_String_String(_xs);
+    })(List$$M_Fold$Tuple_2$String$_String$_list_1$String$_Tuple_2$String$_String$_list_1$String$_Tuple_2$String$_String$_list_1$String$((function (acc)
+    {
+      return (function (x)
+      {
+        return (new list_1$String$_Cons_String(f(x), acc));
+      });
+    }), (new list_1$String$_Nil_String()), xs));
+  });
+  List$$M_MapIndexed$Country$_Tuple_2$Country$_Object$_Country$_Tuple_2$Country$_Object$_Country$_Tuple_2$Country$_Object$ = (function (f, xs)
+  {
+    return (function (_xs)
+    {
+      return List$$M_Reverse$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_Tuple_2$Country$_Object$(_xs);
+    })(List$$M_FoldIndexed$Country$_list_1$Tuple_2$Country$_Object$_Country$_list_1$Tuple_2$Country$_Object$_Country$_list_1$Tuple_2$Country$_Object$((function (i)
     {
       return (function (acc)
       {
         return (function (x)
         {
-          return (new list_1_Cons(f(i)(x), acc));
+          return (new list_1$Tuple_2$Country$_Object$_Cons_Tuple_2$Country$_Object$(f(i)(x), acc));
         });
       });
-    }), (new list_1_Nil()), xs));
+    }), (new list_1$Tuple_2$Country$_Object$_Nil_Tuple_2$Country$_Object$()), xs));
   });
-  List_OfArray = (function (xs)
+  List$$M_OfArray$Country$_Country$_Country$ = (function (xs)
   {
-    return Array_FoldBack((function (x)
+    return Array$$M_FoldBack$Country$_list_1$Country$_Country$_list_1$Country$_Country$_list_1$Country$((function (x)
     {
       return (function (acc)
       {
-        return (new list_1_Cons(x, acc));
+        return (new list_1$Country$_Cons_Country$(x, acc));
       });
-    }), xs, (new list_1_Nil()));
+    }), xs, (new list_1$Country$_Nil_Country$()));
   });
-  List_Reverse = (function (xs)
+  List$$M_Reverse$String$_String_String = (function (xs)
   {
-    return List_Fold((function (acc)
+    return List$$M_Fold$String$_list_1$String$_String_list_1$String$_String_list_1$String$((function (acc)
     {
       return (function (x)
       {
-        return (new list_1_Cons(x, acc));
+        return (new list_1$String$_Cons_String(x, acc));
       });
-    }), (new list_1_Nil()), xs);
+    }), (new list_1$String$_Nil_String()), xs);
   });
-  List_Tail = (function (_arg1)
+  List$$M_Reverse$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_Tuple_2$Country$_Object$ = (function (xs)
+  {
+    return List$$M_Fold$Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_list_1$Tuple_2$Country$_Object$((function (acc)
+    {
+      return (function (x)
+      {
+        return (new list_1$Tuple_2$Country$_Object$_Cons_Tuple_2$Country$_Object$(x, acc));
+      });
+    }), (new list_1$Tuple_2$Country$_Object$_Nil_Tuple_2$Country$_Object$()), xs);
+  });
+  List$$M_Tail$String$_String_String = (function (_arg1)
   {
     if ((_arg1.Tag == "Cons")) 
     {
@@ -908,61 +1459,75 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
       return null;
     };
   });
-  Program_countries = (function (unitVar0)
+  List$$M_Tail$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_Tuple_2$Country$_Object$ = (function (_arg1)
+  {
+    if ((_arg1.Tag == "Cons")) 
+    {
+      var xs = _arg1.Item2;
+      var x = _arg1.Item1;
+      return xs;
+    }
+    else
+    {
+      throw ("List was empty");
+      return null;
+    };
+  });
+  Program$$M_countries$__ = (function (unitVar0)
   {
     var _temp2;
-    var var0 = WorldBankRuntime_GetCountries(Program_data);
-    _temp2 = WorldBankRuntime_GetCountry(var0, "ARB", "Arab World");
+    var var0 = WorldBankRuntime$$M_GetCountries$__(Program$_data_);
+    _temp2 = WorldBankRuntime$$M_GetCountry$__(var0, "ARB", "Arab World");
     var _temp3;
-    var _var0 = WorldBankRuntime_GetCountries(Program_data);
-    _temp3 = WorldBankRuntime_GetCountry(_var0, "EUU", "European Union");
+    var _var0 = WorldBankRuntime$$M_GetCountries$__(Program$_data_);
+    _temp3 = WorldBankRuntime$$M_GetCountry$__(_var0, "EUU", "European Union");
     var _temp4;
-    var __var0 = WorldBankRuntime_GetCountries(Program_data);
-    _temp4 = WorldBankRuntime_GetCountry(__var0, "AUS", "Australia");
+    var __var0 = WorldBankRuntime$$M_GetCountries$__(Program$_data_);
+    _temp4 = WorldBankRuntime$$M_GetCountry$__(__var0, "AUS", "Australia");
     var _temp5;
-    var ___var0 = WorldBankRuntime_GetCountries(Program_data);
-    _temp5 = WorldBankRuntime_GetCountry(___var0, "BRA", "Brazil");
+    var ___var0 = WorldBankRuntime$$M_GetCountries$__(Program$_data_);
+    _temp5 = WorldBankRuntime$$M_GetCountry$__(___var0, "BRA", "Brazil");
     var _temp6;
-    var ____var0 = WorldBankRuntime_GetCountries(Program_data);
-    _temp6 = WorldBankRuntime_GetCountry(____var0, "CAN", "Canada");
+    var ____var0 = WorldBankRuntime$$M_GetCountries$__(Program$_data_);
+    _temp6 = WorldBankRuntime$$M_GetCountry$__(____var0, "CAN", "Canada");
     var _temp7;
-    var _____var0 = WorldBankRuntime_GetCountries(Program_data);
-    _temp7 = WorldBankRuntime_GetCountry(_____var0, "CHL", "Chile");
+    var _____var0 = WorldBankRuntime$$M_GetCountries$__(Program$_data_);
+    _temp7 = WorldBankRuntime$$M_GetCountry$__(_____var0, "CHL", "Chile");
     var _temp8;
-    var ______var0 = WorldBankRuntime_GetCountries(Program_data);
-    _temp8 = WorldBankRuntime_GetCountry(______var0, "CZE", "Czech Republic");
+    var ______var0 = WorldBankRuntime$$M_GetCountries$__(Program$_data_);
+    _temp8 = WorldBankRuntime$$M_GetCountry$__(______var0, "CZE", "Czech Republic");
     var _temp9;
-    var _______var0 = WorldBankRuntime_GetCountries(Program_data);
-    _temp9 = WorldBankRuntime_GetCountry(_______var0, "DNK", "Denmark");
+    var _______var0 = WorldBankRuntime$$M_GetCountries$__(Program$_data_);
+    _temp9 = WorldBankRuntime$$M_GetCountry$__(_______var0, "DNK", "Denmark");
     var _temp10;
-    var ________var0 = WorldBankRuntime_GetCountries(Program_data);
-    _temp10 = WorldBankRuntime_GetCountry(________var0, "FRA", "France");
+    var ________var0 = WorldBankRuntime$$M_GetCountries$__(Program$_data_);
+    _temp10 = WorldBankRuntime$$M_GetCountry$__(________var0, "FRA", "France");
     var _temp11;
-    var _________var0 = WorldBankRuntime_GetCountries(Program_data);
-    _temp11 = WorldBankRuntime_GetCountry(_________var0, "GRC", "Greece");
+    var _________var0 = WorldBankRuntime$$M_GetCountries$__(Program$_data_);
+    _temp11 = WorldBankRuntime$$M_GetCountry$__(_________var0, "GRC", "Greece");
     var _temp12;
-    var __________var0 = WorldBankRuntime_GetCountries(Program_data);
-    _temp12 = WorldBankRuntime_GetCountry(__________var0, "LIC", "Low income");
+    var __________var0 = WorldBankRuntime$$M_GetCountries$__(Program$_data_);
+    _temp12 = WorldBankRuntime$$M_GetCountry$__(__________var0, "LIC", "Low income");
     var _temp13;
-    var ___________var0 = WorldBankRuntime_GetCountries(Program_data);
-    _temp13 = WorldBankRuntime_GetCountry(___________var0, "HIC", "High income");
+    var ___________var0 = WorldBankRuntime$$M_GetCountries$__(Program$_data_);
+    _temp13 = WorldBankRuntime$$M_GetCountry$__(___________var0, "HIC", "High income");
     var _temp14;
-    var ____________var0 = WorldBankRuntime_GetCountries(Program_data);
-    _temp14 = WorldBankRuntime_GetCountry(____________var0, "GBR", "United Kingdom");
+    var ____________var0 = WorldBankRuntime$$M_GetCountries$__(Program$_data_);
+    _temp14 = WorldBankRuntime$$M_GetCountry$__(____________var0, "GBR", "United Kingdom");
     var _temp15;
-    var _____________var0 = WorldBankRuntime_GetCountries(Program_data);
-    _temp15 = WorldBankRuntime_GetCountry(_____________var0, "USA", "United States");
+    var _____________var0 = WorldBankRuntime$$M_GetCountries$__(Program$_data_);
+    _temp15 = WorldBankRuntime$$M_GetCountry$__(_____________var0, "USA", "United States");
     return [_temp2, _temp3, _temp4, _temp5, _temp6, _temp7, _temp8, _temp9, _temp10, _temp11, _temp12, _temp13, _temp14, _temp15];
   });
-  Program_get_data = (function ()
+  Program$$M_get_data$__ = (function ()
   {
     return {ServiceUrl: "http://api.worldbank.org", Source: "World Development Indicators"};
   });
-  Program_jQuery = (function (command)
+  Program$$M_jQuery$__ = (function (command)
   {
     return jQuery(command);
   });
-  Program_main = (function (unitVar0)
+  Program$$M_main$__ = (function (unitVar0)
   {
     var _temp16;
     var _temp17;
@@ -970,12 +1535,12 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
     {
       return (function (country)
       {
-        var input = Program_jQuery("\u003cinput\u003e");
+        var input = Program$$M_jQuery$__("\u003cinput\u003e");
         (function (value)
         {
           var ignored0 = value;
         })(input.attr("type", "checkbox"));
-        var label = Program_jQuery("\u003clabel\u003e");
+        var label = Program$$M_jQuery$__("\u003clabel\u003e");
         (function (value)
         {
           var ignored0 = value;
@@ -984,28 +1549,28 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
         {
           var ignored0 = value;
         })(label.append([country.Name]));
-        var panel = (FunScriptExtensions_floor((index % 3.000000)) + 1.000000);
+        var panel = (FunScriptExtensions$$M_floor$__((index % 3.000000)) + 1.000000);
         (function (value)
         {
           var ignored0 = value;
-        })(label.appendTo(Program_jQuery(("#countryList" + panel.toString()))));
-        return (new Tuple2(country, input));
+        })(label.appendTo(Program$$M_jQuery$__(("#countryList" + panel.toString()))));
+        return (new Tuple_Country$_Object$(country, input));
       });
     });
     _temp17 = (function (list)
     {
-      return List_MapIndexed(mapping, list);
+      return List$$M_MapIndexed$Country$_Tuple_2$Country$_Object$_Country$_Tuple_2$Country$_Object$_Country$_Tuple_2$Country$_Object$(mapping, list);
     });
     _temp16 = _temp17((function (array)
     {
-      return List_OfArray(array);
-    })(Program_countries()));
+      return List$$M_OfArray$Country$_Country$_Country$(array);
+    })(Program$$M_countries$__()));
     var infos = _temp16;
     var render = (function (_unitVar0)
     {
       return (function (builder_)
       {
-        return builder_.Delay((function (unitVar)
+        return AsyncBuilder$$M_Delay$Unit$_Unit$_Unit$(builder_, (function (unitVar)
         {
           var opts = {};
           var _temp18;
@@ -1026,8 +1591,8 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
           null;
           opts.series = [];
           null;
-          var series = {contents: List_Empty()};
-          return builder_.Combine(builder_.For(Seq_OfList(infos), (function (_arg1)
+          var series = {contents: List$$M_Empty$Object$_Object$_Object$()};
+          return AsyncBuilder$$M_Combine$Unit$_Unit$_Unit$(builder_, AsyncBuilder$$M_For$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_Tuple_2$Country$_Object$(builder_, Seq$$M_OfList$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_Tuple_2$Country$_Object$(infos), (function (_arg1)
           {
             var country = _arg1.Item1;
             var check = _arg1.Item2;
@@ -1036,65 +1601,67 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
               return value;
             })(check.is(":checked"))) 
             {
-              var _temp188;
-              var var0 = WorldBankRuntime_GetIndicators(country);
-              _temp188 = WorldBankRuntime_AsyncGetIndicator(var0, "SE.TER.ENRR");
-              return builder_.Bind(_temp188, (function (_arg2)
+              var _temp194;
+              var _temp195;
+              var var0 = WorldBankRuntime$$M_GetIndicators$__(country);
+              _temp195 = WorldBankRuntime$$M_AsyncGetIndicator$__(var0, "SE.TER.ENRR");
+              _temp194 = _temp195;
+              return AsyncBuilder$$M_Bind$Indicator$_Unit$_Indicator$_Unit$_Indicator$_Unit$(builder_, _temp194, (function (_arg2)
               {
                 var vals = _arg2;
-                var _temp193;
-                var _temp195;
-                var _temp196;
+                var _temp208;
+                var _temp210;
+                var _temp211;
                 var _mapping = (function (tupledArg)
                 {
                   var k = tupledArg.Item1;
                   var v = tupledArg.Item2;
-                  return [FunScriptExtensions_number(k), FunScriptExtensions_number(v)];
+                  return [FunScriptExtensions$$M_number$__(k), FunScriptExtensions$$M_number$__(v)];
                 });
-                _temp196 = (function (source)
+                _temp211 = (function (source)
                 {
-                  return Seq_Map(_mapping, source);
+                  return Seq$$M_Map$Tuple_2$Int32$_Double$_Double__$_Tuple_2$Int32$_Double$_Double__$_Tuple_2$Int32$_Double$_Double__$(_mapping, source);
                 });
-                _temp195 = _temp196(vals);
-                _temp193 = (function (source)
+                _temp210 = _temp211(vals);
+                _temp208 = (function (source)
                 {
-                  return Seq_ToArray(source);
-                })(_temp195);
-                var data = _temp193;
-                var _temp197;
+                  return Seq$$M_ToArray$Double__$_Double__$_Double__$(source);
+                })(_temp210);
+                var data = _temp208;
+                var _temp212;
                 var __returnVal = {};
                 __returnVal.data = data;
                 null;
                 __returnVal.name = country.Name;
                 null;
-                _temp197 = __returnVal;
-                FunScriptExtensions_Array_push(opts.series, _temp197);
-                return builder_.Zero();
+                _temp212 = __returnVal;
+                FunScriptExtensions$$M_Array_push$__(opts.series, _temp212);
+                return AsyncBuilder$$M_Zero$__(builder_);
               }));
             }
             else
             {
-              return builder_.Zero();
+              return AsyncBuilder$$M_Zero$__(builder_);
             };
-          })), builder_.Delay((function (_unitVar)
+          })), AsyncBuilder$$M_Delay$Unit$_Unit$_Unit$(builder_, (function (_unitVar)
           {
             (function (value)
             {
               var ignored0 = value;
-            })(FunScriptExtensions_clone(Highcharts.Chart, opts));
-            return builder_.Zero();
+            })(FunScriptExtensions$$M_clone$Object$_Object$_Object$_Object$_Object$_Object$(Highcharts.Chart, opts));
+            return AsyncBuilder$$M_Zero$__(builder_);
           })));
         }));
-      })(Async_get_async());
+      })(Async$1$M_get_async$__());
     });
-    var _temp210;
-    var _temp211;
-    _temp210 = render(_temp211);
+    var _temp220;
+    var _temp221;
+    _temp220 = render(_temp221);
     (function (arg00)
     {
-      return Async_StartImmediate(arg00, {Tag: "None"});
-    })(_temp210);
-    var enumerator = Seq_OfList(infos).GetEnumerator();
+      return Async$$M_StartImmediate$__(arg00, {Tag: "None"});
+    })(_temp220);
+    var enumerator = Seq$$M_OfList$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_Tuple_2$Country$_Object$(infos).GetEnumerator();
     try
     {
       while (enumerator.MoveNext())
@@ -1106,25 +1673,25 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
           var ignored0 = value;
         })(check.click((function (_arg1)
         {
-          var _temp215;
-          var _temp217;
-          var _temp218;
-          _temp217 = render(_temp218);
-          _temp215 = (function (arg00)
+          var _temp225;
+          var _temp227;
+          var _temp228;
+          _temp227 = render(_temp228);
+          _temp225 = (function (arg00)
           {
-            return Async_StartImmediate(arg00, {Tag: "None"});
-          })(_temp217);
+            return Async$$M_StartImmediate$__(arg00, {Tag: "None"});
+          })(_temp227);
           return (function (value)
           {
             return value;
-          })(_temp215);
+          })(_temp225);
         })));
       };
     }
     finally{
       if (false) 
       {
-        LanguagePrimitives_UnboxGeneric(enumerator).Dispose();
+        LanguagePrimitives$$M_UnboxGeneric$IDisposable$_IDisposable$_IDisposable$(enumerator).Dispose();
       }
       else
       {
@@ -1132,70 +1699,70 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
       };
     };
   });
-  Runtime_worldBankUrl = (function (wb, functions, props)
+  Runtime$$M_worldBankUrl$__ = (function (wb, functions, props)
   {
-    var _temp58;
+    var _temp49;
+    var _temp59;
+    var _temp64;
+    var _temp65;
+    var sep = "";
+    _temp65 = (function (strings)
+    {
+      return FSharpString$$M_Concat$__(sep, Seq$$M_OfList$String$_String_String(strings));
+    });
+    var _temp67;
     var _temp68;
+    var mapping = (function (m)
+    {
+      return ("/" + Utils$$M_encodeURIComponent$__(m));
+    });
+    _temp68 = (function (list)
+    {
+      return List$$M_Map$String$_String$_String_String_String_String(mapping, list);
+    });
+    _temp67 = _temp68(functions);
+    _temp64 = _temp65(_temp67);
+    _temp59 = ((wb.ServiceUrl + "/") + _temp64);
+    _temp49 = (_temp59 + "?per_page=1000");
     var _temp73;
     var _temp74;
-    var sep = "";
+    var _sep = "";
     _temp74 = (function (strings)
     {
-      return FSharpString_Concat(sep, Seq_OfList(strings));
+      return FSharpString$$M_Concat$__(_sep, Seq$$M_OfList$String$_String_String(strings));
     });
     var _temp76;
     var _temp77;
-    var mapping = (function (m)
-    {
-      return ("/" + Utils_encodeURIComponent(m));
-    });
-    _temp77 = (function (list)
-    {
-      return List_Map(mapping, list);
-    });
-    _temp76 = _temp77(functions);
-    _temp73 = _temp74(_temp76);
-    _temp68 = ((wb.ServiceUrl + "/") + _temp73);
-    _temp58 = (_temp68 + "?per_page=1000");
-    var _temp82;
-    var _temp83;
-    var _sep = "";
-    _temp83 = (function (strings)
-    {
-      return FSharpString_Concat(_sep, Seq_OfList(strings));
-    });
-    var _temp85;
-    var _temp86;
     var _mapping = (function (tupledArg)
     {
       var key = tupledArg.Item1;
       var value = tupledArg.Item2;
-      return ((("\u0026" + key) + "=") + Utils_encodeURIComponent(value));
+      return ((("\u0026" + key) + "=") + Utils$$M_encodeURIComponent$__(value));
     });
-    _temp86 = (function (list)
+    _temp77 = (function (list)
     {
-      return List_Map(_mapping, list);
+      return List$$M_Map$Tuple_2$String$_String$_String$_Tuple_2$String$_String$_String_Tuple_2$String$_String$_String(_mapping, list);
     });
-    _temp85 = _temp86(props);
-    _temp82 = _temp83(_temp85);
-    return (_temp58 + _temp82);
+    _temp76 = _temp77(props);
+    _temp73 = _temp74(_temp76);
+    return (_temp49 + _temp73);
   });
-  Seq_Choose = (function (f, xs)
+  Seq$$M_Choose$JsonDocument$_Tuple_2$Int32$_Double$_JsonDocument$_Tuple_2$Int32$_Double$_JsonDocument$_Tuple_2$Int32$_Double$ = (function (f, xs)
   {
     var trySkipToNext;
-    trySkipToNext = (function (enum_reserved)
+    trySkipToNext = (function (_enum)
     {
-      if (enum_reserved.MoveNext()) 
+      if (_enum.MoveNext()) 
       {
-        var matchValue = f(enum_reserved.get_Current());
+        var matchValue = f(_enum.get_Current());
         if ((matchValue.Tag == "Some")) 
         {
           var value = matchValue.Value;
-          return {Tag: "Some", Value: (new Tuple2(value, enum_reserved))};
+          return {Tag: "Some", Value: (new Tuple_Tuple_2$Int32$_Double$_IEnumerator_1$JsonDocument$(value, _enum))};
         }
         else
         {
-          return trySkipToNext(enum_reserved);
+          return trySkipToNext(_enum);
         };
       }
       else
@@ -1205,65 +1772,57 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
     });
     return (function (_f)
     {
-      return Seq_Delay(_f);
+      return Seq$$M_Delay$Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$(_f);
     })((function (unitVar0)
     {
-      var _temp114;
+      var _temp111;
       var _f = trySkipToNext;
-      _temp114 = (function (seed)
+      _temp111 = (function (seed)
       {
-        return Seq_Unfold(_f, seed);
+        return Seq$$M_Unfold$IEnumerator_1$JsonDocument$_Tuple_2$Int32$_Double$_IEnumerator_1$JsonDocument$_Tuple_2$Int32$_Double$_IEnumerator_1$JsonDocument$_Tuple_2$Int32$_Double$(_f, seed);
       });
-      return _temp114(Seq_Enumerator(xs));
+      return _temp111(Seq$$M_Enumerator$JsonDocument$_JsonDocument$_JsonDocument$(xs));
     }));
   });
-  Seq_CompareWith = (function (f, xs, ys)
+  Seq$$M_Delay$Double__$_Double__$_Double__$ = (function (f)
   {
-    var _temp33;
-    var _temp34;
-    var _f = (function (i)
+    return Seq$$M_FromFactory$Double__$_Double__$_Double__$((function (unitVar0)
     {
-      return (i.CompareTo(0.000000) != 0.000000);
-    });
-    _temp34 = (function (_xs)
-    {
-      return Seq_TryFind(_f, _xs);
-    });
-    _temp33 = _temp34(Seq_Map2((function (x)
-    {
-      return (function (y)
-      {
-        return f(x)(y);
-      });
-    }), xs, ys));
-    var nonZero = _temp33;
-    if ((nonZero.Tag == "None")) 
-    {
-      return (Seq_Length(xs) - Seq_Length(ys));
-    }
-    else
-    {
-      var diff = nonZero.Value;
-      return diff;
-    };
-  });
-  Seq_Delay = (function (f)
-  {
-    return Seq_FromFactory((function (unitVar0)
-    {
-      var _temp23;
-      var _temp24;
-      _temp23 = f(_temp24);
-      return Seq_Enumerator(_temp23);
+      var _temp199;
+      var _temp200;
+      _temp199 = f(_temp200);
+      return Seq$$M_Enumerator$Double__$_Double__$_Double__$(_temp199);
     }));
   });
-  Seq_Enumerator = (function (xs)
+  Seq$$M_Delay$Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$ = (function (f)
+  {
+    return Seq$$M_FromFactory$Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$((function (unitVar0)
+    {
+      var _temp106;
+      var _temp107;
+      _temp106 = f(_temp107);
+      return Seq$$M_Enumerator$Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$(_temp106);
+    }));
+  });
+  Seq$$M_Enumerator$Double__$_Double__$_Double__$ = (function (xs)
   {
     return xs.GetEnumerator();
   });
-  Seq_Fold = (function (f, seed, xs)
+  Seq$$M_Enumerator$JsonDocument$_JsonDocument$_JsonDocument$ = (function (xs)
   {
-    return Seq_FoldIndexed((function (_arg1)
+    return xs.GetEnumerator();
+  });
+  Seq$$M_Enumerator$String$_String_String = (function (xs)
+  {
+    return xs.GetEnumerator();
+  });
+  Seq$$M_Enumerator$Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$ = (function (xs)
+  {
+    return xs.GetEnumerator();
+  });
+  Seq$$M_Fold$Double__$_Int32$_Double__$_Int32_Double__$_Int32 = (function (f, seed, xs)
+  {
+    return Seq$$M_FoldIndexed$Double__$_Int32$_Double__$_Int32_Double__$_Int32((function (_arg1)
     {
       return (function (acc)
       {
@@ -1274,29 +1833,183 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
       });
     }), seed, xs);
   });
-  Seq_FoldIndexed = (function (f, seed, xs)
+  Seq$$M_Fold$String$_Int32$_String_Int32_String_Int32 = (function (f, seed, xs)
   {
-    return Seq_FoldIndexedAux(f, 0.000000, seed, Seq_Enumerator(xs));
+    return Seq$$M_FoldIndexed$String$_Int32$_String_Int32_String_Int32((function (_arg1)
+    {
+      return (function (acc)
+      {
+        return (function (x)
+        {
+          return f(acc)(x);
+        });
+      });
+    }), seed, xs);
   });
-  Seq_FoldIndexedAux = (function (f, i, acc, xs)
+  Seq$$M_FoldIndexed$Double__$_Int32$_Double__$_Int32_Double__$_Int32 = (function (f, seed, xs)
+  {
+    return Seq$$M_FoldIndexedAux$Int32$_Double__$_Int32_Double__$_Int32_Double__$(f, 0.000000, seed, Seq$$M_Enumerator$Double__$_Double__$_Double__$(xs));
+  });
+  Seq$$M_FoldIndexed$Double__$_Unit$_Double__$_Unit$_Double__$_Unit$ = (function (f, seed, xs)
+  {
+    return Seq$$M_FoldIndexedAux$Unit$_Double__$_Unit$_Double__$_Unit$_Double__$(f, 0.000000, seed, Seq$$M_Enumerator$Double__$_Double__$_Double__$(xs));
+  });
+  Seq$$M_FoldIndexed$String$_Int32$_String_Int32_String_Int32 = (function (f, seed, xs)
+  {
+    return Seq$$M_FoldIndexedAux$Int32$_String$_Int32_String_Int32_String(f, 0.000000, seed, Seq$$M_Enumerator$String$_String_String(xs));
+  });
+  Seq$$M_FoldIndexed$String$_Unit$_String_Unit$_String_Unit$ = (function (f, seed, xs)
+  {
+    return Seq$$M_FoldIndexedAux$Unit$_String$_Unit$_String_Unit$_String(f, 0.000000, seed, Seq$$M_Enumerator$String$_String_String(xs));
+  });
+  Seq$$M_FoldIndexedAux$Int32$_Double__$_Int32_Double__$_Int32_Double__$ = (function (f, i, acc, xs)
   {
     if (xs.MoveNext()) 
     {
-      return Seq_FoldIndexedAux(f, (i + 1.000000), f(i)(acc)(xs.get_Current()), xs);
+      return Seq$$M_FoldIndexedAux$Int32$_Double__$_Int32_Double__$_Int32_Double__$(f, (i + 1.000000), f(i)(acc)(xs.get_Current()), xs);
     }
     else
     {
       return acc;
     };
   });
-  Seq_FromFactory = (function (f)
+  Seq$$M_FoldIndexedAux$Int32$_String$_Int32_String_Int32_String = (function (f, i, acc, xs)
   {
-    return (new i_CreateEnumerable_1__ctor(f));
+    if (xs.MoveNext()) 
+    {
+      return Seq$$M_FoldIndexedAux$Int32$_String$_Int32_String_Int32_String(f, (i + 1.000000), f(i)(acc)(xs.get_Current()), xs);
+    }
+    else
+    {
+      return acc;
+    };
   });
-  Seq_IterateIndexed = (function (f, xs)
+  Seq$$M_FoldIndexedAux$Unit$_Double__$_Unit$_Double__$_Unit$_Double__$ = (function (f, i, acc, xs)
   {
-    var _temp37;
-    return Seq_FoldIndexed((function (i)
+    if (xs.MoveNext()) 
+    {
+      return Seq$$M_FoldIndexedAux$Unit$_Double__$_Unit$_Double__$_Unit$_Double__$(f, (i + 1.000000), f(i)(acc)(xs.get_Current()), xs);
+    }
+    else
+    {
+      return acc;
+    };
+  });
+  Seq$$M_FoldIndexedAux$Unit$_String$_Unit$_String_Unit$_String = (function (f, i, acc, xs)
+  {
+    if (xs.MoveNext()) 
+    {
+      return Seq$$M_FoldIndexedAux$Unit$_String$_Unit$_String_Unit$_String(f, (i + 1.000000), f(i)(acc)(xs.get_Current()), xs);
+    }
+    else
+    {
+      return acc;
+    };
+  });
+  Seq$$M_FromFactory$Double__$_Double__$_Double__$ = (function (f)
+  {
+    var impl;
+    impl = (new CreateEnumerable_1$Double__$$M__ctor$_Double__$_Double__$(f));
+    return {GetEnumerator: (function (unitVar1)
+    {
+      return (function (__, unitVar1)
+      {
+        var _temp201;
+        return __.factory(_temp201);
+      })(impl, unitVar1);
+    }), GetEnumerator1: (function (unitVar1)
+    {
+      return (function (__, unitVar1)
+      {
+        var _temp202;
+        return __.factory(_temp202);
+      })(impl, unitVar1);
+    })};
+  });
+  Seq$$M_FromFactory$JsonDocument$_JsonDocument$_JsonDocument$ = (function (f)
+  {
+    var impl;
+    impl = (new CreateEnumerable_1$JsonDocument$$M__ctor$_JsonDocument$_JsonDocument$(f));
+    return {GetEnumerator: (function (unitVar1)
+    {
+      return (function (__, unitVar1)
+      {
+        var _temp137;
+        return __.factory(_temp137);
+      })(impl, unitVar1);
+    }), GetEnumerator1: (function (unitVar1)
+    {
+      return (function (__, unitVar1)
+      {
+        var _temp138;
+        return __.factory(_temp138);
+      })(impl, unitVar1);
+    })};
+  });
+  Seq$$M_FromFactory$String$_String_String = (function (f)
+  {
+    var impl;
+    impl = (new CreateEnumerable_1$String$$M__ctor$_String_String(f));
+    return {GetEnumerator: (function (unitVar1)
+    {
+      return (function (__, unitVar1)
+      {
+        var _temp25;
+        return __.factory(_temp25);
+      })(impl, unitVar1);
+    }), GetEnumerator1: (function (unitVar1)
+    {
+      return (function (__, unitVar1)
+      {
+        var _temp26;
+        return __.factory(_temp26);
+      })(impl, unitVar1);
+    })};
+  });
+  Seq$$M_FromFactory$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_Tuple_2$Country$_Object$ = (function (f)
+  {
+    var impl;
+    impl = (new CreateEnumerable_1$Tuple_2$Country$_Object$$M__ctor$_Tuple_2$Country$_Object$_Tuple_2$Country$_Object$(f));
+    return {GetEnumerator: (function (unitVar1)
+    {
+      return (function (__, unitVar1)
+      {
+        var _temp21;
+        return __.factory(_temp21);
+      })(impl, unitVar1);
+    }), GetEnumerator1: (function (unitVar1)
+    {
+      return (function (__, unitVar1)
+      {
+        var _temp22;
+        return __.factory(_temp22);
+      })(impl, unitVar1);
+    })};
+  });
+  Seq$$M_FromFactory$Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$ = (function (f)
+  {
+    var impl;
+    impl = (new CreateEnumerable_1$Tuple_2$Int32$_Double$$M__ctor$_Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$(f));
+    return {GetEnumerator: (function (unitVar1)
+    {
+      return (function (__, unitVar1)
+      {
+        var _temp108;
+        return __.factory(_temp108);
+      })(impl, unitVar1);
+    }), GetEnumerator1: (function (unitVar1)
+    {
+      return (function (__, unitVar1)
+      {
+        var _temp109;
+        return __.factory(_temp109);
+      })(impl, unitVar1);
+    })};
+  });
+  Seq$$M_IterateIndexed$Double__$_Double__$_Double__$ = (function (f, xs)
+  {
+    var _temp196;
+    return Seq$$M_FoldIndexed$Double__$_Unit$_Double__$_Unit$_Double__$_Unit$((function (i)
     {
       return (function (unitVar1)
       {
@@ -1305,11 +2018,25 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
           return f(i)(x);
         });
       });
-    }), _temp37, xs);
+    }), _temp196, xs);
   });
-  Seq_Length = (function (xs)
+  Seq$$M_IterateIndexed$String$_String_String = (function (f, xs)
   {
-    return Seq_Fold((function (count)
+    var _temp28;
+    return Seq$$M_FoldIndexed$String$_Unit$_String_Unit$_String_Unit$((function (i)
+    {
+      return (function (unitVar1)
+      {
+        return (function (x)
+        {
+          return f(i)(x);
+        });
+      });
+    }), _temp28, xs);
+  });
+  Seq$$M_Length$Double__$_Double__$_Double__$ = (function (xs)
+  {
+    return Seq$$M_Fold$Double__$_Int32$_Double__$_Int32_Double__$_Int32((function (count)
     {
       return (function (_arg1)
       {
@@ -1317,72 +2044,50 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
       });
     }), 0.000000, xs);
   });
-  Seq_Map = (function (f, xs)
+  Seq$$M_Length$String$_String_String = (function (xs)
+  {
+    return Seq$$M_Fold$String$_Int32$_String_Int32_String_Int32((function (count)
+    {
+      return (function (_arg1)
+      {
+        return (count + 1.000000);
+      });
+    }), 0.000000, xs);
+  });
+  Seq$$M_Map$Tuple_2$Int32$_Double$_Double__$_Tuple_2$Int32$_Double$_Double__$_Tuple_2$Int32$_Double$_Double__$ = (function (f, xs)
   {
     return (function (_f)
     {
-      return Seq_Delay(_f);
+      return Seq$$M_Delay$Double__$_Double__$_Double__$(_f);
     })((function (unitVar0)
     {
-      var _temp189;
-      var _f = (function (enum_reserved)
+      var _temp204;
+      var _f = (function (_enum)
       {
-        if (enum_reserved.MoveNext()) 
+        if (_enum.MoveNext()) 
         {
-          return {Tag: "Some", Value: (new Tuple2(f(enum_reserved.get_Current()), enum_reserved))};
+          return {Tag: "Some", Value: (new Tuple_Double__$_IEnumerator_1$Tuple_2$Int32$_Double$(f(_enum.get_Current()), _enum))};
         }
         else
         {
           return {Tag: "None"};
         };
       });
-      _temp189 = (function (seed)
+      _temp204 = (function (seed)
       {
-        return Seq_Unfold(_f, seed);
+        return Seq$$M_Unfold$IEnumerator_1$Tuple_2$Int32$_Double$_Double__$_IEnumerator_1$Tuple_2$Int32$_Double$_Double__$_IEnumerator_1$Tuple_2$Int32$_Double$_Double__$(_f, seed);
       });
-      return _temp189(Seq_Enumerator(xs));
+      return _temp204(Seq$$M_Enumerator$Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$(xs));
     }));
   });
-  Seq_Map2 = (function (f, xs, ys)
-  {
-    return (function (_f)
-    {
-      return Seq_Delay(_f);
-    })((function (unitVar0)
-    {
-      var _xs = Seq_Enumerator(xs);
-      var _ys = Seq_Enumerator(ys);
-      var _temp28;
-      var _f = (function (_unitVar0)
-      {
-        if ((_xs.MoveNext() && _ys.MoveNext())) 
-        {
-          var _temp30;
-          var _temp31;
-          _temp30 = (new Tuple2(f(_xs.get_Current())(_ys.get_Current()), _temp31));
-          return {Tag: "Some", Value: _temp30};
-        }
-        else
-        {
-          return {Tag: "None"};
-        };
-      });
-      _temp28 = (function (seed)
-      {
-        return Seq_Unfold(_f, seed);
-      });
-      var _temp32;
-      return _temp28(_temp32);
-    }));
-  });
-  Seq_OfArray = (function (xs)
+  Seq$$M_OfArray$JsonDocument$_JsonDocument$_JsonDocument$ = (function (xs)
   {
     var _temp139;
     var f = (function (i)
     {
-      if ((i.CompareTo(Array_BoxedLength(xs)) < 0.000000)) 
+      if ((i < Array$$M_BoxedLength$__(xs))) 
       {
-        return {Tag: "Some", Value: (new Tuple2(xs[i], (i + 1.000000)))};
+        return {Tag: "Some", Value: (new Tuple_JsonDocument$_Int32(xs[i], (i + 1.000000)))};
       }
       else
       {
@@ -1391,36 +2096,58 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
     });
     _temp139 = (function (seed)
     {
-      return Seq_Unfold(f, seed);
+      return Seq$$M_Unfold$Int32$_JsonDocument$_Int32_JsonDocument$_Int32_JsonDocument$(f, seed);
     });
     return _temp139(0.000000);
   });
-  Seq_OfList = (function (xs)
+  Seq$$M_OfList$String$_String_String = (function (xs)
   {
-    var _temp36;
+    var _temp27;
     var f = (function (_arg1)
     {
       if ((_arg1.Tag == "Cons")) 
       {
-        var _xs = List_Tail(_arg1);
-        var x = List_Head(_arg1);
-        return {Tag: "Some", Value: (new Tuple2(x, _xs))};
+        var _xs = List$$M_Tail$String$_String_String(_arg1);
+        var x = List$$M_Head$String$_String_String(_arg1);
+        return {Tag: "Some", Value: (new Tuple_String_FSharpList_1$String$(x, _xs))};
       }
       else
       {
         return {Tag: "None"};
       };
     });
-    _temp36 = (function (seed)
+    _temp27 = (function (seed)
     {
-      return Seq_Unfold(f, seed);
+      return Seq$$M_Unfold$FSharpList_1$String$_String$_FSharpList_1$String$_String_FSharpList_1$String$_String(f, seed);
     });
-    return _temp36(xs);
+    return _temp27(xs);
   });
-  Seq_ToArray = (function (xs)
+  Seq$$M_OfList$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_Tuple_2$Country$_Object$ = (function (xs)
   {
-    var ys = Array_ZeroCreate(Seq_Length(xs));
-    var _temp38;
+    var _temp23;
+    var f = (function (_arg1)
+    {
+      if ((_arg1.Tag == "Cons")) 
+      {
+        var _xs = List$$M_Tail$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_Tuple_2$Country$_Object$(_arg1);
+        var x = List$$M_Head$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_Tuple_2$Country$_Object$(_arg1);
+        return {Tag: "Some", Value: (new Tuple_Tuple_2$Country$_Object$_FSharpList_1$Tuple_2$Country$_Object$(x, _xs))};
+      }
+      else
+      {
+        return {Tag: "None"};
+      };
+    });
+    _temp23 = (function (seed)
+    {
+      return Seq$$M_Unfold$FSharpList_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_FSharpList_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_FSharpList_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$(f, seed);
+    });
+    return _temp23(xs);
+  });
+  Seq$$M_ToArray$Double__$_Double__$_Double__$ = (function (xs)
+  {
+    var ys = Array$$M_ZeroCreate$Double__$_Double__$_Double__$(Seq$$M_Length$Double__$_Double__$_Double__$(xs));
+    var _temp197;
     var f = (function (i)
     {
       return (function (x)
@@ -1429,80 +2156,346 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
         return null;
       });
     });
-    _temp38 = (function (_xs)
+    _temp197 = (function (_xs)
     {
-      return Seq_IterateIndexed(f, _xs);
+      return Seq$$M_IterateIndexed$Double__$_Double__$_Double__$(f, _xs);
     });
-    _temp38(xs);
+    _temp197(xs);
     return ys;
   });
-  Seq_TryFind = (function (f, xs)
+  Seq$$M_ToArray$String$_String_String = (function (xs)
   {
-    return Seq_TryPickIndexed((function (_arg1)
+    var ys = Array$$M_ZeroCreate$String$_String_String(Seq$$M_Length$String$_String_String(xs));
+    var _temp29;
+    var f = (function (i)
     {
       return (function (x)
       {
-        if (f(x)) 
-        {
-          return {Tag: "Some", Value: x};
-        }
-        else
-        {
-          return {Tag: "None"};
-        };
+        ys[i] = x;
+        return null;
       });
-    }), xs);
-  });
-  Seq_TryPickIndexed = (function (f, xs)
-  {
-    return Seq_TryPickIndexedAux(f, 0.000000, Seq_Enumerator(xs));
-  });
-  Seq_TryPickIndexedAux = (function (f, i, xs)
-  {
-    if (xs.MoveNext()) 
+    });
+    _temp29 = (function (_xs)
     {
-      var result = f(i)(xs.get_Current());
-      if ((result.Tag == "None")) 
+      return Seq$$M_IterateIndexed$String$_String_String(f, _xs);
+    });
+    _temp29(xs);
+    return ys;
+  });
+  Seq$$M_Unfold$FSharpList_1$String$_String$_FSharpList_1$String$_String_FSharpList_1$String$_String = (function (f, seed)
+  {
+    return Seq$$M_FromFactory$String$_String_String((function (unitVar0)
+    {
+      var impl;
+      impl = (new UnfoldEnumerator_2$FSharpList_1$String$_String$$M__ctor$_FSharpList_1$String$_String_FSharpList_1$String$_String(seed, f));
+      return {get_Current: (function (unitVar1)
       {
-        return Seq_TryPickIndexedAux(f, (i + 1.000000), xs);
-      }
-      else
+        return (function (__, unitVar1)
+        {
+          return __.current;
+        })(impl, unitVar1);
+      }), Dispose: (function (unitVar1)
       {
-        return result;
-      };
-    }
-    else
-    {
-      return {Tag: "None"};
-    };
-  });
-  Seq_Unfold = (function (f, seed)
-  {
-    return Seq_FromFactory((function (unitVar0)
-    {
-      return (new i_UnfoldEnumerator_2__ctor(seed, f));
+        return (function (__, unitVar1)
+        {
+          ;
+        })(impl, unitVar1);
+      }), MoveNext: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          var matchValue = __.acc;
+          var _temp24;
+          var currAcc = matchValue.Value;
+          var _matchValue = __.unfold(currAcc);
+          if ((_matchValue.Tag == "Some")) 
+          {
+            var value = _matchValue.Value.Item1;
+            var nextAcc = _matchValue.Value.Item2;
+            __.acc = {Tag: "Some", Value: nextAcc};
+            __.current = value;
+            _temp24 = true;
+          }
+          else
+          {
+            __.acc = {Tag: "None"};
+            __.current = null;
+            _temp24 = false;
+          };
+          return ((matchValue.Tag == "Some") && _temp24);
+        })(impl, unitVar1);
+      }), get_Current1: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          return __.current;
+        })(impl, unitVar1);
+      }), Reset: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          __.acc = {Tag: "Some", Value: __.seed};
+          __.current = null;
+        })(impl, unitVar1);
+      })};
     }));
   });
-  String_Join = (function (separator, s)
+  Seq$$M_Unfold$FSharpList_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_FSharpList_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_FSharpList_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$ = (function (f, seed)
+  {
+    return Seq$$M_FromFactory$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_Tuple_2$Country$_Object$((function (unitVar0)
+    {
+      var impl;
+      impl = (new UnfoldEnumerator_2$FSharpList_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$$M__ctor$_FSharpList_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_FSharpList_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$(seed, f));
+      return {get_Current: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          return __.current;
+        })(impl, unitVar1);
+      }), Dispose: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          ;
+        })(impl, unitVar1);
+      }), MoveNext: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          var matchValue = __.acc;
+          var _temp20;
+          var currAcc = matchValue.Value;
+          var _matchValue = __.unfold(currAcc);
+          if ((_matchValue.Tag == "Some")) 
+          {
+            var value = _matchValue.Value.Item1;
+            var nextAcc = _matchValue.Value.Item2;
+            __.acc = {Tag: "Some", Value: nextAcc};
+            __.current = value;
+            _temp20 = true;
+          }
+          else
+          {
+            __.acc = {Tag: "None"};
+            __.current = null;
+            _temp20 = false;
+          };
+          return ((matchValue.Tag == "Some") && _temp20);
+        })(impl, unitVar1);
+      }), get_Current1: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          return __.current;
+        })(impl, unitVar1);
+      }), Reset: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          __.acc = {Tag: "Some", Value: __.seed};
+          __.current = null;
+        })(impl, unitVar1);
+      })};
+    }));
+  });
+  Seq$$M_Unfold$IEnumerator_1$JsonDocument$_Tuple_2$Int32$_Double$_IEnumerator_1$JsonDocument$_Tuple_2$Int32$_Double$_IEnumerator_1$JsonDocument$_Tuple_2$Int32$_Double$ = (function (f, seed)
+  {
+    return Seq$$M_FromFactory$Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$_Tuple_2$Int32$_Double$((function (unitVar0)
+    {
+      var impl;
+      impl = (new UnfoldEnumerator_2$IEnumerator_1$JsonDocument$_Tuple_2$Int32$_Double$$M__ctor$_IEnumerator_1$JsonDocument$_Tuple_2$Int32$_Double$_IEnumerator_1$JsonDocument$_Tuple_2$Int32$_Double$(seed, f));
+      return {get_Current: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          return __.current;
+        })(impl, unitVar1);
+      }), Dispose: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          ;
+        })(impl, unitVar1);
+      }), MoveNext: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          var matchValue = __.acc;
+          var _temp110;
+          var currAcc = matchValue.Value;
+          var _matchValue = __.unfold(currAcc);
+          if ((_matchValue.Tag == "Some")) 
+          {
+            var value = _matchValue.Value.Item1;
+            var nextAcc = _matchValue.Value.Item2;
+            __.acc = {Tag: "Some", Value: nextAcc};
+            __.current = value;
+            _temp110 = true;
+          }
+          else
+          {
+            __.acc = {Tag: "None"};
+            __.current = null;
+            _temp110 = false;
+          };
+          return ((matchValue.Tag == "Some") && _temp110);
+        })(impl, unitVar1);
+      }), get_Current1: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          return __.current;
+        })(impl, unitVar1);
+      }), Reset: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          __.acc = {Tag: "Some", Value: __.seed};
+          __.current = null;
+        })(impl, unitVar1);
+      })};
+    }));
+  });
+  Seq$$M_Unfold$IEnumerator_1$Tuple_2$Int32$_Double$_Double__$_IEnumerator_1$Tuple_2$Int32$_Double$_Double__$_IEnumerator_1$Tuple_2$Int32$_Double$_Double__$ = (function (f, seed)
+  {
+    return Seq$$M_FromFactory$Double__$_Double__$_Double__$((function (unitVar0)
+    {
+      var impl;
+      impl = (new UnfoldEnumerator_2$IEnumerator_1$Tuple_2$Int32$_Double$_Double__$$M__ctor$_IEnumerator_1$Tuple_2$Int32$_Double$_Double__$_IEnumerator_1$Tuple_2$Int32$_Double$_Double__$(seed, f));
+      return {get_Current: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          return __.current;
+        })(impl, unitVar1);
+      }), Dispose: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          ;
+        })(impl, unitVar1);
+      }), MoveNext: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          var matchValue = __.acc;
+          var _temp203;
+          var currAcc = matchValue.Value;
+          var _matchValue = __.unfold(currAcc);
+          if ((_matchValue.Tag == "Some")) 
+          {
+            var value = _matchValue.Value.Item1;
+            var nextAcc = _matchValue.Value.Item2;
+            __.acc = {Tag: "Some", Value: nextAcc};
+            __.current = value;
+            _temp203 = true;
+          }
+          else
+          {
+            __.acc = {Tag: "None"};
+            __.current = null;
+            _temp203 = false;
+          };
+          return ((matchValue.Tag == "Some") && _temp203);
+        })(impl, unitVar1);
+      }), get_Current1: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          return __.current;
+        })(impl, unitVar1);
+      }), Reset: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          __.acc = {Tag: "Some", Value: __.seed};
+          __.current = null;
+        })(impl, unitVar1);
+      })};
+    }));
+  });
+  Seq$$M_Unfold$Int32$_JsonDocument$_Int32_JsonDocument$_Int32_JsonDocument$ = (function (f, seed)
+  {
+    return Seq$$M_FromFactory$JsonDocument$_JsonDocument$_JsonDocument$((function (unitVar0)
+    {
+      var impl;
+      impl = (new UnfoldEnumerator_2$Int32$_JsonDocument$$M__ctor$_Int32_JsonDocument$_Int32_JsonDocument$(seed, f));
+      return {get_Current: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          return __.current;
+        })(impl, unitVar1);
+      }), Dispose: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          ;
+        })(impl, unitVar1);
+      }), MoveNext: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          var matchValue = __.acc;
+          var _temp136;
+          var currAcc = matchValue.Value;
+          var _matchValue = __.unfold(currAcc);
+          if ((_matchValue.Tag == "Some")) 
+          {
+            var value = _matchValue.Value.Item1;
+            var nextAcc = _matchValue.Value.Item2;
+            __.acc = {Tag: "Some", Value: nextAcc};
+            __.current = value;
+            _temp136 = true;
+          }
+          else
+          {
+            __.acc = {Tag: "None"};
+            __.current = null;
+            _temp136 = false;
+          };
+          return ((matchValue.Tag == "Some") && _temp136);
+        })(impl, unitVar1);
+      }), get_Current1: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          return __.current;
+        })(impl, unitVar1);
+      }), Reset: (function (unitVar1)
+      {
+        return (function (__, unitVar1)
+        {
+          __.acc = {Tag: "Some", Value: __.seed};
+          __.current = null;
+        })(impl, unitVar1);
+      })};
+    }));
+  });
+  String$1$M_Join$__ = (function (separator, s)
   {
     return s.join(separator);
   });
-  Tuple2 = (function (Item1, Item2)
+  Tuple_Country$_Object$ = (function (Item1, Item2)
   {
     this.Item1 = Item1;
     this.Item2 = Item2;
   });
-  Tuple2.prototype.CompareTo = (function (that)
+  Tuple_Country$_Object$.prototype.CompareTo = (function (that)
   {
-    var diff;
-    diff = this.Item1.CompareTo(that.Item1);
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Item1.CompareTo(that.Item1);
+    diff = _diff;
     if ((diff != 0.000000)) 
     {
       return diff;
     }
     else
     {
-      diff = this.Item2.CompareTo(that.Item2);
+      var __diff = 0.000000;
+      __diff = this.Item2.CompareTo(that.Item2);
+      diff = __diff;
       if ((diff != 0.000000)) 
       {
         return diff;
@@ -1513,30 +2506,72 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
       };
     };
   });
-  Tuple3 = (function (Item1, Item2, Item3)
+  Tuple_Double__$_IEnumerator_1$Tuple_2$Int32$_Double$ = (function (Item1, Item2)
   {
     this.Item1 = Item1;
     this.Item2 = Item2;
-    this.Item3 = Item3;
   });
-  Tuple3.prototype.CompareTo = (function (that)
+  Tuple_Double__$_IEnumerator_1$Tuple_2$Int32$_Double$.prototype.CompareTo = (function (that)
   {
-    var diff;
-    diff = this.Item1.CompareTo(that.Item1);
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    var i = 0.000000;
+    while (((_diff == 0.000000) && ((i < this.Item1.length) && (i < that.Item1.length))))
+    {
+      _diff = ((this.Item1[i] < that.Item1[i]) ? -1.000000 : ((this.Item1[i] == that.Item1[i]) ? 0.000000 : 1.000000));
+      i = (i + 1.000000);
+    };
+    _diff = ((_diff == 0.000000) ? (this.Item1.length - that.Item1.length) : _diff);
+    diff = _diff;
     if ((diff != 0.000000)) 
     {
       return diff;
     }
     else
     {
-      diff = this.Item2.CompareTo(that.Item2);
+      var __diff = 0.000000;
+      __diff = this.Item2.CompareTo(that.Item2);
+      diff = __diff;
       if ((diff != 0.000000)) 
       {
         return diff;
       }
       else
       {
-        diff = this.Item3.CompareTo(that.Item3);
+        return 0.000000;
+      };
+    };
+  });
+  Tuple_FSharpFunc_2$IEnumerable_1$Tuple_2$Int32$_Double$_Unit$_FSharpFunc_2$String$_Unit$_FSharpFunc_2$String$_Unit$ = (function (Item1, Item2, Item3)
+  {
+    this.Item1 = Item1;
+    this.Item2 = Item2;
+    this.Item3 = Item3;
+  });
+  Tuple_FSharpFunc_2$IEnumerable_1$Tuple_2$Int32$_Double$_Unit$_FSharpFunc_2$String$_Unit$_FSharpFunc_2$String$_Unit$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Item1.CompareTo(that.Item1);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Item2.CompareTo(that.Item2);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        var ___diff = 0.000000;
+        ___diff = this.Item3.CompareTo(that.Item3);
+        diff = ___diff;
         if ((diff != 0.000000)) 
         {
           return diff;
@@ -1548,262 +2583,26 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
       };
     };
   });
-  Utils_encodeURIComponent = (function (s)
+  Tuple_Int32_Double = (function (Item1, Item2)
   {
-    return encodeURIComponent(s);
+    this.Item1 = Item1;
+    this.Item2 = Item2;
   });
-  Utils_getJSON = (function (url, callback)
+  Tuple_Int32_Double.prototype.CompareTo = (function (that)
   {
-    return $.getJSON(url, callback);
-  });
-  WorldBankRuntime_AsyncGetIndicator = (function (country, indicator)
-  {
-    return Async_FromContinuations((function (tupledArg)
-    {
-      var cont = tupledArg.Item1;
-      var econt = tupledArg.Item2;
-      var ccont = tupledArg.Item3;
-      var wb = country.Context;
-      var countryCode = country.Code;
-      var url = Runtime_worldBankUrl(wb, List_CreateCons("countries", List_CreateCons(countryCode, List_CreateCons("indicators", List_CreateCons(indicator, List_Empty())))), List_CreateCons((new Tuple2("date", "1900:2050")), List_CreateCons((new Tuple2("format", "jsonp")), List_Empty())));
-      return Utils_getJSON((url + "\u0026prefix=?"), (function (json)
-      {
-        var data = JsRuntime_Identity(JsRuntime_Parse(json, null));
-        var _temp140;
-        var _temp164;
-        var chooser = (function (v)
-        {
-          if (JsHelpers_isNull(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(v), "value")))) 
-          {
-            return {Tag: "None"};
-          }
-          else
-          {
-            var _temp176;
-            var _temp182;
-            var _temp185;
-            var _temp187;
-            var var0 = JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(v), "value"));
-            _temp187 = JsRuntime_TryGetValueByTypeTag(JsRuntime_Identity(var0), "Number", (function (t)
-            {
-              return JsRuntime_Identity(t);
-            }), (function (t)
-            {
-              return JsRuntime_Identity2(JsRuntime_Identity(t), "");
-            }));
-            _temp185 = _temp187.Value;
-            _temp182 = _temp185;
-            _temp176 = (new Tuple2(JsRuntime_Identity2(JsRuntime_Identity(JsRuntime_Identity(JsRuntime_GetProperty(JsRuntime_Identity(v), "date"))), ""), _temp182));
-            return {Tag: "Some", Value: _temp176};
-          };
-        });
-        _temp164 = (function (source)
-        {
-          return Seq_Choose(chooser, source);
-        });
-        _temp140 = _temp164((function (source)
-        {
-          return Seq_OfArray(source);
-        })(JsRuntime_ConvertArray(JsRuntime_Identity(JsRuntime_Identity(JsRuntime_GetArrayChildByTypeTag(JsRuntime_Identity(data), "Array"))), (function (t)
-        {
-          return JsRuntime_Identity(t);
-        }), (function (t)
-        {
-          return t;
-        }))));
-        var res = _temp140;
-        return cont(res);
-      }));
-    }));
-  });
-  WorldBankRuntime_GetCountries = (function (data)
-  {
-    return data;
-  });
-  WorldBankRuntime_GetCountry = (function (countries, code, name)
-  {
-    return (new i_WorldBankCountry__ctor(countries, code, name));
-  });
-  WorldBankRuntime_GetIndicators = (function (country)
-  {
-    return country;
-  });
-  i_AsyncBuilder__ctor = (function (unitVar0)
-  {
-    ;
-  });
-  i_AsyncBuilder__ctor.prototype.Bind = (function (_arg1, f)
-  {
-    var x = this;
-    var v = _arg1.Item;
-    return (function (_f)
-    {
-      return Async_protectedCont(_f);
-    })((function (k)
-    {
-      var cont = (function (a)
-      {
-        var patternInput = f(a);
-        var r = patternInput.Item;
-        return r(k);
-      });
-      return v((new i_AsyncParams_1__ctor(cont, k.Aux)));
-    }));
-  });
-  i_AsyncBuilder__ctor.prototype.Delay = (function (f)
-  {
-    var x = this;
-    return (function (_f)
-    {
-      return Async_protectedCont(_f);
-    })((function (k)
-    {
-      var _temp199;
-      var _temp200;
-      _temp199 = f(_temp200);
-      var patternInput = _temp199;
-      var r = patternInput.Item;
-      return r(k);
-    }));
-  });
-  i_AsyncBuilder__ctor.prototype.Zero = (function (unitVar1)
-  {
-    var x = this;
-    return (function (f)
-    {
-      return Async_protectedCont(f);
-    })((function (k)
-    {
-      var _temp201;
-      return Async_invokeCont(k, _temp201);
-    }));
-  });
-  i_AsyncBuilder__ctor.prototype.ReturnFrom = (function (w)
-  {
-    var x = this;
-    return w;
-  });
-  i_AsyncBuilder__ctor.prototype.Return = (function (v)
-  {
-    var x = this;
-    return (function (f)
-    {
-      return Async_protectedCont(f);
-    })((function (k)
-    {
-      return Async_invokeCont(k, v);
-    }));
-  });
-  i_AsyncBuilder__ctor.prototype.While = (function (cond, body)
-  {
-    var __ = this;
-    var x = __;
-    var loop;
-    loop = (function (unitVar0)
-    {
-      var _temp204;
-      var _temp205;
-      _temp204 = cond(_temp205);
-      if (_temp204) 
-      {
-        return x.Bind(body, loop);
-      }
-      else
-      {
-        return x.Zero();
-      };
-    });
-    var _temp202;
-    return loop(_temp202);
-  });
-  i_AsyncBuilder__ctor.prototype.Combine = (function (work1, work2)
-  {
-    var __ = this;
-    return __.Bind(work1, (function (unitVar0)
-    {
-      return work2;
-    }));
-  });
-  i_AsyncBuilder__ctor.prototype.For = (function (seq, body)
-  {
-    var __ = this;
-    var en = seq.GetEnumerator();
-    var x = __;
-    var loop;
-    loop = (function (unitVar0)
-    {
-      if (en.MoveNext()) 
-      {
-        return x.Bind(body(en.get_Current()), loop);
-      }
-      else
-      {
-        return x.Zero();
-      };
-    });
-    var _temp206;
-    return loop(_temp206);
-  });
-  i_AsyncParamsAux__ctor = (function (StackCounter, ExceptionCont, CancelledCont, CancellationToken)
-  {
-    this.StackCounter = StackCounter;
-    this.ExceptionCont = ExceptionCont;
-    this.CancelledCont = CancelledCont;
-    this.CancellationToken = CancellationToken;
-  });
-  i_AsyncParamsAux__ctor.prototype.CompareTo = (function (that)
-  {
-    var diff;
-    diff = this.StackCounter.CompareTo(that.StackCounter);
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Item1 < that.Item1) ? -1.000000 : ((this.Item1 == that.Item1) ? 0.000000 : 1.000000));
+    diff = _diff;
     if ((diff != 0.000000)) 
     {
       return diff;
     }
     else
     {
-      diff = this.ExceptionCont.CompareTo(that.ExceptionCont);
-      if ((diff != 0.000000)) 
-      {
-        return diff;
-      }
-      else
-      {
-        diff = this.CancelledCont.CompareTo(that.CancelledCont);
-        if ((diff != 0.000000)) 
-        {
-          return diff;
-        }
-        else
-        {
-          diff = this.CancellationToken.CompareTo(that.CancellationToken);
-          if ((diff != 0.000000)) 
-          {
-            return diff;
-          }
-          else
-          {
-            return 0.000000;
-          };
-        };
-      };
-    };
-  });
-  i_AsyncParams_1__ctor = (function (Cont, Aux)
-  {
-    this.Cont = Cont;
-    this.Aux = Aux;
-  });
-  i_AsyncParams_1__ctor.prototype.CompareTo = (function (that)
-  {
-    var diff;
-    diff = this.Cont.CompareTo(that.Cont);
-    if ((diff != 0.000000)) 
-    {
-      return diff;
-    }
-    else
-    {
-      diff = this.Aux.CompareTo(that.Aux);
+      var __diff = 0.000000;
+      __diff = ((this.Item2 < that.Item2) ? -1.000000 : ((this.Item2 == that.Item2) ? 0.000000 : 1.000000));
+      diff = __diff;
       if ((diff != 0.000000)) 
       {
         return diff;
@@ -1814,139 +2613,229 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
       };
     };
   });
-  i_CancellationToken__ctor = (function (Cell)
+  Tuple_JsonDocument$_Int32 = (function (Item1, Item2)
   {
-    this.Cell = Cell;
+    this.Item1 = Item1;
+    this.Item2 = Item2;
   });
-  i_CancellationToken__ctor.prototype.ThrowIfCancellationRequested = (function (unitVar1)
+  Tuple_JsonDocument$_Int32.prototype.CompareTo = (function (that)
   {
-    var x = this;
-    var matchValue = x.Cell;
-    if ((matchValue.Tag == "Some")) 
-    {
-      var _temp207;
-      var cell = matchValue.Value;
-      _temp207 = cell.contents;
-      if (_temp207) 
-      {
-        var _cell = matchValue.Value;
-        throw ("OperationCancelledException");
-        return null;
-      }
-      else
-      {
-        ;
-      };
-    }
-    else
-    {
-      ;
-    };
-  });
-  i_CancellationToken__ctor.prototype.CompareTo = (function (that)
-  {
-    var diff;
-    diff = this.Cell.CompareTo(that.Cell);
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Item1.CompareTo(that.Item1);
+    diff = _diff;
     if ((diff != 0.000000)) 
     {
       return diff;
     }
     else
     {
-      return 0.000000;
+      var __diff = 0.000000;
+      __diff = ((this.Item2 < that.Item2) ? -1.000000 : ((this.Item2 == that.Item2) ? 0.000000 : 1.000000));
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
     };
   });
-  i_CreateEnumerable_1__ctor = (function (factory)
+  Tuple_String_FSharpList_1$String$ = (function (Item1, Item2)
   {
-    this.factory = factory;
+    this.Item1 = Item1;
+    this.Item2 = Item2;
   });
-  i_CreateEnumerable_1__ctor.prototype.CompareTo = (function (ys)
+  Tuple_String_FSharpList_1$String$.prototype.CompareTo = (function (that)
   {
-    var __ = this;
-    var xs = __;
-    return Seq_CompareWith((function (x)
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Item1 < that.Item1) ? -1.000000 : ((this.Item1 == that.Item1) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
     {
-      return (function (y)
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Item2.CompareTo(that.Item2);
+      diff = __diff;
+      if ((diff != 0.000000)) 
       {
-        return LanguagePrimitives_UnboxGeneric(x).CompareTo(y);
-      });
-    }), xs, ys);
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
   });
-  i_CreateEnumerable_1__ctor.prototype.GetEnumerator = (function (unitVar1)
+  Tuple_String_String = (function (Item1, Item2)
   {
-    var __ = this;
-    var _temp35;
-    return __.factory(_temp35);
+    this.Item1 = Item1;
+    this.Item2 = Item2;
   });
-  i_UnfoldEnumerator_2__ctor = (function (seed, unfold)
+  Tuple_String_String.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Item1 < that.Item1) ? -1.000000 : ((this.Item1 == that.Item1) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = ((this.Item2 < that.Item2) ? -1.000000 : ((this.Item2 == that.Item2) ? 0.000000 : 1.000000));
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  Tuple_Tuple_2$Country$_Object$_FSharpList_1$Tuple_2$Country$_Object$ = (function (Item1, Item2)
+  {
+    this.Item1 = Item1;
+    this.Item2 = Item2;
+  });
+  Tuple_Tuple_2$Country$_Object$_FSharpList_1$Tuple_2$Country$_Object$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Item1.CompareTo(that.Item1);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Item2.CompareTo(that.Item2);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  Tuple_Tuple_2$Int32$_Double$_IEnumerator_1$JsonDocument$ = (function (Item1, Item2)
+  {
+    this.Item1 = Item1;
+    this.Item2 = Item2;
+  });
+  Tuple_Tuple_2$Int32$_Double$_IEnumerator_1$JsonDocument$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Item1.CompareTo(that.Item1);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Item2.CompareTo(that.Item2);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  UnfoldEnumerator_2$FSharpList_1$String$_String$$M__ctor$_FSharpList_1$String$_String_FSharpList_1$String$_String = (function (seed, unfold)
   {
     this.seed = seed;
     this.unfold = unfold;
     this.acc = {Tag: "Some", Value: this.seed};
     this.current = null;
   });
-  i_UnfoldEnumerator_2__ctor.prototype.Reset = (function (unitVar1)
+  UnfoldEnumerator_2$FSharpList_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$$M__ctor$_FSharpList_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$_FSharpList_1$Tuple_2$Country$_Object$_Tuple_2$Country$_Object$ = (function (seed, unfold)
   {
-    var __ = this;
-    __.acc = {Tag: "Some", Value: __.seed};
-    __.current = null;
+    this.seed = seed;
+    this.unfold = unfold;
+    this.acc = {Tag: "Some", Value: this.seed};
+    this.current = null;
   });
-  i_UnfoldEnumerator_2__ctor.prototype.get_Current = (function (unitVar1)
+  UnfoldEnumerator_2$IEnumerator_1$JsonDocument$_Tuple_2$Int32$_Double$$M__ctor$_IEnumerator_1$JsonDocument$_Tuple_2$Int32$_Double$_IEnumerator_1$JsonDocument$_Tuple_2$Int32$_Double$ = (function (seed, unfold)
   {
-    var __ = this;
-    return __.current;
+    this.seed = seed;
+    this.unfold = unfold;
+    this.acc = {Tag: "Some", Value: this.seed};
+    this.current = null;
   });
-  i_UnfoldEnumerator_2__ctor.prototype.MoveNext = (function (unitVar1)
+  UnfoldEnumerator_2$IEnumerator_1$Tuple_2$Int32$_Double$_Double__$$M__ctor$_IEnumerator_1$Tuple_2$Int32$_Double$_Double__$_IEnumerator_1$Tuple_2$Int32$_Double$_Double__$ = (function (seed, unfold)
   {
-    var __ = this;
-    var matchValue = __.acc;
-    var _temp20;
-    var currAcc = matchValue.Value;
-    var _matchValue = __.unfold(currAcc);
-    if ((_matchValue.Tag == "Some")) 
-    {
-      var value = _matchValue.Value.Item1;
-      var nextAcc = _matchValue.Value.Item2;
-      __.acc = {Tag: "Some", Value: nextAcc};
-      __.current = value;
-      _temp20 = true;
-    }
-    else
-    {
-      __.acc = {Tag: "None"};
-      __.current = null;
-      _temp20 = false;
-    };
-    return ((matchValue.Tag == "Some") && _temp20);
+    this.seed = seed;
+    this.unfold = unfold;
+    this.acc = {Tag: "Some", Value: this.seed};
+    this.current = null;
   });
-  i_UnfoldEnumerator_2__ctor.prototype.Dispose = (function (unitVar1)
+  UnfoldEnumerator_2$Int32$_JsonDocument$$M__ctor$_Int32_JsonDocument$_Int32_JsonDocument$ = (function (seed, unfold)
   {
-    var __ = this;
+    this.seed = seed;
+    this.unfold = unfold;
+    this.acc = {Tag: "Some", Value: this.seed};
+    this.current = null;
   });
-  i_WorldBankCountry__ctor = (function (Context, Code, Name)
+  Utils$$M_encodeURIComponent$__ = (function (s)
+  {
+    return encodeURIComponent(s);
+  });
+  Utils$$M_getJSON$__ = (function (url, callback)
+  {
+    return $.getJSON(url, callback);
+  });
+  WorldBankCountry$$M__ctor$_ = (function (Context, Code, Name)
   {
     this.Context = Context;
     this.Code = Code;
     this.Name = Name;
   });
-  i_WorldBankCountry__ctor.prototype.CompareTo = (function (that)
+  WorldBankCountry$$M__ctor$_.prototype.CompareTo = (function (that)
   {
-    var diff;
-    diff = this.Context.CompareTo(that.Context);
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Context.CompareTo(that.Context);
+    diff = _diff;
     if ((diff != 0.000000)) 
     {
       return diff;
     }
     else
     {
-      diff = this.Code.CompareTo(that.Code);
+      var __diff = 0.000000;
+      __diff = ((this.Code < that.Code) ? -1.000000 : ((this.Code == that.Code) ? 0.000000 : 1.000000));
+      diff = __diff;
       if ((diff != 0.000000)) 
       {
         return diff;
       }
       else
       {
-        diff = this.Name.CompareTo(that.Name);
+        var ___diff = 0.000000;
+        ___diff = ((this.Name < that.Name) ? -1.000000 : ((this.Name == that.Name) ? 0.000000 : 1.000000));
+        diff = ___diff;
         if ((diff != 0.000000)) 
         {
           return diff;
@@ -1958,30 +2847,108 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
       };
     };
   });
-  list_1_Cons = (function (Item1, Item2)
+  WorldBankRuntime$$M_AsyncGetIndicator$__ = (function (country, indicator)
+  {
+    return Async$$M_FromContinuations$IEnumerable_1$Tuple_2$Int32$_Double$_IEnumerable_1$Tuple_2$Int32$_Double$_IEnumerable_1$Tuple_2$Int32$_Double$((function (tupledArg)
+    {
+      var cont = tupledArg.Item1;
+      var econt = tupledArg.Item2;
+      var ccont = tupledArg.Item3;
+      var wb = country.Context;
+      var countryCode = country.Code;
+      var url = Runtime$$M_worldBankUrl$__(wb, List$$M_CreateCons$String$_String_String("countries", List$$M_CreateCons$String$_String_String(countryCode, List$$M_CreateCons$String$_String_String("indicators", List$$M_CreateCons$String$_String_String(indicator, List$$M_Empty$String$_String_String())))), List$$M_CreateCons$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$((new Tuple_String_String("date", "1900:2050")), List$$M_CreateCons$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$((new Tuple_String_String("format", "jsonp")), List$$M_Empty$Tuple_2$String$_String$_Tuple_2$String$_String$_Tuple_2$String$_String$())));
+      return Utils$$M_getJSON$__((url + "\u0026prefix=?"), (function (json)
+      {
+        var data = JsRuntime$$M_Identity$__(JsRuntime$$M_Parse$__(json, null));
+        var _temp144;
+        var _temp168;
+        var chooser = (function (v)
+        {
+          if (JsHelpers$$M_isNull$__(JsRuntime$$M_Identity$__(JsRuntime$$M_GetProperty$__(JsRuntime$$M_Identity$__(v), "value")))) 
+          {
+            return {Tag: "None"};
+          }
+          else
+          {
+            var _temp180;
+            var _temp186;
+            var _temp189;
+            var _temp191;
+            var var0 = JsRuntime$$M_Identity$__(JsRuntime$$M_GetProperty$__(JsRuntime$$M_Identity$__(v), "value"));
+            _temp191 = JsRuntime$$M_TryGetValueByTypeTag$JsonDocument$_Decimal$_JsonDocument$_Decimal$_JsonDocument$_Decimal$(JsRuntime$$M_Identity$__(var0), "Number", (function (t)
+            {
+              return JsRuntime$$M_Identity$__(t);
+            }), (function (t)
+            {
+              return JsRuntime$$M_Identity2$__(JsRuntime$$M_Identity$__(t), "");
+            }));
+            _temp189 = _temp191.Value;
+            _temp186 = _temp189;
+            _temp180 = (new Tuple_Int32_Double(JsRuntime$$M_Identity2$__(JsRuntime$$M_Identity$__(JsRuntime$$M_Identity$__(JsRuntime$$M_GetProperty$__(JsRuntime$$M_Identity$__(v), "date"))), ""), _temp186));
+            return {Tag: "Some", Value: _temp180};
+          };
+        });
+        _temp168 = (function (source)
+        {
+          return Seq$$M_Choose$JsonDocument$_Tuple_2$Int32$_Double$_JsonDocument$_Tuple_2$Int32$_Double$_JsonDocument$_Tuple_2$Int32$_Double$(chooser, source);
+        });
+        _temp144 = _temp168((function (source)
+        {
+          return Seq$$M_OfArray$JsonDocument$_JsonDocument$_JsonDocument$(source);
+        })(JsRuntime$$M_ConvertArray$JsonDocument$_JsonDocument$_JsonDocument$_JsonDocument$_JsonDocument$_JsonDocument$(JsRuntime$$M_Identity$__(JsRuntime$$M_Identity$__(JsRuntime$$M_GetArrayChildByTypeTag$__(JsRuntime$$M_Identity$__(data), "Array"))), (function (t)
+        {
+          return JsRuntime$$M_Identity$__(t);
+        }), (function (t)
+        {
+          return t;
+        }))));
+        var res = _temp144;
+        return cont(res);
+      }));
+    }));
+  });
+  WorldBankRuntime$$M_GetCountries$__ = (function (data)
+  {
+    return data;
+  });
+  WorldBankRuntime$$M_GetCountry$__ = (function (countries, code, name)
+  {
+    return (new WorldBankCountry$$M__ctor$_(countries, code, name));
+  });
+  WorldBankRuntime$$M_GetIndicators$__ = (function (country)
+  {
+    return country;
+  });
+  list_1$Country$_Cons_Country$ = (function (Item1, Item2)
   {
     this.Tag = "Cons";
     this.Item1 = Item1;
     this.Item2 = Item2;
   });
-  list_1_Cons.prototype.CompareTo = (function (that)
+  list_1$Country$_Cons_Country$.prototype.CompareTo = (function (that)
   {
-    var diff;
-    diff = this.Tag.CompareTo(that.Tag);
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Tag < that.Tag) ? -1.000000 : ((this.Tag == that.Tag) ? 0.000000 : 1.000000));
+    diff = _diff;
     if ((diff != 0.000000)) 
     {
       return diff;
     }
     else
     {
-      diff = this.Item1.CompareTo(that.Item1);
+      var __diff = 0.000000;
+      __diff = this.Item1.CompareTo(that.Item1);
+      diff = __diff;
       if ((diff != 0.000000)) 
       {
         return diff;
       }
       else
       {
-        diff = this.Item2.CompareTo(that.Item2);
+        var ___diff = 0.000000;
+        ___diff = this.Item2.CompareTo(that.Item2);
+        diff = ___diff;
         if ((diff != 0.000000)) 
         {
           return diff;
@@ -1993,14 +2960,16 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
       };
     };
   });
-  list_1_Nil = (function ()
+  list_1$Country$_Nil_Country$ = (function ()
   {
     this.Tag = "Nil";
   });
-  list_1_Nil.prototype.CompareTo = (function (that)
+  list_1$Country$_Nil_Country$.prototype.CompareTo = (function (that)
   {
-    var diff;
-    diff = this.Tag.CompareTo(that.Tag);
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Tag < that.Tag) ? -1.000000 : ((this.Tag == that.Tag) ? 0.000000 : 1.000000));
+    diff = _diff;
     if ((diff != 0.000000)) 
     {
       return diff;
@@ -2010,8 +2979,207 @@ var list_1_Nil, list_1_Cons, i_WorldBankCountry__ctor, i_UnfoldEnumerator_2__cto
       return 0.000000;
     };
   });
-  Program_data = Program_get_data();
-  return Program_main()
+  list_1$Object$_Nil_Object$ = (function ()
+  {
+    this.Tag = "Nil";
+  });
+  list_1$Object$_Nil_Object$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Tag < that.Tag) ? -1.000000 : ((this.Tag == that.Tag) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      return 0.000000;
+    };
+  });
+  list_1$String$_Cons_String = (function (Item1, Item2)
+  {
+    this.Tag = "Cons";
+    this.Item1 = Item1;
+    this.Item2 = Item2;
+  });
+  list_1$String$_Cons_String.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Tag < that.Tag) ? -1.000000 : ((this.Tag == that.Tag) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = ((this.Item1 < that.Item1) ? -1.000000 : ((this.Item1 == that.Item1) ? 0.000000 : 1.000000));
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        var ___diff = 0.000000;
+        ___diff = this.Item2.CompareTo(that.Item2);
+        diff = ___diff;
+        if ((diff != 0.000000)) 
+        {
+          return diff;
+        }
+        else
+        {
+          return 0.000000;
+        };
+      };
+    };
+  });
+  list_1$String$_Nil_String = (function ()
+  {
+    this.Tag = "Nil";
+  });
+  list_1$String$_Nil_String.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Tag < that.Tag) ? -1.000000 : ((this.Tag == that.Tag) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      return 0.000000;
+    };
+  });
+  list_1$Tuple_2$Country$_Object$_Cons_Tuple_2$Country$_Object$ = (function (Item1, Item2)
+  {
+    this.Tag = "Cons";
+    this.Item1 = Item1;
+    this.Item2 = Item2;
+  });
+  list_1$Tuple_2$Country$_Object$_Cons_Tuple_2$Country$_Object$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Tag < that.Tag) ? -1.000000 : ((this.Tag == that.Tag) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Item1.CompareTo(that.Item1);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        var ___diff = 0.000000;
+        ___diff = this.Item2.CompareTo(that.Item2);
+        diff = ___diff;
+        if ((diff != 0.000000)) 
+        {
+          return diff;
+        }
+        else
+        {
+          return 0.000000;
+        };
+      };
+    };
+  });
+  list_1$Tuple_2$Country$_Object$_Nil_Tuple_2$Country$_Object$ = (function ()
+  {
+    this.Tag = "Nil";
+  });
+  list_1$Tuple_2$Country$_Object$_Nil_Tuple_2$Country$_Object$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Tag < that.Tag) ? -1.000000 : ((this.Tag == that.Tag) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      return 0.000000;
+    };
+  });
+  list_1$Tuple_2$String$_String$_Cons_Tuple_2$String$_String$ = (function (Item1, Item2)
+  {
+    this.Tag = "Cons";
+    this.Item1 = Item1;
+    this.Item2 = Item2;
+  });
+  list_1$Tuple_2$String$_String$_Cons_Tuple_2$String$_String$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Tag < that.Tag) ? -1.000000 : ((this.Tag == that.Tag) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Item1.CompareTo(that.Item1);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        var ___diff = 0.000000;
+        ___diff = this.Item2.CompareTo(that.Item2);
+        diff = ___diff;
+        if ((diff != 0.000000)) 
+        {
+          return diff;
+        }
+        else
+        {
+          return 0.000000;
+        };
+      };
+    };
+  });
+  list_1$Tuple_2$String$_String$_Nil_Tuple_2$String$_String$ = (function ()
+  {
+    this.Tag = "Nil";
+  });
+  list_1$Tuple_2$String$_String$_Nil_Tuple_2$String$_String$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Tag < that.Tag) ? -1.000000 : ((this.Tag == that.Tag) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      return 0.000000;
+    };
+  });
+  Program$_data_ = Program$$M_get_data$__();
+  return Program$$M_main$__()
 });
   </script>
 
