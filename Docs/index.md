@@ -62,11 +62,10 @@ For more information, explore [examples on GitHub](https://github.com/ZachBray/F
 and take a look at our tutorials and samples:
 
  - [Getting started tutorial](samples/tutorial.html)
- - [Drawing a Mandelbrot with HTML5 canvas](samples/mandelbrot.html)
- - [Asynchornous computations](samples/simpleasync.html)
  - [Visualizing World Bank data](samples/worldbank.html)
  - [Calling The Movie Database](samples/moviedatabase.html)
- - [Brainfuck interpreter!!](samples/brainfuck.html)
+ - [Drawing a Mandelbrot with HTML5 canvas](samples/mandelbrot.html)
+ - [Asynchornous computations](samples/simpleasync.html)
 
 </div></div>
 

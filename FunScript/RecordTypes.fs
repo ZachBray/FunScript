@@ -65,14 +65,7 @@ let private creation =
             exprs 
             |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
             |> List.unzip
-         let ci = 
-            recType.GetConstructors(
-               BindingFlags.Public ||| 
-               BindingFlags.NonPublic ||| 
-               BindingFlags.Instance).[0]
-         let typeArgs = Reflection.getGenericTypeArgs recType
-         let specialization = Reflection.getSpecializationString compiler typeArgs
-         let name = JavaScriptNameMapper.mapMethod ci + specialization
+         let name = Reflection.getRecordConstructorName compiler recType
          let cons = 
             compiler.DefineGlobal name (fun var -> 
                [ 

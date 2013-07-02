@@ -6,10 +6,13 @@ open Jint
 open NUnit.Framework
 open Microsoft.FSharp.Linq.QuotationEvaluation
 
+[<JSEmit("test_log({0}.toString());")>]
+let log (msg : obj) : unit = failwith "never"
+
 let checkAreEqual expectedResult quote =
    let code = Compiler.compile quote
    try
-      let engine = JintEngine()
+      let engine = JintEngine().SetFunction("test_log", System.Action<string>(printfn "//[LOG] %s"))
       let result = engine.Run(code + "\nreturn null;")
       Assert.That((result = expectedResult))
    // Wrap xUnit exceptions to stop pauses.

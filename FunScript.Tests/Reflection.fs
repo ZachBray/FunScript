@@ -2,9 +2,10 @@
 [<NUnit.Framework.TestFixture>] 
 module FunScript.Tests.Reflection
 
+open FunScript
 open NUnit.Framework
 
-[<FunScript.JS>]
+[<JS>]
 module X =
    open Microsoft.FSharp.Reflection
 
@@ -45,7 +46,7 @@ module X =
                   let hasPrev = ref false
                   let rows =
                      xs |> List.map (fun (propName, propValue) ->
-                        innerIndent + propName + " : " + toStr "" propValue
+                        innerIndent + "\"" + propName + "\"" + " : " + toStr "" propValue
                      ) |> List.reduce (fun acc line -> acc + ",\n" + line)
                   indent + "{\n" + 
                   rows + 
@@ -64,7 +65,7 @@ module X =
                let propJson = toJson pi.PropertyType (pi.GetValue(x, [||]))
                pi.Name, propJson)
             |> Array.toList
-         let tagVal = "Tag", JString uci.Name
+         let tagVal = "Tag", JNumber(float uci.Tag)
          let allFields = tagVal :: propVals
          JObject allFields
       elif FSharpType.IsRecord(t) then
@@ -83,6 +84,52 @@ module X =
          JString(unbox x)
       else failwith "Unsupported type"
          
+   // Note: This will work in the wild: [<JSEmit("return JSON.parse({0});")>]
+   //       but we use the following emit for JInt compatability.
+   [<JSEmit("return eval(\"(\" + {0} + \")\");")>]
+   let parse(str : string) : obj = failwith "never"
+     
+   
+   // Note: This will work in the wild: [<JSEmit("return {0} != undefined;")>]
+   //       but we use the following emit for JInt compatability.
+   [<JSEmit("return true;")>] 
+   let isDefined (obj : obj) : bool = failwith "never"
+
+   [<JSEmit("return {1}[{0}];")>]
+   let tryGet (prop : string) (obj : obj) : obj = failwith "never"
+      
+   let get prop obj =
+      let value = tryGet prop obj
+      if isDefined value then value
+      else failwith("Couldn't find property: " + prop)
+
+   let rec fromJson (t:System.Type) (jsonObj : obj) =
+      if FSharpType.IsUnion t then
+         let ucis = FSharpType.GetUnionCases t
+         let tag = jsonObj |> get "Tag" :?> int
+         let uci = ucis.[tag]
+         let args =
+            uci.GetFields() |> Array.map (fun pi -> 
+               jsonObj |> get pi.Name |> fromJson pi.PropertyType)
+         FSharpValue.MakeUnion(uci, args)
+      elif FSharpType.IsRecord t then
+         let fields = FSharpType.GetRecordFields t
+         let args =
+            fields |> Array.map (fun pi ->
+               jsonObj |> get pi.Name |> fromJson pi.PropertyType)
+         FSharpValue.MakeRecord(t, args)
+      elif t.FullName = typeof<int>.FullName then
+         jsonObj
+      elif t.FullName = typeof<float>.FullName then
+         jsonObj
+      elif t.FullName = typeof<string>.FullName then
+         jsonObj
+      else failwith ("Unsupported type: " + t.Name)
+
+   let parseJson<'a> (jsonStr : string) =
+      let jsonObj = parse jsonStr
+      let t = typeof<'a>
+      fromJson t jsonObj :?> 'a
 
 [<Test>]
 let ``typeof<ConcreteT>.FullName works``() =
@@ -180,13 +227,27 @@ let createPerson() =
       Occupation = Employed { Name = "Big Bank"; Address = "Centre of the Universe" }
    }
 
+open X
 
 [<Test>]
 let ``Serialization works using reflection API``() =
    check  
       <@@ 
          let person = createPerson()
-         (X.toJson typeof<Person> person).Serialize()
+         (toJson typeof<Person> person).Serialize()
       @@>
+
+[<Test>]
+let ``Deserialization works using reflection API``() =
+   checkAreEqual true 
+      <@@ 
+         let personA = createPerson()
+         let jsonStr = (toJson typeof<Person> personA).Serialize()
+         let personB = parseJson<Person> jsonStr
+         personA.Name = personB.Name &&
+         personA = personB
+      @@>
+
+
 
 // TODO: Test recursive types serialization

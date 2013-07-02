@@ -55,7 +55,31 @@ let getSpecializationString (compiler : InternalCompiler.ICompiler) ts =
          else "obj"
       ) |> String.concat "_")
    |> JavaScriptNameMapper.sanitizeAux
+
+let getRecordConstructorName compiler (recType : System.Type) =
+   let ci = 
+      recType.GetConstructors(
+         BindingFlags.Public ||| 
+         BindingFlags.NonPublic ||| 
+         BindingFlags.Instance).[0]
+   let typeArgs = getGenericTypeArgs recType
+   let specialization = getSpecializationString compiler typeArgs
+   JavaScriptNameMapper.mapMethod ci + specialization
+
+let getUnionCaseConstructorName compiler (uci : UnionCaseInfo) =
+   let typeArgs = getGenericTypeArgs uci.DeclaringType
+   let specialization = getSpecializationString compiler typeArgs
+   JavaScriptNameMapper.mapType uci.DeclaringType + "_" + uci.Name + specialization
    
+let createLambdaVars(fields : PropertyInfo[]) =
+   let fieldCount = fields.Length
+   let argsVar = Var("args", typeof<obj[]>)
+   let argsExpr = Expr.Var argsVar
+   let vars = 
+      Array.init fieldCount (fun i -> Expr.Coerce(<@@ (%%argsExpr : obj[]).[i] @@>, fields.[i].PropertyType))
+      |> Array.toList
+   argsVar, vars
+
 // TODO: memoize for recursive types!
 let rec private getPropertyInfoExpr (getTypeVar : Type -> Var) (pi : PropertyInfo) =
    let name = pi.Name
@@ -64,42 +88,50 @@ let rec private getPropertyInfoExpr (getTypeVar : Type -> Var) (pi : PropertyInf
    let typeVar = Expr.Coerce(Expr.Var(getTypeVar pi.PropertyType), typeof<Core.Type.Type>)
    <@@ Core.Type.PropertyInfo(name, %%caller, fun () -> %%typeVar) @@>
 
-and private getUnionCaseInfo getTypeVar (uci : UnionCaseInfo) =
-    let name = uci.Name
-    let exprs = uci.GetFields() |> Array.map (getPropertyInfoExpr getTypeVar) |> Array.toList
-    let arrayExpr = Expr.NewArray(typeof<Core.Type.PropertyInfo>, exprs)
-    <@@ Core.Type.UnionCaseInfo(name, %%arrayExpr) @@>
+and private getUnionCaseInfo (compiler : InternalCompiler.ICompiler) getTypeVar (uci : UnionCaseInfo) =
+   let name = uci.Name
+   let tag = uci.Tag
+   let fields = uci.GetFields()
+   let exprs = fields |> Array.map (getPropertyInfoExpr getTypeVar) |> Array.toList
+   let arrayExpr = Expr.NewArray(typeof<Core.Type.PropertyInfo>, exprs)
+   let argsVar, vars = createLambdaVars fields
+   let constructorLambda =
+      Expr.Lambda(argsVar, Expr.Coerce(Expr.NewUnionCase(uci, vars), typeof<obj>))
+   <@@ Core.Type.UnionCaseInfo(name, tag, %%constructorLambda, %%arrayExpr) @@>
 
-and private getKind getTypeVar t =
+and private getKind compiler getTypeVar t =
     if FSharpType.IsTuple t then <@ Core.Type.TupleType @>
     elif FSharpType.IsRecord t then 
         let pis = FSharpType.GetRecordFields t
         let exprs = pis |> Array.map (getPropertyInfoExpr getTypeVar) |> Array.toList
         let arrayExpr = Expr.NewArray(typeof<Core.Type.PropertyInfo>, exprs)
-        <@ Core.Type.RecordType %%arrayExpr @>
+        let argsVar, vars = createLambdaVars pis
+        let constructorLambda =
+            Expr.Lambda(argsVar, Expr.Coerce(Expr.NewRecord(t, vars), typeof<obj>))
+        <@ Core.Type.RecordType(%%constructorLambda, %%arrayExpr) @>
     elif FSharpType.IsUnion t then
-        let ucis = FSharpType.GetUnionCases t
-        let exprs = ucis |> Array.map (getUnionCaseInfo getTypeVar) |> Array.toList
+        let ucis = FSharpType.GetUnionCases t |> Array.sortBy (fun uci -> uci.Tag)
+        let exprs = ucis |> Array.map (getUnionCaseInfo compiler getTypeVar) |> Array.toList
         let arrayExpr = Expr.NewArray(typeof<Core.Type.UnionCaseInfo>, exprs)
         <@ Core.Type.UnionType %%arrayExpr @>
     else <@ Core.Type.ClassType @>
 
-and private netTypeExpr getTypeVar (t : Type) =
+and private netTypeExpr compiler getTypeVar (t : Type) =
    let name = t.Name
    let fullName = t.FullName
    let typeArgs =
       let isGeneric = t.IsGenericType || t.IsGenericTypeDefinition
       if isGeneric then t.GetGenericArguments()
       else [||]
-   let typeArgExprs = typeArgs |> Array.toList |> List.map (netTypeExpr getTypeVar)
+   let typeArgExprs = typeArgs |> Array.toList |> List.map (netTypeExpr compiler getTypeVar)
    let typeArgsArrayExpr = Expr.NewArray(typeof<Core.Type.Type>, typeArgExprs)
-   let kindExpr = getKind getTypeVar t
+   let kindExpr = getKind compiler getTypeVar t
    <@@ Core.Type.Type(name, fullName, %%typeArgsArrayExpr, %kindExpr) @@>
 
 let rec buildRuntimeType (compiler : InternalCompiler.ICompiler) (t : System.Type) =
    let typeName = sprintf "t_%s" (JavaScriptNameMapper.mapType t)
    compiler.DefineGlobal typeName (fun var ->
-      let expr = netTypeExpr (buildRuntimeType compiler) t
+      let expr = netTypeExpr compiler (buildRuntimeType compiler) t
       compiler.Compile (ReturnStrategies.assignVar var) expr
    )
 

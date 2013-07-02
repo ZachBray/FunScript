@@ -45,7 +45,7 @@ let genComparisonFunc (uci : UnionCaseInfo) =
             Block cont)
       ]
    let body =
-      compareThen typeof<string> "Tag" (
+      compareThen typeof<int> "Tag" (
          List.foldBack (fun (var : Var, t) acc ->
             compareThen t var.Name acc
          ) (getCaseVars uci) [ Return <| Number 0. ]
@@ -70,7 +70,8 @@ let private ignoredUnions =
 let private createConstructor uci compiler =
    let vars = getCaseVars uci |> List.map fst
    vars, Block [
-      yield Assign(PropertyGet(This, "Tag"), String uci.Name)
+      yield Assign(PropertyGet(This, "Tag"), Number(float uci.Tag))
+      yield Assign(PropertyGet(This, "_CaseName"), String uci.Name)
       for var in vars do yield Assign(PropertyGet(This, var.Name), Reference var)
    ]
 
@@ -84,7 +85,7 @@ let private creation =
             |> List.unzip
          let propNames = getCaseVars uci |> List.map (fun (var,_) -> var.Name)
          let fields = 
-            ("Tag", String uci.Name) ::
+            ("Tag", Number(float uci.Tag)) ::
             (List.zip propNames refs)
          // TODO: What about comparison?
          [ yield! decls |> Seq.concat 
@@ -95,9 +96,7 @@ let private creation =
             exprs 
             |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
             |> List.unzip
-         let typeArgs = Reflection.getGenericTypeArgs uci.DeclaringType
-         let specialization = Reflection.getSpecializationString compiler typeArgs
-         let name = JavaScriptNameMapper.mapType uci.DeclaringType + "_" + uci.Name + specialization
+         let name = Reflection.getUnionCaseConstructorName compiler uci
          let cons = 
             compiler.DefineGlobal name (fun var -> 
                [ 
@@ -118,7 +117,7 @@ let private matching =
       function
       | Patterns.UnionCaseTest(Split(objDecl, objRef), uci) ->
          [ yield! objDecl
-           yield returnStategy.Return <| BinaryOp(PropertyGet(objRef, "Tag"), "==", String(uci.Name))
+           yield returnStategy.Return <| BinaryOp(PropertyGet(objRef, "Tag"), "==", Number(float uci.Tag))
          ]
       | _ -> []
 
