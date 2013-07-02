@@ -73,11 +73,14 @@ let nullary quote code =
       | [] -> Some([], code)
       | _ -> None)
 
-let unary quote genCode =
+let unaryTyped quote genCode =
    generateArity quote (fun _ (|Split|) ->
       function
-      | [Split(decl, ref)] -> Some([decl], genCode ref)
+      | [Split(decl, ref) as expr] -> 
+         genCode expr.Type ref |> Option.map (fun x -> [decl], x)
       | _ -> None)
+
+let unary quote genCode = unaryTyped quote (fun _ x -> Some(genCode x))
 
 let unaryStatement quote genCode =
    generateArity quote (fun _ (|Split|) ->

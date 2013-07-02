@@ -60,6 +60,7 @@
     <Compile Include="Strings.fs" />
     <Compile Include="Asyncs.fs" />
     <Compile Include="Reflection.fs" />
+    <Compile Include="StringWriter.fs" />
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>

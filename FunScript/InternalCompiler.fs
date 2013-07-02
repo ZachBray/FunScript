@@ -72,14 +72,8 @@ type Compiler(components, shouldFlattenGenericsForReflection) as this =
             (mi.DeclaringType.GetGenericArguments())
             (mi.GetGenericArguments())
 
-   let mutable usedMethods = []
-
-   let remember (methodBase:MethodBase) =
-      usedMethods <- methodBase :: usedMethods
-
    let tryCompileCall callType returnStrategy mi obj exprs  =
       let this = this :> ICompiler
-      remember mi
       match callerReplacers.TryFind (key mi callType) with
       | Some r ->
          let typeArgs = getTypeArgs mi

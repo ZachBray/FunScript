@@ -60,6 +60,8 @@
     <Compile Include="Core\Events.fs" />
     <Compile Include="Core\Async.fs" />
     <Compile Include="Core\Type.fs" />
+    <Compile Include="Core\StringWriter.fs" />
+    <Compile Include="Core\Newtonsoft.fs" />
     <Compile Include="JavaScriptNameMapper.fs" />
     <Compile Include="AST.fs" />
     <Compile Include="QuoteExtensions.fs" />
@@ -84,6 +86,7 @@
     <Compile Include="Objects.fs" />
     <Compile Include="CommonOperators.fs" />
     <Compile Include="Strings.fs" />
+    <Compile Include="OtherMappings.fs" />
     <Compile Include="Asyncs.fs" />
     <Compile Include="UnionTypes.fs" />
     <Compile Include="RecordTypes.fs" />

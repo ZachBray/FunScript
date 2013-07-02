@@ -24,9 +24,10 @@ let private allComponents =
       Comparison.components
       PrimitiveTypes.components
       ControlFlow.components
-      CommonOperators.components
       Objects.components
       Reflection.components
+      OtherMappings.components
+      CommonOperators.components
    ] |> List.concat
 
 type Compiler =
