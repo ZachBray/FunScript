@@ -54,7 +54,7 @@ module X =
          toStr "" json
 
    let rec toJson (t : System.Type) (x : obj) =
-      if FSharpType.IsUnion(t) then
+      if FSharpType.IsUnion t then
          let readTag = FSharpValue.PreComputeUnionTagReader t
          let ucis = FSharpType.GetUnionCases t
          let tagIndex = readTag x
@@ -68,7 +68,7 @@ module X =
          let tagVal = "Tag", JNumber(float uci.Tag)
          let allFields = tagVal :: propVals
          JObject allFields
-      elif FSharpType.IsRecord(t) then
+      elif FSharpType.IsRecord t then
          let fields = FSharpType.GetRecordFields t
          let propVals =
             fields |> Array.map (fun pi ->
@@ -76,6 +76,13 @@ module X =
                pi.Name, propJson)
             |> Array.toList
          JObject propVals
+      elif FSharpType.IsTuple t then
+         let elementTypes = FSharpType.GetTupleElements t
+         let values = FSharpValue.GetTupleFields x
+         let arrayElements =
+            Array.map2 (fun t v -> toJson t v) elementTypes values
+            |> Array.toList
+         JArray arrayElements
       elif t.FullName = typeof<int>.FullName then
          JNumber(float (unbox<int> x))
       elif t.FullName = typeof<float>.FullName then
@@ -88,20 +95,12 @@ module X =
    //       but we use the following emit for JInt compatability.
    [<JSEmit("return eval(\"(\" + {0} + \")\");")>]
    let parse(str : string) : obj = failwith "never"
-     
    
-   // Note: This will work in the wild: [<JSEmit("return {0} != undefined;")>]
-   //       but we use the following emit for JInt compatability.
-   [<JSEmit("return true;")>] 
-   let isDefined (obj : obj) : bool = failwith "never"
+   [<JSEmit("return {1}[{0}];")>]
+   let get (prop : string) (obj : obj) : obj = failwith "never"
 
    [<JSEmit("return {1}[{0}];")>]
-   let tryGet (prop : string) (obj : obj) : obj = failwith "never"
-      
-   let get prop obj =
-      let value = tryGet prop obj
-      if isDefined value then value
-      else failwith("Couldn't find property: " + prop)
+   let getIndex (index : int) (obj : obj) : obj = failwith "never"
 
    let rec fromJson (t:System.Type) (jsonObj : obj) =
       if FSharpType.IsUnion t then
@@ -118,6 +117,13 @@ module X =
             fields |> Array.map (fun pi ->
                jsonObj |> get pi.Name |> fromJson pi.PropertyType)
          FSharpValue.MakeRecord(t, args)
+      elif FSharpType.IsTuple t then
+         let elementTypes = FSharpType.GetTupleElements t
+         let values = 
+            elementTypes |> Array.mapi (fun i t ->
+               let jEl = jsonObj |> getIndex i
+               fromJson t jEl)
+         FSharpValue.MakeTuple(values, t)
       elif t.FullName = typeof<int>.FullName then
          jsonObj
       elif t.FullName = typeof<float>.FullName then
@@ -217,12 +223,12 @@ type Occupation =
    | Unemployed
    | Employed of Company
 
-type Person = { Name : string; Occupation : Occupation; Age : int }
+type Person = { Name : string * string; Occupation : Occupation; Age : int }
 
 
 let createPerson() =
    {
-      Name = "Bob Diamonte"
+      Name = "Bob", "Diamonte"
       Age = 1000000
       Occupation = Employed { Name = "Big Bank"; Address = "Centre of the Universe" }
    }

@@ -4,26 +4,20 @@ open AST
 open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Reflection
 
-let getPropNames n =
-   match n with
-   | 1 -> [ "Value" ]
-   | n -> [ for i = 1 to n do  yield sprintf "Item%i" i ]
-
-let getTupleVars n =
-   getPropNames n |> List.map (fun name -> Var(name, typeof<obj>))
+let itemsPropName = "Items"
+let getItem i ref = IndexGet(PropertyGet(ref, itemsPropName), Number(float i))
 
 let genComparisonFunc ts =
    let that = Var("that", typeof<obj>)
    let diff = Var("diff", typeof<obj>)
       
    let fields =
-      let propNames = ts |> List.length |> getPropNames
-      List.zip propNames ts
+      ts |> List.mapi (fun i x -> i, x)
 
    let body =
-      List.foldBack (fun (name, t) acc ->
-         let thisField = PropertyGet(This, name)
-         let thatField = PropertyGet(Reference that, name)
+      List.foldBack (fun (i, t) acc ->
+         let thisField = This |> getItem i
+         let thatField = Reference that |> getItem i
          let decls, compareExpr = Comparison.compareCall t thisField t thatField |> Option.get
          [  yield! decls
             yield Assign(Reference diff, compareExpr)
@@ -42,10 +36,15 @@ let genComparisonMethods ts =
     let func = genComparisonFunc ts
     [ "CompareTo", func ]
 
+let getTupleVars n =
+   [ 0 .. n - 1] |> List.map (fun i -> Var(sprintf "Item%i" i, typeof<obj>))
+
 let private createConstructor n compiler =
    let vars = getTupleVars n
-   vars, Block [  
-      for var in vars do yield Assign(PropertyGet(This, var.Name), Reference var)
+   let refs = vars |> List.map Reference
+   vars, Block [
+      for var in vars do 
+          yield Assign(PropertyGet(This, itemsPropName), Array refs)
    ]
 
 let private creation =
@@ -78,13 +77,19 @@ let private getIndex =
       function
       | Patterns.TupleGet(Split(valDecl, valRef), i) ->
          [ yield! valDecl
-           yield returnStategy.Return <| PropertyGet(valRef, sprintf "Item%i" (i+1))
+           yield returnStategy.Return (valRef |> getItem i)
          ]
       | _ -> []
 
 let components = [ 
    creation
    getIndex
-   CompilerComponent.unary <@ fst @> (fun arg -> PropertyGet(arg, "Item1"))
-   CompilerComponent.unary <@ snd @> (fun arg -> PropertyGet(arg, "Item2"))
+   CompilerComponent.unary <@ fst @> (fun arg -> arg |> getItem 0)
+   CompilerComponent.unary <@ snd @> (fun arg -> arg |> getItem 1)
+   CompilerComponent.unary 
+      <@ Microsoft.FSharp.Reflection.FSharpValue.GetTupleFields @> 
+      (fun arg -> PropertyGet(arg, itemsPropName))
+   CompilerComponent.binary 
+      <@ fun obj i -> Microsoft.FSharp.Reflection.FSharpValue.GetTupleField(obj, i) @> 
+      (fun arg i -> IndexGet(PropertyGet(arg, itemsPropName), i))
 ]

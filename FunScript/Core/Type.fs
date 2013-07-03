@@ -22,7 +22,7 @@ and TypeKind =
     | ClassType
     | RecordType of Construct * PropertyInfo []
     | UnionType of UnionCaseInfo []
-    | TupleType
+    | TupleType of Construct * Type[]
     
 and Type(name, fullName, typeArgs, kind) =
    member __.Name : string = name
@@ -42,7 +42,7 @@ type FSharpType() =
 
     static member IsTuple (t : Type) = 
         match t.Kind with
-        | TupleType -> true
+        | TupleType _ -> true
         | _ -> false
 
     static member IsRecord (t : Type, _ : obj) =
@@ -54,6 +54,11 @@ type FSharpType() =
         match t.Kind with
         | UnionType ucis -> ucis
         | _ -> failwith "Not a union type."
+
+    static member GetTupleElements (t : Type) =
+        match t.Kind with
+        | TupleType(_, ts) -> ts
+        | _ -> failwith "Not a tuple type."
 
     static member GetRecordFields (t : Type, _ : obj) =
         match t.Kind with
@@ -73,6 +78,11 @@ type FSharpValue() =
 
    static member MakeUnion(uci : UnionCaseInfo, args : obj[], _ : obj) =
       uci.Construct args
+
+   static member MakeTuple(args : obj[], t : Type) =
+      match t.Kind with
+      | TupleType(c, _) -> c args
+      | _ -> failwith "Not a tuple type."
 
    static member MakeRecord(t : Type, args : obj[], _ : obj) =
       match t.Kind with

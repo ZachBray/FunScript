@@ -71,12 +71,12 @@ let getUnionCaseConstructorName compiler (uci : UnionCaseInfo) =
    let specialization = getSpecializationString compiler typeArgs
    JavaScriptNameMapper.mapType uci.DeclaringType + "_" + uci.Name + specialization
    
-let createLambdaVars(fields : PropertyInfo[]) =
+let createLambdaVars(fields : Type[]) =
    let fieldCount = fields.Length
    let argsVar = Var("args", typeof<obj[]>)
    let argsExpr = Expr.Var argsVar
    let vars = 
-      Array.init fieldCount (fun i -> Expr.Coerce(<@@ (%%argsExpr : obj[]).[i] @@>, fields.[i].PropertyType))
+      Array.init fieldCount (fun i -> Expr.Coerce(<@@ (%%argsExpr : obj[]).[i] @@>, fields.[i]))
       |> Array.toList
    argsVar, vars
 
@@ -94,18 +94,17 @@ and private getUnionCaseInfo (compiler : InternalCompiler.ICompiler) getTypeVar 
    let fields = uci.GetFields()
    let exprs = fields |> Array.map (getPropertyInfoExpr getTypeVar) |> Array.toList
    let arrayExpr = Expr.NewArray(typeof<Core.Type.PropertyInfo>, exprs)
-   let argsVar, vars = createLambdaVars fields
+   let argsVar, vars = createLambdaVars (fields |> Array.map (fun pi -> pi.PropertyType))
    let constructorLambda =
       Expr.Lambda(argsVar, Expr.Coerce(Expr.NewUnionCase(uci, vars), typeof<obj>))
    <@@ Core.Type.UnionCaseInfo(name, tag, %%constructorLambda, %%arrayExpr) @@>
 
 and private getKind compiler getTypeVar t =
-    if FSharpType.IsTuple t then <@ Core.Type.TupleType @>
-    elif FSharpType.IsRecord t then 
+    if FSharpType.IsRecord t then 
         let pis = FSharpType.GetRecordFields t
         let exprs = pis |> Array.map (getPropertyInfoExpr getTypeVar) |> Array.toList
         let arrayExpr = Expr.NewArray(typeof<Core.Type.PropertyInfo>, exprs)
-        let argsVar, vars = createLambdaVars pis
+        let argsVar, vars = createLambdaVars (pis |> Array.map (fun pi -> pi.PropertyType))
         let constructorLambda =
             Expr.Lambda(argsVar, Expr.Coerce(Expr.NewRecord(t, vars), typeof<obj>))
         <@ Core.Type.RecordType(%%constructorLambda, %%arrayExpr) @>
@@ -114,6 +113,18 @@ and private getKind compiler getTypeVar t =
         let exprs = ucis |> Array.map (getUnionCaseInfo compiler getTypeVar) |> Array.toList
         let arrayExpr = Expr.NewArray(typeof<Core.Type.UnionCaseInfo>, exprs)
         <@ Core.Type.UnionType %%arrayExpr @>
+    elif FSharpType.IsTuple t then
+        let ts = FSharpType.GetTupleElements t
+        let tVars = ts |> Array.map getTypeVar
+        let tExprs = 
+            tVars |> Array.map Expr.Var 
+            |> Array.map (fun v -> Expr.Coerce(v, typeof<Core.Type.Type>)) 
+            |> Array.toList
+        let tsExpr = Expr.NewArray(typeof<Core.Type.Type>, tExprs)
+        let argsVar, vars = createLambdaVars ts
+        let constructorLambda =
+            Expr.Lambda(argsVar, Expr.Coerce(Expr.NewTuple vars, typeof<obj>))
+        <@ Core.Type.TupleType(%%constructorLambda, %%tsExpr) @>
     else <@ Core.Type.ClassType @>
 
 and private netTypeExpr compiler getTypeVar (t : Type) =
