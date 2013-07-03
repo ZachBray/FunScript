@@ -36,6 +36,11 @@ let private setIndexBoxed =
       <@ fun (xs:System.Array) (v : obj) (i : int) -> xs.SetValue(v, i) @> 
       (fun array value index -> Assign(IndexGet(array, index), value))
 
+[<JS>]
+module Extensions =
+   let getEnumeratorBoxed(xs : System.Array) =
+      (unbox<obj []> xs |> Array.toSeq).GetEnumerator()
+
 let components = 
    [ 
       [
@@ -48,6 +53,7 @@ let components =
          ExpressionReplacer.createUnsafe 
             <@ fun (t, s:int) -> System.Array.CreateInstance(t, s) @> 
             <@ fun (t, s:int) -> Core.Array.CreateInstance(t, s) @>
+         ExpressionReplacer.createUnsafe <@ fun (xs : System.Array) -> xs.GetEnumerator() @> <@ Extensions.getEnumeratorBoxed @>
          getIndexBoxed
          setIndexBoxed
          ExpressionReplacer.create <@ Array.toSeq @> <@ Core.Seq.OfArray @>

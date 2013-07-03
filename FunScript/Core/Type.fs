@@ -23,11 +23,20 @@ and TypeKind =
     | RecordType of Construct * PropertyInfo []
     | UnionType of UnionCaseInfo []
     | TupleType of Construct * Type[]
+    | ArrayType of Type
     
 and Type(name, fullName, typeArgs, kind) =
    member __.Name : string = name
    member __.FullName : string = fullName
    member __.GetGenericArguments() : Type[] = typeArgs
+   member __.IsArray =
+      match kind with
+      | ArrayType _ -> true
+      | _ -> false
+   member __.GetElementType() =
+      match kind with
+      | ArrayType t -> t
+      | _ -> failwith "Not an array type."
    member __.Kind : TypeKind = kind
 //   member __.IsGenericType = isGenericType
 //   member __.IsGenericTypeDefinition = isGenericTypeDefinition

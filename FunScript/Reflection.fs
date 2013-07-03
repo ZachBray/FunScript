@@ -125,6 +125,11 @@ and private getKind compiler getTypeVar t =
         let constructorLambda =
             Expr.Lambda(argsVar, Expr.Coerce(Expr.NewTuple vars, typeof<obj>))
         <@ Core.Type.TupleType(%%constructorLambda, %%tsExpr) @>
+    elif t.IsArray then
+        let elT = t.GetElementType()
+        let elTVar = getTypeVar elT
+        let elTExpr = Expr.Coerce(Expr.Var elTVar, typeof<Core.Type.Type>)
+        <@ Core.Type.ArrayType(%%elTExpr) @>
     else <@ Core.Type.ClassType @>
 
 and private netTypeExpr compiler getTypeVar (t : Type) =

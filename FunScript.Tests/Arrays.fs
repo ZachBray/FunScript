@@ -47,7 +47,7 @@ let ``Array.zeroCreate works``() =
       @@>
 
 [<Test>]
-let ``Array.CreateInstance works``() =
+let ``System.Array.CreateInstance works``() =
    check  
       <@@ 
          let xs = System.Array.CreateInstance(typeof<string>, 2)
@@ -56,6 +56,18 @@ let ``Array.CreateInstance works``() =
          // length doesn't seem to work properly in Jint
          // float xs.Length
          (unbox<string>(xs.GetValue 0)) + (unbox<string>(xs.GetValue 1))
+      @@>
+
+[<Test>]
+let ``System.Array.GetEnumerator works``() =
+   check  
+      <@@ 
+         let xs = System.Array.CreateInstance(typeof<string>, 2)
+         xs.SetValue("blah1", 0)
+         xs.SetValue("blah2", 1)
+         let acc = ref ""
+         for x in xs do acc := !acc + unbox<string> x
+         !acc
       @@>
 
 [<Test>]
