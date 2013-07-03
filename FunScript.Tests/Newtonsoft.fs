@@ -4,6 +4,7 @@ module FunScript.Tests.Newtonsoft
 open NUnit.Framework
 open System.IO
 open Newtonsoft.Json
+open Newtonsoft.Json.Linq
 
 [<Test>]
 let ``JsonTextWriter should emit the same for objects``() =
@@ -36,4 +37,26 @@ let ``JsonTextWriter should emit the same for arrays``() =
          jw.WriteValue 1.5
          jw.WriteEndArray()
          sw.ToString()
+      @@>
+
+
+[<Test>]
+let ``JToken.Parse, JToken.Values and JToken.Value should work the same on JSON objects``() =
+   check 
+      <@@
+         let token = JToken.Parse "[\"blah1\",\"blah2\",\"blah3\"]"
+         token.Values<JToken>()
+         |> Seq.map (fun t -> t.Value<string>())
+         |> String.concat ", "
+      @@>
+
+[<Test>]
+let ``JObject.Properties should work the same on JSON objects``() =
+   check 
+      <@@
+         let token = JToken.Parse "{\"my_field\" : \"blah\"}"
+         let obj = token :?> JObject
+         obj.Properties()
+         |> Seq.map (fun t -> t.Name + ":" + t.Value.Value<string>())
+         |> String.concat ", "
       @@>
