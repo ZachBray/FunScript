@@ -52,6 +52,9 @@ let SortWith f xs =
 [<JSEmit("return new Array({0});")>]
 let ZeroCreate (size:int) : 'a[] = failwith "never"
 
+let CreateInstance(_type : obj, size) =
+   ZeroCreate size : obj[]
+
 let Fill (xs:'a []) offset count value =
    for i = offset to offset + count - 1 do
       xs.[i] <- value

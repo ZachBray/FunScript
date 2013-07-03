@@ -47,6 +47,18 @@ let ``Array.zeroCreate works``() =
       @@>
 
 [<Test>]
+let ``Array.CreateInstance works``() =
+   check  
+      <@@ 
+         let xs = System.Array.CreateInstance(typeof<string>, 2)
+         xs.SetValue("blah1", 0)
+         xs.SetValue("blah2", 1)
+         // length doesn't seem to work properly in Jint
+         // float xs.Length
+         (unbox<string>(xs.GetValue 0)) + (unbox<string>(xs.GetValue 1))
+      @@>
+
+[<Test>]
 let ``Array.blit works``() =
    check  
       <@@ 
