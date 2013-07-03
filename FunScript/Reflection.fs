@@ -46,14 +46,14 @@ let getGenericMethodArgs (mb : MethodBase) =
    Array.append (getGenericTypeArgs mb.DeclaringType) methodTypeArgs
 
 let getSpecializationString (compiler : InternalCompiler.ICompiler) ts =
-   "_" + (
-      ts |> Seq.map (fun (t : Type) ->
-         //TODO: Name isn't safe. We really need to keep a dictionary around
-         // to make this safer. Using only the short names if there are no collisions.
-         if isPrimitive t then t.Name
-         elif compiler.ShouldFlattenGenericsForReflection then JavaScriptNameMapper.mapType t
-         else "obj"
-      ) |> String.concat "_")
+   ts |> Seq.map (fun (t : Type) ->
+      //TODO: Name isn't safe. We really need to keep a dictionary around
+      // to make this safer. Using only the short names if there are no collisions.
+      if isPrimitive t then t.Name
+      elif compiler.ShouldFlattenGenericsForReflection then JavaScriptNameMapper.mapType t
+      else "obj"
+   ) 
+   |> String.concat "_"
    |> JavaScriptNameMapper.sanitizeAux
 
 let getRecordConstructorName compiler (recType : System.Type) =

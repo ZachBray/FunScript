@@ -34,18 +34,31 @@ type CompilerComponent =
    | CompilerComponent of ICompilerComponent
 
 type Compiler(components, shouldFlattenGenericsForReflection) as this = 
+   let parameterKey (mb : MethodBase) =
+      mb.GetParameters() |> Array.map (fun pi ->
+         pi.ParameterType.Name)
    let key (mb:MethodBase) tt =
       mb.Name, mb.DeclaringType.Name, mb.DeclaringType.Namespace, tt
  
    let callerReplacers =
       components |> Seq.choose (function
-         | CallReplacer r -> Some (key r.Target r.TargetType, r)
-         | _ -> None) |> Map.ofSeq
+         | CallReplacer r -> Some r
+         | _ -> None) 
+      |> Seq.groupBy (fun r -> key r.Target r.TargetType)
+      |> Seq.map (fun (key, values) ->
+         key, values |> Seq.map (fun r -> parameterKey r.Target, r) |> Map.ofSeq)
+      |> Map.ofSeq
 
    let callerReplacements =
-      callerReplacers |> Seq.choose (fun (KeyValue(id, r)) -> 
-         r.Replacement |> Option.map (fun replacement ->
-            key r.Target r.TargetType, replacement))
+      callerReplacers |> Seq.choose (fun (KeyValue(id, rs)) ->
+         let replacements =
+            rs 
+            |> Map.map (fun k r -> r.Replacement)
+            |> Map.filter (fun k r -> r.IsSome)
+            |> Map.map (fun k r -> r.Value)
+         if replacements = Map.empty then
+            None
+         else Some (id, replacements))
       |> Map.ofSeq
 
    let rest = 
@@ -75,7 +88,12 @@ type Compiler(components, shouldFlattenGenericsForReflection) as this =
    let tryCompileCall callType returnStrategy mi obj exprs  =
       let this = this :> ICompiler
       match callerReplacers.TryFind (key mi callType) with
-      | Some r ->
+      | Some rs ->
+         let paramKey = parameterKey mi
+         let r =
+            match rs.TryFind paramKey with
+            | None -> (rs |> Seq.head).Value
+            | Some r -> r
          let typeArgs = getTypeArgs mi
          r.TryReplace this returnStrategy (obj, typeArgs, exprs)
       | None -> []
@@ -142,6 +160,13 @@ type Compiler(components, shouldFlattenGenericsForReflection) as this =
 
       member __.ReplacementFor (pi:MethodBase) targetType =
          callerReplacements.TryFind (key pi targetType)
+         |> Option.map (fun rs ->
+            let paramKey = parameterKey pi
+            let r =
+               match rs.TryFind paramKey with
+               | None -> (rs |> Seq.head).Value
+               | Some r -> r
+            r)
 
       member __.NextTempVar() = 
          incr nextId

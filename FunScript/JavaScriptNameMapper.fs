@@ -115,7 +115,7 @@ let rec private getBestTypeName (t : System.Type) =
       if t.IsGenericType || t.IsGenericTypeDefinition then
          t.GetGenericArguments()
       else [||]
-   t.Name + "$" + (args |> Seq.map getBestTypeName |> String.concat "_")
+   t.Name + "_" + (args |> Seq.map getBestTypeName |> String.concat "_")
 
 let (*internal*) mapType (t : System.Type) =
    sanitize t.FullName (getBestTypeName t)
@@ -125,10 +125,13 @@ let getBestMethodName (mb : MethodBase) =
       if mb.IsGenericMethod || mb.IsGenericMethodDefinition then
          mb.GetGenericArguments()
       else [||]
-   (mapType mb.DeclaringType) + "$M_" + mb.Name + "$" + (args |> Seq.map mapType |> String.concat "_")
+   (mapType mb.DeclaringType) + "_" + mb.Name + "$" + (args |> Seq.map mapType |> String.concat "_")
 
 let (*internal*) mapMethod mb =
    let suggestedName = getBestMethodName mb
+   let paramKey =
+      mb.GetParameters() |> Array.map (fun pi -> pi.ParameterType.Name)
+      |> String.concat ","
    let key =
-      mb.DeclaringType.FullName + suggestedName
+      mb.DeclaringType.FullName + suggestedName + "[" + paramKey + "]"
    sanitize key suggestedName

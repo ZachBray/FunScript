@@ -61,6 +61,7 @@
     <Compile Include="Asyncs.fs" />
     <Compile Include="Reflection.fs" />
     <Compile Include="StringWriter.fs" />
+    <Compile Include="Newtonsoft.fs" />
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
@@ -69,6 +70,9 @@
       <HintPath>..\ThirdParty\Jint.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\ThirdParty\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\ThirdParty\nunit.framework.dll</HintPath>
     </Reference>

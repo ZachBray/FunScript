@@ -107,6 +107,9 @@ let rec getInterfaces (t : System.Type) =
    |]
 
 let createTypeMethodMappings (fromType:Type) (toType:Type) =
+   let parameterKey (mb : MethodBase) =
+      mb.GetParameters() |> Array.map (fun pi ->
+         pi.ParameterType.Name)
    let methodLookup = 
       let methods =
          toType.GetMethods(BindingFlags.Instance ||| BindingFlags.Static ||| BindingFlags.NonPublic ||| BindingFlags.Public)
@@ -114,24 +117,28 @@ let createTypeMethodMappings (fromType:Type) (toType:Type) =
          getInterfaces toType
          |> Array.collect (fun it -> toType.GetInterfaceMap(it).TargetMethods)
       Array.append methods interfaceMethods 
-      |> Array.map (fun mi -> mi.Name, mi) 
-      |> Map.ofArray
+      |> Seq.filter (Expr.TryGetReflectedDefinition >> Option.isSome)
+      |> Seq.groupBy (fun mi -> mi.Name)
+      |> Seq.map (fun (key, values) -> 
+         key, values |> Seq.map (fun mi -> parameterKey mi, mi) |> Map.ofSeq)
+      |> Map.ofSeq
    let availableMethods =
       fromType.GetMethods(BindingFlags.Instance ||| BindingFlags.Static ||| BindingFlags.NonPublic ||| BindingFlags.Public)
       |> Array.choose (fun mi ->
          match methodLookup.TryFind mi.Name with
-         | Some replacementMi -> 
-            match Expr.TryGetReflectedDefinition replacementMi with
-            | Some _ -> 
-               let replacementMi =
-                  if mi.IsGenericMethod then
-                     if replacementMi.IsGenericMethod then
-                        replacementMi.MakeGenericMethod(mi.GetGenericArguments())
-                     else
-                        replacementMi
-                  else replacementMi
-               Some <| createMethodMap mi Quote.MethodCall replacementMi
-            | None -> None
+         | Some replacementMis ->
+            let replacementMi =
+               match replacementMis.TryFind (parameterKey mi) with
+               | Some replacementMi -> replacementMi
+               | None -> (replacementMis |> Seq.head).Value
+            let replacementMi =
+               if mi.IsGenericMethod then
+                  if replacementMi.IsGenericMethod then
+                     replacementMi.MakeGenericMethod(mi.GetGenericArguments())
+                  else
+                     replacementMi
+               else replacementMi
+            Some <| createMethodMap mi Quote.MethodCall replacementMi
          | None -> None)
       |> Array.toList
    availableMethods

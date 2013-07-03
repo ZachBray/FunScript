@@ -63,9 +63,7 @@ let private createConstruction
    match ci with
    | ReflectedDefinition name ->
       //TODO: Generic types will have typeArgs we need to deal with here.
-      let typeArgs = Reflection.getGenericMethodArgs ci
-      let specialization = Reflection.getSpecializationString compiler typeArgs
-      let consRef = createGlobalMethod (name + specialization) compiler ci Quote.ConstructorCall
+      let consRef = createGlobalMethod name compiler ci Quote.ConstructorCall
       [ yield! decls |> List.concat
         yield returnStategy.Return <| New(consRef.Name, refs) ]
    | _ -> []
@@ -93,9 +91,7 @@ let private createCall
    | SpecialOp((ReflectedDefinition name) as mi)
    | (ReflectedDefinition name as mi) ->
       // TODO: What about interfaces!
-      let typeArgs = Reflection.getGenericMethodArgs mi
-      let specialization = Reflection.getSpecializationString compiler typeArgs
-      let methRef = createGlobalMethod (name + specialization) compiler mi Quote.MethodCall
+      let methRef = createGlobalMethod name compiler mi Quote.MethodCall
       [  yield! decls |> List.concat
          yield returnStategy.Return <| Apply(Reference methRef, refs) ]
    | _ -> []
