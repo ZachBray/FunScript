@@ -62,7 +62,7 @@ type JToken(obj : obj) =
    static member Parse(str : string) = JToken(parse str)
 
    //JObject(...)
-   member __.Item name = JToken(obj |> get name)
+   member __.Property name = JProperty (name, obj |> get name)
    member __.Properties() = 
       obj |> getProps |> Seq.map (fun name ->
          JProperty(name, obj |> get name))
