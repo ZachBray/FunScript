@@ -63,7 +63,7 @@
     <Compile Include="FunctionHelpers.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
-    <None Include="Index.html">
+    <None Include="index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Site.css">
