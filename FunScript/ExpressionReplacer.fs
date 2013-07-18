@@ -7,7 +7,7 @@ open System.Reflection
 open System
 
 let private buildInlineReplacement (mi:MethodBase) (args:_ list) =
-   match Expr.TryGetReflectedDefinition mi with
+   match Expr.tryGetReflectedDefinition mi with
    | Some (DerivedPatterns.Lambdas(vars, bodyExpr)) -> 
       let appliedVars = 
          vars |> List.concat |> Seq.take args.Length
@@ -117,7 +117,7 @@ let createTypeMethodMappings (fromType:Type) (toType:Type) =
          getInterfaces toType
          |> Array.collect (fun it -> toType.GetInterfaceMap(it).TargetMethods)
       Array.append methods interfaceMethods 
-      |> Seq.filter (Expr.TryGetReflectedDefinition >> Option.isSome)
+      |> Seq.filter (Expr.tryGetReflectedDefinition >> Option.isSome)
       |> Seq.groupBy (fun mi -> mi.Name)
       |> Seq.map (fun (key, values) -> 
          key, values |> Seq.map (fun mi -> parameterKey mi, mi) |> Map.ofSeq)

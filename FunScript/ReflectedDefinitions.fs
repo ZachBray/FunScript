@@ -15,7 +15,7 @@ let private (|NonNull|_|) x =
 let private (|ReflectedDefinition|_|) (mi:MethodBase) =
    if mi.DeclaringType.IsInterface then Some mi.Name
    else
-      match Expr.TryGetReflectedDefinition mi with
+      match Expr.tryGetReflectedDefinition mi with
       | Some _ -> Some(JavaScriptNameMapper.mapMethod mi)
       | _ -> None
 

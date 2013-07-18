@@ -11,7 +11,7 @@ let rec private isAvailable (compiler : InternalCompiler.ICompiler) (mb : Method
          let t = mb.DeclaringType
          FSharpType.IsUnion(t, BindingFlags.Public ||| BindingFlags.NonPublic)  || 
          FSharpType.IsRecord(t, BindingFlags.Public ||| BindingFlags.NonPublic) || 
-         Expr.TryGetReflectedDefinition(mb).IsSome ||
+         Expr.tryGetReflectedDefinition(mb).IsSome ||
          compiler.ReplacementFor mb Quote.CallType.MethodCall |> Option.exists (isAvailable compiler))
 
 let private propertyGetter =
@@ -58,7 +58,7 @@ let replaceIfAvailable (compiler:InternalCompiler.ICompiler) (mb : MethodBase) c
 
 let methodCallPattern (mb:MethodBase) =
    let argCounts = mb.GetCustomAttribute<CompilationArgumentCountsAttribute>()
-   match Expr.TryGetReflectedDefinition mb with
+   match Expr.tryGetReflectedDefinition mb with
    | Some (DerivedPatterns.Lambdas(vars, bodyExpr)) 
       when argCounts <> Unchecked.defaultof<_>
            && mb.IsStatic ->

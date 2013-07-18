@@ -49,10 +49,10 @@ type UnfoldEnumerator<'acc, 'a>(seed:'acc, unfold) =
       member __.Current: obj = current :> obj
 
       member __.MoveNext() =
-         match acc with
-         | None -> false
-         | Some currAcc ->
-            match unfold currAcc with
+         let next() =
+            let currAcc = acc.Value
+            let x = unfold currAcc
+            match x with
             | None -> 
                acc <- None
                current <- Unchecked.defaultof<_>
@@ -61,6 +61,24 @@ type UnfoldEnumerator<'acc, 'a>(seed:'acc, unfold) =
                acc <- Some nextAcc
                current <- value
                true
+         if acc.IsSome then next()
+         else false
+
+// TODO: Work out problem with this:-
+//
+//      member __.MoveNext() =
+//         match acc with
+//         | None -> false
+//         | Some currAcc ->
+//            match unfold currAcc with
+//            | None -> 
+//               acc <- None
+//               current <- Unchecked.defaultof<_>
+//               false
+//            | Some (value, nextAcc) ->
+//               acc <- Some nextAcc
+//               current <- value
+//               true
             
       member __.Dispose() = ()
 
@@ -102,7 +120,7 @@ let Skip n xs =
       for i = 1 to n do enum.MoveNext() |> ignore<bool>
       enum)
 
-let Empty<'a> =
+let Empty<'a> : 'a seq =
     Unfold (fun _ -> None) false
 
 let Length xs =
@@ -312,7 +330,7 @@ let OfList xs =
       | x::xs -> Some(x, xs))
 
 let ToArray xs =
-   let ys = FunScript.Core.Array.ZeroCreate (Length xs)
+   let ys = FunScript.Core.Array.ZeroCreate 0// (Length xs)
    xs |> IterateIndexed (fun i x -> ys.[i] <- x)
    ys
 
@@ -422,9 +440,7 @@ let CountBy f xs =
    |> Map (fun (k, vs) -> k, Length vs)
 
 let Concat xs =
-   let first = Head xs
-   let rest = Skip 1 xs
-   Fold Append (first :> _ seq) rest
+   Fold Append Empty<_> xs
 
 let Collect f xs =
    Map f xs |> Concat

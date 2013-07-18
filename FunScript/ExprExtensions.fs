@@ -1,6 +1,18 @@
 ﻿module internal FunScript.Expr
 
+open System.Reflection
+open System.Collections.Generic
 open Microsoft.FSharp.Quotations
+
+let memoize f =
+    let cache = Dictionary(HashIdentity.Reference)
+    fun x ->
+        match cache.TryGetValue x with
+        | true, v -> v
+        | false, _ ->
+            let v = f x
+            cache.Add(x, v)
+            v
 
 let iter f expr =
    let rec iter expr =
@@ -22,3 +34,6 @@ let exists f expr =
          | ExprShape.ShapeCombination (_, exprs) ->
             exprs |> List.exists exists
    exists expr
+
+let tryGetReflectedDefinition : MethodBase -> Expr option =
+    memoize Expr.TryGetReflectedDefinition
