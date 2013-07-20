@@ -170,7 +170,7 @@ type Compiler(components, shouldFlattenGenericsForReflection) as this =
 
       member __.NextTempVar() = 
          incr nextId
-         Var(sprintf "_temp%i" !nextId, typeof<obj>, false) 
+         Var(sprintf "_%i" !nextId, typeof<obj>, false) 
          
       member __.DefineGlobal name cons =
          define name cons

@@ -29,9 +29,14 @@ let private whileLoop =
    CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
       let (|Return|) = compiler.Compile
       function
-      | Patterns.WhileLoop(Split(condDecl, condRef), Return ReturnStrategies.inplace block) ->
-         [ yield! condDecl
-           yield WhileLoop(condRef, Block block)
+      | Patterns.WhileLoop(condExpr, Return ReturnStrategies.inplace block) ->
+         //TODO: Don't use a lambda when it is uneccessary! PERF!
+         let condBody = compiler.Compile ReturnStrategies.returnFrom condExpr
+         let condLambda = Lambda([], Block condBody)
+         let condVar = compiler.NextTempVar()
+         [ 
+           yield DeclareAndAssign(condVar, condLambda)
+           yield WhileLoop(Apply(Reference condVar, []), Block block)
          ]
       | _ -> []
 

@@ -7,12 +7,14 @@ open Microsoft.FSharp.Quotations
 /// This is to cope with nested stuff that is supported in F#
 /// but not JS. For example, f(if x then y else z)
 let private splitDeclarationFromUsageIfNeeded (compiler:ICompiler) expr =
-   let firstAttempt = compiler.Compile ReturnStrategies.inplace expr
-   match firstAttempt with
-   | Do expr::[] -> [], expr
-   | DeclareAndAssign(var, valExpr)::Do(Reference(var2) as refExpr)::[] when var = var2 ->
-      [], valExpr
-   | multipleStatements ->
+// Need to push this optimization into the return strategy to improve compilation PERF.
+// At the moment we are generating horrible JS because we've removed this.
+//   let firstAttempt = compiler.Compile ReturnStrategies.inplace expr
+//   match firstAttempt with
+//   | Do expr::[] -> [], expr
+//   | DeclareAndAssign(var, valExpr)::Do(Reference(var2) as refExpr)::[] when var = var2 ->
+//      [], valExpr
+//   | multipleStatements ->
       let var = compiler.NextTempVar()
       let declsAndRef =
          [  yield Declare [var]
