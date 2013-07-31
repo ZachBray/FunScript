@@ -13,7 +13,6 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FunScript.TypeScript.Intero
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FunScript.Compiler", "FunScript.Compiler\FunScript.Compiler.fsproj", "{4AAD0F56-AF0F-46BD-811E-FEC88EBED669}"
 EndProject
-
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
