@@ -41,6 +41,14 @@ let ``String.Replace works``() =
       @@>
 
 [<Test>]
+let ``String.Replace does not get stuck in endless loop``() =
+   checkAreEqual "......" 
+      <@@ 
+         "...".Replace(".", "..")
+      @@>
+
+
+[<Test>]
 let ``String.IndexOf works``() =
    check 
       <@@ 

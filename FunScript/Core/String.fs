@@ -17,7 +17,7 @@ let ToLowerCase(s:string) : string = failwith "never"
 let ToUpperCase(s:string) : string = failwith "never"
 
 [<FunScript.JSEmit("return ({0}==null)||({0}==\"\");")>]
-let IsNullOrEmpty(s:string) : string = failwith "never"
+let IsNullOrEmpty(s:string) : bool = failwith "never"
 
 [<FunScript.JSEmit("return {0}.length;")>]
 let Length(s:string) : int = failwith "never"
@@ -32,15 +32,14 @@ let Split(s:string, delimiters:string[]) : string[] =
    delimiters |> Array.fold (fun inputs delimiter ->
       inputs |> Array.map (fun inp -> splitSingle(inp, delimiter))
              |> Array.concat) [| s |]
-
-let Replace(s:string, search:string, replace:string) : string = 
-   let mutable res = s
-   while res.IndexOf(search) > -1 do
-      res <- replaceSingle(res, search, replace)
-   res 
+  
 
 [<FunScript.JSEmit("return {1}.join({0});")>]
 let Join(separator:string, s:string[]) : string = failwith "never"
+
+let Replace(s:string, search:string, replace:string) : string = 
+    let splits = splitSingle(s, search)
+    Join(replace,splits)
 
 [<FunScript.JSEmit("return {0};")>]
 let ToCharArray(str:string) : char[] = failwith "never"

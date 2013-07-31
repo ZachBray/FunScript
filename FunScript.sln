@@ -13,6 +13,13 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FunScript.TypeScript.Intero
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FunScript.Compiler", "FunScript.Compiler\FunScript.Compiler.fsproj", "{4AAD0F56-AF0F-46BD-811E-FEC88EBED669}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{FAF6BB78-747F-43DA-892B-A8A84B3FD7BB}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
