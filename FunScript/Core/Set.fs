@@ -33,7 +33,7 @@ type SetTree<'T> when 'T : comparison =
       // ~6 and 3 words respectively. 
 
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
-module internal SetTree = 
+module SetTree = 
    let rec countAux s acc = 
       match s with 
       | SetNode(_,l,r,_) -> countAux l (countAux r (acc+1))
@@ -474,11 +474,11 @@ module internal SetTree =
 
 type Set<[<EqualityConditionalOn>]'T when 'T : comparison >(comparer:IComparer<'T>, tree: SetTree<'T>) = 
 
-   [<System.NonSerialized>]
+   //[<System.NonSerialized>]
    // NOTE: This type is logically immutable. This field is only mutated during deserialization. 
    let mutable comparer = comparer 
         
-   [<System.NonSerialized>]
+   //[<System.NonSerialized>]
    // NOTE: This type is logically immutable. This field is only mutated during deserialization. 
    let mutable tree = tree  
         
@@ -492,9 +492,9 @@ type Set<[<EqualityConditionalOn>]'T when 'T : comparison >(comparer:IComparer<'
    // We use .NET generics per-instantiation static fields to avoid allocating a new object for each empty
    // set (it is just a lookup into a .NET table of type-instantiation-indexed static fields).
 
-   member internal set.Comparer = comparer
+   member set.Comparer = comparer
    //[<DebuggerBrowsable(DebuggerBrowsableState.Never)>]
-   member internal set.Tree : SetTree<'T> = tree
+   member set.Tree : SetTree<'T> = tree
 
    static member Empty : Set<'T> = 
       let comparer = GenericComparer<'T>()

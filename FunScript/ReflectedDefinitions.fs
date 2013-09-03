@@ -171,7 +171,6 @@ let private fieldSetting =
            yield Assign(PropertyGet(Reference (Var.Global(name, typeof<obj>)), JavaScriptNameMapper.sanitizeAux fi.Name), valRef) ]
       | _ -> []
 
-let private objectGuid = typeof<obj>.GUID
 let private objectName = typeof<obj>.FullName
 
 let private constructingInstances =
@@ -179,8 +178,7 @@ let private constructingInstances =
       function
       | PatternsExt.NewObject(ci, exprs) -> 
          let declaringType = ci.DeclaringType
-         if declaringType.GUID = objectGuid &&
-            declaringType.FullName = objectName 
+         if declaringType.FullName = objectName 
          then [ Scope <| Block [] ]
          else createConstruction split returnStategy compiler [exprs] ci
       | _ -> []

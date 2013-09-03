@@ -19,8 +19,8 @@ let components =
       ]
       ExpressionReplacer.createModuleMapping 
          "FSharp.Core" "Microsoft.FSharp.Core.StringModule"
-         "FunScript" "FunScript.Core.String.FSharpString"
+         thisAssembly "FunScript.Core.String.FSharpString"
       ExpressionReplacer.createModuleMapping 
          "mscorlib" "System.String"
-         "FunScript" "FunScript.Core.String"
+         thisAssembly "FunScript.Core.String"
    ] |> List.concat

@@ -24,7 +24,10 @@ let private withoutComments(stream:StreamReader) =
 
    and ignoreLine() =
       if not stream.EndOfStream then
+#if SILVERLIGHT
+#else
          printf "*"
+#endif
          match consume() with
          | '\n' -> read()
          | _ -> ignoreLine()

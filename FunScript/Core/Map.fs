@@ -381,11 +381,11 @@ module MapTree =
 type Map<[<EqualityConditionalOn>]'Key,[<EqualityConditionalOn;ComparisonConditionalOn>]'Value when 'Key : comparison >
       (comparer: IComparer<'Key>, tree: MapTree<'Key,'Value>) =
 
-   [<System.NonSerialized>]
+   //[<System.NonSerialized>]
    // This type is logically immutable. This field is only mutated during deserialization. 
    let mutable comparer = comparer 
         
-   [<System.NonSerialized>]
+   //[<System.NonSerialized>]
    // This type is logically immutable. This field is only mutated during deserialization. 
    let mutable tree = tree  
 
@@ -403,9 +403,9 @@ type Map<[<EqualityConditionalOn>]'Key,[<EqualityConditionalOn;ComparisonConditi
       let comparer = GenericComparer<'Key>()
       new Map<_,_>(comparer,MapTree.ofSeq comparer ie)
     
-   member internal m.Comparer = comparer
+   member m.Comparer = comparer
    //[<DebuggerBrowsable(DebuggerBrowsableState.Never)>]
-   member internal m.Tree = tree
+   member m.Tree = tree
    member m.Add(k,v) : Map<'Key,'Value> = 
       new Map<'Key,'Value>(comparer,MapTree.add comparer k v tree)
    member m.IsEmpty = MapTree.isEmpty tree

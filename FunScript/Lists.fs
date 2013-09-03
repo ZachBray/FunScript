@@ -21,5 +21,5 @@ let components =
       ]
       ExpressionReplacer.createModuleMapping 
          "FSharp.Core" "Microsoft.FSharp.Collections.ListModule"
-         "FunScript" "FunScript.Core.List"
+         thisAssembly "FunScript.Core.List"
    ] |> List.concat

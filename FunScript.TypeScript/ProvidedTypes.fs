@@ -38,10 +38,14 @@ module Misc =
     let nonNull str x = if x=null then failwith ("Null in " + str) else x
     let notRequired opname item = 
         let msg = sprintf "The operation '%s' on item '%s' should not be called on provided type, member or parameter" opname item
+#if SILVERLIGHT
+#else
         if isAssertOn then
             System.Diagnostics.Debug.Assert (false, msg)
+#endif
         raise (System.NotSupportedException msg)
-
+#if SILVERLIGHT
+#else
     let mkEditorHideMethodsCustomAttributeData() = 
         { new CustomAttributeData() with 
                 member __.Constructor =  typeof<TypeProviderEditorHideMethodsAttribute>.GetConstructors().[0]
@@ -97,7 +101,7 @@ module Misc =
             [| yield! customAttributesOnce.Force()
                match xmlDocAlwaysRecomputed with None -> () | Some f -> customAttributes.Add(mkXmlDocCustomAttributeData (f()))  |]
             :> IList<_>
-
+#endif
 
     let transQuotationToCode qexprf (argExprs: Quotations.Expr[]) = 
         let expr = qexprf (Array.toList argExprs)
@@ -158,10 +162,13 @@ module Misc =
 type ProvidedStaticParameter(parameterName:string,parameterType:Type,?parameterDefaultValue:obj) = 
     inherit System.Reflection.ParameterInfo()
 
+#if SILVERLIGHT
+#else
     let customAttributesImpl = CustomAttributesImpl()
     member __.AddXmlDocDelayed(xmlDoc : unit -> string) = customAttributesImpl.AddXmlDocDelayed xmlDoc
     member __.AddXmlDocComputed(xmlDoc : unit -> string) = customAttributesImpl.AddXmlDocComputed xmlDoc
     member this.AddXmlDoc(text:string) = customAttributesImpl.AddXmlDoc text
+#endif
 
     override __.RawDefaultValue = defaultArg parameterDefaultValue null
     override __.Attributes = if parameterDefaultValue.IsNone then enum 0 else ParameterAttributes.Optional
@@ -174,14 +181,20 @@ type ProvidedStaticParameter(parameterName:string,parameterType:Type,?parameterD
 
 type ProvidedParameter(name:string,parameterType:Type,?isOut:bool,?optionalValue:obj) = 
     inherit System.Reflection.ParameterInfo()
+#if SILVERLIGHT
+#else
     let customAttributesImpl = CustomAttributesImpl()
+#endif
     let isOut = defaultArg isOut false
     override this.Name = name
     override this.ParameterType = parameterType
     override this.Attributes = (base.Attributes ||| (if isOut then ParameterAttributes.Out else enum 0)
                                                 ||| (match optionalValue with None -> enum 0 | Some _ -> ParameterAttributes.Optional ||| ParameterAttributes.HasDefault))
     override this.RawDefaultValue = defaultArg optionalValue null
+#if SILVERLIGHT
+#else
     override __.GetCustomAttributesData() = customAttributesImpl.GetCustomAttributesData()
+#endif
 
 type ProvidedConstructor(parameters : ProvidedParameter list) = 
     inherit ConstructorInfo()
@@ -190,7 +203,8 @@ type ProvidedConstructor(parameters : ProvidedParameter list) =
     let mutable declaringType = null : System.Type
     let mutable invokeCode    = None : option<Quotations.Expr[] -> Quotations.Expr>
     let nameText () = sprintf "constructor for %s" (if declaringType=null then "<not yet known type>" else declaringType.FullName)
-
+#if SILVERLIGHT
+#else
     let customAttributesImpl = CustomAttributesImpl()
     member this.AddXmlDocComputed xmlDoc                    = customAttributesImpl.AddXmlDocComputed xmlDoc
     member this.AddXmlDocDelayed xmlDoc                     = customAttributesImpl.AddXmlDocDelayed xmlDoc
@@ -198,6 +212,7 @@ type ProvidedConstructor(parameters : ProvidedParameter list) =
     member this.AddDefinitionLocation(line,column,filePath) = customAttributesImpl.AddDefinitionLocation(line, column, filePath)
     member this.HideObjectMethods with set v                = customAttributesImpl.HideObjectMethods <- v
     override this.GetCustomAttributesData()                 = customAttributesImpl.GetCustomAttributesData()
+#endif
 
     member this.DeclaringTypeImpl 
         with set x = 
@@ -241,12 +256,15 @@ type ProvidedMethod(methodName: string, parameters: ProvidedParameter list, retu
     let mutable methodAttrs   = MethodAttributes.Public
     let mutable invokeCode    = None : option<Quotations.Expr[] -> Quotations.Expr>
 
+#if SILVERLIGHT
+#else
     let customAttributesImpl = CustomAttributesImpl()
     member this.AddXmlDocComputed xmlDoc                    = customAttributesImpl.AddXmlDocComputed xmlDoc
     member this.AddXmlDocDelayed xmlDoc                     = customAttributesImpl.AddXmlDocDelayed xmlDoc
     member this.AddXmlDoc xmlDoc                            = customAttributesImpl.AddXmlDoc xmlDoc
     member this.AddDefinitionLocation(line,column,filePath) = customAttributesImpl.AddDefinitionLocation(line, column, filePath)
     override this.GetCustomAttributesData()                 = customAttributesImpl.GetCustomAttributesData()
+#endif
 
     member this.SetMethodAttrs m = methodAttrs <- m 
     member this.AddMethodAttrs m = methodAttrs <- methodAttrs ||| m
@@ -310,13 +328,16 @@ type ProvidedProperty(propertyName:string,propertyType:Type, ?parameters:Provide
     let markSpecialName (m:ProvidedMethod) = m.AddMethodAttrs(MethodAttributes.SpecialName); m
     let getter = lazy (ProvidedMethod("get_" + propertyName,parameters,propertyType,IsStaticMethod=isStatic,DeclaringTypeImpl=declaringType,InvokeCodeInternal=getterCode.Value) |> markSpecialName)  
     let setter = lazy (ProvidedMethod("set_" + propertyName,parameters @ [ProvidedParameter("value",propertyType)],typeof<System.Void>,IsStaticMethod=isStatic,DeclaringTypeImpl=declaringType,InvokeCodeInternal=setterCode.Value) |> markSpecialName) 
- 
+
+#if SILVERLIGHT
+#else
     let customAttributesImpl = CustomAttributesImpl()
     member this.AddXmlDocComputed xmlDoc                    = customAttributesImpl.AddXmlDocComputed xmlDoc
     member this.AddXmlDocDelayed xmlDoc                     = customAttributesImpl.AddXmlDocDelayed xmlDoc
     member this.AddXmlDoc xmlDoc                            = customAttributesImpl.AddXmlDoc xmlDoc
     member this.AddDefinitionLocation(line,column,filePath) = customAttributesImpl.AddDefinitionLocation(line, column, filePath)
     override this.GetCustomAttributesData()                 = customAttributesImpl.GetCustomAttributesData()
+#endif
 
     member this.DeclaringTypeImpl with set x = declaringType <- x // check: not set twice
     member this.IsStatic 
@@ -365,12 +386,15 @@ type ProvidedLiteralField(fieldName:string,fieldType:Type,literalValue:obj) =
 
     let mutable declaringType = null
 
+#if SILVERLIGHT
+#else
     let customAttributesImpl = CustomAttributesImpl()
     member this.AddXmlDocComputed xmlDoc                    = customAttributesImpl.AddXmlDocComputed xmlDoc
     member this.AddXmlDocDelayed xmlDoc                     = customAttributesImpl.AddXmlDocDelayed xmlDoc
     member this.AddXmlDoc xmlDoc                            = customAttributesImpl.AddXmlDoc xmlDoc
     member this.AddDefinitionLocation(line,column,filePath) = customAttributesImpl.AddDefinitionLocation(line, column, filePath)
     override this.GetCustomAttributesData()                 = customAttributesImpl.GetCustomAttributesData()
+#endif
 
     member this.DeclaringTypeImpl with set x = declaringType <- x // check: not set twice
 
@@ -482,7 +506,10 @@ type ProvidedSymbolType(kind: SymbolKind, args: Type list) =
           this :> System.Type 
 
       | _ -> notRequired "UnderlyingSystemType" this.Name
+#if SILVERLIGHT
+#else
     override this.GetCustomAttributesData()                                                        = notRequired "GetCustomAttributesData" this.Name
+#endif
     override this.MemberType                                                                       = notRequired "MemberType" this.Name
     override this.GetHashCode()                                                                    = notRequired "GetHashCode" this.Name
     override this.Equals(_that:obj) : bool                                                        = 
@@ -614,9 +641,11 @@ type ProvidedTypeDefinition(container:TypeContainer,className : string, baseType
         | :? ProvidedLiteralField as l -> l.DeclaringTypeImpl <- this
         | _ -> ()
 
-    let customAttributesImpl = CustomAttributesImpl()
-
     static let mutable cache = Map.empty
+
+#if SILVERLIGHT
+#else
+    let customAttributesImpl = CustomAttributesImpl()
 
     member this.AddXmlDocComputed xmlDoc                    = customAttributesImpl.AddXmlDocComputed xmlDoc
     member this.AddXmlDocDelayed xmlDoc                     = customAttributesImpl.AddXmlDocDelayed xmlDoc
@@ -624,6 +653,7 @@ type ProvidedTypeDefinition(container:TypeContainer,className : string, baseType
     member this.AddDefinitionLocation(line,column,filePath) = customAttributesImpl.AddDefinitionLocation(line, column, filePath)
     member this.HideObjectMethods with set v                = customAttributesImpl.HideObjectMethods <- v
     override this.GetCustomAttributesData()                 = customAttributesImpl.GetCustomAttributesData()
+#endif
 
     new (assembly:Assembly,namespaceName,className,baseType) = new ProvidedTypeDefinition(TypeContainer.Namespace (assembly,namespaceName), className, baseType)
     new (className,baseType) = new ProvidedTypeDefinition(TypeContainer.TypeToBeDecided, className, baseType)
@@ -857,6 +887,8 @@ type ProvidedTypeDefinition(container:TypeContainer,className : string, baseType
            if v then attributes <- attributes ||| enum (int32 TypeProviderTypeAttributes.SuppressRelocate)
            else attributes <- attributes &&& ~~~(enum (int32 TypeProviderTypeAttributes.SuppressRelocate))
 
+#if SILVERLIGHT
+#else
     static member RegisterGenerated (fileName:string) = 
         let assemblyBytes = System.IO.File.ReadAllBytes fileName
         let assembly = Assembly.Load(assemblyBytes,null,System.Security.SecurityContextSource.CurrentAppDomain)
@@ -1181,7 +1213,7 @@ type ProvidedTypeDefinition(container:TypeContainer,className : string, baseType
               assemblyLoadedInMemory
 
         theAssembly <- theElementsLazy
-
+#endif
 
 module Local = 
 
@@ -1254,9 +1286,16 @@ type TypeProviderForNamespaces(namespacesAndTypes : list<(string * list<Provided
             | _ -> failwith (sprintf "ApplyStaticArguments: static params for type %s are unexpected" ty.FullName)
 
         override x.GetGeneratedAssemblyContents(assembly) = 
+         
             match GlobalProvidedAssemblyElementsTable.theTable.TryGetValue assembly with 
             | true,bytes -> bytes
             | _ -> 
+#if SILVERLIGHT
+                let bytes = System.IO.File.ReadAllBytes assembly.ManifestModule.Assembly.CodeBase
+                GlobalProvidedAssemblyElementsTable.theTable.[assembly] <- bytes
+                bytes
+#else
                 let bytes = System.IO.File.ReadAllBytes assembly.ManifestModule.FullyQualifiedName
                 GlobalProvidedAssemblyElementsTable.theTable.[assembly] <- bytes
                 bytes
+#endif

@@ -30,3 +30,9 @@ type System.Reflection.PropertyInfo with
       t.GetCustomAttributes(true)
       |> findAttribute<'attr>
       
+
+#if SILVERLIGHT
+let thisAssembly = "FunScript.Silverlight"
+#else
+let thisAssembly = "FunScript"
+#endif

@@ -2,6 +2,37 @@
 
 open Microsoft.FSharp.Quotations
 
+module HttpUtility =
+    open System
+    open System.Text
+    open System.Globalization
+    
+    let EncodeCharAsUnicodeJavaScript (sb : StringBuilder, c : char) =
+        sb.Append("\\u")
+          .Append(((int) c).ToString("x4", CultureInfo.InvariantCulture))
+
+    let JavaScriptStringEncode value =
+        if String.IsNullOrEmpty value then String.Empty
+        else
+            let rec convert (builder : StringBuilder) index =
+                if index >= value.Length then builder.ToString()
+                else
+                    let c = value.[index]
+                    let builder =
+                        match c with
+                        | '&' | '\'' | '<' | '>' -> EncodeCharAsUnicodeJavaScript(builder, c)
+                        | c when int c < 32 -> EncodeCharAsUnicodeJavaScript(builder, c)
+                        | '\\' -> builder.Append("\\\\")
+                        | '\b' -> builder.Append("\\b")
+                        | '\t' -> builder.Append("\\t")
+                        | '\n' -> builder.Append("\\n")
+                        | '\f' -> builder.Append("\\f")
+                        | '\r' -> builder.Append("\\r")
+                        | '"' -> builder.Append("\\\"")
+                        | _ -> builder.Append c
+                    convert builder (index + 1)
+            convert (StringBuilder()) 0
+
 let indent n = String.init n (fun _ -> "  ")
 
 let (|Newline|) padding =
@@ -67,7 +98,7 @@ type JSExpr =
       | Null -> "null"
       | Boolean b -> b.ToString().ToLower()
       | Number f -> sprintf "%f" f
-      | String str -> sprintf @"""%s""" (System.Web.HttpUtility.JavaScriptStringEncode(str))
+      | String str -> sprintf @"""%s""" (HttpUtility.JavaScriptStringEncode str)
       | Reference ref -> (!scope).ObtainNameScope ref FromReference |> fst
       | UnsafeReference ref -> ref
       | This -> "this"

@@ -203,6 +203,6 @@ let components =
       
       ExpressionReplacer.createModuleMapping 
          "FSharp.Core" "Microsoft.FSharp.Core.LanguagePrimitives.IntrinsicFunctions"
-         "FunScript" "FunScript.Core.LanguagePrimitives"
+         thisAssembly "FunScript.Core.LanguagePrimitives"
 
    ] |> List.concat

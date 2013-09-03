@@ -8,5 +8,5 @@ let components =
       ]
       ExpressionReplacer.createModuleMapping
          "FSharp.Core" "Microsoft.FSharp.Core.OptionModule"
-         "FunScript" "FunScript.Core.Option"
+         thisAssembly "FunScript.Core.Option"
    ] |> List.concat

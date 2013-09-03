@@ -146,7 +146,12 @@ let createTypeMethodMappings (fromType:Type) (toType:Type) =
 let private getModule assembly (name:string) =
    let ass =
       AppDomain.CurrentDomain.GetAssemblies()
+#if SILVERLIGHT
+      // TODO: Make this safer. E.g., consider System and System.Core.
+      |> Seq.find (fun ass -> ass.FullName.StartsWith(assembly + ",") || ass.FullName = assembly)
+#else
       |> Seq.find (fun ass -> ass.GetName().Name = assembly)
+#endif
    let split (name:string) =
       let i = name.LastIndexOf '.'
       if i >= 0 then Some(name.Substring(0, i), name.Substring (i+1))

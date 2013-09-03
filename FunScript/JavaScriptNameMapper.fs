@@ -76,7 +76,7 @@ let filterUnsafe str =
    else str
 
 let sanitizeAux(str:string) =
-   str |> Seq.map (function
+   str.ToCharArray() |> Seq.map (function
       | c when (c >= 'a' && c <= 'z') || 
                (c >= '0' && c <= '9') ||
                (c >= 'A' && c <= 'Z') ||

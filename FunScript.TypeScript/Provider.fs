@@ -9,7 +9,11 @@ open Samples.FSharp.ProvidedTypes
 open System.IO
 open System
 open System.Net
+
+#if SILVERLIGHT
+#else
 open System.Net.Security
+#endif
 
 [<AutoOpen>]
 module private Helpers =
@@ -20,11 +24,17 @@ module private Helpers =
    let openFileOrUri resolutionFolder (fileName:string) =
       if fileName.StartsWith("http://", StringComparison.InvariantCultureIgnoreCase) ||
          fileName.StartsWith("https://", StringComparison.InvariantCultureIgnoreCase) then
+#if SILVERLIGHT
+         let req = System.Net.WebRequest.Create(Uri(fileName))
+         let resp = Async.RunSynchronously(req.AsyncGetResponse())
+         new StreamReader(resp.GetResponseStream())        
+#else
          let acceptAllCerts = RemoteCertificateValidationCallback(fun _ _ _ _ -> true)
-         ServicePointManager.ServerCertificateValidationCallback <- acceptAllCerts            
+         ServicePointManager.ServerCertificateValidationCallback <- acceptAllCerts
          let req = System.Net.WebRequest.Create(Uri(fileName))
          let resp = req.GetResponse() 
-         new StreamReader(resp.GetResponseStream())
+         new StreamReader(resp.GetResponseStream())          
+#endif  
       else
          // If the second path is absolute, Path.Combine returns it without change
          let file = 
@@ -45,8 +55,11 @@ module private Helpers =
 type TypeScriptProvider(cfg:TypeProviderConfig) as this =
    inherit TypeProviderForNamespaces()
 
+#if SILVERLIGHT
+#else
    let runtimeAssembly = Assembly.LoadFrom(cfg.RuntimeAssembly)
-   
+#endif
+
    let thisAssembly = Assembly.GetExecutingAssembly()
    let rootNamespace = "FunScript.TypeScript"
    let staticParams = [
@@ -88,7 +101,8 @@ module AssemblyResolver =
       let name = System.Reflection.AssemblyName(args.Name)
       let existingAssembly = 
          System.AppDomain.CurrentDomain.GetAssemblies()
-         |> Seq.tryFind(fun a -> System.Reflection.AssemblyName.ReferenceMatchesDefinition(name, a.GetName()))
+         |> Seq.tryFind(fun a -> 
+            System.Reflection.AssemblyName.ReferenceMatchesDefinition(name, System.Reflection.AssemblyName(a.FullName)))
       match existingAssembly with
       | Some a -> a
       | None -> null
