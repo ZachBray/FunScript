@@ -61,11 +61,12 @@ Help us make [improve FunScript](contribute.html)!
 For more information, explore [examples on GitHub](https://github.com/ZachBray/FunScript/tree/master/Examples)
 and take a look at our tutorials and samples:
 
- - [Getting started tutorial](samples/tutorial.html)
- - [Visualizing World Bank data](samples/worldbank.html)
- - [Calling The Movie Database](samples/moviedatabase.html)
- - [Drawing a Mandelbrot with HTML5 canvas](samples/mandelbrot.html)
- - [Asynchornous computations](samples/simpleasync.html)
+ - [Getting started tutorial](samples/tutorial/index.html)
+ - [Mario tutorial](samples/mario/index.html) & [PacMan game](samples/pacman/index.html)
+ - [Visualizing World Bank data](samples/worldbank/index.html)
+ - [Calling The Movie Database](samples/moviedatabase/index.html)
+ - [Mandelbrot with HTML5 canvas](samples/mandelbrot/index.html)
+ - [Asynchornous computations](samples/simpleasync/index.html)
 
 </div></div>
 
