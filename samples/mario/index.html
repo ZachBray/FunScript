@@ -1,0 +1,2759 @@
+<!DOCTYPE html>
+<!--[if IE 8]> 				 <html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+
+<head>
+  <meta charset="utf-8">
+  <title>FunScript - Mario - Playing Mario with HTML5 Canvas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="
+    FunScript consists of a standalone F# to JavaScript compiler library and a Type Provider to TypeScript.       
+    FunScript lets you connect to client and server APIs with Intellisense and types automagically using
+    F# 3's Type Provider mechanism.">
+  <meta name="author" content="Zach Bray">
+
+  <!-- Reference Foundation -->
+  <link rel="stylesheet" href="http://funscript.info/css/foundation.css" />
+  <script src="http://funscript.info/js/vendor/custom.modernizr.js"></script>
+
+  <!-- Reference custom CSS and tooltips -->
+  <link type="text/css" rel="stylesheet" href="http://funscript.info/custom/style.css" />
+  <script src="http://funscript.info/custom/tooltips.js" type="text/javascript"></script>
+  <link type="text/css" rel="stylesheet" href="http://funscript.info/custom/tooltips.css" />
+</head>
+<body>
+
+  <!-- Header bar with name and navigation links -->
+  <nav class="top-bar">
+    <ul class="title-area">
+      <li class="name"><h1><a href="http://funscript.info">FunScript</a></h1></li>
+      <li class="toggle-topbar"><a href="#"><span>Menu</span></a></li>
+    </ul>
+
+    <section class="top-bar-section">
+      <ul class="left">
+        <li><a href="http://funscript.info/index.html">home</a></li>
+        <li><a href="http://funscript.info/learn.html">learn more</a></li>
+        <li><a href="http://funscript.info/get.html">get started</a></li>
+        <li><a href="http://funscript.info/contribute.html">contribute</a></li>
+      </ul>
+    </section>
+  </nav>
+
+  <header>
+    <div class="row">
+      <div class="twelve columns">
+        <h1>Mario</h1>
+        <h3>Playing Mario with HTML5 Canvas</h3>
+      </div>
+    </div>
+  </header>
+
+  <!-- Some more Foundation references (always load jQuery, because samples use it) -->
+  <script src="http://funscript.info/js/vendor/jquery.js"></script>
+  <script src="http://funscript.info/js/foundation.min.js"></script>  
+  <script src="http://funscript.info/js/foundation/foundation.reveal.js"></script>
+  <script>
+    $(document).foundation();
+  </script>
+  
+  <!-- Some references the samples might need. TODO: Import these ,e.g., {sample-scripts}. -->
+  <script src="http://code.jquery.com/jquery-1.8.0.js"></script>
+  <script src="http://code.jquery.com/ui/1.8.23/jquery-ui.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/highcharts/2.3.1/highcharts.js"></script>
+  
+  <!-- Foundation dialog that appears when "Open Sample"  is clicked -->
+  <div id="sampleDialog" class="reveal-modal medium" style="width:580px">
+    <h2>Playing Mario with HTML5 Canvas</h2>
+    
+  <div>
+    <canvas align="center" id="canvas" width="512" height="384"></canvas>
+    <img id="image" style="position:absolute" />
+  </div>
+  
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
+
+	<div class="row">
+    <div class="large-9 columns">
+      <p>Mario game sample, based on functional reactive <a href="http://elm-lang.org/edit/examples/Intermediate/Mario.elm">Elm script</a>.
+The F# version is using HTML 5 canvas to render the background and an <code>img</code>
+tag showing the Mario (using animated GIFs). To play the game, click the "Open sample"
+button on the right and use keyboard keys to play!</p>
+
+<h2>Mario step</h2>
+
+<p>We keep information about Mario in a single record type with fields that 
+represent the current x and y coordinates (<code>x</code> and <code>y</code>), current velocity
+(<code>vx</code> and <code>vy</code>) and the current direction <code>dir</code>. The direction is used to
+pick the correct Mario image when rendering:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip">
+<span class="l">1: </span>
+</pre>
+</td>
+<td class="snippet"><pre class="fssnip">
+<span class="k">type</span> <span onmouseout="hideTip(event, 'fs1', 1)" onmouseover="showTip(event, 'fs1', 1)" class="i">Mario</span> <span class="o">=</span> { <span onmouseout="hideTip(event, 'fs2', 2)" onmouseover="showTip(event, 'fs2', 2)" class="i">x</span><span class="o">:</span><span onmouseout="hideTip(event, 'fs3', 3)" onmouseover="showTip(event, 'fs3', 3)" class="i">float</span>; <span onmouseout="hideTip(event, 'fs4', 4)" onmouseover="showTip(event, 'fs4', 4)" class="i">y</span><span class="o">:</span><span onmouseout="hideTip(event, 'fs3', 5)" onmouseover="showTip(event, 'fs3', 5)" class="i">float</span>; <span onmouseout="hideTip(event, 'fs5', 6)" onmouseover="showTip(event, 'fs5', 6)" class="i">vx</span><span class="o">:</span><span onmouseout="hideTip(event, 'fs3', 7)" onmouseover="showTip(event, 'fs3', 7)" class="i">float</span>; <span onmouseout="hideTip(event, 'fs6', 8)" onmouseover="showTip(event, 'fs6', 8)" class="i">vy</span><span class="o">:</span><span onmouseout="hideTip(event, 'fs3', 9)" onmouseover="showTip(event, 'fs3', 9)" class="i">float</span>; <span onmouseout="hideTip(event, 'fs7', 10)" onmouseover="showTip(event, 'fs7', 10)" class="i">dir</span><span class="o">:</span><span onmouseout="hideTip(event, 'fs8', 11)" onmouseover="showTip(event, 'fs8', 11)" class="i">string</span> }</pre>
+</td>
+</tr>
+</table><p>The step function of the game takes previvous <code>Mario</code> value and returns a new 
+one. It is composed from 4 functions that represent different aspects of the game.</p>
+
+<p>The functions that depend on keyboard take the current keyboard state as the 
+first argument. This is represented as a tuple <code>int*int</code> consisting of x and y
+directions. For example, when the left key is pressed, the value is <code>(-1, 0)</code>.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip">
+<span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+</pre>
+</td>
+<td class="snippet"><pre class="fssnip">
+<span class="c">// If the Up key is pressed (y &gt; 0) and Mario is on the ground, </span>
+<span class="c">// then create Mario with the y velocity &#39;vy&#39; set to 5</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs9', 12)" onmouseover="showTip(event, 'fs9', 12)" class="i">jump</span> (_,<span onmouseout="hideTip(event, 'fs10', 13)" onmouseover="showTip(event, 'fs10', 13)" class="i">y</span>) <span onmouseout="hideTip(event, 'fs11', 14)" onmouseover="showTip(event, 'fs11', 14)" class="i">m</span> <span class="o">=</span> <span class="k">if</span> <span onmouseout="hideTip(event, 'fs10', 15)" onmouseover="showTip(event, 'fs10', 15)" class="i">y</span> <span class="o">&gt;</span> <span class="n">0</span> <span class="o">&amp;&amp;</span> <span onmouseout="hideTip(event, 'fs11', 16)" onmouseover="showTip(event, 'fs11', 16)" class="i">m</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs4', 17)" onmouseover="showTip(event, 'fs4', 17)" class="i">y</span> <span class="o">=</span> <span class="n">0.</span> <span class="k">then</span>  { <span onmouseout="hideTip(event, 'fs11', 18)" onmouseover="showTip(event, 'fs11', 18)" class="i">m</span> <span class="k">with</span> <span class="i">vy</span> <span class="o">=</span> <span class="n">5.</span> } <span class="k">else</span> <span onmouseout="hideTip(event, 'fs11', 19)" onmouseover="showTip(event, 'fs11', 19)" class="i">m</span>
+<span class="c">// If Mario is in the air, then his &quot;up&quot; velocity is decreasing</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs12', 20)" onmouseover="showTip(event, 'fs12', 20)" class="i">gravity</span> <span onmouseout="hideTip(event, 'fs11', 21)" onmouseover="showTip(event, 'fs11', 21)" class="i">m</span> <span class="o">=</span> <span class="k">if</span> <span onmouseout="hideTip(event, 'fs11', 22)" onmouseover="showTip(event, 'fs11', 22)" class="i">m</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs4', 23)" onmouseover="showTip(event, 'fs4', 23)" class="i">y</span> <span class="o">&gt;</span> <span class="n">0.</span> <span class="k">then</span> { <span onmouseout="hideTip(event, 'fs11', 24)" onmouseover="showTip(event, 'fs11', 24)" class="i">m</span> <span class="k">with</span> <span class="i">vy</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs11', 25)" onmouseover="showTip(event, 'fs11', 25)" class="i">m</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs6', 26)" onmouseover="showTip(event, 'fs6', 26)" class="i">vy</span> <span class="o">-</span> <span class="n">0.1</span> } <span class="k">else</span> <span onmouseout="hideTip(event, 'fs11', 27)" onmouseover="showTip(event, 'fs11', 27)" class="i">m</span>
+<span class="c">// Apply physics - move Mario according to the current velocities</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs13', 28)" onmouseover="showTip(event, 'fs13', 28)" class="i">physics</span> <span onmouseout="hideTip(event, 'fs11', 29)" onmouseover="showTip(event, 'fs11', 29)" class="i">m</span> <span class="o">=</span> { <span onmouseout="hideTip(event, 'fs11', 30)" onmouseover="showTip(event, 'fs11', 30)" class="i">m</span> <span class="k">with</span> <span onmouseout="hideTip(event, 'fs2', 31)" onmouseover="showTip(event, 'fs2', 31)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs11', 32)" onmouseover="showTip(event, 'fs11', 32)" class="i">m</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs2', 33)" onmouseover="showTip(event, 'fs2', 33)" class="i">x</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs11', 34)" onmouseover="showTip(event, 'fs11', 34)" class="i">m</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 35)" onmouseover="showTip(event, 'fs5', 35)" class="i">vx</span>; <span onmouseout="hideTip(event, 'fs4', 36)" onmouseover="showTip(event, 'fs4', 36)" class="i">y</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs14', 37)" onmouseover="showTip(event, 'fs14', 37)" class="i">max</span> <span class="n">0.</span> (<span onmouseout="hideTip(event, 'fs11', 38)" onmouseover="showTip(event, 'fs11', 38)" class="i">m</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs4', 39)" onmouseover="showTip(event, 'fs4', 39)" class="i">y</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs11', 40)" onmouseover="showTip(event, 'fs11', 40)" class="i">m</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs6', 41)" onmouseover="showTip(event, 'fs6', 41)" class="i">vy</span>) }
+<span class="c">// When Left or Right keys are pressed, change the &#39;vx&#39; velocity and direction</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs15', 42)" onmouseover="showTip(event, 'fs15', 42)" class="i">walk</span> (<span onmouseout="hideTip(event, 'fs16', 43)" onmouseover="showTip(event, 'fs16', 43)" class="i">x</span>,_) <span onmouseout="hideTip(event, 'fs11', 44)" onmouseover="showTip(event, 'fs11', 44)" class="i">m</span> <span class="o">=</span> 
+    { <span onmouseout="hideTip(event, 'fs11', 45)" onmouseover="showTip(event, 'fs11', 45)" class="i">m</span> <span class="k">with</span> <span class="i">vx</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs3', 46)" onmouseover="showTip(event, 'fs3', 46)" class="i">float</span> <span onmouseout="hideTip(event, 'fs16', 47)" onmouseover="showTip(event, 'fs16', 47)" class="i">x</span> 
+             <span class="i">dir</span> <span class="o">=</span> <span class="k">if</span> <span onmouseout="hideTip(event, 'fs16', 48)" onmouseover="showTip(event, 'fs16', 48)" class="i">x</span> <span class="o">&lt;</span> <span class="n">0</span> <span class="k">then</span> <span class="s">&quot;</span><span class="s">left</span><span class="s">&quot;</span> <span class="k">elif</span> <span onmouseout="hideTip(event, 'fs16', 49)" onmouseover="showTip(event, 'fs16', 49)" class="i">x</span> <span class="o">&gt;</span> <span class="n">0</span> <span class="k">then</span> <span class="s">&quot;</span><span class="s">right</span><span class="s">&quot;</span> <span class="k">else</span> <span onmouseout="hideTip(event, 'fs11', 50)" onmouseover="showTip(event, 'fs11', 50)" class="i">m</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 51)" onmouseover="showTip(event, 'fs7', 51)" class="i">dir</span> }</pre>
+</td>
+</tr>
+</table><p>The <code>step</code> function takes a <code>dir</code> parameter representing the keyboard status
+and a current <code>Mario</code> state. It simply runs 4 components in a pipeline:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip">
+<span class="l">1: </span>
+</pre>
+</td>
+<td class="snippet"><pre class="fssnip">
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs17', 52)" onmouseover="showTip(event, 'fs17', 52)" class="i">step</span> <span onmouseout="hideTip(event, 'fs18', 53)" onmouseover="showTip(event, 'fs18', 53)" class="i">dir</span> <span onmouseout="hideTip(event, 'fs19', 54)" onmouseover="showTip(event, 'fs19', 54)" class="i">mario</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs19', 55)" onmouseover="showTip(event, 'fs19', 55)" class="i">mario</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs13', 56)" onmouseover="showTip(event, 'fs13', 56)" class="i">physics</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs15', 57)" onmouseover="showTip(event, 'fs15', 57)" class="i">walk</span> <span onmouseout="hideTip(event, 'fs18', 58)" onmouseover="showTip(event, 'fs18', 58)" class="i">dir</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs12', 59)" onmouseover="showTip(event, 'fs12', 59)" class="i">gravity</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs9', 60)" onmouseover="showTip(event, 'fs9', 60)" class="i">jump</span> <span onmouseout="hideTip(event, 'fs18', 61)" onmouseover="showTip(event, 'fs18', 61)" class="i">dir</span></pre>
+</td>
+</tr>
+</table><h2>Rendering Mario</h2>
+
+<p>Now we're ready to render Mario using HTML 5 canvas! To do that, we need the 
+width and height of the canvas and the current state of Mario. The following
+function fills the bottom half of the canvas with green, upper half with blue
+and then chooses the right Mario image:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip">
+<span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+</pre>
+</td>
+<td class="snippet"><pre class="fssnip">
+<span class="c">/// Render mario on canvas </span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs20', 62)" onmouseover="showTip(event, 'fs20', 62)" class="i">render</span> (<span onmouseout="hideTip(event, 'fs21', 63)" onmouseover="showTip(event, 'fs21', 63)" class="i">w</span>,<span onmouseout="hideTip(event, 'fs22', 64)" onmouseover="showTip(event, 'fs22', 64)" class="i">h</span>) (<span onmouseout="hideTip(event, 'fs19', 65)" onmouseover="showTip(event, 'fs19', 65)" class="i">mario</span><span class="o">:</span><span onmouseout="hideTip(event, 'fs1', 66)" onmouseover="showTip(event, 'fs1', 66)" class="i">Mario</span>) <span class="o">=</span>
+    <span class="c">// Render background</span>
+    (<span class="n">0.</span>, <span class="n">0.</span>, <span onmouseout="hideTip(event, 'fs21', 67)" onmouseover="showTip(event, 'fs21', 67)" class="i">w</span>, <span onmouseout="hideTip(event, 'fs22', 68)" onmouseover="showTip(event, 'fs22', 68)" class="i">h</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs23', 69)" onmouseover="showTip(event, 'fs23', 69)" class="i">filled</span> (<span onmouseout="hideTip(event, 'fs24', 70)" onmouseover="showTip(event, 'fs24', 70)" class="i">rgb</span> <span class="n">174</span> <span class="n">238</span> <span class="n">238</span>)
+    (<span class="n">0.</span>, <span onmouseout="hideTip(event, 'fs22', 71)" onmouseover="showTip(event, 'fs22', 71)" class="i">h</span><span class="o">-</span><span class="n">50.</span>, <span onmouseout="hideTip(event, 'fs21', 72)" onmouseover="showTip(event, 'fs21', 72)" class="i">w</span>, <span class="n">50.</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs23', 73)" onmouseover="showTip(event, 'fs23', 73)" class="i">filled</span> (<span onmouseout="hideTip(event, 'fs24', 74)" onmouseover="showTip(event, 'fs24', 74)" class="i">rgb</span> <span class="n">74</span> <span class="n">163</span> <span class="n">41</span>)
+    <span class="c">// Select and position Mario</span>
+    <span class="c">// (walking is represented as an animated gif)</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs25', 75)" onmouseover="showTip(event, 'fs25', 75)" class="i">verb</span> <span class="o">=</span>
+        <span class="k">if</span> <span onmouseout="hideTip(event, 'fs19', 76)" onmouseover="showTip(event, 'fs19', 76)" class="i">mario</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs4', 77)" onmouseover="showTip(event, 'fs4', 77)" class="i">y</span> <span class="o">&gt;</span> <span class="n">0.</span> <span class="k">then</span> <span class="s">&quot;</span><span class="s">jump</span><span class="s">&quot;</span>
+        <span class="k">elif</span> <span onmouseout="hideTip(event, 'fs19', 78)" onmouseover="showTip(event, 'fs19', 78)" class="i">mario</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 79)" onmouseover="showTip(event, 'fs5', 79)" class="i">vx</span> <span class="o">&lt;&gt;</span> <span class="n">0.</span> <span class="k">then</span> <span class="s">&quot;</span><span class="s">walk</span><span class="s">&quot;</span>
+        <span class="k">else</span> <span class="s">&quot;</span><span class="s">stand</span><span class="s">&quot;</span>
+    <span class="s">&quot;</span><span class="s">mario</span><span class="s">&quot;</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs25', 80)" onmouseover="showTip(event, 'fs25', 80)" class="i">verb</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs19', 81)" onmouseover="showTip(event, 'fs19', 81)" class="i">mario</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 82)" onmouseover="showTip(event, 'fs7', 82)" class="i">dir</span> <span class="o">+</span> <span class="s">&quot;</span><span class="s">.</span><span class="s">gif</span><span class="s">&quot;</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs26', 83)" onmouseover="showTip(event, 'fs26', 83)" class="i">image</span> 
+    <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs27', 84)" onmouseover="showTip(event, 'fs27', 84)" class="i">position</span> (<span onmouseout="hideTip(event, 'fs21', 85)" onmouseover="showTip(event, 'fs21', 85)" class="i">w</span><span class="o">/</span><span class="n">2.</span><span class="o">-</span><span class="n">16.</span><span class="o">+</span><span onmouseout="hideTip(event, 'fs19', 86)" onmouseover="showTip(event, 'fs19', 86)" class="i">mario</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs2', 87)" onmouseover="showTip(event, 'fs2', 87)" class="i">x</span>,  <span onmouseout="hideTip(event, 'fs22', 88)" onmouseover="showTip(event, 'fs22', 88)" class="i">h</span><span class="o">-</span><span class="n">50.</span><span class="o">-</span><span class="n">31.</span><span class="o">-</span><span onmouseout="hideTip(event, 'fs19', 89)" onmouseover="showTip(event, 'fs19', 89)" class="i">mario</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs4', 90)" onmouseover="showTip(event, 'fs4', 90)" class="i">y</span>)</pre>
+</td>
+</tr>
+</table><h2>Driving the game</h2>
+
+<p>The last thing that needs to be done is to write the <code>main</code> function that drives
+the game. The function does some initialization and then starts a recursive <code>update</code> 
+function that calculates a new game state using <code>step</code> and renders it in a loop:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip">
+<span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+</pre>
+</td>
+<td class="snippet"><pre class="fssnip">
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs28', 91)" onmouseover="showTip(event, 'fs28', 91)" class="i">main</span>() <span class="o">=</span>
+  <span class="c">// Some initialization</span>
+  <span onmouseout="hideTip(event, 'fs29', 92)" onmouseover="showTip(event, 'fs29', 92)" class="i">Keyboard</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs30', 93)" onmouseover="showTip(event, 'fs30', 93)" class="i">init</span>()
+  <span class="k">let</span> <span onmouseout="hideTip(event, 'fs21', 94)" onmouseover="showTip(event, 'fs21', 94)" class="i">w</span>,<span onmouseout="hideTip(event, 'fs22', 95)" onmouseover="showTip(event, 'fs22', 95)" class="i">h</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs31', 96)" onmouseover="showTip(event, 'fs31', 96)" class="i">dimensions</span>()
+  <span class="c">// Recursive function that updates the state &amp; renders it</span>
+  <span class="k">let</span> <span class="k">rec</span> <span onmouseout="hideTip(event, 'fs32', 97)" onmouseover="showTip(event, 'fs32', 97)" class="i">update</span> <span onmouseout="hideTip(event, 'fs19', 98)" onmouseover="showTip(event, 'fs19', 98)" class="i">mario</span> () <span class="o">=</span>
+      <span class="k">let</span> <span onmouseout="hideTip(event, 'fs19', 99)" onmouseover="showTip(event, 'fs19', 99)" class="i">mario</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs19', 100)" onmouseover="showTip(event, 'fs19', 100)" class="i">mario</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs17', 101)" onmouseover="showTip(event, 'fs17', 101)" class="i">step</span> (<span onmouseout="hideTip(event, 'fs29', 102)" onmouseover="showTip(event, 'fs29', 102)" class="i">Keyboard</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs33', 103)" onmouseover="showTip(event, 'fs33', 103)" class="i">arrows</span>())
+      <span onmouseout="hideTip(event, 'fs20', 104)" onmouseover="showTip(event, 'fs20', 104)" class="i">render</span> (<span onmouseout="hideTip(event, 'fs21', 105)" onmouseover="showTip(event, 'fs21', 105)" class="i">w</span>,<span onmouseout="hideTip(event, 'fs22', 106)" onmouseover="showTip(event, 'fs22', 106)" class="i">h</span>) <span onmouseout="hideTip(event, 'fs19', 107)" onmouseover="showTip(event, 'fs19', 107)" class="i">mario</span>      
+      <span onmouseout="hideTip(event, 'fs34', 108)" onmouseover="showTip(event, 'fs34', 108)" class="i">ts</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs35', 109)" onmouseover="showTip(event, 'fs35', 109)" class="i">setTimeout</span>(<span onmouseout="hideTip(event, 'fs32', 110)" onmouseover="showTip(event, 'fs32', 110)" class="i">update</span> <span onmouseout="hideTip(event, 'fs19', 111)" onmouseover="showTip(event, 'fs19', 111)" class="i">mario</span>, <span class="n">1000.</span> <span class="o">/</span> <span class="n">60.</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs36', 112)" onmouseover="showTip(event, 'fs36', 112)" class="i">ignore</span>
+  <span class="c">// Start the game with Mario in the center</span>
+  <span class="k">let</span> <span onmouseout="hideTip(event, 'fs19', 113)" onmouseover="showTip(event, 'fs19', 113)" class="i">mario</span> <span class="o">=</span> { <span onmouseout="hideTip(event, 'fs2', 114)" onmouseover="showTip(event, 'fs2', 114)" class="i">x</span><span class="o">=</span><span class="n">0.</span>; <span onmouseout="hideTip(event, 'fs4', 115)" onmouseover="showTip(event, 'fs4', 115)" class="i">y</span><span class="o">=</span><span class="n">0.</span>; <span class="i">vx</span><span class="o">=</span><span class="n">0.</span>; <span class="i">vy</span><span class="o">=</span><span class="n">0.</span>; <span class="i">dir</span><span class="o">=</span><span class="s">&quot;</span><span class="s">right</span><span class="s">&quot;</span> }
+  <span onmouseout="hideTip(event, 'fs32', 116)" onmouseover="showTip(event, 'fs32', 116)" class="i">update</span> <span onmouseout="hideTip(event, 'fs19', 117)" onmouseover="showTip(event, 'fs19', 117)" class="i">mario</span>
+   </pre>
+</td>
+</tr>
+</table>
+      <div class="tip" id="fs1">type Mario =<br />&#160;&#160;{x: float;<br />&#160;&#160;&#160;y: float;<br />&#160;&#160;&#160;vx: float;<br />&#160;&#160;&#160;vy: float;<br />&#160;&#160;&#160;dir: string;}<br /><br />Full name: Program.Mario</div>
+<div class="tip" id="fs2">Mario.x: float</div>
+<div class="tip" id="fs3">Multiple items<br />val float : value:&#39;T -&gt; float (requires member op_Explicit)<br /><br />Full name: Microsoft.FSharp.Core.Operators.float<br /><br />--------------------<br />type float = System.Double<br /><br />Full name: Microsoft.FSharp.Core.float<br /><br />--------------------<br />type float&lt;&#39;Measure&gt; = float<br /><br />Full name: Microsoft.FSharp.Core.float&lt;_&gt;</div>
+<div class="tip" id="fs4">Mario.y: float</div>
+<div class="tip" id="fs5">Mario.vx: float</div>
+<div class="tip" id="fs6">Mario.vy: float</div>
+<div class="tip" id="fs7">Mario.dir: string</div>
+<div class="tip" id="fs8">Multiple items<br />val string : value:&#39;T -&gt; string<br /><br />Full name: Microsoft.FSharp.Core.Operators.string<br /><br />--------------------<br />type string = System.String<br /><br />Full name: Microsoft.FSharp.Core.string</div>
+<div class="tip" id="fs9">val jump : &#39;a * y:int -&gt; m:Mario -&gt; Mario<br /><br />Full name: Program.jump</div>
+<div class="tip" id="fs10">val y : int</div>
+<div class="tip" id="fs11">val m : Mario</div>
+<div class="tip" id="fs12">val gravity : m:Mario -&gt; Mario<br /><br />Full name: Program.gravity</div>
+<div class="tip" id="fs13">val physics : m:Mario -&gt; Mario<br /><br />Full name: Program.physics</div>
+<div class="tip" id="fs14">val max : e1:&#39;T -&gt; e2:&#39;T -&gt; &#39;T (requires comparison)<br /><br />Full name: Microsoft.FSharp.Core.Operators.max</div>
+<div class="tip" id="fs15">val walk : x:int * &#39;a -&gt; m:Mario -&gt; Mario<br /><br />Full name: Program.walk</div>
+<div class="tip" id="fs16">val x : int</div>
+<div class="tip" id="fs17">val step : int * int -&gt; mario:Mario -&gt; Mario<br /><br />Full name: Program.step</div>
+<div class="tip" id="fs18">val dir : int * int</div>
+<div class="tip" id="fs19">val mario : Mario</div>
+<div class="tip" id="fs20">val render : w:float * h:float -&gt; mario:Mario -&gt; unit<br /><br />Full name: Program.render<br /><em><br /><br />&#160;Render mario on canvas </em></div>
+<div class="tip" id="fs21">val w : float</div>
+<div class="tip" id="fs22">val h : float</div>
+<div class="tip" id="fs23">val filled : color:&#39;a -&gt; float * float * float * float -&gt; Unit<br /><br />Full name: Program.Window.filled</div>
+<div class="tip" id="fs24">val rgb : r:&#39;a -&gt; g:&#39;b -&gt; b:&#39;c -&gt; string<br /><br />Full name: Program.Window.rgb</div>
+<div class="tip" id="fs25">val verb : string</div>
+<div class="tip" id="fs26">val image : src:string -&gt; Api&lt;...&gt;.HTMLImageElement<br /><br />Full name: Program.Window.image</div>
+<div class="tip" id="fs27">val position : x:float * y:float -&gt; img:&#39;a -&gt; unit<br /><br />Full name: Program.Window.position</div>
+<div class="tip" id="fs28">val main : unit -&gt; (unit -&gt; unit)<br /><br />Full name: Program.main</div>
+<div class="tip" id="fs29">module Keyboard<br /><br />from Program<br /><em><br /><br />&#160;Handles keydown and keyup events of the window and exposes them<br />&#160;using the &#39;arrows&#39; property (which is a tuple int*int with -1 if the<br />&#160;left/up key is pressed, 1 if right/down key is pressed and 0 otherwise)</em></div>
+<div class="tip" id="fs30">val init : unit -&gt; Unit<br /><br />Full name: Program.Keyboard.init</div>
+<div class="tip" id="fs31">val dimensions : unit -&gt; float * float<br /><br />Full name: Program.Window.dimensions</div>
+<div class="tip" id="fs32">val update : (Mario -&gt; unit -&gt; unit)</div>
+<div class="tip" id="fs33">val arrows : unit -&gt; int * int<br /><br />Full name: Program.Keyboard.arrows</div>
+<div class="tip" id="fs34">type ts = Api&lt;...&gt;<br /><br />Full name: Program.ts<br /><em><br /><br />&#160;Use the type script type provider to import core JavaScript libraries</em></div>
+<div class="tip" id="fs35">Api&lt;...&gt;.setTimeout(expression: obj) : float<br />Api&lt;...&gt;.setTimeout(expression: obj, language: obj) : float<br />Api&lt;...&gt;.setTimeout(expression: obj, msec: float) : float<br />Api&lt;...&gt;.setTimeout(expression: obj, msec: float, language: obj) : float</div>
+<div class="tip" id="fs36">val ignore : value:&#39;T -&gt; unit<br /><br />Full name: Microsoft.FSharp.Core.Operators.ignore</div>
+
+    </div>
+    <div class="large-3 columns">
+
+      <h3>Live demo</h3>
+      <p>Click here to open the sample live, running using JavaScript in a dialog window.</p>
+
+      <div style="margin-left:auto;margin-right:auto;text-align:center;">
+      <div id="run-button">
+			  <a data-reveal-id="sampleDialog" href="#" class="success button">Open sample</a>
+  		</div>
+      </div>
+
+      <p>To look at the generated JavaScript, view the source of this web page
+        and scroll to the end of the file.</p>
+
+      <h3>Tutorials</h3>
+      <p>Learn FunScript from the following introductory tutorials</p>
+      <ul>
+        <li><a href="../tutorial/index.html">Getting started tutorial</a></li>
+        <li><a href="../mario/index.html">Mario Game using HTML5</a></li>
+        <li><a href="../simpleasync/index.html">Asynchornous computations</a></li>
+        <li><a href="../canvas/index.html">Using HTML5 canvas</a></li>
+      </ul>
+
+      <h3>Samples</h3>
+      <p>Browse other amazing samples created with FunScript</p>
+      <ul>
+        <li><a href="../pacman/index.html">Pacman using HTML5 Canvas</a></li>
+        <li><a href="../worldbank/index.html">Visualizing World Bank data</a></li>
+        <li><a href="../moviedatabase/index.html">Calling The Movie Database</a></li>
+      </ul>
+    </div>
+	</div>
+
+  <div class="row"><div class="large-12 columns" id="footer">
+    FunScript is open-source project available under Apache 2.0 &#160; | &#160;  <a href="http://fsharp.org">The F# Software Foundation</a>
+  </div></div>
+
+  <!-- Fork me on GitHub link -->
+  <a href="https://github.com/ZachBray/FunScript"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+   
+
+  
+  <script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	  ga('create', 'UA-36398955-2', 'funscript.info');
+	  ga('send', 'pageview');
+  </script>
+
+  <!-- JavaScript code from the sample goes here... -->
+  <script type="text/javascript">
+    $(document).ready(function () {
+var mario___ctor$, Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Object_Object_, Window__op_Dollar$String_String, Window__op_Dollar$Int32_Int32, Window__image$, Window__filled$String_String, Window__dimensions$, Window__context$, Window__canvas$, TupleSetTree_1_Int32__SetTree_1_Int32_, TupleInt32_SetTree_1_Int32_, TupleInt32_Int32, TupleDouble_Double_Double_Double, TupleDouble_Double, String_1_IndexOf$, Set__Remove$Int32_Int32, Set__Empty$Int32_Int32, Set__Add$Int32_Int32, Set_1_Int32__get_Tree$Int32, Set_1_Int32__get_Empty$Int32, Set_1_Int32__get_Comparer$Int32, Set_1_Int32___ctor$Int32, Set_1_Int32__Remove$Int32, Set_1_Int32__Add$Int32, Set_1_IComparable__get_Tree$IComparable_, Set_1_IComparable__get_Comparer$IComparable_, Set_1_IComparable__Contains$IComparable_, SetTree_1_Int32__SetOneInt32, SetTree_1_Int32__SetNodeInt32, SetTree_1_Int32__SetEmptyInt32, SetTreeModule__spliceOutSuccessor$Int32_Int32, SetTreeModule__remove$Int32_Int32, SetTreeModule__rebalance$Int32_Int32, SetTreeModule__mk$Int32_Int32, SetTreeModule__mem$IComparable_IComparable_, SetTreeModule__height$Int32_Int32, SetTreeModule__get_tolerance$, SetTreeModule__add$Int32_Int32, SetTreeModule__SetOne$Int32_Int32, SetTreeModule__SetNode$Int32_Int32, Program__walk$Int32_Int32, Program__step$, Program__render$, Program__physics$, Program__main$, Program__jump$Int32_Int32, Program__gravity$, Keyboard__update$Object_Object_, Keyboard__keysPressed, Keyboard__init$, Keyboard__get_keysPressed$, Keyboard__code$, Keyboard__arrows$, GenericComparer_1_Int32___ctor$Int32;
+  GenericComparer_1_Int32___ctor$Int32 = (function (unitVar0)
+  {
+    ;
+  });
+  Keyboard__arrows$ = (function (unitVar0)
+  {
+    var _401;
+    var _402;
+    var _403;
+    _403 = 39;
+    _402 = Keyboard__code$(_403);
+    var _453;
+    var _454;
+    _454 = 37;
+    _453 = Keyboard__code$(_454);
+    _401 = (_402 - _453);
+    var _455;
+    var _456;
+    var _457;
+    _457 = 38;
+    _456 = Keyboard__code$(_457);
+    var _458;
+    var _459;
+    _459 = 40;
+    _458 = Keyboard__code$(_459);
+    _455 = (_456 - _458);
+    return (new TupleInt32_Int32(_401, _455));
+  });
+  Keyboard__code$ = (function (x)
+  {
+    var _404;
+    var _405;
+    var _406;
+    _406 = Keyboard__keysPressed;
+    _405 = _406;
+    var _407;
+    var _408;
+    _408 = x;
+    _407 = _408;
+    _404 = Set_1_IComparable__Contains$IComparable_(_405, _407);
+    if (_404) 
+    {
+      return 1;
+    }
+    else
+    {
+      return 0;
+    };
+  });
+  Keyboard__get_keysPressed$ = (function ()
+  {
+    return Set__Empty$Int32_Int32();
+  });
+  Keyboard__init$ = (function (unitVar0)
+  {
+    var _1;
+    _1 = "keydown";
+    var _2;
+    var _3;
+    _3 = (function (e)
+    {
+      var _4;
+      _4 = e;
+      var _5;
+      _5 = true;
+      return Keyboard__update$Object_Object_(_4, _5);
+    });
+    _2 = _3;
+    addEventListener(_1, _2);
+    var _370;
+    _370 = "keyup";
+    var _371;
+    var _372;
+    _372 = (function (e)
+    {
+      var _373;
+      _373 = e;
+      var _374;
+      _374 = false;
+      return Keyboard__update$Object_Object_(_373, _374);
+    });
+    _371 = _372;
+    return addEventListener(_370, _371);
+  });
+  Keyboard__update$Object_Object_ = (function (e, pressed)
+  {
+    var _6;
+    var _7;
+    _7 = e;
+    _6 = _7;
+    var _e = _6;
+    var _8;
+    var _9;
+    var _10;
+    _10 = _e;
+    _9 = _10.keyCode;
+    _8 = _9;
+    var keyCode = _8;
+    var _11;
+    var _12;
+    _12 = pressed;
+    if (_12) 
+    {
+      _11 = (function (value)
+      {
+        return (function (set)
+        {
+          var _13;
+          var _14;
+          _14 = value;
+          _13 = _14;
+          var _15;
+          var _16;
+          _16 = set;
+          _15 = _16;
+          return Set__Add$Int32_Int32(_13, _15);
+        });
+      });
+    }
+    else
+    {
+      _11 = (function (value)
+      {
+        return (function (set)
+        {
+          var _249;
+          var _250;
+          _250 = value;
+          _249 = _250;
+          var _251;
+          var _252;
+          _252 = set;
+          _251 = _252;
+          return Set__Remove$Int32_Int32(_249, _251);
+        });
+      });
+    };
+    var op = _11;
+    var _360;
+    var _361;
+    var _362;
+    _362 = op;
+    var _363;
+    _363 = keyCode;
+    _361 = _362(_363);
+    var _364;
+    _364 = Keyboard__keysPressed;
+    _360 = _361(_364);
+    Keyboard__keysPressed = _360;
+  });
+  Program__gravity$ = (function (m)
+  {
+    var _503;
+    var _504;
+    var _506;
+    _506 = m;
+    _504 = _506.y;
+    var _507;
+    _507 = 0.000000;
+    _503 = (_504 > _507);
+    if (_503) 
+    {
+      var _508;
+      var _509;
+      var _511;
+      _511 = m;
+      _509 = _511.vy;
+      var _512;
+      _512 = 0.100000;
+      _508 = (_509 - _512);
+      var vy = _508;
+      var _513;
+      var _515;
+      _515 = m;
+      _513 = _515.x;
+      var _516;
+      var _518;
+      _518 = m;
+      _516 = _518.y;
+      var _519;
+      var _521;
+      _521 = m;
+      _519 = _521.vx;
+      var _522;
+      _522 = vy;
+      var _523;
+      var _525;
+      _525 = m;
+      _523 = _525.dir;
+      return (new mario___ctor$(_513, _516, _519, _522, _523));
+    }
+    else
+    {
+      return m;
+    };
+  });
+  Program__jump$Int32_Int32 = (function (_arg1, y, m)
+  {
+    var _478;
+    var _479;
+    var _480;
+    _480 = y;
+    var _481;
+    _481 = 0;
+    _479 = (_480 > _481);
+    _478 = (_479 && (function ()
+    {
+      var _482;
+      var _484;
+      _484 = m;
+      _482 = _484.y;
+      var _485;
+      _485 = 0.000000;
+      return (_482 == _485);
+    })());
+    if (_478) 
+    {
+      var _486;
+      _486 = 5.000000;
+      var vy = _486;
+      var _487;
+      var _489;
+      _489 = m;
+      _487 = _489.x;
+      var _490;
+      var _492;
+      _492 = m;
+      _490 = _492.y;
+      var _493;
+      var _495;
+      _495 = m;
+      _493 = _495.vx;
+      var _496;
+      _496 = vy;
+      var _497;
+      var _499;
+      _499 = m;
+      _497 = _499.dir;
+      return (new mario___ctor$(_487, _490, _493, _496, _497));
+    }
+    else
+    {
+      return m;
+    };
+  });
+  Program__main$ = (function (unitVar0)
+  {
+    Keyboard__init$();
+    var _375;
+    _375 = Window__dimensions$();
+    var patternInput = _375;
+    var _383;
+    var _384;
+    _384 = patternInput;
+    _383 = _384.Items[0.000000];
+    var w = _383;
+    var _385;
+    var _386;
+    _386 = patternInput;
+    _385 = _386.Items[1.000000];
+    var h = _385;
+    var _387;
+    var _388;
+    var _389;
+    _389 = 0.000000;
+    var _390;
+    _390 = 0.000000;
+    var _391;
+    _391 = 0.000000;
+    var _392;
+    _392 = 0.000000;
+    var _393;
+    _393 = "right";
+    _388 = (new mario___ctor$(_389, _390, _391, _392, _393));
+    _387 = {contents: _388};
+    var mario = _387;
+    var update;
+    var _396;
+    _396 = (function (_unitVar0)
+    {
+      var _596;
+      _596 = mario;
+      var _597;
+      var _598;
+      var _599;
+      _599 = Keyboard__arrows$();
+      var tupledArg = _599;
+      var _600;
+      var _601;
+      _601 = tupledArg;
+      _600 = _601.Items[0.000000];
+      var arg00_ = _600;
+      var _602;
+      var _603;
+      _603 = tupledArg;
+      _602 = _603.Items[1.000000];
+      var arg01_ = _602;
+      _598 = (function (_mario)
+      {
+        var _604;
+        _604 = arg00_;
+        var _605;
+        _605 = arg01_;
+        var _606;
+        _606 = _mario;
+        return Program__step$(_604, _605, _606);
+      });
+      var _607;
+      var _609;
+      _609 = mario;
+      _607 = _609.contents;
+      _597 = _598(_607);
+      _596.contents = _597;
+      null;
+      var _610;
+      _610 = w;
+      var _611;
+      _611 = h;
+      var _612;
+      var _614;
+      _614 = mario;
+      _612 = _614.contents;
+      Program__render$(_610, _611, _612);
+      var _781;
+      _781 = (function (value)
+      {
+        var _782;
+        _782 = value;
+        var ignored0 = _782;
+      });
+      var _783;
+      var _784;
+      _784 = update;
+      var _785;
+      var _786;
+      _786 = 1000.000000;
+      var _787;
+      _787 = 60.000000;
+      _785 = (_786 / _787);
+      _783 = setTimeout(_784, _785);
+      return _781(_783);
+    });
+    update = _396;
+    var _394;
+    _394 = update;
+    var _395;
+    return _394(_395);
+  });
+  Program__physics$ = (function (m)
+  {
+    var _560;
+    var _561;
+    var _563;
+    _563 = m;
+    _561 = _563.x;
+    var _564;
+    var _566;
+    _566 = m;
+    _564 = _566.vx;
+    _560 = (_561 + _564);
+    var _567;
+    var _568;
+    var _569;
+    var _570;
+    var _572;
+    _572 = m;
+    _570 = _572.y;
+    var _573;
+    var _575;
+    _575 = m;
+    _573 = _575.vy;
+    _569 = (_570 + _573);
+    var _576;
+    _576 = 0.000000;
+    _568 = (_569 > _576);
+    if (_568) 
+    {
+      var _577;
+      var _579;
+      _579 = m;
+      _577 = _579.y;
+      var _580;
+      var _582;
+      _582 = m;
+      _580 = _582.vy;
+      _567 = (_577 + _580);
+    }
+    else
+    {
+      _567 = 0.000000;
+    };
+    var _583;
+    var _585;
+    _585 = m;
+    _583 = _585.vx;
+    var _586;
+    var _588;
+    _588 = m;
+    _586 = _588.vy;
+    var _589;
+    var _591;
+    _591 = m;
+    _589 = _591.dir;
+    return (new mario___ctor$(_560, _567, _583, _586, _589));
+  });
+  Program__render$ = (function (w, h, mario)
+  {
+    var _615;
+    var _616;
+    var _617;
+    _617 = 174;
+    var _618;
+    _618 = 238;
+    var _619;
+    _619 = 238;
+    _616 = Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32(_617, _618, _619);
+    var color = _616;
+    _615 = (function (tupledArg)
+    {
+      var _638;
+      var _639;
+      _639 = tupledArg;
+      _638 = _639.Items[0.000000];
+      var arg10_ = _638;
+      var _640;
+      var _641;
+      _641 = tupledArg;
+      _640 = _641.Items[1.000000];
+      var arg11_ = _640;
+      var _642;
+      var _643;
+      _643 = tupledArg;
+      _642 = _643.Items[2.000000];
+      var arg12_ = _642;
+      var _644;
+      var _645;
+      _645 = tupledArg;
+      _644 = _645.Items[3.000000];
+      var arg13_ = _644;
+      var _646;
+      _646 = color;
+      var _647;
+      _647 = arg10_;
+      var _648;
+      _648 = arg11_;
+      var _649;
+      _649 = arg12_;
+      var _650;
+      _650 = arg13_;
+      return Window__filled$String_String(_646, _647, _648, _649, _650);
+    });
+    var _676;
+    var _677;
+    _677 = 0.000000;
+    var _678;
+    _678 = 0.000000;
+    var _679;
+    _679 = w;
+    var _680;
+    _680 = h;
+    _676 = (new TupleDouble_Double_Double_Double(_677, _678, _679, _680));
+    _615(_676);
+    var _681;
+    var _682;
+    var _683;
+    _683 = 74;
+    var _684;
+    _684 = 163;
+    var _685;
+    _685 = 41;
+    _682 = Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32(_683, _684, _685);
+    var _color = _682;
+    _681 = (function (tupledArg)
+    {
+      var _686;
+      var _687;
+      _687 = tupledArg;
+      _686 = _687.Items[0.000000];
+      var arg10_ = _686;
+      var _688;
+      var _689;
+      _689 = tupledArg;
+      _688 = _689.Items[1.000000];
+      var arg11_ = _688;
+      var _690;
+      var _691;
+      _691 = tupledArg;
+      _690 = _691.Items[2.000000];
+      var arg12_ = _690;
+      var _692;
+      var _693;
+      _693 = tupledArg;
+      _692 = _693.Items[3.000000];
+      var arg13_ = _692;
+      var _694;
+      _694 = _color;
+      var _695;
+      _695 = arg10_;
+      var _696;
+      _696 = arg11_;
+      var _697;
+      _697 = arg12_;
+      var _698;
+      _698 = arg13_;
+      return Window__filled$String_String(_694, _695, _696, _697, _698);
+    });
+    var _699;
+    var _700;
+    _700 = 0.000000;
+    var _701;
+    var _702;
+    _702 = h;
+    var _703;
+    _703 = 50.000000;
+    _701 = (_702 - _703);
+    var _704;
+    _704 = w;
+    var _705;
+    _705 = 50.000000;
+    _699 = (new TupleDouble_Double_Double_Double(_700, _701, _704, _705));
+    _681(_699);
+    var _706;
+    var _707;
+    var _708;
+    var _710;
+    _710 = mario;
+    _708 = _710.y;
+    var _711;
+    _711 = 0.000000;
+    _707 = (_708 > _711);
+    if (_707) 
+    {
+      _706 = "jump";
+    }
+    else
+    {
+      var _712;
+      var _713;
+      var _715;
+      _715 = mario;
+      _713 = _715.vx;
+      var _716;
+      _716 = 0.000000;
+      _712 = (_713 != _716);
+      if (_712) 
+      {
+        _706 = "walk";
+      }
+      else
+      {
+        _706 = "stand";
+      };
+    };
+    var verb = _706;
+    var _717;
+    var _718;
+    var _719;
+    var _720;
+    var _721;
+    var _722;
+    _722 = w;
+    var _723;
+    _723 = 2.000000;
+    _721 = (_722 / _723);
+    var _724;
+    _724 = 16.000000;
+    _720 = (_721 - _724);
+    var _725;
+    var _727;
+    _727 = mario;
+    _725 = _727.x;
+    _719 = (_720 + _725);
+    var _728;
+    var _729;
+    var _730;
+    var _731;
+    _731 = h;
+    var _732;
+    _732 = 50.000000;
+    _730 = (_731 - _732);
+    var _733;
+    _733 = 31.000000;
+    _729 = (_730 - _733);
+    var _734;
+    var _736;
+    _736 = mario;
+    _734 = _736.y;
+    _728 = (_729 - _734);
+    _718 = (new TupleDouble_Double(_719, _728));
+    var tupledArg = _718;
+    var _737;
+    var _738;
+    _738 = tupledArg;
+    _737 = _738.Items[0.000000];
+    var x = _737;
+    var _739;
+    var _740;
+    _740 = tupledArg;
+    _739 = _740.Items[1.000000];
+    var y = _739;
+    _717 = (function (img)
+    {
+      var _741;
+      _741 = x;
+      var _742;
+      _742 = y;
+      var _743;
+      _743 = img;
+      return Window__position$Object_Object_(_741, _742, _743);
+    });
+    var _755;
+    var _756;
+    _756 = (function (src)
+    {
+      var _757;
+      _757 = src;
+      return Window__image$(_757);
+    });
+    var _772;
+    var _773;
+    var _774;
+    var _775;
+    _775 = "mario";
+    var _776;
+    _776 = verb;
+    _774 = (_775 + _776);
+    var _777;
+    var _779;
+    _779 = mario;
+    _777 = _779.dir;
+    _773 = (_774 + _777);
+    var _780;
+    _780 = ".gif";
+    _772 = (_773 + _780);
+    _755 = _756(_772);
+    return _717(_755);
+  });
+  Program__step$ = (function (dir_0, dir_1, mario)
+  {
+    var _467;
+    var _468;
+    _468 = dir_0;
+    var _469;
+    _469 = dir_1;
+    _467 = (new TupleInt32_Int32(_468, _469));
+    var dir = _467;
+    var _470;
+    var _471;
+    var _472;
+    _472 = dir;
+    _471 = _472.Items[0.000000];
+    var arg00_ = _471;
+    var _473;
+    var _474;
+    _474 = dir;
+    _473 = _474.Items[1.000000];
+    var y = _473;
+    _470 = (function (m)
+    {
+      var _475;
+      _475 = arg00_;
+      var _476;
+      _476 = y;
+      var _477;
+      _477 = m;
+      return Program__jump$Int32_Int32(_475, _476, _477);
+    });
+    var _500;
+    var _501;
+    _501 = (function (m)
+    {
+      var _502;
+      _502 = m;
+      return Program__gravity$(_502);
+    });
+    var _526;
+    var _527;
+    var _528;
+    var _529;
+    _529 = dir;
+    _528 = _529.Items[0.000000];
+    var x = _528;
+    var _530;
+    var _531;
+    _531 = dir;
+    _530 = _531.Items[1.000000];
+    var arg01_ = _530;
+    _527 = (function (m)
+    {
+      var _532;
+      _532 = x;
+      var _533;
+      _533 = arg01_;
+      var _534;
+      _534 = m;
+      return Program__walk$Int32_Int32(_532, _533, _534);
+    });
+    var _557;
+    var _558;
+    _558 = (function (m)
+    {
+      var _559;
+      _559 = m;
+      return Program__physics$(_559);
+    });
+    var _592;
+    _592 = mario;
+    _557 = _558(_592);
+    _526 = _527(_557);
+    _500 = _501(_526);
+    return _470(_500);
+  });
+  Program__walk$Int32_Int32 = (function (x, _arg1, m)
+  {
+    var _535;
+    var _536;
+    _536 = x;
+    _535 = _536;
+    var vx = _535;
+    var _537;
+    var _538;
+    var _539;
+    _539 = x;
+    var _540;
+    _540 = 0;
+    _538 = (_539 < _540);
+    if (_538) 
+    {
+      _537 = "left";
+    }
+    else
+    {
+      var _541;
+      var _542;
+      _542 = x;
+      var _543;
+      _543 = 0;
+      _541 = (_542 > _543);
+      if (_541) 
+      {
+        _537 = "right";
+      }
+      else
+      {
+        var _545;
+        _545 = m;
+        _537 = _545.dir;
+      };
+    };
+    var dir = _537;
+    var _546;
+    var _548;
+    _548 = m;
+    _546 = _548.x;
+    var _549;
+    var _551;
+    _551 = m;
+    _549 = _551.y;
+    var _552;
+    _552 = vx;
+    var _553;
+    var _555;
+    _555 = m;
+    _553 = _555.vy;
+    var _556;
+    _556 = dir;
+    return (new mario___ctor$(_546, _549, _552, _553, _556));
+  });
+  SetTreeModule__SetNode$Int32_Int32 = (function (x, l, r, h)
+  {
+    var _45;
+    _45 = x;
+    var _46;
+    _46 = l;
+    var _47;
+    _47 = r;
+    var _48;
+    _48 = h;
+    return (new SetTree_1_Int32__SetNodeInt32(_45, _46, _47, _48));
+  });
+  SetTreeModule__SetOne$Int32_Int32 = (function (n)
+  {
+    var _59;
+    _59 = n;
+    return (new SetTree_1_Int32__SetOneInt32(_59));
+  });
+  SetTreeModule__add$Int32_Int32 = (function (comparer, k, t)
+  {
+    var _29;
+    var _30;
+    _30 = t;
+    _29 = (_30.Tag == 2.000000);
+    if (_29) 
+    {
+      var _31;
+      var _33;
+      _33 = t;
+      _31 = _33.Item;
+      var k2 = _31;
+      var _34;
+      var _35;
+      _35 = comparer;
+      var _36;
+      _36 = k;
+      var _37;
+      _37 = k2;
+      _34 = _35.Compare(_36, _37);
+      var c = _34;
+      var _38;
+      var _39;
+      _39 = c;
+      var _40;
+      _40 = 0;
+      _38 = (_39 < _40);
+      if (_38) 
+      {
+        var _41;
+        _41 = k;
+        var _42;
+        _42 = (new SetTree_1_Int32__SetEmptyInt32());
+        var _43;
+        _43 = t;
+        var _44;
+        _44 = 2;
+        return SetTreeModule__SetNode$Int32_Int32(_41, _42, _43, _44);
+      }
+      else
+      {
+        var _49;
+        var _50;
+        _50 = c;
+        var _51;
+        _51 = 0;
+        _49 = (_50 == _51);
+        if (_49) 
+        {
+          return t;
+        }
+        else
+        {
+          var _52;
+          _52 = k;
+          var _53;
+          _53 = t;
+          var _54;
+          _54 = (new SetTree_1_Int32__SetEmptyInt32());
+          var _55;
+          _55 = 2;
+          return SetTreeModule__SetNode$Int32_Int32(_52, _53, _54, _55);
+        };
+      };
+    }
+    else
+    {
+      var _56;
+      var _57;
+      _57 = t;
+      _56 = (_57.Tag == 0.000000);
+      if (_56) 
+      {
+        var _58;
+        _58 = k;
+        return SetTreeModule__SetOne$Int32_Int32(_58);
+      }
+      else
+      {
+        var _60;
+        var _62;
+        _62 = t;
+        _60 = _62.Item3;
+        var r = _60;
+        var _63;
+        var _65;
+        _65 = t;
+        _63 = _65.Item2;
+        var l = _63;
+        var _66;
+        var _68;
+        _68 = t;
+        _66 = _68.Item1;
+        var _k2 = _66;
+        var _69;
+        var _70;
+        _70 = comparer;
+        var _71;
+        _71 = k;
+        var _72;
+        _72 = _k2;
+        _69 = _70.Compare(_71, _72);
+        var _c = _69;
+        var _73;
+        var _74;
+        _74 = _c;
+        var _75;
+        _75 = 0;
+        _73 = (_74 < _75);
+        if (_73) 
+        {
+          var _76;
+          var _77;
+          _77 = comparer;
+          var _78;
+          _78 = k;
+          var _79;
+          _79 = l;
+          _76 = SetTreeModule__add$Int32_Int32(_77, _78, _79);
+          var _80;
+          _80 = _k2;
+          var _81;
+          _81 = r;
+          return SetTreeModule__rebalance$Int32_Int32(_76, _80, _81);
+        }
+        else
+        {
+          var _234;
+          var _235;
+          _235 = _c;
+          var _236;
+          _236 = 0;
+          _234 = (_235 == _236);
+          if (_234) 
+          {
+            return t;
+          }
+          else
+          {
+            var _237;
+            _237 = l;
+            var _238;
+            _238 = _k2;
+            var _239;
+            var _240;
+            _240 = comparer;
+            var _241;
+            _241 = k;
+            var _242;
+            _242 = r;
+            _239 = SetTreeModule__add$Int32_Int32(_240, _241, _242);
+            return SetTreeModule__rebalance$Int32_Int32(_237, _238, _239);
+          };
+        };
+      };
+    };
+  });
+  SetTreeModule__get_tolerance$ = (function ()
+  {
+    return 2;
+  });
+  SetTreeModule__height$Int32_Int32 = (function (t)
+  {
+    var _84;
+    var _85;
+    _85 = t;
+    _84 = (_85.Tag == 2.000000);
+    if (_84) 
+    {
+      return 1;
+    }
+    else
+    {
+      var _86;
+      var _87;
+      _87 = t;
+      _86 = (_87.Tag == 1.000000);
+      if (_86) 
+      {
+        var _88;
+        var _90;
+        _90 = t;
+        _88 = _90.Item4;
+        var h = _88;
+        return h;
+      }
+      else
+      {
+        return 0;
+      };
+    };
+  });
+  SetTreeModule__mem$IComparable_IComparable_ = (function (comparer, k, t)
+  {
+    var _416;
+    var _417;
+    _417 = t;
+    _416 = (_417.Tag == 2.000000);
+    if (_416) 
+    {
+      var _418;
+      var _420;
+      _420 = t;
+      _418 = _420.Item;
+      var k2 = _418;
+      var _421;
+      var _422;
+      _422 = comparer;
+      var _423;
+      _423 = k;
+      var _424;
+      _424 = k2;
+      _421 = _422.Compare(_423, _424);
+      var _425;
+      _425 = 0;
+      return (_421 == _425);
+    }
+    else
+    {
+      var _426;
+      var _427;
+      _427 = t;
+      _426 = (_427.Tag == 0.000000);
+      if (_426) 
+      {
+        return false;
+      }
+      else
+      {
+        var _428;
+        var _430;
+        _430 = t;
+        _428 = _430.Item3;
+        var r = _428;
+        var _431;
+        var _433;
+        _433 = t;
+        _431 = _433.Item2;
+        var l = _431;
+        var _434;
+        var _436;
+        _436 = t;
+        _434 = _436.Item1;
+        var _k2 = _434;
+        var _437;
+        var _438;
+        _438 = comparer;
+        var _439;
+        _439 = k;
+        var _440;
+        _440 = _k2;
+        _437 = _438.Compare(_439, _440);
+        var c = _437;
+        var _441;
+        var _442;
+        _442 = c;
+        var _443;
+        _443 = 0;
+        _441 = (_442 < _443);
+        if (_441) 
+        {
+          var _444;
+          _444 = comparer;
+          var _445;
+          _445 = k;
+          var _446;
+          _446 = l;
+          return SetTreeModule__mem$IComparable_IComparable_(_444, _445, _446);
+        }
+        else
+        {
+          var _447;
+          var _448;
+          _448 = c;
+          var _449;
+          _449 = 0;
+          _447 = (_448 == _449);
+          return (_447 || (function ()
+          {
+            var _450;
+            _450 = comparer;
+            var _451;
+            _451 = k;
+            var _452;
+            _452 = r;
+            return SetTreeModule__mem$IComparable_IComparable_(_450, _451, _452);
+          })());
+        };
+      };
+    };
+  });
+  SetTreeModule__mk$Int32_Int32 = (function (l, k, r)
+  {
+    var _130;
+    var _131;
+    _131 = l;
+    var _132;
+    _132 = r;
+    _130 = (new TupleSetTree_1_Int32__SetTree_1_Int32_(_131, _132));
+    var matchValue = _130;
+    var _133;
+    var _134;
+    var _135;
+    _135 = matchValue;
+    _134 = _135.Items[0.000000];
+    _133 = (_134.Tag == 0.000000);
+    if (_133) 
+    {
+      var _136;
+      var _137;
+      var _138;
+      _138 = matchValue;
+      _137 = _138.Items[1.000000];
+      _136 = (_137.Tag == 0.000000);
+      if (_136) 
+      {
+        var _139;
+        _139 = k;
+        return SetTreeModule__SetOne$Int32_Int32(_139);
+      }
+      else
+      {
+        var _140;
+        var _141;
+        _141 = l;
+        _140 = SetTreeModule__height$Int32_Int32(_141);
+        var hl = _140;
+        var _142;
+        var _143;
+        _143 = r;
+        _142 = SetTreeModule__height$Int32_Int32(_143);
+        var hr = _142;
+        var _144;
+        var _145;
+        var _146;
+        _146 = hl;
+        var _147;
+        _147 = hr;
+        _145 = (_146 < _147);
+        if (_145) 
+        {
+          _144 = hr;
+        }
+        else
+        {
+          _144 = hl;
+        };
+        var m = _144;
+        var _148;
+        _148 = k;
+        var _149;
+        _149 = l;
+        var _150;
+        _150 = r;
+        var _151;
+        var _152;
+        _152 = m;
+        var _153;
+        _153 = 1;
+        _151 = (_152 + _153);
+        return SetTreeModule__SetNode$Int32_Int32(_148, _149, _150, _151);
+      };
+    }
+    else
+    {
+      var _154;
+      var _155;
+      _155 = l;
+      _154 = SetTreeModule__height$Int32_Int32(_155);
+      var _hl = _154;
+      var _156;
+      var _157;
+      _157 = r;
+      _156 = SetTreeModule__height$Int32_Int32(_157);
+      var _hr = _156;
+      var _158;
+      var _159;
+      var _160;
+      _160 = _hl;
+      var _161;
+      _161 = _hr;
+      _159 = (_160 < _161);
+      if (_159) 
+      {
+        _158 = _hr;
+      }
+      else
+      {
+        _158 = _hl;
+      };
+      var _m = _158;
+      var _162;
+      _162 = k;
+      var _163;
+      _163 = l;
+      var _164;
+      _164 = r;
+      var _165;
+      var _166;
+      _166 = _m;
+      var _167;
+      _167 = 1;
+      _165 = (_166 + _167);
+      return SetTreeModule__SetNode$Int32_Int32(_162, _163, _164, _165);
+    };
+  });
+  SetTreeModule__rebalance$Int32_Int32 = (function (t1, k, t2)
+  {
+    var _82;
+    var _83;
+    _83 = t1;
+    _82 = SetTreeModule__height$Int32_Int32(_83);
+    var t1h = _82;
+    var _91;
+    var _92;
+    _92 = t2;
+    _91 = SetTreeModule__height$Int32_Int32(_92);
+    var t2h = _91;
+    var _93;
+    var _94;
+    _94 = t2h;
+    var _95;
+    var _96;
+    _96 = t1h;
+    var _97;
+    _97 = SetTreeModule__get_tolerance$();
+    _95 = (_96 + _97);
+    _93 = (_94 > _95);
+    if (_93) 
+    {
+      var _98;
+      var _99;
+      _99 = t2;
+      _98 = (_99.Tag == 1.000000);
+      if (_98) 
+      {
+        var _100;
+        var _102;
+        _102 = t2;
+        _100 = _102.Item3;
+        var t2r = _100;
+        var _103;
+        var _105;
+        _105 = t2;
+        _103 = _105.Item2;
+        var t2l = _103;
+        var _106;
+        var _108;
+        _108 = t2;
+        _106 = _108.Item1;
+        var t2k = _106;
+        var _109;
+        var _110;
+        var _111;
+        _111 = t2l;
+        _110 = SetTreeModule__height$Int32_Int32(_111);
+        var _112;
+        var _113;
+        _113 = t1h;
+        var _114;
+        _114 = 1;
+        _112 = (_113 + _114);
+        _109 = (_110 > _112);
+        if (_109) 
+        {
+          var _115;
+          var _116;
+          _116 = t2l;
+          _115 = (_116.Tag == 1.000000);
+          if (_115) 
+          {
+            var _117;
+            var _119;
+            _119 = t2l;
+            _117 = _119.Item3;
+            var t2lr = _117;
+            var _120;
+            var _122;
+            _122 = t2l;
+            _120 = _122.Item2;
+            var t2ll = _120;
+            var _123;
+            var _125;
+            _125 = t2l;
+            _123 = _125.Item1;
+            var t2lk = _123;
+            var _126;
+            var _127;
+            _127 = t1;
+            var _128;
+            _128 = k;
+            var _129;
+            _129 = t2ll;
+            _126 = SetTreeModule__mk$Int32_Int32(_127, _128, _129);
+            var _168;
+            _168 = t2lk;
+            var _169;
+            var _170;
+            _170 = t2lr;
+            var _171;
+            _171 = t2k;
+            var _172;
+            _172 = t2r;
+            _169 = SetTreeModule__mk$Int32_Int32(_170, _171, _172);
+            return SetTreeModule__mk$Int32_Int32(_126, _168, _169);
+          }
+          else
+          {
+            var _173;
+            _173 = "rebalance";
+            throw (_173);
+            return null;
+          };
+        }
+        else
+        {
+          var _174;
+          var _175;
+          _175 = t1;
+          var _176;
+          _176 = k;
+          var _177;
+          _177 = t2l;
+          _174 = SetTreeModule__mk$Int32_Int32(_175, _176, _177);
+          var _178;
+          _178 = t2k;
+          var _179;
+          _179 = t2r;
+          return SetTreeModule__mk$Int32_Int32(_174, _178, _179);
+        };
+      }
+      else
+      {
+        var _180;
+        _180 = "rebalance";
+        throw (_180);
+        return null;
+      };
+    }
+    else
+    {
+      var _181;
+      var _182;
+      _182 = t1h;
+      var _183;
+      var _184;
+      _184 = t2h;
+      var _185;
+      _185 = SetTreeModule__get_tolerance$();
+      _183 = (_184 + _185);
+      _181 = (_182 > _183);
+      if (_181) 
+      {
+        var _186;
+        var _187;
+        _187 = t1;
+        _186 = (_187.Tag == 1.000000);
+        if (_186) 
+        {
+          var _188;
+          var _190;
+          _190 = t1;
+          _188 = _190.Item3;
+          var t1r = _188;
+          var _191;
+          var _193;
+          _193 = t1;
+          _191 = _193.Item2;
+          var t1l = _191;
+          var _194;
+          var _196;
+          _196 = t1;
+          _194 = _196.Item1;
+          var t1k = _194;
+          var _197;
+          var _198;
+          var _199;
+          _199 = t1r;
+          _198 = SetTreeModule__height$Int32_Int32(_199);
+          var _200;
+          var _201;
+          _201 = t2h;
+          var _202;
+          _202 = 1;
+          _200 = (_201 + _202);
+          _197 = (_198 > _200);
+          if (_197) 
+          {
+            var _203;
+            var _204;
+            _204 = t1r;
+            _203 = (_204.Tag == 1.000000);
+            if (_203) 
+            {
+              var _205;
+              var _207;
+              _207 = t1r;
+              _205 = _207.Item3;
+              var t1rr = _205;
+              var _208;
+              var _210;
+              _210 = t1r;
+              _208 = _210.Item2;
+              var t1rl = _208;
+              var _211;
+              var _213;
+              _213 = t1r;
+              _211 = _213.Item1;
+              var t1rk = _211;
+              var _214;
+              var _215;
+              _215 = t1l;
+              var _216;
+              _216 = t1k;
+              var _217;
+              _217 = t1rl;
+              _214 = SetTreeModule__mk$Int32_Int32(_215, _216, _217);
+              var _218;
+              _218 = t1rk;
+              var _219;
+              var _220;
+              _220 = t1rr;
+              var _221;
+              _221 = k;
+              var _222;
+              _222 = t2;
+              _219 = SetTreeModule__mk$Int32_Int32(_220, _221, _222);
+              return SetTreeModule__mk$Int32_Int32(_214, _218, _219);
+            }
+            else
+            {
+              var _223;
+              _223 = "rebalance";
+              throw (_223);
+              return null;
+            };
+          }
+          else
+          {
+            var _224;
+            _224 = t1l;
+            var _225;
+            _225 = t1k;
+            var _226;
+            var _227;
+            _227 = t1r;
+            var _228;
+            _228 = k;
+            var _229;
+            _229 = t2;
+            _226 = SetTreeModule__mk$Int32_Int32(_227, _228, _229);
+            return SetTreeModule__mk$Int32_Int32(_224, _225, _226);
+          };
+        }
+        else
+        {
+          var _230;
+          _230 = "rebalance";
+          throw (_230);
+          return null;
+        };
+      }
+      else
+      {
+        var _231;
+        _231 = t1;
+        var _232;
+        _232 = k;
+        var _233;
+        _233 = t2;
+        return SetTreeModule__mk$Int32_Int32(_231, _232, _233);
+      };
+    };
+  });
+  SetTreeModule__remove$Int32_Int32 = (function (comparer, k, t)
+  {
+    var _263;
+    var _264;
+    _264 = t;
+    _263 = (_264.Tag == 2.000000);
+    if (_263) 
+    {
+      var _265;
+      var _267;
+      _267 = t;
+      _265 = _267.Item;
+      var k2 = _265;
+      var _268;
+      var _269;
+      _269 = comparer;
+      var _270;
+      _270 = k;
+      var _271;
+      _271 = k2;
+      _268 = _269.Compare(_270, _271);
+      var c = _268;
+      var _272;
+      var _273;
+      _273 = c;
+      var _274;
+      _274 = 0;
+      _272 = (_273 == _274);
+      if (_272) 
+      {
+        return (new SetTree_1_Int32__SetEmptyInt32());
+      }
+      else
+      {
+        return t;
+      };
+    }
+    else
+    {
+      var _275;
+      var _276;
+      _276 = t;
+      _275 = (_276.Tag == 1.000000);
+      if (_275) 
+      {
+        var _277;
+        var _279;
+        _279 = t;
+        _277 = _279.Item3;
+        var r = _277;
+        var _280;
+        var _282;
+        _282 = t;
+        _280 = _282.Item2;
+        var l = _280;
+        var _283;
+        var _285;
+        _285 = t;
+        _283 = _285.Item1;
+        var _k2 = _283;
+        var _286;
+        var _287;
+        _287 = comparer;
+        var _288;
+        _288 = k;
+        var _289;
+        _289 = _k2;
+        _286 = _287.Compare(_288, _289);
+        var _c = _286;
+        var _290;
+        var _291;
+        _291 = _c;
+        var _292;
+        _292 = 0;
+        _290 = (_291 < _292);
+        if (_290) 
+        {
+          var _293;
+          var _294;
+          _294 = comparer;
+          var _295;
+          _295 = k;
+          var _296;
+          _296 = l;
+          _293 = SetTreeModule__remove$Int32_Int32(_294, _295, _296);
+          var _297;
+          _297 = _k2;
+          var _298;
+          _298 = r;
+          return SetTreeModule__rebalance$Int32_Int32(_293, _297, _298);
+        }
+        else
+        {
+          var _299;
+          var _300;
+          _300 = _c;
+          var _301;
+          _301 = 0;
+          _299 = (_300 == _301);
+          if (_299) 
+          {
+            var _302;
+            var _303;
+            _303 = l;
+            var _304;
+            _304 = r;
+            _302 = (new TupleSetTree_1_Int32__SetTree_1_Int32_(_303, _304));
+            var matchValue = _302;
+            var _305;
+            var _306;
+            var _307;
+            _307 = matchValue;
+            _306 = _307.Items[0.000000];
+            _305 = (_306.Tag == 0.000000);
+            if (_305) 
+            {
+              return r;
+            }
+            else
+            {
+              var _308;
+              var _309;
+              var _310;
+              _310 = matchValue;
+              _309 = _310.Items[1.000000];
+              _308 = (_309.Tag == 0.000000);
+              if (_308) 
+              {
+                return l;
+              }
+              else
+              {
+                var _311;
+                var _312;
+                _312 = r;
+                _311 = SetTreeModule__spliceOutSuccessor$Int32_Int32(_312);
+                var patternInput = _311;
+                var _347;
+                var _348;
+                _348 = patternInput;
+                _347 = _348.Items[0.000000];
+                var sk = _347;
+                var _349;
+                var _350;
+                _350 = patternInput;
+                _349 = _350.Items[1.000000];
+                var r_ = _349;
+                var _351;
+                _351 = l;
+                var _352;
+                _352 = sk;
+                var _353;
+                _353 = r_;
+                return SetTreeModule__mk$Int32_Int32(_351, _352, _353);
+              };
+            };
+          }
+          else
+          {
+            var _354;
+            _354 = l;
+            var _355;
+            _355 = _k2;
+            var _356;
+            var _357;
+            _357 = comparer;
+            var _358;
+            _358 = k;
+            var _359;
+            _359 = r;
+            _356 = SetTreeModule__remove$Int32_Int32(_357, _358, _359);
+            return SetTreeModule__rebalance$Int32_Int32(_354, _355, _356);
+          };
+        };
+      }
+      else
+      {
+        return t;
+      };
+    };
+  });
+  SetTreeModule__spliceOutSuccessor$Int32_Int32 = (function (t)
+  {
+    var _313;
+    var _314;
+    _314 = t;
+    _313 = (_314.Tag == 2.000000);
+    if (_313) 
+    {
+      var _315;
+      var _317;
+      _317 = t;
+      _315 = _317.Item;
+      var k2 = _315;
+      var _318;
+      _318 = k2;
+      var _319;
+      _319 = (new SetTree_1_Int32__SetEmptyInt32());
+      return (new TupleInt32_SetTree_1_Int32_(_318, _319));
+    }
+    else
+    {
+      var _320;
+      var _321;
+      _321 = t;
+      _320 = (_321.Tag == 1.000000);
+      if (_320) 
+      {
+        var _322;
+        var _324;
+        _324 = t;
+        _322 = _324.Item3;
+        var r = _322;
+        var _325;
+        var _327;
+        _327 = t;
+        _325 = _327.Item2;
+        var l = _325;
+        var _328;
+        var _330;
+        _330 = t;
+        _328 = _330.Item1;
+        var _k2 = _328;
+        var _331;
+        var _332;
+        _332 = l;
+        _331 = (_332.Tag == 0.000000);
+        if (_331) 
+        {
+          var _333;
+          _333 = _k2;
+          var _334;
+          _334 = r;
+          return (new TupleInt32_SetTree_1_Int32_(_333, _334));
+        }
+        else
+        {
+          var _335;
+          var _336;
+          _336 = l;
+          _335 = SetTreeModule__spliceOutSuccessor$Int32_Int32(_336);
+          var patternInput = _335;
+          var _337;
+          var _338;
+          _338 = patternInput;
+          _337 = _338.Items[1.000000];
+          var l_ = _337;
+          var _339;
+          var _340;
+          _340 = patternInput;
+          _339 = _340.Items[0.000000];
+          var k3 = _339;
+          var _341;
+          _341 = k3;
+          var _342;
+          var _343;
+          _343 = l_;
+          var _344;
+          _344 = _k2;
+          var _345;
+          _345 = r;
+          _342 = SetTreeModule__mk$Int32_Int32(_343, _344, _345);
+          return (new TupleInt32_SetTree_1_Int32_(_341, _342));
+        };
+      }
+      else
+      {
+        var _346;
+        _346 = "internal error: Map.spliceOutSuccessor";
+        throw (_346);
+        return null;
+      };
+    };
+  });
+  SetTree_1_Int32__SetEmptyInt32 = (function ()
+  {
+    this.Tag = 0.000000;
+    this._CaseName = "SetEmpty";
+  });
+  SetTree_1_Int32__SetEmptyInt32.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Tag < that.Tag) ? -1.000000 : ((this.Tag == that.Tag) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      return 0.000000;
+    };
+  });
+  SetTree_1_Int32__SetNodeInt32 = (function (Item1, Item2, Item3, Item4)
+  {
+    this.Tag = 1.000000;
+    this._CaseName = "SetNode";
+    this.Item1 = Item1;
+    this.Item2 = Item2;
+    this.Item3 = Item3;
+    this.Item4 = Item4;
+  });
+  SetTree_1_Int32__SetNodeInt32.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Tag < that.Tag) ? -1.000000 : ((this.Tag == that.Tag) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = ((this.Item1 < that.Item1) ? -1.000000 : ((this.Item1 == that.Item1) ? 0.000000 : 1.000000));
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        var ___diff = 0.000000;
+        ___diff = this.Item2.CompareTo(that.Item2);
+        diff = ___diff;
+        if ((diff != 0.000000)) 
+        {
+          return diff;
+        }
+        else
+        {
+          var ____diff = 0.000000;
+          ____diff = this.Item3.CompareTo(that.Item3);
+          diff = ____diff;
+          if ((diff != 0.000000)) 
+          {
+            return diff;
+          }
+          else
+          {
+            var _____diff = 0.000000;
+            _____diff = ((this.Item4 < that.Item4) ? -1.000000 : ((this.Item4 == that.Item4) ? 0.000000 : 1.000000));
+            diff = _____diff;
+            if ((diff != 0.000000)) 
+            {
+              return diff;
+            }
+            else
+            {
+              return 0.000000;
+            };
+          };
+        };
+      };
+    };
+  });
+  SetTree_1_Int32__SetOneInt32 = (function (Item)
+  {
+    this.Tag = 2.000000;
+    this._CaseName = "SetOne";
+    this.Item = Item;
+  });
+  SetTree_1_Int32__SetOneInt32.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Tag < that.Tag) ? -1.000000 : ((this.Tag == that.Tag) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = ((this.Item < that.Item) ? -1.000000 : ((this.Item == that.Item) ? 0.000000 : 1.000000));
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  Set_1_IComparable__Contains$IComparable_ = (function (s, x)
+  {
+    var _409;
+    var _410;
+    _410 = s;
+    _409 = Set_1_IComparable__get_Comparer$IComparable_(_410);
+    var _412;
+    _412 = x;
+    var _413;
+    var _414;
+    _414 = s;
+    _413 = Set_1_IComparable__get_Tree$IComparable_(_414);
+    return SetTreeModule__mem$IComparable_IComparable_(_409, _412, _413);
+  });
+  Set_1_IComparable__get_Comparer$IComparable_ = (function (set, unitVar1)
+  {
+    var _411;
+    _411 = set;
+    return _411.comparer_479;
+  });
+  Set_1_IComparable__get_Tree$IComparable_ = (function (set, unitVar1)
+  {
+    var _415;
+    _415 = set;
+    return _415.tree_483;
+  });
+  Set_1_Int32__Add$Int32 = (function (s, x)
+  {
+    var _19;
+    var _20;
+    _20 = s;
+    _19 = Set_1_Int32__get_Comparer$Int32(_20);
+    var _22;
+    var _23;
+    var _24;
+    _24 = s;
+    _23 = Set_1_Int32__get_Comparer$Int32(_24);
+    var _25;
+    _25 = x;
+    var _26;
+    var _27;
+    _27 = s;
+    _26 = Set_1_Int32__get_Tree$Int32(_27);
+    _22 = SetTreeModule__add$Int32_Int32(_23, _25, _26);
+    return (new Set_1_Int32___ctor$Int32(_19, _22));
+  });
+  Set_1_Int32__Remove$Int32 = (function (s, x)
+  {
+    var _255;
+    var _256;
+    _256 = s;
+    _255 = Set_1_Int32__get_Comparer$Int32(_256);
+    var _257;
+    var _258;
+    var _259;
+    _259 = s;
+    _258 = Set_1_Int32__get_Comparer$Int32(_259);
+    var _260;
+    _260 = x;
+    var _261;
+    var _262;
+    _262 = s;
+    _261 = Set_1_Int32__get_Tree$Int32(_262);
+    _257 = SetTreeModule__remove$Int32_Int32(_258, _260, _261);
+    return (new Set_1_Int32___ctor$Int32(_255, _257));
+  });
+  Set_1_Int32___ctor$Int32 = (function (comparer, tree)
+  {
+    var _243;
+    _243 = this;
+    var _244;
+    _244 = comparer;
+    _243.comparer_479 = _244;
+    var _245;
+    _245 = this;
+    var _246;
+    _246 = tree;
+    _245.tree_483 = _246;
+    var _247;
+    _247 = this;
+    var _248;
+    _248 = null;
+    _247.serializedData = _248;
+  });
+  Set_1_Int32__get_Comparer$Int32 = (function (set, unitVar1)
+  {
+    var _21;
+    _21 = set;
+    return _21.comparer_479;
+  });
+  Set_1_Int32__get_Empty$Int32 = (function (unitVar0)
+  {
+    var _365;
+    _365 = (new GenericComparer_1_Int32___ctor$Int32());
+    var comparer = _365;
+    var _366;
+    var impl;
+    impl = comparer;
+    _366 = {Compare: (function (x, y)
+    {
+      return (function (__, x, y)
+      {
+        var _367;
+        _367 = x;
+        var _368;
+        _368 = y;
+        var diff = 0.000000;
+        diff = ((_367 < _368) ? -1.000000 : ((_367 == _368) ? 0.000000 : 1.000000));
+        return diff;
+      })(impl, x, y);
+    })};
+    var _369;
+    _369 = (new SetTree_1_Int32__SetEmptyInt32());
+    return (new Set_1_Int32___ctor$Int32(_366, _369));
+  });
+  Set_1_Int32__get_Tree$Int32 = (function (set, unitVar1)
+  {
+    var _28;
+    _28 = set;
+    return _28.tree_483;
+  });
+  Set__Add$Int32_Int32 = (function (x, s)
+  {
+    var _17;
+    _17 = s;
+    var _18;
+    _18 = x;
+    return Set_1_Int32__Add$Int32(_17, _18);
+  });
+  Set__Empty$Int32_Int32 = (function ()
+  {
+    return Set_1_Int32__get_Empty$Int32();
+  });
+  Set__Remove$Int32_Int32 = (function (x, s)
+  {
+    var _253;
+    _253 = s;
+    var _254;
+    _254 = x;
+    return Set_1_Int32__Remove$Int32(_253, _254);
+  });
+  String_1_IndexOf$ = (function (s, search)
+  {
+    return s.indexOf(search);
+  });
+  TupleDouble_Double = (function (Item0, Item1)
+  {
+    this.Items = [Item0, Item1];
+    this.Items = [Item0, Item1];
+  });
+  TupleDouble_Double.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Items[0.000000] < that.Items[0.000000]) ? -1.000000 : ((this.Items[0.000000] == that.Items[0.000000]) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = ((this.Items[1.000000] < that.Items[1.000000]) ? -1.000000 : ((this.Items[1.000000] == that.Items[1.000000]) ? 0.000000 : 1.000000));
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  TupleDouble_Double_Double_Double = (function (Item0, Item1, Item2, Item3)
+  {
+    this.Items = [Item0, Item1, Item2, Item3];
+    this.Items = [Item0, Item1, Item2, Item3];
+    this.Items = [Item0, Item1, Item2, Item3];
+    this.Items = [Item0, Item1, Item2, Item3];
+  });
+  TupleDouble_Double_Double_Double.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Items[0.000000] < that.Items[0.000000]) ? -1.000000 : ((this.Items[0.000000] == that.Items[0.000000]) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = ((this.Items[1.000000] < that.Items[1.000000]) ? -1.000000 : ((this.Items[1.000000] == that.Items[1.000000]) ? 0.000000 : 1.000000));
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        var ___diff = 0.000000;
+        ___diff = ((this.Items[2.000000] < that.Items[2.000000]) ? -1.000000 : ((this.Items[2.000000] == that.Items[2.000000]) ? 0.000000 : 1.000000));
+        diff = ___diff;
+        if ((diff != 0.000000)) 
+        {
+          return diff;
+        }
+        else
+        {
+          var ____diff = 0.000000;
+          ____diff = ((this.Items[3.000000] < that.Items[3.000000]) ? -1.000000 : ((this.Items[3.000000] == that.Items[3.000000]) ? 0.000000 : 1.000000));
+          diff = ____diff;
+          if ((diff != 0.000000)) 
+          {
+            return diff;
+          }
+          else
+          {
+            return 0.000000;
+          };
+        };
+      };
+    };
+  });
+  TupleInt32_Int32 = (function (Item0, Item1)
+  {
+    this.Items = [Item0, Item1];
+    this.Items = [Item0, Item1];
+  });
+  TupleInt32_Int32.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Items[0.000000] < that.Items[0.000000]) ? -1.000000 : ((this.Items[0.000000] == that.Items[0.000000]) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = ((this.Items[1.000000] < that.Items[1.000000]) ? -1.000000 : ((this.Items[1.000000] == that.Items[1.000000]) ? 0.000000 : 1.000000));
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  TupleInt32_SetTree_1_Int32_ = (function (Item0, Item1)
+  {
+    this.Items = [Item0, Item1];
+    this.Items = [Item0, Item1];
+  });
+  TupleInt32_SetTree_1_Int32_.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Items[0.000000] < that.Items[0.000000]) ? -1.000000 : ((this.Items[0.000000] == that.Items[0.000000]) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Items[1.000000].CompareTo(that.Items[1.000000]);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  TupleSetTree_1_Int32__SetTree_1_Int32_ = (function (Item0, Item1)
+  {
+    this.Items = [Item0, Item1];
+    this.Items = [Item0, Item1];
+  });
+  TupleSetTree_1_Int32__SetTree_1_Int32_.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Items[0.000000].CompareTo(that.Items[0.000000]);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Items[1.000000].CompareTo(that.Items[1.000000]);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  Window__canvas$ = (function (unitVar0)
+  {
+    var _378;
+    var _379;
+    _379 = document;
+    var _380;
+    _380 = "canvas";
+    _378 = _379.getElementById(_380);
+    return _378;
+  });
+  Window__context$ = (function (unitVar0)
+  {
+    var _657;
+    _657 = Window__canvas$();
+    var _658;
+    _658 = "2d";
+    return _657.getContext(_658);
+  });
+  Window__dimensions$ = (function (unitVar0)
+  {
+    var _376;
+    var _377;
+    _377 = Window__canvas$();
+    _376 = _377.width;
+    var _381;
+    var _382;
+    _382 = Window__canvas$();
+    _381 = _382.height;
+    return (new TupleDouble_Double(_376, _381));
+  });
+  Window__filled$String_String = (function (color, rect_0, rect_1, rect_2, rect_3)
+  {
+    var _651;
+    var _652;
+    _652 = rect_0;
+    var _653;
+    _653 = rect_1;
+    var _654;
+    _654 = rect_2;
+    var _655;
+    _655 = rect_3;
+    _651 = (new TupleDouble_Double_Double_Double(_652, _653, _654, _655));
+    var rect = _651;
+    var _656;
+    _656 = Window__context$();
+    var ctx = _656;
+    var _659;
+    _659 = ctx;
+    var _660;
+    _660 = color;
+    _659.fillStyle = _660;
+    null;
+    var _661;
+    _661 = (function (tupledArg)
+    {
+      var _662;
+      var _663;
+      _663 = tupledArg;
+      _662 = _663.Items[0.000000];
+      var arg00 = _662;
+      var _664;
+      var _665;
+      _665 = tupledArg;
+      _664 = _665.Items[1.000000];
+      var arg01 = _664;
+      var _666;
+      var _667;
+      _667 = tupledArg;
+      _666 = _667.Items[2.000000];
+      var arg02 = _666;
+      var _668;
+      var _669;
+      _669 = tupledArg;
+      _668 = _669.Items[3.000000];
+      var arg03 = _668;
+      var _670;
+      _670 = ctx;
+      var _671;
+      _671 = arg00;
+      var _672;
+      _672 = arg01;
+      var _673;
+      _673 = arg02;
+      var _674;
+      _674 = arg03;
+      return _670.fillRect(_671, _672, _673, _674);
+    });
+    var _675;
+    _675 = rect;
+    return _661(_675);
+  });
+  Window__image$ = (function (src)
+  {
+    var _758;
+    var _759;
+    var _760;
+    _760 = document;
+    var _761;
+    _761 = "image";
+    _759 = _760.getElementById(_761);
+    _758 = _759;
+    var image = _758;
+    var _762;
+    var _763;
+    var _764;
+    var _765;
+    var _766;
+    _766 = image;
+    _765 = _766.src;
+    _764 = _765;
+    var _767;
+    var _768;
+    _768 = src;
+    _767 = _768;
+    _763 = String_1_IndexOf$(_764, _767);
+    var _769;
+    _769 = -1;
+    _762 = (_763 == _769);
+    if (_762) 
+    {
+      var _770;
+      _770 = image;
+      var _771;
+      _771 = src;
+      _770.src = _771;
+      null;
+    }
+    else
+    {
+      ;
+    };
+    return image;
+  });
+  Window__op_Dollar$Int32_Int32 = (function (s, n)
+  {
+    var _627;
+    _627 = s;
+    var _628;
+    var _629;
+    _629 = n;
+    _628 = _629.toString();
+    return (_627 + _628);
+  });
+  Window__op_Dollar$String_String = (function (s, n)
+  {
+    var _631;
+    _631 = s;
+    var _632;
+    var _633;
+    _633 = n;
+    _632 = _633.toString();
+    return (_631 + _632);
+  });
+  Window__position$Object_Object_ = (function (x, y, img)
+  {
+    var _744;
+    var _745;
+    _745 = img;
+    _744 = _745;
+    var _img = _744;
+    var _746;
+    var _747;
+    _747 = _img;
+    _746 = _747.style;
+    var _748;
+    _748 = x;
+    _746.posLeft = _748;
+    null;
+    var _749;
+    var _750;
+    _750 = _img;
+    _749 = _750.style;
+    var _751;
+    var _752;
+    var _753;
+    _753 = Window__canvas$();
+    _752 = _753.offsetTop;
+    var _754;
+    _754 = y;
+    _751 = (_752 + _754);
+    _749.posTop = _751;
+    return null;
+  });
+  Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32 = (function (r, g, b)
+  {
+    var _620;
+    var _621;
+    var _622;
+    var _623;
+    var _624;
+    var _625;
+    _625 = "rgb(";
+    var _626;
+    _626 = r;
+    _624 = Window__op_Dollar$Int32_Int32(_625, _626);
+    var _630;
+    _630 = ",";
+    _623 = Window__op_Dollar$String_String(_624, _630);
+    var _634;
+    _634 = g;
+    _622 = Window__op_Dollar$Int32_Int32(_623, _634);
+    var _635;
+    _635 = ",";
+    _621 = Window__op_Dollar$String_String(_622, _635);
+    var _636;
+    _636 = b;
+    _620 = Window__op_Dollar$Int32_Int32(_621, _636);
+    var _637;
+    _637 = ")";
+    return Window__op_Dollar$String_String(_620, _637);
+  });
+  mario___ctor$ = (function (x, y, vx, vy, dir)
+  {
+    this.x = x;
+    this.y = y;
+    this.vx = vx;
+    this.vy = vy;
+    this.dir = dir;
+  });
+  mario___ctor$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.x < that.x) ? -1.000000 : ((this.x == that.x) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = ((this.y < that.y) ? -1.000000 : ((this.y == that.y) ? 0.000000 : 1.000000));
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        var ___diff = 0.000000;
+        ___diff = ((this.vx < that.vx) ? -1.000000 : ((this.vx == that.vx) ? 0.000000 : 1.000000));
+        diff = ___diff;
+        if ((diff != 0.000000)) 
+        {
+          return diff;
+        }
+        else
+        {
+          var ____diff = 0.000000;
+          ____diff = ((this.vy < that.vy) ? -1.000000 : ((this.vy == that.vy) ? 0.000000 : 1.000000));
+          diff = ____diff;
+          if ((diff != 0.000000)) 
+          {
+            return diff;
+          }
+          else
+          {
+            var _____diff = 0.000000;
+            _____diff = ((this.dir < that.dir) ? -1.000000 : ((this.dir == that.dir) ? 0.000000 : 1.000000));
+            diff = _____diff;
+            if ((diff != 0.000000)) 
+            {
+              return diff;
+            }
+            else
+            {
+              return 0.000000;
+            };
+          };
+        };
+      };
+    };
+  });
+  Keyboard__keysPressed = Keyboard__get_keysPressed$();
+  return Program__main$()
+});
+  </script>
+
+</body>
+</html>
