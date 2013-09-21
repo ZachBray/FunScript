@@ -109,6 +109,7 @@ let sampleTemplate = source ++ "template" ++ "sample-template.html" // Sample wi
 let samples = 
   [ "Tutorial", funScriptRoot ++ "Examples/Tutorial/", ""
     "Mario", funScriptRoot ++ "Examples/Mario/", "Web"
+    "PacMan", funScriptRoot ++ "Examples/PacMan/", "Web"
     "WorldBank", funScriptRoot ++ "Examples/WorldBank/", "Web"
     "MovieDatabase", funScriptRoot ++ "Examples/MovieDatabase/", "Web"
     "Canvas", funScriptRoot ++ "Examples/Canvas/", "Web"
@@ -116,7 +117,8 @@ let samples =
     "SimpleAsync", funScriptRoot ++ "Examples/SimpleAsync/", "" ]
 
 let sampleFiles  =
-  [ funScriptRoot ++ "Examples/Mario/Web", outputPath ++ "samples/mario" ]
+  [ funScriptRoot ++ "Examples/Mario/Web", outputPath ++ "samples/mario" 
+    funScriptRoot ++ "Examples/Pacman/Web", outputPath ++ "samples/pacman" ]
 
 // --------------------------------------------------------------------------------------
 // Build the FunScript web site

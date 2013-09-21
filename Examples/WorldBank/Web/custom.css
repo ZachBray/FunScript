@@ -42,7 +42,7 @@ h2 {
 }
 .countryList label {
   margin-bottom:10px;
-  font-size:130%;
+  font-size:100%;
 }
 #chart {
   width:600px; height:400px;margin:0px auto 50px auto; background:#fafafa;

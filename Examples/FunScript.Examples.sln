@@ -33,6 +33,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "jQueryUI", "jQueryUI\jQuery
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Mario", "Mario\Mario.fsproj", "{C0EC7DDC-91B9-47F1-BF4C-DEF78715F7C4}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "PacMan", "Pacman\PacMan.fsproj", "{1CD63889-D724-46FA-B055-7BDCFEDC1541}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +76,10 @@ Global
 		{C0EC7DDC-91B9-47F1-BF4C-DEF78715F7C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C0EC7DDC-91B9-47F1-BF4C-DEF78715F7C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C0EC7DDC-91B9-47F1-BF4C-DEF78715F7C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CD63889-D724-46FA-B055-7BDCFEDC1541}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CD63889-D724-46FA-B055-7BDCFEDC1541}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CD63889-D724-46FA-B055-7BDCFEDC1541}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CD63889-D724-46FA-B055-7BDCFEDC1541}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

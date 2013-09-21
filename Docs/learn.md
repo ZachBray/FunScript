@@ -15,7 +15,8 @@ For more information, explore [examples on GitHub](https://github.com/ZachBray/F
 and take a look at our tutorials and samples:
 
  - [Getting started tutorial](samples/tutorial/index.html)
- - [Mario game](samples/mario/index.html)
+ - [Mario gaming tutorial](samples/mario/index.html)
+ - [Complete Pacman game with sounds!](samples/pacman/index.html)
  - [Visualizing World Bank data](samples/worldbank/index.html)
  - [Calling The Movie Database](samples/moviedatabase/index.html)
  - [Using HTML5 canvas](samples/canvas/index.html)
