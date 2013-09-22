@@ -38,7 +38,10 @@ module RuntimeImplementation =
   /// Simple HTTP server
   type HttpServer private (url, root) =
 
-    let contentTypes = dict [ ".css", "text/css"; ".html", "text/html"; ".js", "text/javascript" ]
+    let contentTypes = 
+        dict [ ".css", "text/css"; ".html", "text/html"; ".js", "text/javascript";
+               ".gif", "image/gif"; ".png", "image/png"; ".jpg", "image/jpeg";
+               ".mp3", "audio/mpeg"; ".wav", "audio/wav"; ".mpg", "video/mpeg" ]
     let tokenSource = new CancellationTokenSource()
   
     let agent = MailboxProcessor<HttpListenerContext>.Start((fun inbox -> async { 

@@ -27,3 +27,18 @@ let ``Infix modulo can be generated``() =
 let ``Evaluation order is preserved by generated code``() =
    check <@@ (4. - 2.) * 2. + 1. @@>
 
+[<Test>]
+let ``Bitwise and can be generated``() =
+   check <@@ float (6 &&& 2) @@>
+
+[<Test>]
+let ``Bitwise or can be generated``() =
+   check <@@ float (4 ||| 2) @@>
+
+[<Test>]
+let ``Bitwise shift left can be generated``() =
+   check <@@ float (4 <<< 2) @@>
+
+[<Test>]
+let ``Bitwise shift right can be generated``() =
+   check <@@ float (4 >>> 2) @@>

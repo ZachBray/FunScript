@@ -22,5 +22,7 @@ let components = [
    CompilerComponent.binaryTyped <@ (%) @> (numericInfix "%")
    CompilerComponent.binaryTyped <@ (>>>) @> (numericInfix ">>")
    CompilerComponent.binaryTyped <@ (<<<) @> (numericInfix "<<")
+   CompilerComponent.binaryTyped <@ (&&&) @> (numericInfix "&")
+   CompilerComponent.binaryTyped <@ (|||) @> (numericInfix "|")
    CompilerComponent.unaryOp <@ op_UnaryNegation @> "-"
 ]

@@ -72,7 +72,6 @@ let getTempFileAndHeader file =
 // --------------------------------------------------------------------------------------
 
 //let root = @"file:///C:/Tomas/Projects/FunScript/Docs/output"
-//let root = "http://tpetricek.github.io/FunScript"
 let root = "http://www.funscript.info"
 
 let source = __SOURCE_DIRECTORY__     // Root directory with pages
@@ -97,8 +96,6 @@ let createDownloadZip() =
    zip.AddFiles funScriptFiles
    zip.Save(downloadPath)
 
-createDownloadZip()
-
 /// Command line options needed when type-checking sample FunScript projects
 let funScriptReferences = 
    funScriptFiles |> Seq.map (sprintf "-r:\"%s\"") |> String.concat " "
@@ -111,11 +108,17 @@ let sampleTemplate = source ++ "template" ++ "sample-template.html" // Sample wi
 //   output 'bin/Debug/index.html' and 'bin/Debug/page.js'
 let samples = 
   [ "Tutorial", funScriptRoot ++ "Examples/Tutorial/", ""
+    "Mario", funScriptRoot ++ "Examples/Mario/", "Web"
+    "PacMan", funScriptRoot ++ "Examples/PacMan/", "Web"
     "WorldBank", funScriptRoot ++ "Examples/WorldBank/", "Web"
     "MovieDatabase", funScriptRoot ++ "Examples/MovieDatabase/", "Web"
     "Canvas", funScriptRoot ++ "Examples/Canvas/", "Web"
     "Mandelbrot", funScriptRoot ++ "Examples/Mandelbrot/", "Web"
     "SimpleAsync", funScriptRoot ++ "Examples/SimpleAsync/", "" ]
+
+let sampleFiles  =
+  [ funScriptRoot ++ "Examples/Mario/Web", outputPath ++ "samples/mario" 
+    funScriptRoot ++ "Examples/Pacman/Web", outputPath ++ "samples/pacman" ]
 
 // --------------------------------------------------------------------------------------
 // Build the FunScript web site
@@ -126,6 +129,11 @@ let generateDocs () =
   SafeDeleteDir outputPath true
   CopyFiles staticFiles outputPath
   EnsureDirectory (outputPath ++ "samples")
+  EnsureDirectory (outputPath ++ "downloads")
+  createDownloadZip()
+
+  // Copy static files required by samples
+  for source, target in sampleFiles do CopyFiles source target
 
   // Process all Markdown files in the source directory
   for doc in Directory.GetFiles(source, "*.md") do
@@ -142,7 +150,9 @@ let generateDocs () =
     printfn " - processing sample: %s" name
 
     // Find input & output files, generate HTML replacements
-    let outputFile = outputPath ++ "samples" ++ (name.ToLower().Replace(' ', '-') + ".html")
+    let outputDir = outputPath ++ "samples" ++ (name.ToLower().Replace(' ', '-')) 
+    EnsureDirectory outputDir
+    let outputFile = outputDir ++ "index.html"
     let headers, tempInputPage = getTempFileAndHeader (sampleSource ++ "Page.fs")
 
     let subdir = "bin/Debug" + (if webDir <> "" then "/" + webDir else "")
@@ -150,12 +160,15 @@ let generateDocs () =
     let inputJs = sampleSource ++ subdir ++ "page.js" |> File.ReadAllText
 
     let headersDict = dict headers
+    let defaults = 
+      if not (headersDict.ContainsKey("popup-style")) then 
+        [ "popup-style", "" ] else []
     let info = 
       [ "sample-javascript", inputJs
         "root", root
         "sample-body", extractMarkedPagePart "body" inputHtml
         "sample-title", extractMarkedPagePart "title" inputHtml ]
-      @ headers
+      @ defaults @ headers
 
     // Process the file and delete the temp
     Literate.ProcessScriptFile
