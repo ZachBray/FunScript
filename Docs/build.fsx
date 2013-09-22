@@ -71,8 +71,8 @@ let getTempFileAndHeader file =
 // Configuration
 // --------------------------------------------------------------------------------------
 
-//let root = @"file:///C:/Tomas/Projects/FunScript/Docs/output"
-let root = "http://funscript.info"
+let root = @"file:///C:/Tomas/Projects/FunScript/Docs/output"
+//let root = "http://funscript.info"
 
 let source = __SOURCE_DIRECTORY__     // Root directory with pages
 let outputPath = source ++ "output"   // Where to save generated output
