@@ -4,11 +4,8 @@ open AST
 open System.Reflection
 open Microsoft.FSharp.Quotations
 
-let private isNumericType (t:System.Type) =
-   Reflection.primitiveTypes.Contains t.FullName
-
 let private numericInfix op (mi : MethodBase) lhsT lhs rhsT rhs =
-   if isNumericType lhsT && isNumericType rhsT then
+   if Reflection.isPrimitive lhsT && Reflection.isPrimitive rhsT then
       Some([], BinaryOp(lhs, op, rhs))
    else
       None

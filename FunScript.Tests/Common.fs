@@ -9,8 +9,8 @@ open Microsoft.FSharp.Linq.QuotationEvaluation
 [<JSEmit("test_log({0}.toString());")>]
 let log (msg : obj) : unit = failwith "never"
 
-let checkAreEqual expectedResult quote =
-   let code = Compiler.compile quote
+let checkAreEqualWithComponents components expectedResult quote =
+   let code = Compiler.Compiler.Compile(quote, components = components)
    try
       let engine = JintEngine().SetFunction("test_log", System.Action<string>(printfn "//[LOG] %s"))
       let result = engine.Run(code + "\nreturn null;")
@@ -20,6 +20,9 @@ let checkAreEqual expectedResult quote =
       printfn "// Code:\n%s" code
       if ex.GetType().Namespace.StartsWith "FunScript" then raise ex
       else failwithf "Message: %s\n" ex.Message
+
+let checkAreEqual expectedResult quote =
+    checkAreEqualWithComponents [] expectedResult quote
 
 /// Bootstrapping:
 /// Generates code. Runs it through a JS interpreter. 

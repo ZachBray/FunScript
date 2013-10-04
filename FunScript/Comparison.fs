@@ -11,8 +11,6 @@ module Replacements =
 
    let max x y = if y > x then y else x
 
-let private isPrimitiveType (t:System.Type) =
-   Reflection.primitiveTypes.Contains t.FullName
 
 type private TypeKind =
    | Primitive
@@ -20,7 +18,7 @@ type private TypeKind =
    | Array of TypeKind
 
 let rec private kindOf (t:System.Type) =
-   if isPrimitiveType t then Primitive
+   if Reflection.isPrimitive t then Primitive
    elif t.IsArray then 
       if t.GetArrayRank() <> 1 then
          failwith "Unsupported array rank."
@@ -89,7 +87,7 @@ let compareCall typeLHS refLHS typeRHS refRHS =
    else None
 
 let private primitiveInfix op _ lhsT lhs rhsT rhs =
-   match isPrimitiveType lhsT, isPrimitiveType rhsT with
+   match Reflection.isPrimitive lhsT, Reflection.isPrimitive rhsT with
    | true, true ->
       Some([], BinaryOp(lhs, op, rhs))
    | false, false ->

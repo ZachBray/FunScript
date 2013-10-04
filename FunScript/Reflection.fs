@@ -31,7 +31,7 @@ let isGenericParameter (t : System.Type) =
 
 /// For generic specialization. 
 let isPrimitive (t : Type) =
-   primitiveTypes.Contains t.FullName
+   primitiveTypes.Contains t.FullName || t.IsEnum
 
 let getGenericTypeArgs (t : Type) =
    let isGeneric = t.IsGenericType || t.IsGenericTypeDefinition

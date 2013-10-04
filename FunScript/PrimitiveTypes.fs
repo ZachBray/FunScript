@@ -21,6 +21,9 @@ let private primitiveValues =
       | DerivedPatterns.Single x -> [ yield returnStategy.Return <| Number(float x) ]
       | DerivedPatterns.Double x -> [ yield returnStategy.Return <| Number(x) ]
       | Patterns.Value(null, _) -> [ yield returnStategy.Return <| Null ]
+      | Patterns.Value(x, t) ->
+            if t.IsEnum then [ yield returnStategy.Return <| Integer(unbox x) ]
+            else []
       | _ -> []
 
 let components = [ 
