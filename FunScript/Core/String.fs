@@ -25,6 +25,9 @@ let Length(s:string) : int = failwith "never"
 [<FunScript.JSEmit("return {0}.charAt({1});")>]
 let CharAt(s:string, length:int) : char = failwith "never"
 
+[<FunScript.JSEmit("return {0}.substring({1}, {1} + {2});")>]
+let Substring(s:string, offset:int, length:int) : char = failwith "never"
+
 [<FunScript.JSEmit("return String.fromCharCode({0});")>]
 let inline FromCharCode x = char x
 

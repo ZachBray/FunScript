@@ -5,6 +5,9 @@ open FunScript
 [<JSEmit("return {0}.Tag;")>]
 let getTag (x : obj) : int = failwith "never"
 
+[<JSEmit("return {0}[{1}];")>]
+let getProp (x : obj) (propName:string) : obj = failwith "never"
+
 type PropertyInfo(name, f, getPropType) =
    member __.Name : string = name
    member __.GetValue (obj : obj, args : obj[]) : obj = f obj
@@ -79,21 +82,49 @@ type FSharpType() =
 let invoke(methodName : string, args : obj[]) : obj =
    failwith "never"
 
+let mkDelayed (t : Type) (flags : obj) f =
+    fun arg -> f(t, arg, flags)
+
+let mkDelayedNoFlags (t : Type) f =
+    fun arg -> f(arg, t) 
+
 type FSharpValue() =
 
-   static member PreComputeUnionTagReader (t : Type, _ : obj) : obj =
-      // TODO: Fix returning lambda bug!
-      box getTag
+    static member PreComputeUnionTagReader (t : Type, _ : obj) =
+        getTag
 
-   static member MakeUnion(uci : UnionCaseInfo, args : obj[], _ : obj) =
-      uci.Construct args
+    static member MakeUnion(uci : UnionCaseInfo, args : obj[], _ : obj) =
+        uci.Construct args
 
-   static member MakeTuple(args : obj[], t : Type) =
-      match t.Kind with
-      | TupleType(c, _) -> c args
-      | _ -> failwith "Not a tuple type."
+    static member MakeTuple(args : obj[], t : Type) =
+        match t.Kind with
+        | TupleType(c, _) -> c args
+        | _ -> failwith "Not a tuple type."
 
-   static member MakeRecord(t : Type, args : obj[], _ : obj) =
-      match t.Kind with
-      | RecordType(cons, _) -> cons args
-      | _ -> failwith "Not a record type."
+    static member MakeRecord(t : Type, args : obj[], _ : obj) =
+        match t.Kind with
+        | RecordType(cons, _) -> cons args
+        | _ -> failwith "Not a record type."
+
+    static member PreComputeRecordConstructor(t, flags : obj) =
+        fun args -> FSharpValue.MakeRecord(t, args, flags)
+
+    static member PreComputeTupleConstructor t =
+        fun args -> FSharpValue.MakeTuple(args, t)
+
+    static member PreComputeUnionConstructor(uci, flags : obj) =
+        fun args -> FSharpValue.MakeUnion(uci, args, flags)
+
+    static member PreComputeRecordFieldReader (pi : PropertyInfo) =
+        fun (args : obj) -> pi.GetValue(args, [||])
+
+    static member PreComputeUnionReader (uci : UnionCaseInfo, flags : obj) =
+        fun (args : obj) -> 
+            uci.GetFields() |> Array.map (fun pi ->
+                pi.GetValue(args, [||]))
+
+    static member PreComputeTupleReader t =
+        fun (args : obj) -> 
+            FSharpType.GetTupleElements t 
+            |> Array.mapi (fun i _ ->
+                getProp args ("Item" + i.ToString()))

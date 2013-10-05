@@ -3,6 +3,11 @@
 open AST
 open Microsoft.FSharp.Quotations
 
+[<JS>]
+module Redirects =
+    let substring (str:string) i =
+        str.Substring(i, str.Length - i)
+
 let components = 
    [
       [
@@ -15,6 +20,7 @@ let components =
          ExpressionReplacer.createUnsafe <@ fun (s:string) -> s.ToUpper() @> <@ Core.String.ToUpperCase @>
          ExpressionReplacer.createUnsafe <@ fun (s:string) -> s.Length @> <@ Core.String.Length @>
          ExpressionReplacer.createUnsafe <@ fun (s:string) -> s.[0] @> <@ Core.String.CharAt @>
+         ExpressionReplacer.create <@ fun (s:string) -> s.Substring @> <@ Redirects.substring @>
          // ExpressionReplacer.create <@ List.toSeq @> <@ Core.Seq.OfList @>
       ]
       ExpressionReplacer.createModuleMapping 

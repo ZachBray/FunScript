@@ -12,11 +12,14 @@ let components =
          ExpressionReplacer.createUnsafe 
             <@ fun () -> new StringWriter() @> 
             <@ fun () -> Core.StringWriter.StringWriter.Create() @>
-
       ]
 
       ExpressionReplacer.createTypeMethodMappings 
          typeof<StringWriter>
          typeof<Core.StringWriter.StringWriter>
+
+      ExpressionReplacer.createTypeMethodMappings
+         typeof<System.Lazy<_>>
+         typeof<Core.LanguagePrimitives.Lazy<_>>
 
    ] |> List.concat
