@@ -17,7 +17,7 @@ let checkAreEqualWithComponents components expectedResult quote =
       Assert.That((result = expectedResult))
    // Wrap xUnit exceptions to stop pauses.
    with ex ->
-      printfn "// Code:\n%s" code
+      //printfn "// Code:\n%s" code
       if ex.GetType().Namespace.StartsWith "FunScript" then raise ex
       else failwithf "Message: %s\n" ex.Message
 

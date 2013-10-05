@@ -43,10 +43,11 @@ let private (|CallPattern|_|) = Objects.methodCallPattern
 
 let private createGlobalMethod name compiler mb callType =
    match Objects.replaceIfAvailable compiler mb callType with
-   | (CallPattern(vars, bodyExpr) as replacementMi) ->
+   | (CallPattern getVarsExpr as replacementMi) ->
       let typeArgs = Reflection.getGenericMethodArgs replacementMi
       let specialization = Reflection.getSpecializationString compiler typeArgs
       compiler.DefineGlobal (name + specialization) (fun var ->
+         let vars, bodyExpr = getVarsExpr()
          genMethod mb replacementMi vars bodyExpr var compiler)
    | _ -> failwithf "No reflected definition for method: %s" mb.Name
 
