@@ -17,9 +17,9 @@ let primitiveTypes =
       typeof<uint32>.FullName
       typeof<int64>.FullName
       typeof<uint64>.FullName
-      typeof<float>.FullName
-      typeof<single>.FullName
       typeof<float32>.FullName
+      typeof<float>.FullName
+      typeof<decimal>.FullName
 
       typeof<string>.FullName
       typeof<char>.FullName

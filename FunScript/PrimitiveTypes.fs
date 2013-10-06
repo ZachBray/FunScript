@@ -20,6 +20,7 @@ let private primitiveValues =
       | DerivedPatterns.UInt64 x -> [ yield returnStategy.Return <| Number(float x) ]
       | DerivedPatterns.Single x -> [ yield returnStategy.Return <| Number(float x) ]
       | DerivedPatterns.Double x -> [ yield returnStategy.Return <| Number(x) ]
+      // TODO: our own decimal type?
       | Patterns.Value(null, _) -> [ yield returnStategy.Return <| Null ]
       | Patterns.Value(x, t) ->
             if t.IsEnum then [ yield returnStategy.Return <| Integer(unbox x) ]

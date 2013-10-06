@@ -26,6 +26,7 @@ let private allComponents =
       ControlFlow.components
       Objects.components
       Reflection.components
+      TypeConversions.components
       OtherMappings.components
       CommonOperators.components
    ] |> List.concat
