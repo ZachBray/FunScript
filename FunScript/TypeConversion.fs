@@ -6,6 +6,7 @@ open System
 
 [<JS; AutoOpen>]
 module internal Replacements =
+
     [<JSEmit("return parseInt({0});")>]
     let parseInt (x : string) : int = failwith "never"
     
