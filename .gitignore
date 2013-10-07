@@ -1,5 +1,6 @@
 bin
 obj
+NuGet/lib/*
 [Rr]elease*/
 _ReSharper*/
 *.ReSharper
