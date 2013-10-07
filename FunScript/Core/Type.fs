@@ -90,7 +90,7 @@ let mkDelayedNoFlags (t : Type) f =
 
 type FSharpValue() =
 
-    static member PreComputeUnionTagReader (t : Type, _ : obj) =
+    static member PreComputeUnionTagReader (t : Type, _ : obj) : obj -> int =
         getTag
 
     static member MakeUnion(uci : UnionCaseInfo, args : obj[], _ : obj) =

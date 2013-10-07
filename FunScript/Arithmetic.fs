@@ -27,11 +27,11 @@ type MathJS() =
     [<JSEmit("return Math.atan({0});")>]
     static member Atan(x : float) : float = failwith "never"
 
-    [<JSEmit("return Math.atan2({0});")>]
-    static member Atan2(x : float) : float = failwith "never"
+    [<JSEmit("return Math.atan2({0}, {1});")>]
+    static member Atan2(x : float, y : float) : float = failwith "never"
 
     [<JSEmit("return Math.ceil({0});")>]
-    static member Ceil(x : float) : float = failwith "never"
+    static member Ceiling(x : float) : float = failwith "never"
 
     [<JSEmit("return Math.cos({0});")>]
     static member Cos(x : float) : float = failwith "never"
@@ -60,12 +60,6 @@ type MathJS() =
     [<JSEmit("return Math.tan({0});")>]
     static member Tan(x : float) : float = failwith "never"
     
-    [<JSEmit("return Math.E;")>]
-    static member E() : float = failwith "never"
-
-    [<JSEmit("return Math.PI;")>]
-    static member PI() : float = failwith "never"
-    
     [<JSEmit("return Math.LN10;")>]
     static member LN10() : float = failwith "never"
 
@@ -85,19 +79,17 @@ let components = [
         CompilerComponent.unaryOp <@ op_UnaryNegation @> "-"
 
         ExpressionReplacer.createUnsafe <@ sqrt @> <@ MathJS.Sqrt @>
-        ExpressionReplacer.create <@ fun () -> Math.PI @> <@ fun () -> MathJS.PI() @>
-        ExpressionReplacer.create <@ fun () -> Math.E @> <@ fun () -> MathJS.E() @>
         ExpressionReplacer.createUnsafe <@ abs @> <@ MathJS.Abs @>
         ExpressionReplacer.createUnsafe <@ acos @> <@ MathJS.Acos @>
         ExpressionReplacer.createUnsafe <@ asin @> <@ MathJS.Asin @>
         ExpressionReplacer.createUnsafe <@ atan @> <@ MathJS.Atan @>
         ExpressionReplacer.createUnsafe <@ atan2 @> <@ MathJS.Atan2 @>
-        ExpressionReplacer.createUnsafe <@ ceil @> <@ MathJS.Ceil @>
+        ExpressionReplacer.createUnsafe <@ ceil @> <@ MathJS.Ceiling @>
         ExpressionReplacer.createUnsafe <@ cos @> <@ MathJS.Cos @>
         ExpressionReplacer.createUnsafe <@ exp @> <@ MathJS.Exp @>
         ExpressionReplacer.createUnsafe <@ floor @> <@ MathJS.Floor @>
-        ExpressionReplacer.createUnsafe <@ log @> <@ Math.Log @>
-        ExpressionReplacer.createUnsafe <@ log10 @> <@ Math.Log10 @>
+        ExpressionReplacer.createUnsafe <@ log @> <@ MathJS.Log @>
+        ExpressionReplacer.createUnsafe <@ log10 @> <@ MathJS.Log10 @>
         ExpressionReplacer.createUnsafe <@ pown @> <@ MathJS.Pow @>
         ExpressionReplacer.createUnsafe <@ round @> <@ MathJS.Round @>
         ExpressionReplacer.createUnsafe <@ sin @> <@ MathJS.Sin @>
