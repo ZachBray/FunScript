@@ -48,21 +48,13 @@ type AsyncBuilder() =
          r k
       v { Cont = cont; Aux = k.Aux }
 
-// Needs to work for non-monadic and monadic using. Currently, we don't support this type of overloading...
-//   member x.Using<'T, 'R when 'T :> System.IDisposable>(Cont v:Async<'T>, f:'T -> Async<'R>) : Async<'R> = protectedCont <| fun k -> 
-//      //TODO: Stop leaking...
-//      let cont (a:'T) =
-//         let (Cont r) = f a 
-//         r k
-//      v { Cont = cont; Aux = k.Aux }
-//      // Why doesn't this work?
-////      let cont (a:'T) =
-////         let (Cont r) = f a 
-////         r { 
-////            Cont = fun x -> a.Dispose(); k.Cont x
-////            Aux = k.Aux
-////         }
-////      v { Cont = cont; Aux = k.Aux }
+   member x.Using<'T, 'R when 'T :> System.IDisposable>(a:'T, f:'T -> Async<'R>) : Async<'R> = protectedCont <| fun k -> 
+      let (Cont v) = f a
+      let resource = a :> System.IDisposable
+      v { 
+        Cont = fun x -> resource.Dispose(); k.Cont x
+        Aux = k.Aux
+      }
 
    member x.Delay(f) = protectedCont <| fun k -> 
       let (Cont r) = f ()

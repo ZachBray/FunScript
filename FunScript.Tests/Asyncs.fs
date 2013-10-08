@@ -5,6 +5,7 @@ open FunScript.Tests.Common
 [<NUnit.Framework.TestFixture>] 
 module FunScript.Tests.Asyncs
 
+open System
 open NUnit.Framework
 
 
@@ -30,4 +31,27 @@ let ``Simple async is executed correctly``() =
          //TODO: RunSynchronously would make more sense here but in JS I think this will be ok.
          |> Async.StartImmediate 
          !result
+      @@>
+
+[<FunScript.JS>]
+type DisposableAction(f) =
+    interface IDisposable with
+        member __.Dispose() = f()
+
+[<Test>]
+let ``async use statements should dispose of resources when the go out of scope``() =
+   checkAreEqual true
+      <@@ 
+         let isDisposed = ref false
+         let step1ok = ref false
+         let step2ok = ref false
+         let resource = async { return new DisposableAction(fun () -> isDisposed := true) }
+         async { 
+            use! r = resource
+            step1ok := not !isDisposed
+         }
+         //TODO: RunSynchronously would make more sense here but in JS I think this will be ok.
+         |> Async.StartImmediate 
+         step2ok := !isDisposed
+         !step1ok && !step2ok
       @@>
