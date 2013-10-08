@@ -15,12 +15,14 @@ let private splitDeclarationFromUsageIfNeeded (compiler:ICompiler) expr =
 //   | DeclareAndAssign(var, valExpr)::Do(Reference(var2) as refExpr)::[] when var = var2 ->
 //      [], valExpr
 //   | multipleStatements ->
-      let var = compiler.NextTempVar()
-      let declsAndRef =
-         [  yield Declare [var]
-            yield! compiler.Compile (ReturnStrategies.assignVar var) expr
-         ], Reference var
-      declsAndRef
+    let var = compiler.NextTempVar()
+    match compiler.Compile (ReturnStrategies.assignVar var) expr with
+    | [Assign(Reference v, expr)] -> [], expr
+    | assignmentSteps ->
+        [  
+            yield Declare [var]
+            yield! assignmentSteps
+        ], Reference var
 
 let makeFriendly transform compiler =
    let split = splitDeclarationFromUsageIfNeeded compiler
