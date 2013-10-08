@@ -3,10 +3,11 @@ module FunScript.Core.Option
 
 open FunScript
 
-let GetValue option = 
-   match option with 
-   | None -> invalidArg "option" "Expected Some got None"
-   | Some x -> x
+[<JSEmit("return {0}.Value;")>]
+let GetValue(option : obj) = failwith "never"
+//   match option with 
+//   | None -> invalidArg "option" "Expected Some got None"
+//   | Some x -> x
 
 let IsSome option = 
    match option with  

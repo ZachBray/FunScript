@@ -40,6 +40,8 @@ module private Replacements =
                         [arg2]),
                         [arg3])
 
+   let exn(msg : string) = System.Exception(msg)
+
 let private defaultValue =
    CompilerComponent.create <| fun (|Split|) _ returnStategy ->
       function
@@ -177,6 +179,7 @@ let components =
          CompilerComponent.unary <@ InternalCompiler.Helpers.Cast @> id
 
          // Exns 
+         //ExpressionReplacer.create <@ fun str -> exn str @> <@ Replacements.exn @>
          CompilerComponent.unaryStatement <@ raise @> Throw
          CompilerComponent.unaryStatement <@ invalidOp @> Throw
          CompilerComponent.unaryStatement <@ failwith @> Throw
@@ -202,6 +205,10 @@ let components =
             Replacements.applyCurried3
       ] 
       
+//      ExpressionReplacer.createTypeMethodMappings
+//         typeof<System.Exception>
+//         typeof<Core.LanguagePrimitives.Exception>
+
       ExpressionReplacer.createModuleMapping 
          "FSharp.Core" "Microsoft.FSharp.Core.LanguagePrimitives.IntrinsicFunctions"
          "FunScript" "FunScript.Core.LanguagePrimitives"

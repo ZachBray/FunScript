@@ -56,13 +56,19 @@ let ``setting a mutable module property works``() =
       @@>
 
 [<ReflectedDefinition>]
+module StaticBackingFields =
+    let mutable x = 0.
+
+[<ReflectedDefinition>]
 type StaticCalculator() =
    static member zero = 0.
    static member add x y = x + y
    static member subtract(x, y) = x - y
-   static member current
-      with get() = 0
-      and set (value:int) = ()
+   static member currentX2
+      with get() = StaticBackingFields.x
+      and set value = StaticBackingFields.x <- 2. * value
+   //NOTE: not supported by ReflectedDefinition/quotations because of static field
+   //static member val current = 0 with get, set
 
 [<Test>]
 let ``application of a static curried method works``() =
@@ -86,11 +92,20 @@ let ``getting a static property works``() =
 
 [<Test>]
 let ``setting a static property works``() =
-   check  <@@ StaticCalculator.current <- 1 @@>
+   check  <@@ StaticCalculator.currentX2 <- 1.; StaticCalculator.currentX2 @@>
+
+//[<Test>]
+//let ``setting a static auto-property works``() =
+//   check  
+//      <@@ StaticCalculator.current <- 3; StaticCalculator.current @@>
 
 type InstanceCalculator(x) =
    let y = x * 2.
+   let mutable x = 0.
    member val current = x with get, set
+   member __.currentX2 
+      with get() = x
+      and set v = x <- v * 2.
    member __.getY = y
    member __.zero = 0.
    member __.add x y = x + y
@@ -156,7 +171,16 @@ let ``setting an instance property works``() =
    check  
       <@@ 
          let calc = InstanceCalculator(10.)
-         calc.current <- calc.current + 1. @@>
+         calc.currentX2 <- 3.
+         calc.currentX2 @@>
+
+[<Test>]
+let ``setting an instance auto-property works``() =
+   check  
+      <@@ 
+         let calc = InstanceCalculator(10.)
+         calc.current <- 1.
+         calc.current @@>
 
 [<Test>]
 let ``let bound fields on instances work``() =

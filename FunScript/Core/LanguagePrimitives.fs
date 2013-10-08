@@ -34,3 +34,6 @@ type Lazy<'T>(value : 'T, factory: unit -> 'T) =
             value <- factory()
             isCreated <- true
         value
+
+type Exception(message) =
+    member __.Message = message

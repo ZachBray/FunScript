@@ -25,7 +25,7 @@ let getUniqueObjectId(x : obj)  =
         thisId
 
 // Note: JS only has single-threaded execution.
-// Note: Only supports 
+// TODO: Use array/object for hashtable like performance
 type ConcurrentDictionary<'k, 'v>() =
     let mutable innerCache = Map.empty
 

@@ -62,6 +62,7 @@
     <Compile Include="Core\Type.fs" />
     <Compile Include="Core\StringWriter.fs" />
     <Compile Include="Core\Dictionaries.fs" />
+    <Compile Include="Core\Web.fs" />
     <Compile Include="JavaScriptNameMapper.fs" />
     <Compile Include="AST.fs" />
     <Compile Include="QuoteExtensions.fs" />

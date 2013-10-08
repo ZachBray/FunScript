@@ -119,6 +119,13 @@ let private matching =
          [ yield! objDecl
            yield returnStategy.Return <| BinaryOp(PropertyGet(objRef, "Tag"), "==", Number(float uci.Tag))
          ]
+      | Patterns.Call(None, mi, [Split(objDecl, objRef)]) when 
+        FSharpType.IsUnion mi.DeclaringType && 
+        mi.Name = "GetTag" && 
+        mi.ReturnType = typeof<int> ->
+        [ yield! objDecl
+          yield returnStategy.Return <| PropertyGet(objRef, "Tag")
+        ]
       | _ -> []
 
 let components = [ 

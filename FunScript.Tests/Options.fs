@@ -29,6 +29,24 @@ let ``Option.IsNone works``() =
       @@>
 
 [<Test>]
+let ``pattern matching on None works``() =
+   check  
+      <@@ 
+         match None with
+         | Some _ -> "foo"
+         | None -> "bar"
+      @@>
+
+[<Test>]
+let ``pattern matching on Some works``() =
+   check  
+      <@@ 
+         match Some 1 with
+         | None -> "bar"
+         | Some _ -> "foo"
+      @@>
+
+[<Test>]
 let ``Option.bind works``() =
    check  
       <@@ 
