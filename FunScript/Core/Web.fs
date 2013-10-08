@@ -112,7 +112,8 @@ type Stream(initalContents : byte[]) =
             nextIndex <- nextIndex + count
             return Array.sub contents start count
         }
-
+        
+    member __.Dispose() = ()
     interface IDisposable with
         member __.Dispose() = ()
 
@@ -121,6 +122,7 @@ type WebResponse(contents) =
     member __.GetResponseStream() = new Stream(contents)
     member __.ContentLength = int64 contents.Length
 
+    member __.Dispose() = ()
     interface IDisposable with
         member __.Dispose() = ()
 

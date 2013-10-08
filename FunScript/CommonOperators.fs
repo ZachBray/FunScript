@@ -179,7 +179,7 @@ let components =
          CompilerComponent.unary <@ InternalCompiler.Helpers.Cast @> id
 
          // Exns 
-         //ExpressionReplacer.create <@ fun str -> exn str @> <@ Replacements.exn @>
+         ExpressionReplacer.create <@ fun str -> exn str @> <@ Replacements.exn @>
          CompilerComponent.unaryStatement <@ raise @> Throw
          CompilerComponent.unaryStatement <@ invalidOp @> Throw
          CompilerComponent.unaryStatement <@ failwith @> Throw
@@ -205,9 +205,9 @@ let components =
             Replacements.applyCurried3
       ] 
       
-//      ExpressionReplacer.createTypeMethodMappings
-//         typeof<System.Exception>
-//         typeof<Core.LanguagePrimitives.Exception>
+      ExpressionReplacer.createTypeMethodMappings
+         typeof<System.Exception>
+         typeof<Core.LanguagePrimitives.Exception>
 
       ExpressionReplacer.createModuleMapping 
          "FSharp.Core" "Microsoft.FSharp.Core.LanguagePrimitives.IntrinsicFunctions"

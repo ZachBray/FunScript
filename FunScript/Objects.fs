@@ -42,7 +42,7 @@ let private propertySetter =
 
 let localized (name:string) =
    let sections = name.Split '-'
-   JavaScriptNameMapper.sanitize name sections.[sections.Length - 1]
+   JavaScriptNameMapper.sanitizeAux sections.[sections.Length - 1]
 
 let private getAllMethods (t:System.Type) =
    t.GetMethods(
