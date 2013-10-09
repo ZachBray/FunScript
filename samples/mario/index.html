@@ -13,29 +13,29 @@
   <meta name="author" content="Zach Bray">
 
   <!-- Reference Foundation -->
-  <link rel="stylesheet" href="http://funscript.info/css/foundation.css" />
-  <script src="http://funscript.info/js/vendor/custom.modernizr.js"></script>
+  <link rel="stylesheet" href="http://www.funscript.info/css/foundation.css" />
+  <script src="http://www.funscript.info/js/vendor/custom.modernizr.js"></script>
 
   <!-- Reference custom CSS and tooltips -->
-  <link type="text/css" rel="stylesheet" href="http://funscript.info/custom/style.css" />
-  <script src="http://funscript.info/custom/tooltips.js" type="text/javascript"></script>
-  <link type="text/css" rel="stylesheet" href="http://funscript.info/custom/tooltips.css" />
+  <link type="text/css" rel="stylesheet" href="http://www.funscript.info/custom/style.css" />
+  <script src="http://www.funscript.info/custom/tooltips.js" type="text/javascript"></script>
+  <link type="text/css" rel="stylesheet" href="http://www.funscript.info/custom/tooltips.css" />
 </head>
 <body>
 
   <!-- Header bar with name and navigation links -->
   <nav class="top-bar">
     <ul class="title-area">
-      <li class="name"><h1><a href="http://funscript.info">FunScript</a></h1></li>
+      <li class="name"><h1><a href="http://www.funscript.info">FunScript</a></h1></li>
       <li class="toggle-topbar"><a href="#"><span>Menu</span></a></li>
     </ul>
 
     <section class="top-bar-section">
       <ul class="left">
-        <li><a href="http://funscript.info/index.html">home</a></li>
-        <li><a href="http://funscript.info/learn.html">learn more</a></li>
-        <li><a href="http://funscript.info/get.html">get started</a></li>
-        <li><a href="http://funscript.info/contribute.html">contribute</a></li>
+        <li><a href="http://www.funscript.info/index.html">home</a></li>
+        <li><a href="http://www.funscript.info/learn.html">learn more</a></li>
+        <li><a href="http://www.funscript.info/get.html">get started</a></li>
+        <li><a href="http://www.funscript.info/contribute.html">contribute</a></li>
       </ul>
     </section>
   </nav>
@@ -50,9 +50,9 @@
   </header>
 
   <!-- Some more Foundation references (always load jQuery, because samples use it) -->
-  <script src="http://funscript.info/js/vendor/jquery.js"></script>
-  <script src="http://funscript.info/js/foundation.min.js"></script>  
-  <script src="http://funscript.info/js/foundation/foundation.reveal.js"></script>
+  <script src="http://www.funscript.info/js/vendor/jquery.js"></script>
+  <script src="http://www.funscript.info/js/foundation.min.js"></script>  
+  <script src="http://www.funscript.info/js/foundation/foundation.reveal.js"></script>
   <script>
     $(document).foundation();
   </script>
@@ -308,48 +308,18 @@ function that calculates a new game state using <code>step</code> and renders it
   <!-- JavaScript code from the sample goes here... -->
   <script type="text/javascript">
     $(document).ready(function () {
-var mario___ctor$, Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Object_Object_, Window__op_Dollar$String_String, Window__op_Dollar$Int32_Int32, Window__image$, Window__filled$String_String, Window__dimensions$, Window__context$, Window__canvas$, TupleSetTree_1_Int32__SetTree_1_Int32_, TupleInt32_SetTree_1_Int32_, TupleInt32_Int32, TupleDouble_Double_Double_Double, TupleDouble_Double, String_1_IndexOf$, Set__Remove$Int32_Int32, Set__Empty$Int32_Int32, Set__Add$Int32_Int32, Set_1_Int32__get_Tree$Int32, Set_1_Int32__get_Empty$Int32, Set_1_Int32__get_Comparer$Int32, Set_1_Int32___ctor$Int32, Set_1_Int32__Remove$Int32, Set_1_Int32__Add$Int32, Set_1_IComparable__get_Tree$IComparable_, Set_1_IComparable__get_Comparer$IComparable_, Set_1_IComparable__Contains$IComparable_, SetTree_1_Int32__SetOneInt32, SetTree_1_Int32__SetNodeInt32, SetTree_1_Int32__SetEmptyInt32, SetTreeModule__spliceOutSuccessor$Int32_Int32, SetTreeModule__remove$Int32_Int32, SetTreeModule__rebalance$Int32_Int32, SetTreeModule__mk$Int32_Int32, SetTreeModule__mem$IComparable_IComparable_, SetTreeModule__height$Int32_Int32, SetTreeModule__get_tolerance$, SetTreeModule__add$Int32_Int32, SetTreeModule__SetOne$Int32_Int32, SetTreeModule__SetNode$Int32_Int32, Program__walk$Int32_Int32, Program__step$, Program__render$, Program__physics$, Program__main$, Program__jump$Int32_Int32, Program__gravity$, Keyboard__update$Object_Object_, Keyboard__keysPressed, Keyboard__init$, Keyboard__get_keysPressed$, Keyboard__code$, Keyboard__arrows$, GenericComparer_1_Int32___ctor$Int32;
+var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Object_Object_, Window__op_Dollar$String_String, Window__op_Dollar$Int32_Int32, Window__image$, Window__filled$String_String, Window__dimensions$, Window__context$, Window__canvas$, TupleSetTree_1_Int32__SetTree_1_Int32_, TupleInt32_SetTree_1_Int32_, TupleInt32_Int32, TupleDouble_Double_Double_Double, TupleDouble_Double, String_1_IndexOf$, Set__Remove$Int32_Int32, Set__Empty$Int32_Int32, Set__Add$Int32_Int32, Set_1_Int32__get_Tree$Int32, Set_1_Int32__get_Empty$Int32, Set_1_Int32__get_Comparer$Int32, Set_1_Int32___ctor$Int32, Set_1_Int32__Remove$Int32, Set_1_Int32__Add$Int32, Set_1_IComparable__get_Tree$IComparable_, Set_1_IComparable__get_Comparer$IComparable_, Set_1_IComparable__Contains$IComparable_, SetTree_1_Int32__SetOneInt32, SetTree_1_Int32__SetNodeInt32, SetTree_1_Int32__SetEmptyInt32, SetTreeModule__tolerance, SetTreeModule__spliceOutSuccessor$Int32_Int32, SetTreeModule__remove$Int32_Int32, SetTreeModule__rebalance$Int32_Int32, SetTreeModule__mk$Int32_Int32, SetTreeModule__mem$IComparable_IComparable_, SetTreeModule__height$Int32_Int32, SetTreeModule__get_tolerance$, SetTreeModule__add$Int32_Int32, SetTreeModule__SetOne$Int32_Int32, SetTreeModule__SetNode$Int32_Int32, Program__walk$Int32_Int32, Program__step$, Program__render$, Program__physics$, Program__main$, Program__jump$Int32_Int32, Program__gravity$, Mario___ctor$, Keyboard__update$Object_Object_, Keyboard__keysPressed, Keyboard__init$, Keyboard__get_keysPressed$, Keyboard__code$, Keyboard__arrows$, GenericComparer_1_Int32___ctor$Int32;
   GenericComparer_1_Int32___ctor$Int32 = (function (unitVar0)
   {
     ;
   });
   Keyboard__arrows$ = (function (unitVar0)
   {
-    var _401;
-    var _402;
-    var _403;
-    _403 = 39;
-    _402 = Keyboard__code$(_403);
-    var _453;
-    var _454;
-    _454 = 37;
-    _453 = Keyboard__code$(_454);
-    _401 = (_402 - _453);
-    var _455;
-    var _456;
-    var _457;
-    _457 = 38;
-    _456 = Keyboard__code$(_457);
-    var _458;
-    var _459;
-    _459 = 40;
-    _458 = Keyboard__code$(_459);
-    _455 = (_456 - _458);
-    return (new TupleInt32_Int32(_401, _455));
+    return (new TupleInt32_Int32((Keyboard__code$(39) - Keyboard__code$(37)), (Keyboard__code$(38) - Keyboard__code$(40))));
   });
   Keyboard__code$ = (function (x)
   {
-    var _404;
-    var _405;
-    var _406;
-    _406 = Keyboard__keysPressed;
-    _405 = _406;
-    var _407;
-    var _408;
-    _408 = x;
-    _407 = _408;
-    _404 = Set_1_IComparable__Contains$IComparable_(_405, _407);
-    if (_404) 
+    if (Set_1_IComparable__Contains$IComparable_(Keyboard__keysPressed, x)) 
     {
       return 1;
     }
@@ -364,67 +334,27 @@ var mario___ctor$, Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__po
   });
   Keyboard__init$ = (function (unitVar0)
   {
-    var _1;
-    _1 = "keydown";
-    var _2;
-    var _3;
-    _3 = (function (e)
+    addEventListener("keydown", (function (e)
     {
-      var _4;
-      _4 = e;
-      var _5;
-      _5 = true;
-      return Keyboard__update$Object_Object_(_4, _5);
-    });
-    _2 = _3;
-    addEventListener(_1, _2);
-    var _370;
-    _370 = "keyup";
-    var _371;
-    var _372;
-    _372 = (function (e)
+      return Keyboard__update$Object_Object_(e, true);
+    }));
+    return addEventListener("keyup", (function (e)
     {
-      var _373;
-      _373 = e;
-      var _374;
-      _374 = false;
-      return Keyboard__update$Object_Object_(_373, _374);
-    });
-    _371 = _372;
-    return addEventListener(_370, _371);
+      return Keyboard__update$Object_Object_(e, false);
+    }));
   });
   Keyboard__update$Object_Object_ = (function (e, pressed)
   {
-    var _6;
-    var _7;
-    _7 = e;
-    _6 = _7;
-    var _e = _6;
-    var _8;
-    var _9;
-    var _10;
-    _10 = _e;
-    _9 = _10.keyCode;
-    _8 = _9;
-    var keyCode = _8;
+    var _e = e;
+    var keyCode = _e.keyCode;
     var _11;
-    var _12;
-    _12 = pressed;
-    if (_12) 
+    if (pressed) 
     {
       _11 = (function (value)
       {
         return (function (set)
         {
-          var _13;
-          var _14;
-          _14 = value;
-          _13 = _14;
-          var _15;
-          var _16;
-          _16 = set;
-          _15 = _16;
-          return Set__Add$Int32_Int32(_13, _15);
+          return Set__Add$Int32_Int32(value, set);
         });
       });
     }
@@ -434,71 +364,82 @@ var mario___ctor$, Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__po
       {
         return (function (set)
         {
-          var _249;
-          var _250;
-          _250 = value;
-          _249 = _250;
-          var _251;
-          var _252;
-          _252 = set;
-          _251 = _252;
-          return Set__Remove$Int32_Int32(_249, _251);
+          return Set__Remove$Int32_Int32(value, set);
         });
       });
     };
     var op = _11;
-    var _360;
-    var _361;
-    var _362;
-    _362 = op;
-    var _363;
-    _363 = keyCode;
-    _361 = _362(_363);
-    var _364;
-    _364 = Keyboard__keysPressed;
-    _360 = _361(_364);
-    Keyboard__keysPressed = _360;
+    Keyboard__keysPressed = op(keyCode)(Keyboard__keysPressed);
+  });
+  Mario___ctor$ = (function (x, y, vx, vy, dir)
+  {
+    this.x = x;
+    this.y = y;
+    this.vx = vx;
+    this.vy = vy;
+    this.dir = dir;
+  });
+  Mario___ctor$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.x < that.x) ? -1.000000 : ((this.x == that.x) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = ((this.y < that.y) ? -1.000000 : ((this.y == that.y) ? 0.000000 : 1.000000));
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        var ___diff = 0.000000;
+        ___diff = ((this.vx < that.vx) ? -1.000000 : ((this.vx == that.vx) ? 0.000000 : 1.000000));
+        diff = ___diff;
+        if ((diff != 0.000000)) 
+        {
+          return diff;
+        }
+        else
+        {
+          var ____diff = 0.000000;
+          ____diff = ((this.vy < that.vy) ? -1.000000 : ((this.vy == that.vy) ? 0.000000 : 1.000000));
+          diff = ____diff;
+          if ((diff != 0.000000)) 
+          {
+            return diff;
+          }
+          else
+          {
+            var _____diff = 0.000000;
+            _____diff = ((this.dir < that.dir) ? -1.000000 : ((this.dir == that.dir) ? 0.000000 : 1.000000));
+            diff = _____diff;
+            if ((diff != 0.000000)) 
+            {
+              return diff;
+            }
+            else
+            {
+              return 0.000000;
+            };
+          };
+        };
+      };
+    };
   });
   Program__gravity$ = (function (m)
   {
-    var _503;
-    var _504;
-    var _506;
-    _506 = m;
-    _504 = _506.y;
-    var _507;
-    _507 = 0.000000;
-    _503 = (_504 > _507);
-    if (_503) 
+    if ((m.y > 0.000000)) 
     {
-      var _508;
-      var _509;
-      var _511;
-      _511 = m;
-      _509 = _511.vy;
-      var _512;
-      _512 = 0.100000;
-      _508 = (_509 - _512);
-      var vy = _508;
-      var _513;
-      var _515;
-      _515 = m;
-      _513 = _515.x;
-      var _516;
-      var _518;
-      _518 = m;
-      _516 = _518.y;
-      var _519;
-      var _521;
-      _521 = m;
-      _519 = _521.vx;
-      var _522;
-      _522 = vy;
-      var _523;
-      var _525;
-      _525 = m;
-      _523 = _525.dir;
-      return (new mario___ctor$(_513, _516, _519, _522, _523));
+      var vy = (m.vy - 0.100000);
+      return (new Mario___ctor$(m.x, m.y, m.vx, vy, m.dir));
     }
     else
     {
@@ -507,47 +448,10 @@ var mario___ctor$, Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__po
   });
   Program__jump$Int32_Int32 = (function (_arg1, y, m)
   {
-    var _478;
-    var _479;
-    var _480;
-    _480 = y;
-    var _481;
-    _481 = 0;
-    _479 = (_480 > _481);
-    _478 = (_479 && (function ()
+    if (((y > 0) && (m.y == 0.000000))) 
     {
-      var _482;
-      var _484;
-      _484 = m;
-      _482 = _484.y;
-      var _485;
-      _485 = 0.000000;
-      return (_482 == _485);
-    })());
-    if (_478) 
-    {
-      var _486;
-      _486 = 5.000000;
-      var vy = _486;
-      var _487;
-      var _489;
-      _489 = m;
-      _487 = _489.x;
-      var _490;
-      var _492;
-      _492 = m;
-      _490 = _492.y;
-      var _493;
-      var _495;
-      _495 = m;
-      _493 = _495.vx;
-      var _496;
-      _496 = vy;
-      var _497;
-      var _499;
-      _499 = m;
-      _497 = _499.dir;
-      return (new mario___ctor$(_487, _490, _493, _496, _497));
+      var vy = 5.000000;
+      return (new Mario___ctor$(m.x, m.y, m.vx, vy, m.dir));
     }
     else
     {
@@ -557,697 +461,208 @@ var mario___ctor$, Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__po
   Program__main$ = (function (unitVar0)
   {
     Keyboard__init$();
-    var _375;
-    _375 = Window__dimensions$();
-    var patternInput = _375;
-    var _383;
-    var _384;
-    _384 = patternInput;
-    _383 = _384.Items[0.000000];
-    var w = _383;
-    var _385;
-    var _386;
-    _386 = patternInput;
-    _385 = _386.Items[1.000000];
-    var h = _385;
-    var _387;
-    var _388;
-    var _389;
-    _389 = 0.000000;
-    var _390;
-    _390 = 0.000000;
-    var _391;
-    _391 = 0.000000;
-    var _392;
-    _392 = 0.000000;
-    var _393;
-    _393 = "right";
-    _388 = (new mario___ctor$(_389, _390, _391, _392, _393));
-    _387 = {contents: _388};
-    var mario = _387;
+    var patternInput = Window__dimensions$();
+    var w = patternInput.Items[0.000000];
+    var h = patternInput.Items[1.000000];
     var update;
-    var _396;
-    _396 = (function (_unitVar0)
+    update = (function (mario)
     {
-      var _596;
-      _596 = mario;
-      var _597;
-      var _598;
-      var _599;
-      _599 = Keyboard__arrows$();
-      var tupledArg = _599;
-      var _600;
-      var _601;
-      _601 = tupledArg;
-      _600 = _601.Items[0.000000];
-      var arg00_ = _600;
-      var _602;
-      var _603;
-      _603 = tupledArg;
-      _602 = _603.Items[1.000000];
-      var arg01_ = _602;
-      _598 = (function (_mario)
+      return (function (unitVar1)
       {
-        var _604;
-        _604 = arg00_;
-        var _605;
-        _605 = arg01_;
-        var _606;
-        _606 = _mario;
-        return Program__step$(_604, _605, _606);
+        var _396;
+        var _397;
+        var tupledArg = Keyboard__arrows$();
+        var arg00_ = tupledArg.Items[0.000000];
+        var arg01_ = tupledArg.Items[1.000000];
+        _397 = (function (_mario)
+        {
+          return Program__step$(arg00_, arg01_, _mario);
+        });
+        _396 = _397(mario);
+        var _mario = _396;
+        Program__render$(w, h, _mario);
+        return (function (value)
+        {
+          var ignored0 = value;
+        })(setTimeout(update(_mario), (1000.000000 / 60.000000)));
       });
-      var _607;
-      var _609;
-      _609 = mario;
-      _607 = _609.contents;
-      _597 = _598(_607);
-      _596.contents = _597;
-      null;
-      var _610;
-      _610 = w;
-      var _611;
-      _611 = h;
-      var _612;
-      var _614;
-      _614 = mario;
-      _612 = _614.contents;
-      Program__render$(_610, _611, _612);
-      var _781;
-      _781 = (function (value)
-      {
-        var _782;
-        _782 = value;
-        var ignored0 = _782;
-      });
-      var _783;
-      var _784;
-      _784 = update;
-      var _785;
-      var _786;
-      _786 = 1000.000000;
-      var _787;
-      _787 = 60.000000;
-      _785 = (_786 / _787);
-      _783 = setTimeout(_784, _785);
-      return _781(_783);
     });
-    update = _396;
-    var _394;
-    _394 = update;
-    var _395;
-    return _394(_395);
+    var mario = (new Mario___ctor$(0.000000, 0.000000, 0.000000, 0.000000, "right"));
+    return update(mario);
   });
   Program__physics$ = (function (m)
   {
-    var _560;
-    var _561;
-    var _563;
-    _563 = m;
-    _561 = _563.x;
-    var _564;
-    var _566;
-    _566 = m;
-    _564 = _566.vx;
-    _560 = (_561 + _564);
-    var _567;
-    var _568;
-    var _569;
-    var _570;
-    var _572;
-    _572 = m;
-    _570 = _572.y;
-    var _573;
-    var _575;
-    _575 = m;
-    _573 = _575.vy;
-    _569 = (_570 + _573);
-    var _576;
-    _576 = 0.000000;
-    _568 = (_569 > _576);
-    if (_568) 
+    var _565;
+    if (((m.y + m.vy) > 0.000000)) 
     {
-      var _577;
-      var _579;
-      _579 = m;
-      _577 = _579.y;
-      var _580;
-      var _582;
-      _582 = m;
-      _580 = _582.vy;
-      _567 = (_577 + _580);
+      _565 = (m.y + m.vy);
     }
     else
     {
-      _567 = 0.000000;
+      _565 = 0.000000;
     };
-    var _583;
-    var _585;
-    _585 = m;
-    _583 = _585.vx;
-    var _586;
-    var _588;
-    _588 = m;
-    _586 = _588.vy;
-    var _589;
-    var _591;
-    _591 = m;
-    _589 = _591.dir;
-    return (new mario___ctor$(_560, _567, _583, _586, _589));
+    return (new Mario___ctor$((m.x + m.vx), _565, m.vx, m.vy, m.dir));
   });
   Program__render$ = (function (w, h, mario)
   {
-    var _615;
-    var _616;
-    var _617;
-    _617 = 174;
-    var _618;
-    _618 = 238;
-    var _619;
-    _619 = 238;
-    _616 = Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32(_617, _618, _619);
-    var color = _616;
-    _615 = (function (tupledArg)
+    var _595;
+    var color = Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32(174, 238, 238);
+    _595 = (function (tupledArg)
     {
-      var _638;
-      var _639;
-      _639 = tupledArg;
-      _638 = _639.Items[0.000000];
-      var arg10_ = _638;
-      var _640;
-      var _641;
-      _641 = tupledArg;
-      _640 = _641.Items[1.000000];
-      var arg11_ = _640;
-      var _642;
-      var _643;
-      _643 = tupledArg;
-      _642 = _643.Items[2.000000];
-      var arg12_ = _642;
-      var _644;
-      var _645;
-      _645 = tupledArg;
-      _644 = _645.Items[3.000000];
-      var arg13_ = _644;
-      var _646;
-      _646 = color;
-      var _647;
-      _647 = arg10_;
-      var _648;
-      _648 = arg11_;
-      var _649;
-      _649 = arg12_;
-      var _650;
-      _650 = arg13_;
-      return Window__filled$String_String(_646, _647, _648, _649, _650);
+      var arg10_ = tupledArg.Items[0.000000];
+      var arg11_ = tupledArg.Items[1.000000];
+      var arg12_ = tupledArg.Items[2.000000];
+      var arg13_ = tupledArg.Items[3.000000];
+      return Window__filled$String_String(color, arg10_, arg11_, arg12_, arg13_);
     });
-    var _676;
-    var _677;
-    _677 = 0.000000;
-    var _678;
-    _678 = 0.000000;
-    var _679;
-    _679 = w;
-    var _680;
-    _680 = h;
-    _676 = (new TupleDouble_Double_Double_Double(_677, _678, _679, _680));
-    _615(_676);
-    var _681;
-    var _682;
-    var _683;
-    _683 = 74;
-    var _684;
-    _684 = 163;
-    var _685;
-    _685 = 41;
-    _682 = Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32(_683, _684, _685);
-    var _color = _682;
-    _681 = (function (tupledArg)
+    _595((new TupleDouble_Double_Double_Double(0.000000, 0.000000, w, h)));
+    var _661;
+    var _color = Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32(74, 163, 41);
+    _661 = (function (tupledArg)
     {
-      var _686;
-      var _687;
-      _687 = tupledArg;
-      _686 = _687.Items[0.000000];
-      var arg10_ = _686;
-      var _688;
-      var _689;
-      _689 = tupledArg;
-      _688 = _689.Items[1.000000];
-      var arg11_ = _688;
-      var _690;
-      var _691;
-      _691 = tupledArg;
-      _690 = _691.Items[2.000000];
-      var arg12_ = _690;
-      var _692;
-      var _693;
-      _693 = tupledArg;
-      _692 = _693.Items[3.000000];
-      var arg13_ = _692;
-      var _694;
-      _694 = _color;
-      var _695;
-      _695 = arg10_;
-      var _696;
-      _696 = arg11_;
-      var _697;
-      _697 = arg12_;
-      var _698;
-      _698 = arg13_;
-      return Window__filled$String_String(_694, _695, _696, _697, _698);
+      var arg10_ = tupledArg.Items[0.000000];
+      var arg11_ = tupledArg.Items[1.000000];
+      var arg12_ = tupledArg.Items[2.000000];
+      var arg13_ = tupledArg.Items[3.000000];
+      return Window__filled$String_String(_color, arg10_, arg11_, arg12_, arg13_);
     });
-    var _699;
-    var _700;
-    _700 = 0.000000;
-    var _701;
-    var _702;
-    _702 = h;
-    var _703;
-    _703 = 50.000000;
-    _701 = (_702 - _703);
-    var _704;
-    _704 = w;
-    var _705;
-    _705 = 50.000000;
-    _699 = (new TupleDouble_Double_Double_Double(_700, _701, _704, _705));
-    _681(_699);
-    var _706;
-    var _707;
-    var _708;
-    var _710;
-    _710 = mario;
-    _708 = _710.y;
-    var _711;
-    _711 = 0.000000;
-    _707 = (_708 > _711);
-    if (_707) 
+    _661((new TupleDouble_Double_Double_Double(0.000000, (h - 50.000000), w, 50.000000)));
+    var _686;
+    if ((mario.y > 0.000000)) 
     {
-      _706 = "jump";
+      _686 = "jump";
     }
     else
     {
-      var _712;
-      var _713;
-      var _715;
-      _715 = mario;
-      _713 = _715.vx;
-      var _716;
-      _716 = 0.000000;
-      _712 = (_713 != _716);
-      if (_712) 
+      if ((mario.vx != 0.000000)) 
       {
-        _706 = "walk";
+        _686 = "walk";
       }
       else
       {
-        _706 = "stand";
+        _686 = "stand";
       };
     };
-    var verb = _706;
-    var _717;
-    var _718;
-    var _719;
-    var _720;
-    var _721;
-    var _722;
-    _722 = w;
-    var _723;
-    _723 = 2.000000;
-    _721 = (_722 / _723);
-    var _724;
-    _724 = 16.000000;
-    _720 = (_721 - _724);
-    var _725;
-    var _727;
-    _727 = mario;
-    _725 = _727.x;
-    _719 = (_720 + _725);
-    var _728;
-    var _729;
-    var _730;
-    var _731;
-    _731 = h;
-    var _732;
-    _732 = 50.000000;
-    _730 = (_731 - _732);
-    var _733;
-    _733 = 31.000000;
-    _729 = (_730 - _733);
-    var _734;
-    var _736;
-    _736 = mario;
-    _734 = _736.y;
-    _728 = (_729 - _734);
-    _718 = (new TupleDouble_Double(_719, _728));
-    var tupledArg = _718;
-    var _737;
-    var _738;
-    _738 = tupledArg;
-    _737 = _738.Items[0.000000];
-    var x = _737;
-    var _739;
-    var _740;
-    _740 = tupledArg;
-    _739 = _740.Items[1.000000];
-    var y = _739;
-    _717 = (function (img)
+    var verb = _686;
+    var _697;
+    var tupledArg = (new TupleDouble_Double((((w / 2.000000) - 16.000000) + mario.x), (((h - 50.000000) - 31.000000) - mario.y)));
+    var x = tupledArg.Items[0.000000];
+    var y = tupledArg.Items[1.000000];
+    _697 = (function (img)
     {
-      var _741;
-      _741 = x;
-      var _742;
-      _742 = y;
-      var _743;
-      _743 = img;
-      return Window__position$Object_Object_(_741, _742, _743);
+      return Window__position$Object_Object_(x, y, img);
     });
-    var _755;
-    var _756;
-    _756 = (function (src)
+    return _697((function (src)
     {
-      var _757;
-      _757 = src;
-      return Window__image$(_757);
-    });
-    var _772;
-    var _773;
-    var _774;
-    var _775;
-    _775 = "mario";
-    var _776;
-    _776 = verb;
-    _774 = (_775 + _776);
-    var _777;
-    var _779;
-    _779 = mario;
-    _777 = _779.dir;
-    _773 = (_774 + _777);
-    var _780;
-    _780 = ".gif";
-    _772 = (_773 + _780);
-    _755 = _756(_772);
-    return _717(_755);
+      return Window__image$(src);
+    })(((("mario" + verb) + mario.dir) + ".gif")));
   });
   Program__step$ = (function (dir_0, dir_1, mario)
   {
-    var _467;
+    var dir = (new TupleInt32_Int32(dir_0, dir_1));
     var _468;
-    _468 = dir_0;
-    var _469;
-    _469 = dir_1;
-    _467 = (new TupleInt32_Int32(_468, _469));
-    var dir = _467;
-    var _470;
-    var _471;
-    var _472;
-    _472 = dir;
-    _471 = _472.Items[0.000000];
-    var arg00_ = _471;
-    var _473;
-    var _474;
-    _474 = dir;
-    _473 = _474.Items[1.000000];
-    var y = _473;
-    _470 = (function (m)
+    var arg00_ = dir.Items[0.000000];
+    var y = dir.Items[1.000000];
+    _468 = (function (m)
     {
-      var _475;
-      _475 = arg00_;
-      var _476;
-      _476 = y;
-      var _477;
-      _477 = m;
-      return Program__jump$Int32_Int32(_475, _476, _477);
+      return Program__jump$Int32_Int32(arg00_, y, m);
     });
-    var _500;
-    var _501;
-    _501 = (function (m)
+    var _498;
+    var _524;
+    var _525;
+    var x = dir.Items[0.000000];
+    var arg01_ = dir.Items[1.000000];
+    _525 = (function (m)
     {
-      var _502;
-      _502 = m;
-      return Program__gravity$(_502);
+      return Program__walk$Int32_Int32(x, arg01_, m);
     });
-    var _526;
-    var _527;
-    var _528;
-    var _529;
-    _529 = dir;
-    _528 = _529.Items[0.000000];
-    var x = _528;
-    var _530;
-    var _531;
-    _531 = dir;
-    _530 = _531.Items[1.000000];
-    var arg01_ = _530;
-    _527 = (function (m)
+    _524 = _525((function (m)
     {
-      var _532;
-      _532 = x;
-      var _533;
-      _533 = arg01_;
-      var _534;
-      _534 = m;
-      return Program__walk$Int32_Int32(_532, _533, _534);
-    });
-    var _557;
-    var _558;
-    _558 = (function (m)
+      return Program__physics$(m);
+    })(mario));
+    _498 = (function (m)
     {
-      var _559;
-      _559 = m;
-      return Program__physics$(_559);
-    });
-    var _592;
-    _592 = mario;
-    _557 = _558(_592);
-    _526 = _527(_557);
-    _500 = _501(_526);
-    return _470(_500);
+      return Program__gravity$(m);
+    })(_524);
+    return _468(_498);
   });
   Program__walk$Int32_Int32 = (function (x, _arg1, m)
   {
+    var vx = x;
     var _535;
-    var _536;
-    _536 = x;
-    _535 = _536;
-    var vx = _535;
-    var _537;
-    var _538;
-    var _539;
-    _539 = x;
-    var _540;
-    _540 = 0;
-    _538 = (_539 < _540);
-    if (_538) 
+    if ((x < 0)) 
     {
-      _537 = "left";
+      _535 = "left";
     }
     else
     {
-      var _541;
-      var _542;
-      _542 = x;
-      var _543;
-      _543 = 0;
-      _541 = (_542 > _543);
-      if (_541) 
+      if ((x > 0)) 
       {
-        _537 = "right";
+        _535 = "right";
       }
       else
       {
-        var _545;
-        _545 = m;
-        _537 = _545.dir;
+        _535 = m.dir;
       };
     };
-    var dir = _537;
-    var _546;
-    var _548;
-    _548 = m;
-    _546 = _548.x;
-    var _549;
-    var _551;
-    _551 = m;
-    _549 = _551.y;
-    var _552;
-    _552 = vx;
-    var _553;
-    var _555;
-    _555 = m;
-    _553 = _555.vy;
-    var _556;
-    _556 = dir;
-    return (new mario___ctor$(_546, _549, _552, _553, _556));
+    var dir = _535;
+    return (new Mario___ctor$(m.x, m.y, vx, m.vy, dir));
   });
   SetTreeModule__SetNode$Int32_Int32 = (function (x, l, r, h)
   {
-    var _45;
-    _45 = x;
-    var _46;
-    _46 = l;
-    var _47;
-    _47 = r;
-    var _48;
-    _48 = h;
-    return (new SetTree_1_Int32__SetNodeInt32(_45, _46, _47, _48));
+    return (new SetTree_1_Int32__SetNodeInt32(x, l, r, h));
   });
   SetTreeModule__SetOne$Int32_Int32 = (function (n)
   {
-    var _59;
-    _59 = n;
-    return (new SetTree_1_Int32__SetOneInt32(_59));
+    return (new SetTree_1_Int32__SetOneInt32(n));
   });
   SetTreeModule__add$Int32_Int32 = (function (comparer, k, t)
   {
-    var _29;
-    var _30;
-    _30 = t;
-    _29 = (_30.Tag == 2.000000);
-    if (_29) 
+    if ((t.Tag == 2.000000)) 
     {
-      var _31;
-      var _33;
-      _33 = t;
-      _31 = _33.Item;
-      var k2 = _31;
-      var _34;
-      var _35;
-      _35 = comparer;
-      var _36;
-      _36 = k;
-      var _37;
-      _37 = k2;
-      _34 = _35.Compare(_36, _37);
-      var c = _34;
-      var _38;
-      var _39;
-      _39 = c;
-      var _40;
-      _40 = 0;
-      _38 = (_39 < _40);
-      if (_38) 
+      var k2 = t.Item;
+      var c = comparer.Compare(k, k2);
+      if ((c < 0)) 
       {
-        var _41;
-        _41 = k;
-        var _42;
-        _42 = (new SetTree_1_Int32__SetEmptyInt32());
-        var _43;
-        _43 = t;
-        var _44;
-        _44 = 2;
-        return SetTreeModule__SetNode$Int32_Int32(_41, _42, _43, _44);
+        return SetTreeModule__SetNode$Int32_Int32(k, (new SetTree_1_Int32__SetEmptyInt32()), t, 2);
       }
       else
       {
-        var _49;
-        var _50;
-        _50 = c;
-        var _51;
-        _51 = 0;
-        _49 = (_50 == _51);
-        if (_49) 
+        if ((c == 0)) 
         {
           return t;
         }
         else
         {
-          var _52;
-          _52 = k;
-          var _53;
-          _53 = t;
-          var _54;
-          _54 = (new SetTree_1_Int32__SetEmptyInt32());
-          var _55;
-          _55 = 2;
-          return SetTreeModule__SetNode$Int32_Int32(_52, _53, _54, _55);
+          return SetTreeModule__SetNode$Int32_Int32(k, t, (new SetTree_1_Int32__SetEmptyInt32()), 2);
         };
       };
     }
     else
     {
-      var _56;
-      var _57;
-      _57 = t;
-      _56 = (_57.Tag == 0.000000);
-      if (_56) 
+      if ((t.Tag == 0.000000)) 
       {
-        var _58;
-        _58 = k;
-        return SetTreeModule__SetOne$Int32_Int32(_58);
+        return SetTreeModule__SetOne$Int32_Int32(k);
       }
       else
       {
-        var _60;
-        var _62;
-        _62 = t;
-        _60 = _62.Item3;
-        var r = _60;
-        var _63;
-        var _65;
-        _65 = t;
-        _63 = _65.Item2;
-        var l = _63;
-        var _66;
-        var _68;
-        _68 = t;
-        _66 = _68.Item1;
-        var _k2 = _66;
-        var _69;
-        var _70;
-        _70 = comparer;
-        var _71;
-        _71 = k;
-        var _72;
-        _72 = _k2;
-        _69 = _70.Compare(_71, _72);
-        var _c = _69;
-        var _73;
-        var _74;
-        _74 = _c;
-        var _75;
-        _75 = 0;
-        _73 = (_74 < _75);
-        if (_73) 
+        var r = t.Item3;
+        var l = t.Item2;
+        var _k2 = t.Item1;
+        var _c = comparer.Compare(k, _k2);
+        if ((_c < 0)) 
         {
-          var _76;
-          var _77;
-          _77 = comparer;
-          var _78;
-          _78 = k;
-          var _79;
-          _79 = l;
-          _76 = SetTreeModule__add$Int32_Int32(_77, _78, _79);
-          var _80;
-          _80 = _k2;
-          var _81;
-          _81 = r;
-          return SetTreeModule__rebalance$Int32_Int32(_76, _80, _81);
+          return SetTreeModule__rebalance$Int32_Int32(SetTreeModule__add$Int32_Int32(comparer, k, l), _k2, r);
         }
         else
         {
-          var _234;
-          var _235;
-          _235 = _c;
-          var _236;
-          _236 = 0;
-          _234 = (_235 == _236);
-          if (_234) 
+          if ((_c == 0)) 
           {
             return t;
           }
           else
           {
-            var _237;
-            _237 = l;
-            var _238;
-            _238 = _k2;
-            var _239;
-            var _240;
-            _240 = comparer;
-            var _241;
-            _241 = k;
-            var _242;
-            _242 = r;
-            _239 = SetTreeModule__add$Int32_Int32(_240, _241, _242);
-            return SetTreeModule__rebalance$Int32_Int32(_237, _238, _239);
+            return SetTreeModule__rebalance$Int32_Int32(l, _k2, SetTreeModule__add$Int32_Int32(comparer, k, r));
           };
         };
       };
@@ -1259,27 +674,15 @@ var mario___ctor$, Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__po
   });
   SetTreeModule__height$Int32_Int32 = (function (t)
   {
-    var _84;
-    var _85;
-    _85 = t;
-    _84 = (_85.Tag == 2.000000);
-    if (_84) 
+    if ((t.Tag == 2.000000)) 
     {
       return 1;
     }
     else
     {
-      var _86;
-      var _87;
-      _87 = t;
-      _86 = (_87.Tag == 1.000000);
-      if (_86) 
+      if ((t.Tag == 1.000000)) 
       {
-        var _88;
-        var _90;
-        _90 = t;
-        _88 = _90.Item4;
-        var h = _88;
+        var h = t.Item4;
         return h;
       }
       else
@@ -1290,152 +693,49 @@ var mario___ctor$, Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__po
   });
   SetTreeModule__mem$IComparable_IComparable_ = (function (comparer, k, t)
   {
-    var _416;
-    var _417;
-    _417 = t;
-    _416 = (_417.Tag == 2.000000);
-    if (_416) 
+    if ((t.Tag == 2.000000)) 
     {
-      var _418;
-      var _420;
-      _420 = t;
-      _418 = _420.Item;
-      var k2 = _418;
-      var _421;
-      var _422;
-      _422 = comparer;
-      var _423;
-      _423 = k;
-      var _424;
-      _424 = k2;
-      _421 = _422.Compare(_423, _424);
-      var _425;
-      _425 = 0;
-      return (_421 == _425);
+      var k2 = t.Item;
+      return (comparer.Compare(k, k2) == 0);
     }
     else
     {
-      var _426;
-      var _427;
-      _427 = t;
-      _426 = (_427.Tag == 0.000000);
-      if (_426) 
+      if ((t.Tag == 0.000000)) 
       {
         return false;
       }
       else
       {
-        var _428;
-        var _430;
-        _430 = t;
-        _428 = _430.Item3;
-        var r = _428;
-        var _431;
-        var _433;
-        _433 = t;
-        _431 = _433.Item2;
-        var l = _431;
-        var _434;
-        var _436;
-        _436 = t;
-        _434 = _436.Item1;
-        var _k2 = _434;
-        var _437;
-        var _438;
-        _438 = comparer;
-        var _439;
-        _439 = k;
-        var _440;
-        _440 = _k2;
-        _437 = _438.Compare(_439, _440);
-        var c = _437;
-        var _441;
-        var _442;
-        _442 = c;
-        var _443;
-        _443 = 0;
-        _441 = (_442 < _443);
-        if (_441) 
+        var r = t.Item3;
+        var l = t.Item2;
+        var _k2 = t.Item1;
+        var c = comparer.Compare(k, _k2);
+        if ((c < 0)) 
         {
-          var _444;
-          _444 = comparer;
-          var _445;
-          _445 = k;
-          var _446;
-          _446 = l;
-          return SetTreeModule__mem$IComparable_IComparable_(_444, _445, _446);
+          return SetTreeModule__mem$IComparable_IComparable_(comparer, k, l);
         }
         else
         {
-          var _447;
-          var _448;
-          _448 = c;
-          var _449;
-          _449 = 0;
-          _447 = (_448 == _449);
-          return (_447 || (function ()
-          {
-            var _450;
-            _450 = comparer;
-            var _451;
-            _451 = k;
-            var _452;
-            _452 = r;
-            return SetTreeModule__mem$IComparable_IComparable_(_450, _451, _452);
-          })());
+          return ((c == 0) || SetTreeModule__mem$IComparable_IComparable_(comparer, k, r));
         };
       };
     };
   });
   SetTreeModule__mk$Int32_Int32 = (function (l, k, r)
   {
-    var _130;
-    var _131;
-    _131 = l;
-    var _132;
-    _132 = r;
-    _130 = (new TupleSetTree_1_Int32__SetTree_1_Int32_(_131, _132));
-    var matchValue = _130;
-    var _133;
-    var _134;
-    var _135;
-    _135 = matchValue;
-    _134 = _135.Items[0.000000];
-    _133 = (_134.Tag == 0.000000);
-    if (_133) 
+    var matchValue = (new TupleSetTree_1_Int32__SetTree_1_Int32_(l, r));
+    if ((matchValue.Items[0.000000].Tag == 0.000000)) 
     {
-      var _136;
-      var _137;
-      var _138;
-      _138 = matchValue;
-      _137 = _138.Items[1.000000];
-      _136 = (_137.Tag == 0.000000);
-      if (_136) 
+      if ((matchValue.Items[1.000000].Tag == 0.000000)) 
       {
-        var _139;
-        _139 = k;
-        return SetTreeModule__SetOne$Int32_Int32(_139);
+        return SetTreeModule__SetOne$Int32_Int32(k);
       }
       else
       {
-        var _140;
-        var _141;
-        _141 = l;
-        _140 = SetTreeModule__height$Int32_Int32(_141);
-        var hl = _140;
-        var _142;
-        var _143;
-        _143 = r;
-        _142 = SetTreeModule__height$Int32_Int32(_143);
-        var hr = _142;
+        var hl = SetTreeModule__height$Int32_Int32(l);
+        var hr = SetTreeModule__height$Int32_Int32(r);
         var _144;
-        var _145;
-        var _146;
-        _146 = hl;
-        var _147;
-        _147 = hr;
-        _145 = (_146 < _147);
-        if (_145) 
+        if ((hl < hr)) 
         {
           _144 = hr;
         }
@@ -1444,41 +744,15 @@ var mario___ctor$, Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__po
           _144 = hl;
         };
         var m = _144;
-        var _148;
-        _148 = k;
-        var _149;
-        _149 = l;
-        var _150;
-        _150 = r;
-        var _151;
-        var _152;
-        _152 = m;
-        var _153;
-        _153 = 1;
-        _151 = (_152 + _153);
-        return SetTreeModule__SetNode$Int32_Int32(_148, _149, _150, _151);
+        return SetTreeModule__SetNode$Int32_Int32(k, l, r, (m + 1));
       };
     }
     else
     {
-      var _154;
-      var _155;
-      _155 = l;
-      _154 = SetTreeModule__height$Int32_Int32(_155);
-      var _hl = _154;
-      var _156;
-      var _157;
-      _157 = r;
-      _156 = SetTreeModule__height$Int32_Int32(_157);
-      var _hr = _156;
+      var _hl = SetTreeModule__height$Int32_Int32(l);
+      var _hr = SetTreeModule__height$Int32_Int32(r);
       var _158;
-      var _159;
-      var _160;
-      _160 = _hl;
-      var _161;
-      _161 = _hr;
-      _159 = (_160 < _161);
-      if (_159) 
+      if ((_hl < _hr)) 
       {
         _158 = _hr;
       }
@@ -1487,318 +761,94 @@ var mario___ctor$, Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__po
         _158 = _hl;
       };
       var _m = _158;
-      var _162;
-      _162 = k;
-      var _163;
-      _163 = l;
-      var _164;
-      _164 = r;
-      var _165;
-      var _166;
-      _166 = _m;
-      var _167;
-      _167 = 1;
-      _165 = (_166 + _167);
-      return SetTreeModule__SetNode$Int32_Int32(_162, _163, _164, _165);
+      return SetTreeModule__SetNode$Int32_Int32(k, l, r, (_m + 1));
     };
   });
   SetTreeModule__rebalance$Int32_Int32 = (function (t1, k, t2)
   {
-    var _82;
-    var _83;
-    _83 = t1;
-    _82 = SetTreeModule__height$Int32_Int32(_83);
-    var t1h = _82;
-    var _91;
-    var _92;
-    _92 = t2;
-    _91 = SetTreeModule__height$Int32_Int32(_92);
-    var t2h = _91;
-    var _93;
-    var _94;
-    _94 = t2h;
-    var _95;
-    var _96;
-    _96 = t1h;
-    var _97;
-    _97 = SetTreeModule__get_tolerance$();
-    _95 = (_96 + _97);
-    _93 = (_94 > _95);
-    if (_93) 
+    var t1h = SetTreeModule__height$Int32_Int32(t1);
+    var t2h = SetTreeModule__height$Int32_Int32(t2);
+    if ((t2h > (t1h + SetTreeModule__tolerance))) 
     {
-      var _98;
-      var _99;
-      _99 = t2;
-      _98 = (_99.Tag == 1.000000);
-      if (_98) 
+      if ((t2.Tag == 1.000000)) 
       {
-        var _100;
-        var _102;
-        _102 = t2;
-        _100 = _102.Item3;
-        var t2r = _100;
-        var _103;
-        var _105;
-        _105 = t2;
-        _103 = _105.Item2;
-        var t2l = _103;
-        var _106;
-        var _108;
-        _108 = t2;
-        _106 = _108.Item1;
-        var t2k = _106;
-        var _109;
-        var _110;
-        var _111;
-        _111 = t2l;
-        _110 = SetTreeModule__height$Int32_Int32(_111);
-        var _112;
-        var _113;
-        _113 = t1h;
-        var _114;
-        _114 = 1;
-        _112 = (_113 + _114);
-        _109 = (_110 > _112);
-        if (_109) 
+        var t2r = t2.Item3;
+        var t2l = t2.Item2;
+        var t2k = t2.Item1;
+        if ((SetTreeModule__height$Int32_Int32(t2l) > (t1h + 1))) 
         {
-          var _115;
-          var _116;
-          _116 = t2l;
-          _115 = (_116.Tag == 1.000000);
-          if (_115) 
+          if ((t2l.Tag == 1.000000)) 
           {
-            var _117;
-            var _119;
-            _119 = t2l;
-            _117 = _119.Item3;
-            var t2lr = _117;
-            var _120;
-            var _122;
-            _122 = t2l;
-            _120 = _122.Item2;
-            var t2ll = _120;
-            var _123;
-            var _125;
-            _125 = t2l;
-            _123 = _125.Item1;
-            var t2lk = _123;
-            var _126;
-            var _127;
-            _127 = t1;
-            var _128;
-            _128 = k;
-            var _129;
-            _129 = t2ll;
-            _126 = SetTreeModule__mk$Int32_Int32(_127, _128, _129);
-            var _168;
-            _168 = t2lk;
-            var _169;
-            var _170;
-            _170 = t2lr;
-            var _171;
-            _171 = t2k;
-            var _172;
-            _172 = t2r;
-            _169 = SetTreeModule__mk$Int32_Int32(_170, _171, _172);
-            return SetTreeModule__mk$Int32_Int32(_126, _168, _169);
+            var t2lr = t2l.Item3;
+            var t2ll = t2l.Item2;
+            var t2lk = t2l.Item1;
+            return SetTreeModule__mk$Int32_Int32(SetTreeModule__mk$Int32_Int32(t1, k, t2ll), t2lk, SetTreeModule__mk$Int32_Int32(t2lr, t2k, t2r));
           }
           else
           {
-            var _173;
-            _173 = "rebalance";
-            throw (_173);
+            throw ("rebalance");
             return null;
           };
         }
         else
         {
-          var _174;
-          var _175;
-          _175 = t1;
-          var _176;
-          _176 = k;
-          var _177;
-          _177 = t2l;
-          _174 = SetTreeModule__mk$Int32_Int32(_175, _176, _177);
-          var _178;
-          _178 = t2k;
-          var _179;
-          _179 = t2r;
-          return SetTreeModule__mk$Int32_Int32(_174, _178, _179);
+          return SetTreeModule__mk$Int32_Int32(SetTreeModule__mk$Int32_Int32(t1, k, t2l), t2k, t2r);
         };
       }
       else
       {
-        var _180;
-        _180 = "rebalance";
-        throw (_180);
+        throw ("rebalance");
         return null;
       };
     }
     else
     {
-      var _181;
-      var _182;
-      _182 = t1h;
-      var _183;
-      var _184;
-      _184 = t2h;
-      var _185;
-      _185 = SetTreeModule__get_tolerance$();
-      _183 = (_184 + _185);
-      _181 = (_182 > _183);
-      if (_181) 
+      if ((t1h > (t2h + SetTreeModule__tolerance))) 
       {
-        var _186;
-        var _187;
-        _187 = t1;
-        _186 = (_187.Tag == 1.000000);
-        if (_186) 
+        if ((t1.Tag == 1.000000)) 
         {
-          var _188;
-          var _190;
-          _190 = t1;
-          _188 = _190.Item3;
-          var t1r = _188;
-          var _191;
-          var _193;
-          _193 = t1;
-          _191 = _193.Item2;
-          var t1l = _191;
-          var _194;
-          var _196;
-          _196 = t1;
-          _194 = _196.Item1;
-          var t1k = _194;
-          var _197;
-          var _198;
-          var _199;
-          _199 = t1r;
-          _198 = SetTreeModule__height$Int32_Int32(_199);
-          var _200;
-          var _201;
-          _201 = t2h;
-          var _202;
-          _202 = 1;
-          _200 = (_201 + _202);
-          _197 = (_198 > _200);
-          if (_197) 
+          var t1r = t1.Item3;
+          var t1l = t1.Item2;
+          var t1k = t1.Item1;
+          if ((SetTreeModule__height$Int32_Int32(t1r) > (t2h + 1))) 
           {
-            var _203;
-            var _204;
-            _204 = t1r;
-            _203 = (_204.Tag == 1.000000);
-            if (_203) 
+            if ((t1r.Tag == 1.000000)) 
             {
-              var _205;
-              var _207;
-              _207 = t1r;
-              _205 = _207.Item3;
-              var t1rr = _205;
-              var _208;
-              var _210;
-              _210 = t1r;
-              _208 = _210.Item2;
-              var t1rl = _208;
-              var _211;
-              var _213;
-              _213 = t1r;
-              _211 = _213.Item1;
-              var t1rk = _211;
-              var _214;
-              var _215;
-              _215 = t1l;
-              var _216;
-              _216 = t1k;
-              var _217;
-              _217 = t1rl;
-              _214 = SetTreeModule__mk$Int32_Int32(_215, _216, _217);
-              var _218;
-              _218 = t1rk;
-              var _219;
-              var _220;
-              _220 = t1rr;
-              var _221;
-              _221 = k;
-              var _222;
-              _222 = t2;
-              _219 = SetTreeModule__mk$Int32_Int32(_220, _221, _222);
-              return SetTreeModule__mk$Int32_Int32(_214, _218, _219);
+              var t1rr = t1r.Item3;
+              var t1rl = t1r.Item2;
+              var t1rk = t1r.Item1;
+              return SetTreeModule__mk$Int32_Int32(SetTreeModule__mk$Int32_Int32(t1l, t1k, t1rl), t1rk, SetTreeModule__mk$Int32_Int32(t1rr, k, t2));
             }
             else
             {
-              var _223;
-              _223 = "rebalance";
-              throw (_223);
+              throw ("rebalance");
               return null;
             };
           }
           else
           {
-            var _224;
-            _224 = t1l;
-            var _225;
-            _225 = t1k;
-            var _226;
-            var _227;
-            _227 = t1r;
-            var _228;
-            _228 = k;
-            var _229;
-            _229 = t2;
-            _226 = SetTreeModule__mk$Int32_Int32(_227, _228, _229);
-            return SetTreeModule__mk$Int32_Int32(_224, _225, _226);
+            return SetTreeModule__mk$Int32_Int32(t1l, t1k, SetTreeModule__mk$Int32_Int32(t1r, k, t2));
           };
         }
         else
         {
-          var _230;
-          _230 = "rebalance";
-          throw (_230);
+          throw ("rebalance");
           return null;
         };
       }
       else
       {
-        var _231;
-        _231 = t1;
-        var _232;
-        _232 = k;
-        var _233;
-        _233 = t2;
-        return SetTreeModule__mk$Int32_Int32(_231, _232, _233);
+        return SetTreeModule__mk$Int32_Int32(t1, k, t2);
       };
     };
   });
   SetTreeModule__remove$Int32_Int32 = (function (comparer, k, t)
   {
-    var _263;
-    var _264;
-    _264 = t;
-    _263 = (_264.Tag == 2.000000);
-    if (_263) 
+    if ((t.Tag == 2.000000)) 
     {
-      var _265;
-      var _267;
-      _267 = t;
-      _265 = _267.Item;
-      var k2 = _265;
-      var _268;
-      var _269;
-      _269 = comparer;
-      var _270;
-      _270 = k;
-      var _271;
-      _271 = k2;
-      _268 = _269.Compare(_270, _271);
-      var c = _268;
-      var _272;
-      var _273;
-      _273 = c;
-      var _274;
-      _274 = 0;
-      _272 = (_273 == _274);
-      if (_272) 
+      var k2 = t.Item;
+      var c = comparer.Compare(k, k2);
+      if ((c == 0)) 
       {
         return (new SetTree_1_Int32__SetEmptyInt32());
       }
@@ -1809,139 +859,43 @@ var mario___ctor$, Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__po
     }
     else
     {
-      var _275;
-      var _276;
-      _276 = t;
-      _275 = (_276.Tag == 1.000000);
-      if (_275) 
+      if ((t.Tag == 1.000000)) 
       {
-        var _277;
-        var _279;
-        _279 = t;
-        _277 = _279.Item3;
-        var r = _277;
-        var _280;
-        var _282;
-        _282 = t;
-        _280 = _282.Item2;
-        var l = _280;
-        var _283;
-        var _285;
-        _285 = t;
-        _283 = _285.Item1;
-        var _k2 = _283;
-        var _286;
-        var _287;
-        _287 = comparer;
-        var _288;
-        _288 = k;
-        var _289;
-        _289 = _k2;
-        _286 = _287.Compare(_288, _289);
-        var _c = _286;
-        var _290;
-        var _291;
-        _291 = _c;
-        var _292;
-        _292 = 0;
-        _290 = (_291 < _292);
-        if (_290) 
+        var r = t.Item3;
+        var l = t.Item2;
+        var _k2 = t.Item1;
+        var _c = comparer.Compare(k, _k2);
+        if ((_c < 0)) 
         {
-          var _293;
-          var _294;
-          _294 = comparer;
-          var _295;
-          _295 = k;
-          var _296;
-          _296 = l;
-          _293 = SetTreeModule__remove$Int32_Int32(_294, _295, _296);
-          var _297;
-          _297 = _k2;
-          var _298;
-          _298 = r;
-          return SetTreeModule__rebalance$Int32_Int32(_293, _297, _298);
+          return SetTreeModule__rebalance$Int32_Int32(SetTreeModule__remove$Int32_Int32(comparer, k, l), _k2, r);
         }
         else
         {
-          var _299;
-          var _300;
-          _300 = _c;
-          var _301;
-          _301 = 0;
-          _299 = (_300 == _301);
-          if (_299) 
+          if ((_c == 0)) 
           {
-            var _302;
-            var _303;
-            _303 = l;
-            var _304;
-            _304 = r;
-            _302 = (new TupleSetTree_1_Int32__SetTree_1_Int32_(_303, _304));
-            var matchValue = _302;
-            var _305;
-            var _306;
-            var _307;
-            _307 = matchValue;
-            _306 = _307.Items[0.000000];
-            _305 = (_306.Tag == 0.000000);
-            if (_305) 
+            var matchValue = (new TupleSetTree_1_Int32__SetTree_1_Int32_(l, r));
+            if ((matchValue.Items[0.000000].Tag == 0.000000)) 
             {
               return r;
             }
             else
             {
-              var _308;
-              var _309;
-              var _310;
-              _310 = matchValue;
-              _309 = _310.Items[1.000000];
-              _308 = (_309.Tag == 0.000000);
-              if (_308) 
+              if ((matchValue.Items[1.000000].Tag == 0.000000)) 
               {
                 return l;
               }
               else
               {
-                var _311;
-                var _312;
-                _312 = r;
-                _311 = SetTreeModule__spliceOutSuccessor$Int32_Int32(_312);
-                var patternInput = _311;
-                var _347;
-                var _348;
-                _348 = patternInput;
-                _347 = _348.Items[0.000000];
-                var sk = _347;
-                var _349;
-                var _350;
-                _350 = patternInput;
-                _349 = _350.Items[1.000000];
-                var r_ = _349;
-                var _351;
-                _351 = l;
-                var _352;
-                _352 = sk;
-                var _353;
-                _353 = r_;
-                return SetTreeModule__mk$Int32_Int32(_351, _352, _353);
+                var patternInput = SetTreeModule__spliceOutSuccessor$Int32_Int32(r);
+                var sk = patternInput.Items[0.000000];
+                var r_ = patternInput.Items[1.000000];
+                return SetTreeModule__mk$Int32_Int32(l, sk, r_);
               };
             };
           }
           else
           {
-            var _354;
-            _354 = l;
-            var _355;
-            _355 = _k2;
-            var _356;
-            var _357;
-            _357 = comparer;
-            var _358;
-            _358 = k;
-            var _359;
-            _359 = r;
-            _356 = SetTreeModule__remove$Int32_Int32(_357, _358, _359);
-            return SetTreeModule__rebalance$Int32_Int32(_354, _355, _356);
+            return SetTreeModule__rebalance$Int32_Int32(l, _k2, SetTreeModule__remove$Int32_Int32(comparer, k, r));
           };
         };
       }
@@ -1953,93 +907,33 @@ var mario___ctor$, Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__po
   });
   SetTreeModule__spliceOutSuccessor$Int32_Int32 = (function (t)
   {
-    var _313;
-    var _314;
-    _314 = t;
-    _313 = (_314.Tag == 2.000000);
-    if (_313) 
+    if ((t.Tag == 2.000000)) 
     {
-      var _315;
-      var _317;
-      _317 = t;
-      _315 = _317.Item;
-      var k2 = _315;
-      var _318;
-      _318 = k2;
-      var _319;
-      _319 = (new SetTree_1_Int32__SetEmptyInt32());
-      return (new TupleInt32_SetTree_1_Int32_(_318, _319));
+      var k2 = t.Item;
+      return (new TupleInt32_SetTree_1_Int32_(k2, (new SetTree_1_Int32__SetEmptyInt32())));
     }
     else
     {
-      var _320;
-      var _321;
-      _321 = t;
-      _320 = (_321.Tag == 1.000000);
-      if (_320) 
+      if ((t.Tag == 1.000000)) 
       {
-        var _322;
-        var _324;
-        _324 = t;
-        _322 = _324.Item3;
-        var r = _322;
-        var _325;
-        var _327;
-        _327 = t;
-        _325 = _327.Item2;
-        var l = _325;
-        var _328;
-        var _330;
-        _330 = t;
-        _328 = _330.Item1;
-        var _k2 = _328;
-        var _331;
-        var _332;
-        _332 = l;
-        _331 = (_332.Tag == 0.000000);
-        if (_331) 
+        var r = t.Item3;
+        var l = t.Item2;
+        var _k2 = t.Item1;
+        if ((l.Tag == 0.000000)) 
         {
-          var _333;
-          _333 = _k2;
-          var _334;
-          _334 = r;
-          return (new TupleInt32_SetTree_1_Int32_(_333, _334));
+          return (new TupleInt32_SetTree_1_Int32_(_k2, r));
         }
         else
         {
-          var _335;
-          var _336;
-          _336 = l;
-          _335 = SetTreeModule__spliceOutSuccessor$Int32_Int32(_336);
-          var patternInput = _335;
-          var _337;
-          var _338;
-          _338 = patternInput;
-          _337 = _338.Items[1.000000];
-          var l_ = _337;
-          var _339;
-          var _340;
-          _340 = patternInput;
-          _339 = _340.Items[0.000000];
-          var k3 = _339;
-          var _341;
-          _341 = k3;
-          var _342;
-          var _343;
-          _343 = l_;
-          var _344;
-          _344 = _k2;
-          var _345;
-          _345 = r;
-          _342 = SetTreeModule__mk$Int32_Int32(_343, _344, _345);
-          return (new TupleInt32_SetTree_1_Int32_(_341, _342));
+          var patternInput = SetTreeModule__spliceOutSuccessor$Int32_Int32(l);
+          var l_ = patternInput.Items[1.000000];
+          var k3 = patternInput.Items[0.000000];
+          return (new TupleInt32_SetTree_1_Int32_(k3, SetTreeModule__mk$Int32_Int32(l_, _k2, r)));
         };
       }
       else
       {
-        var _346;
-        _346 = "internal error: Map.spliceOutSuccessor";
-        throw (_346);
+        throw ("internal error: Map.spliceOutSuccessor");
         return null;
       };
     };
@@ -2161,99 +1055,37 @@ var mario___ctor$, Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__po
   });
   Set_1_IComparable__Contains$IComparable_ = (function (s, x)
   {
-    var _409;
-    var _410;
-    _410 = s;
-    _409 = Set_1_IComparable__get_Comparer$IComparable_(_410);
-    var _412;
-    _412 = x;
-    var _413;
-    var _414;
-    _414 = s;
-    _413 = Set_1_IComparable__get_Tree$IComparable_(_414);
-    return SetTreeModule__mem$IComparable_IComparable_(_409, _412, _413);
+    return SetTreeModule__mem$IComparable_IComparable_(Set_1_IComparable__get_Comparer$IComparable_(s), x, Set_1_IComparable__get_Tree$IComparable_(s));
   });
   Set_1_IComparable__get_Comparer$IComparable_ = (function (set, unitVar1)
   {
-    var _411;
-    _411 = set;
-    return _411.comparer_479;
+    return set.comparer_479;
   });
   Set_1_IComparable__get_Tree$IComparable_ = (function (set, unitVar1)
   {
-    var _415;
-    _415 = set;
-    return _415.tree_483;
+    return set.tree_483;
   });
   Set_1_Int32__Add$Int32 = (function (s, x)
   {
-    var _19;
-    var _20;
-    _20 = s;
-    _19 = Set_1_Int32__get_Comparer$Int32(_20);
-    var _22;
-    var _23;
-    var _24;
-    _24 = s;
-    _23 = Set_1_Int32__get_Comparer$Int32(_24);
-    var _25;
-    _25 = x;
-    var _26;
-    var _27;
-    _27 = s;
-    _26 = Set_1_Int32__get_Tree$Int32(_27);
-    _22 = SetTreeModule__add$Int32_Int32(_23, _25, _26);
-    return (new Set_1_Int32___ctor$Int32(_19, _22));
+    return (new Set_1_Int32___ctor$Int32(Set_1_Int32__get_Comparer$Int32(s), SetTreeModule__add$Int32_Int32(Set_1_Int32__get_Comparer$Int32(s), x, Set_1_Int32__get_Tree$Int32(s))));
   });
   Set_1_Int32__Remove$Int32 = (function (s, x)
   {
-    var _255;
-    var _256;
-    _256 = s;
-    _255 = Set_1_Int32__get_Comparer$Int32(_256);
-    var _257;
-    var _258;
-    var _259;
-    _259 = s;
-    _258 = Set_1_Int32__get_Comparer$Int32(_259);
-    var _260;
-    _260 = x;
-    var _261;
-    var _262;
-    _262 = s;
-    _261 = Set_1_Int32__get_Tree$Int32(_262);
-    _257 = SetTreeModule__remove$Int32_Int32(_258, _260, _261);
-    return (new Set_1_Int32___ctor$Int32(_255, _257));
+    return (new Set_1_Int32___ctor$Int32(Set_1_Int32__get_Comparer$Int32(s), SetTreeModule__remove$Int32_Int32(Set_1_Int32__get_Comparer$Int32(s), x, Set_1_Int32__get_Tree$Int32(s))));
   });
   Set_1_Int32___ctor$Int32 = (function (comparer, tree)
   {
-    var _243;
-    _243 = this;
-    var _244;
-    _244 = comparer;
-    _243.comparer_479 = _244;
-    var _245;
-    _245 = this;
-    var _246;
-    _246 = tree;
-    _245.tree_483 = _246;
-    var _247;
-    _247 = this;
-    var _248;
-    _248 = null;
-    _247.serializedData = _248;
+    this.comparer_479 = comparer;
+    this.tree_483 = tree;
+    this.serializedData = null;
   });
   Set_1_Int32__get_Comparer$Int32 = (function (set, unitVar1)
   {
-    var _21;
-    _21 = set;
-    return _21.comparer_479;
+    return set.comparer_479;
   });
   Set_1_Int32__get_Empty$Int32 = (function (unitVar0)
   {
-    var _365;
-    _365 = (new GenericComparer_1_Int32___ctor$Int32());
-    var comparer = _365;
+    var comparer = (new GenericComparer_1_Int32___ctor$Int32());
     var _366;
     var impl;
     impl = comparer;
@@ -2261,32 +1093,20 @@ var mario___ctor$, Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__po
     {
       return (function (__, x, y)
       {
-        var _367;
-        _367 = x;
-        var _368;
-        _368 = y;
         var diff = 0.000000;
-        diff = ((_367 < _368) ? -1.000000 : ((_367 == _368) ? 0.000000 : 1.000000));
+        diff = ((x < y) ? -1.000000 : ((x == y) ? 0.000000 : 1.000000));
         return diff;
       })(impl, x, y);
     })};
-    var _369;
-    _369 = (new SetTree_1_Int32__SetEmptyInt32());
-    return (new Set_1_Int32___ctor$Int32(_366, _369));
+    return (new Set_1_Int32___ctor$Int32(_366, (new SetTree_1_Int32__SetEmptyInt32())));
   });
   Set_1_Int32__get_Tree$Int32 = (function (set, unitVar1)
   {
-    var _28;
-    _28 = set;
-    return _28.tree_483;
+    return set.tree_483;
   });
   Set__Add$Int32_Int32 = (function (x, s)
   {
-    var _17;
-    _17 = s;
-    var _18;
-    _18 = x;
-    return Set_1_Int32__Add$Int32(_17, _18);
+    return Set_1_Int32__Add$Int32(s, x);
   });
   Set__Empty$Int32_Int32 = (function ()
   {
@@ -2294,11 +1114,7 @@ var mario___ctor$, Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__po
   });
   Set__Remove$Int32_Int32 = (function (x, s)
   {
-    var _253;
-    _253 = s;
-    var _254;
-    _254 = x;
-    return Set_1_Int32__Remove$Int32(_253, _254);
+    return Set_1_Int32__Remove$Int32(s, x);
   });
   String_1_IndexOf$ = (function (s, search)
   {
@@ -2478,129 +1294,37 @@ var mario___ctor$, Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__po
   });
   Window__canvas$ = (function (unitVar0)
   {
-    var _378;
-    var _379;
-    _379 = document;
-    var _380;
-    _380 = "canvas";
-    _378 = _379.getElementById(_380);
-    return _378;
+    return document.getElementById("canvas");
   });
   Window__context$ = (function (unitVar0)
   {
-    var _657;
-    _657 = Window__canvas$();
-    var _658;
-    _658 = "2d";
-    return _657.getContext(_658);
+    return Window__canvas$().getContext("2d");
   });
   Window__dimensions$ = (function (unitVar0)
   {
-    var _376;
-    var _377;
-    _377 = Window__canvas$();
-    _376 = _377.width;
-    var _381;
-    var _382;
-    _382 = Window__canvas$();
-    _381 = _382.height;
-    return (new TupleDouble_Double(_376, _381));
+    return (new TupleDouble_Double(Window__canvas$().width, Window__canvas$().height));
   });
   Window__filled$String_String = (function (color, rect_0, rect_1, rect_2, rect_3)
   {
-    var _651;
-    var _652;
-    _652 = rect_0;
-    var _653;
-    _653 = rect_1;
-    var _654;
-    _654 = rect_2;
-    var _655;
-    _655 = rect_3;
-    _651 = (new TupleDouble_Double_Double_Double(_652, _653, _654, _655));
-    var rect = _651;
-    var _656;
-    _656 = Window__context$();
-    var ctx = _656;
-    var _659;
-    _659 = ctx;
-    var _660;
-    _660 = color;
-    _659.fillStyle = _660;
+    var rect = (new TupleDouble_Double_Double_Double(rect_0, rect_1, rect_2, rect_3));
+    var ctx = Window__context$();
+    ctx.fillStyle = color;
     null;
-    var _661;
-    _661 = (function (tupledArg)
+    return (function (tupledArg)
     {
-      var _662;
-      var _663;
-      _663 = tupledArg;
-      _662 = _663.Items[0.000000];
-      var arg00 = _662;
-      var _664;
-      var _665;
-      _665 = tupledArg;
-      _664 = _665.Items[1.000000];
-      var arg01 = _664;
-      var _666;
-      var _667;
-      _667 = tupledArg;
-      _666 = _667.Items[2.000000];
-      var arg02 = _666;
-      var _668;
-      var _669;
-      _669 = tupledArg;
-      _668 = _669.Items[3.000000];
-      var arg03 = _668;
-      var _670;
-      _670 = ctx;
-      var _671;
-      _671 = arg00;
-      var _672;
-      _672 = arg01;
-      var _673;
-      _673 = arg02;
-      var _674;
-      _674 = arg03;
-      return _670.fillRect(_671, _672, _673, _674);
-    });
-    var _675;
-    _675 = rect;
-    return _661(_675);
+      var arg00 = tupledArg.Items[0.000000];
+      var arg01 = tupledArg.Items[1.000000];
+      var arg02 = tupledArg.Items[2.000000];
+      var arg03 = tupledArg.Items[3.000000];
+      return ctx.fillRect(arg00, arg01, arg02, arg03);
+    })(rect);
   });
   Window__image$ = (function (src)
   {
-    var _758;
-    var _759;
-    var _760;
-    _760 = document;
-    var _761;
-    _761 = "image";
-    _759 = _760.getElementById(_761);
-    _758 = _759;
-    var image = _758;
-    var _762;
-    var _763;
-    var _764;
-    var _765;
-    var _766;
-    _766 = image;
-    _765 = _766.src;
-    _764 = _765;
-    var _767;
-    var _768;
-    _768 = src;
-    _767 = _768;
-    _763 = String_1_IndexOf$(_764, _767);
-    var _769;
-    _769 = -1;
-    _762 = (_763 == _769);
-    if (_762) 
+    var image = document.getElementById("image");
+    if ((String_1_IndexOf$(image.src, src) == -1)) 
     {
-      var _770;
-      _770 = image;
-      var _771;
-      _771 = src;
-      _770.src = _771;
+      image.src = src;
       null;
     }
     else
@@ -2611,145 +1335,25 @@ var mario___ctor$, Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__po
   });
   Window__op_Dollar$Int32_Int32 = (function (s, n)
   {
-    var _627;
-    _627 = s;
-    var _628;
-    var _629;
-    _629 = n;
-    _628 = _629.toString();
-    return (_627 + _628);
+    return (s + n.toString());
   });
   Window__op_Dollar$String_String = (function (s, n)
   {
-    var _631;
-    _631 = s;
-    var _632;
-    var _633;
-    _633 = n;
-    _632 = _633.toString();
-    return (_631 + _632);
+    return (s + n.toString());
   });
   Window__position$Object_Object_ = (function (x, y, img)
   {
-    var _744;
-    var _745;
-    _745 = img;
-    _744 = _745;
-    var _img = _744;
-    var _746;
-    var _747;
-    _747 = _img;
-    _746 = _747.style;
-    var _748;
-    _748 = x;
-    _746.posLeft = _748;
+    var _img = img;
+    _img.style.posLeft = x;
     null;
-    var _749;
-    var _750;
-    _750 = _img;
-    _749 = _750.style;
-    var _751;
-    var _752;
-    var _753;
-    _753 = Window__canvas$();
-    _752 = _753.offsetTop;
-    var _754;
-    _754 = y;
-    _751 = (_752 + _754);
-    _749.posTop = _751;
+    _img.style.posTop = (Window__canvas$().offsetTop + y);
     return null;
   });
   Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32 = (function (r, g, b)
   {
-    var _620;
-    var _621;
-    var _622;
-    var _623;
-    var _624;
-    var _625;
-    _625 = "rgb(";
-    var _626;
-    _626 = r;
-    _624 = Window__op_Dollar$Int32_Int32(_625, _626);
-    var _630;
-    _630 = ",";
-    _623 = Window__op_Dollar$String_String(_624, _630);
-    var _634;
-    _634 = g;
-    _622 = Window__op_Dollar$Int32_Int32(_623, _634);
-    var _635;
-    _635 = ",";
-    _621 = Window__op_Dollar$String_String(_622, _635);
-    var _636;
-    _636 = b;
-    _620 = Window__op_Dollar$Int32_Int32(_621, _636);
-    var _637;
-    _637 = ")";
-    return Window__op_Dollar$String_String(_620, _637);
+    return Window__op_Dollar$String_String(Window__op_Dollar$Int32_Int32(Window__op_Dollar$String_String(Window__op_Dollar$Int32_Int32(Window__op_Dollar$String_String(Window__op_Dollar$Int32_Int32("rgb(", r), ","), g), ","), b), ")");
   });
-  mario___ctor$ = (function (x, y, vx, vy, dir)
-  {
-    this.x = x;
-    this.y = y;
-    this.vx = vx;
-    this.vy = vy;
-    this.dir = dir;
-  });
-  mario___ctor$.prototype.CompareTo = (function (that)
-  {
-    var diff = 0.000000;
-    var _diff = 0.000000;
-    _diff = ((this.x < that.x) ? -1.000000 : ((this.x == that.x) ? 0.000000 : 1.000000));
-    diff = _diff;
-    if ((diff != 0.000000)) 
-    {
-      return diff;
-    }
-    else
-    {
-      var __diff = 0.000000;
-      __diff = ((this.y < that.y) ? -1.000000 : ((this.y == that.y) ? 0.000000 : 1.000000));
-      diff = __diff;
-      if ((diff != 0.000000)) 
-      {
-        return diff;
-      }
-      else
-      {
-        var ___diff = 0.000000;
-        ___diff = ((this.vx < that.vx) ? -1.000000 : ((this.vx == that.vx) ? 0.000000 : 1.000000));
-        diff = ___diff;
-        if ((diff != 0.000000)) 
-        {
-          return diff;
-        }
-        else
-        {
-          var ____diff = 0.000000;
-          ____diff = ((this.vy < that.vy) ? -1.000000 : ((this.vy == that.vy) ? 0.000000 : 1.000000));
-          diff = ____diff;
-          if ((diff != 0.000000)) 
-          {
-            return diff;
-          }
-          else
-          {
-            var _____diff = 0.000000;
-            _____diff = ((this.dir < that.dir) ? -1.000000 : ((this.dir == that.dir) ? 0.000000 : 1.000000));
-            diff = _____diff;
-            if ((diff != 0.000000)) 
-            {
-              return diff;
-            }
-            else
-            {
-              return 0.000000;
-            };
-          };
-        };
-      };
-    };
-  });
+  SetTreeModule__tolerance = SetTreeModule__get_tolerance$();
   Keyboard__keysPressed = Keyboard__get_keysPressed$();
   return Program__main$()
 });

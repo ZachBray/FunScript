@@ -13,29 +13,29 @@
   <meta name="author" content="Zach Bray">
 
   <!-- Reference Foundation -->
-  <link rel="stylesheet" href="http://funscript.info/css/foundation.css" />
-  <script src="http://funscript.info/js/vendor/custom.modernizr.js"></script>
+  <link rel="stylesheet" href="http://www.funscript.info/css/foundation.css" />
+  <script src="http://www.funscript.info/js/vendor/custom.modernizr.js"></script>
 
   <!-- Reference custom CSS and tooltips -->
-  <link type="text/css" rel="stylesheet" href="http://funscript.info/custom/style.css" />
-  <script src="http://funscript.info/custom/tooltips.js" type="text/javascript"></script>
-  <link type="text/css" rel="stylesheet" href="http://funscript.info/custom/tooltips.css" />
+  <link type="text/css" rel="stylesheet" href="http://www.funscript.info/custom/style.css" />
+  <script src="http://www.funscript.info/custom/tooltips.js" type="text/javascript"></script>
+  <link type="text/css" rel="stylesheet" href="http://www.funscript.info/custom/tooltips.css" />
 </head>
 <body>
 
   <!-- Header bar with name and navigation links -->
   <nav class="top-bar">
     <ul class="title-area">
-      <li class="name"><h1><a href="http://funscript.info">FunScript</a></h1></li>
+      <li class="name"><h1><a href="http://www.funscript.info">FunScript</a></h1></li>
       <li class="toggle-topbar"><a href="#"><span>Menu</span></a></li>
     </ul>
 
     <section class="top-bar-section">
       <ul class="left">
-        <li><a href="http://funscript.info/index.html">home</a></li>
-        <li><a href="http://funscript.info/learn.html">learn more</a></li>
-        <li><a href="http://funscript.info/get.html">get started</a></li>
-        <li><a href="http://funscript.info/contribute.html">contribute</a></li>
+        <li><a href="http://www.funscript.info/index.html">home</a></li>
+        <li><a href="http://www.funscript.info/learn.html">learn more</a></li>
+        <li><a href="http://www.funscript.info/get.html">get started</a></li>
+        <li><a href="http://www.funscript.info/contribute.html">contribute</a></li>
       </ul>
     </section>
   </nav>
@@ -50,9 +50,9 @@
   </header>
 
   <!-- Some more Foundation references (always load jQuery, because samples use it) -->
-  <script src="http://funscript.info/js/vendor/jquery.js"></script>
-  <script src="http://funscript.info/js/foundation.min.js"></script>  
-  <script src="http://funscript.info/js/foundation/foundation.reveal.js"></script>
+  <script src="http://www.funscript.info/js/vendor/jquery.js"></script>
+  <script src="http://www.funscript.info/js/foundation.min.js"></script>  
+  <script src="http://www.funscript.info/js/foundation/foundation.reveal.js"></script>
   <script>
     $(document).foundation();
   </script>
@@ -198,38 +198,8 @@
   <!-- JavaScript code from the sample goes here... -->
   <script type="text/javascript">
     $(document).ready(function () {
-
-
-Boolean.prototype.CompareTo = function(that) {
-   return this - that;
-};
-
-Number.prototype.CompareTo = function(that) {
-   return this - that;
-};
-
-String.prototype.CompareTo = function(that) {
-   return this > that
-      ? 1
-      : this < that
-         ? -1
-         : 0;
-};
-
-Array.prototype.CompareTo = function(that) {
-   var i = 0;
-   while(i < this.length && i < that.length) {
-      var diff = this[i].CompareTo(that[i]);
-      if(diff != 0) {
-         return diff;
-      }
-      i = i + 1;
-   };
-   return this.length - that.length;
-};
-
-var Program_main;
-  Program_main = (function (unitVar0)
+var Program__main$;
+  Program__main$ = (function (unitVar0)
   {
     var canvas = document.getElementById("canvas");
     canvas.width = 1000.000000;
@@ -244,7 +214,7 @@ var Program_main;
     null;
     return ctx.fillRect(30.000000, 30.000000, 55.000000, 50.000000);
   });
-  return Program_main()
+  return Program__main$()
 });
   </script>
 

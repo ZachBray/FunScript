@@ -13,29 +13,29 @@
   <meta name="author" content="Zach Bray">
 
   <!-- Reference Foundation -->
-  <link rel="stylesheet" href="http://funscript.info/css/foundation.css" />
-  <script src="http://funscript.info/js/vendor/custom.modernizr.js"></script>
+  <link rel="stylesheet" href="http://www.funscript.info/css/foundation.css" />
+  <script src="http://www.funscript.info/js/vendor/custom.modernizr.js"></script>
 
   <!-- Reference custom CSS and tooltips -->
-  <link type="text/css" rel="stylesheet" href="http://funscript.info/custom/style.css" />
-  <script src="http://funscript.info/custom/tooltips.js" type="text/javascript"></script>
-  <link type="text/css" rel="stylesheet" href="http://funscript.info/custom/tooltips.css" />
+  <link type="text/css" rel="stylesheet" href="http://www.funscript.info/custom/style.css" />
+  <script src="http://www.funscript.info/custom/tooltips.js" type="text/javascript"></script>
+  <link type="text/css" rel="stylesheet" href="http://www.funscript.info/custom/tooltips.css" />
 </head>
 <body>
 
   <!-- Header bar with name and navigation links -->
   <nav class="top-bar">
     <ul class="title-area">
-      <li class="name"><h1><a href="http://funscript.info">FunScript</a></h1></li>
+      <li class="name"><h1><a href="http://www.funscript.info">FunScript</a></h1></li>
       <li class="toggle-topbar"><a href="#"><span>Menu</span></a></li>
     </ul>
 
     <section class="top-bar-section">
       <ul class="left">
-        <li><a href="http://funscript.info/index.html">home</a></li>
-        <li><a href="http://funscript.info/learn.html">learn more</a></li>
-        <li><a href="http://funscript.info/get.html">get started</a></li>
-        <li><a href="http://funscript.info/contribute.html">contribute</a></li>
+        <li><a href="http://www.funscript.info/index.html">home</a></li>
+        <li><a href="http://www.funscript.info/learn.html">learn more</a></li>
+        <li><a href="http://www.funscript.info/get.html">get started</a></li>
+        <li><a href="http://www.funscript.info/contribute.html">contribute</a></li>
       </ul>
     </section>
   </nav>
@@ -50,9 +50,9 @@
   </header>
 
   <!-- Some more Foundation references (always load jQuery, because samples use it) -->
-  <script src="http://funscript.info/js/vendor/jquery.js"></script>
-  <script src="http://funscript.info/js/foundation.min.js"></script>  
-  <script src="http://funscript.info/js/foundation/foundation.reveal.js"></script>
+  <script src="http://www.funscript.info/js/vendor/jquery.js"></script>
+  <script src="http://www.funscript.info/js/foundation.min.js"></script>  
+  <script src="http://www.funscript.info/js/foundation/foundation.reveal.js"></script>
   <script>
     $(document).foundation();
   </script>
@@ -312,137 +312,394 @@
   <!-- JavaScript code from the sample goes here... -->
   <script type="text/javascript">
     $(document).ready(function () {
-
-
-Boolean.prototype.CompareTo = function(that) {
-   return this - that;
-};
-
-Number.prototype.CompareTo = function(that) {
-   return this - that;
-};
-
-String.prototype.CompareTo = function(that) {
-   return this > that
-      ? 1
-      : this < that
-         ? -1
-         : 0;
-};
-
-Array.prototype.CompareTo = function(that) {
-   var i = 0;
-   while(i < this.length && i < that.length) {
-      var diff = this[i].CompareTo(that[i]);
-      if(diff != 0) {
-         return diff;
-      }
-      i = i + 1;
-   };
-   return this.length - that.length;
-};
-
-var i_CancellationToken__ctor, i_CancellationTokenSource__ctor, i_AsyncParams_1__ctor, i_AsyncParamsAux__ctor, i_AsyncBuilder__ctor, Program_worker, Program_op_Dynamic, Program_main, Program_log, Program_increment, Async_setTimeout, Async_protectedCont, Async_invokeCont, Async_get_async, Async_StartImmediate, Async_Sleep, Async_FromContinuations, Async_AwaitJQueryEvent, Async_1_Cont;
-  Async_1_Cont = (function (Item)
+var TupleFSharpFunc_2_Unit__Unit__FSharpFunc_2_String__Unit__FSharpFunc_2_String__Unit_, TupleFSharpFunc_2_Object__Unit__FSharpFunc_2_String__Unit__FSharpFunc_2_String__Unit_, Program__worker$Unit_Unit_, Program__op_Dynamic$, Program__main$, Program__log$, Program__increment$, Option__GetValue$Object_Object_, Option__GetValue$FSharpRef_1_Boolean_FSharpRef_1_Boolean_, Option__GetValue$CancellationToken_CancellationToken_, CancellationToken___ctor$, CancellationToken__ThrowIfCancellationRequested$, CancellationTokenSource__get_Token$, CancellationTokenSource___ctor$, CancellationTokenSource__Cancel$, Async__StartImmediate$, Async__Sleep$, Async__FromContinuations$Unit_Unit_, Async__FromContinuations$Object_Object_, Async_2_setTimeout$Unit_Unit_, Async_2_setTimeout$Object_Object_, Async_2_protectedCont$Unit_Unit_, Async_2_protectedCont$Object_Object_, Async_2_protectedCont$Int32_Int32, Async_2_invokeCont$Unit_Unit_, Async_2_invokeCont$Int32_Int32, Async_2_get_async$, Async_1_Unit__ContUnit_, Async_1_Object__ContObject_, Async_1_Int32__ContInt32, Async_1_AwaitJQueryEvent$Object_Object_, AsyncParams_1_Unit___ctor$Unit_, AsyncParams_1_Object___ctor$Object_, AsyncParams_1_Int32___ctor$Int32, AsyncParamsAux___ctor$, AsyncBuilder___ctor$, AsyncBuilder__Zero$, AsyncBuilder__ReturnFrom$Unit_Unit_, AsyncBuilder__Return$Int32_Int32, AsyncBuilder__Delay$Unit_Unit_, AsyncBuilder__Delay$Int32_Int32, AsyncBuilder__Bind$Unit__Int32_Unit__Int32, AsyncBuilder__Bind$Object__Unit_Object__Unit_, AsyncBuilder__Bind$Int32__Unit_Int32_Unit_;
+  AsyncBuilder__Bind$Int32__Unit_Int32_Unit_ = (function (x, _arg1, f)
   {
-    this.Tag = "Cont";
-    this.Item = Item;
-  });
-  Async_AwaitJQueryEvent = (function (f)
-  {
-    return Async_FromContinuations((function (tupledArg)
+    var v = _arg1.Item;
+    return (function (_f)
     {
-      var cont = tupledArg.Item1;
-      var econt = tupledArg.Item2;
-      var ccont = tupledArg.Item3;
-      var named = {contents: {Tag: "None"}};
-      named.contents = {Tag: "Some", Value: f((function (v)
+      return Async_2_protectedCont$Unit_Unit_(_f);
+    })((function (k)
+    {
+      var cont = (function (a)
+      {
+        var patternInput = f(a);
+        var r = patternInput.Item;
+        return r(k);
+      });
+      return v((new AsyncParams_1_Int32___ctor$Int32(cont, k.Aux)));
+    }));
+  });
+  AsyncBuilder__Bind$Object__Unit_Object__Unit_ = (function (x, _arg1, f)
+  {
+    var v = _arg1.Item;
+    return (function (_f)
+    {
+      return Async_2_protectedCont$Unit_Unit_(_f);
+    })((function (k)
+    {
+      var cont = (function (a)
+      {
+        var patternInput = f(a);
+        var r = patternInput.Item;
+        return r(k);
+      });
+      return v((new AsyncParams_1_Object___ctor$Object_(cont, k.Aux)));
+    }));
+  });
+  AsyncBuilder__Bind$Unit__Int32_Unit__Int32 = (function (x, _arg1, f)
+  {
+    var v = _arg1.Item;
+    return (function (_f)
+    {
+      return Async_2_protectedCont$Int32_Int32(_f);
+    })((function (k)
+    {
+      var cont = (function (a)
+      {
+        var patternInput = f(a);
+        var r = patternInput.Item;
+        return r(k);
+      });
+      return v((new AsyncParams_1_Unit___ctor$Unit_(cont, k.Aux)));
+    }));
+  });
+  AsyncBuilder__Delay$Int32_Int32 = (function (x, f)
+  {
+    return (function (_f)
+    {
+      return Async_2_protectedCont$Int32_Int32(_f);
+    })((function (k)
+    {
+      var _535;
+      var _537;
+      _535 = f(_537);
+      var patternInput = _535;
+      var r = patternInput.Item;
+      return r(k);
+    }));
+  });
+  AsyncBuilder__Delay$Unit_Unit_ = (function (x, f)
+  {
+    return (function (_f)
+    {
+      return Async_2_protectedCont$Unit_Unit_(_f);
+    })((function (k)
+    {
+      var _614;
+      var _616;
+      _614 = f(_616);
+      var patternInput = _614;
+      var r = patternInput.Item;
+      return r(k);
+    }));
+  });
+  AsyncBuilder__Return$Int32_Int32 = (function (x, v)
+  {
+    return (function (f)
+    {
+      return Async_2_protectedCont$Int32_Int32(f);
+    })((function (k)
+    {
+      return Async_2_invokeCont$Int32_Int32(k, v);
+    }));
+  });
+  AsyncBuilder__ReturnFrom$Unit_Unit_ = (function (x, w)
+  {
+    return w;
+  });
+  AsyncBuilder__Zero$ = (function (x, unitVar1)
+  {
+    return (function (f)
+    {
+      return Async_2_protectedCont$Unit_Unit_(f);
+    })((function (k)
+    {
+      var _663;
+      return Async_2_invokeCont$Unit_Unit_(k, _663);
+    }));
+  });
+  AsyncBuilder___ctor$ = (function (unitVar0)
+  {
+    ;
+  });
+  AsyncParamsAux___ctor$ = (function (StackCounter, ExceptionCont, CancelledCont, CancellationToken)
+  {
+    this.StackCounter = StackCounter;
+    this.ExceptionCont = ExceptionCont;
+    this.CancelledCont = CancelledCont;
+    this.CancellationToken = CancellationToken;
+  });
+  AsyncParamsAux___ctor$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.StackCounter.CompareTo(that.StackCounter);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.ExceptionCont.CompareTo(that.ExceptionCont);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        var ___diff = 0.000000;
+        ___diff = this.CancelledCont.CompareTo(that.CancelledCont);
+        diff = ___diff;
+        if ((diff != 0.000000)) 
+        {
+          return diff;
+        }
+        else
+        {
+          var ____diff = 0.000000;
+          ____diff = this.CancellationToken.CompareTo(that.CancellationToken);
+          diff = ____diff;
+          if ((diff != 0.000000)) 
+          {
+            return diff;
+          }
+          else
+          {
+            return 0.000000;
+          };
+        };
+      };
+    };
+  });
+  AsyncParams_1_Int32___ctor$Int32 = (function (Cont, Aux)
+  {
+    this.Cont = Cont;
+    this.Aux = Aux;
+  });
+  AsyncParams_1_Int32___ctor$Int32.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Cont.CompareTo(that.Cont);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Aux.CompareTo(that.Aux);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  AsyncParams_1_Object___ctor$Object_ = (function (Cont, Aux)
+  {
+    this.Cont = Cont;
+    this.Aux = Aux;
+  });
+  AsyncParams_1_Object___ctor$Object_.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Cont.CompareTo(that.Cont);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Aux.CompareTo(that.Aux);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  AsyncParams_1_Unit___ctor$Unit_ = (function (Cont, Aux)
+  {
+    this.Cont = Cont;
+    this.Aux = Aux;
+  });
+  AsyncParams_1_Unit___ctor$Unit_.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Cont.CompareTo(that.Cont);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Aux.CompareTo(that.Aux);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  Async_1_AwaitJQueryEvent$Object_Object_ = (function (f)
+  {
+    return Async__FromContinuations$Object_Object_((function (tupledArg)
+    {
+      var cont = tupledArg.Items[0.000000];
+      var econt = tupledArg.Items[1.000000];
+      var ccont = tupledArg.Items[2.000000];
+      var named = {contents: {Tag: 0.000000}};
+      named.contents = {Tag: 1.000000, Value: f((function (v)
       {
         (function (value)
         {
-          ;
-        })(named.contents.Value.off());
+          var ignored0 = value;
+        })(Option__GetValue$Object_Object_(named.contents).off());
         cont(v);
       }))};
     }));
   });
-  Async_FromContinuations = (function (f)
+  Async_1_Int32__ContInt32 = (function (Item)
   {
-    return (function (_f)
-    {
-      return Async_protectedCont(_f);
-    })((function (k)
-    {
-      return f({CompareTo: (function (that)
-      {
-        var diff;
-        return 0.000000;
-      }), Item1: k.Cont, Item2: k.Aux.ExceptionCont, Item3: k.Aux.CancelledCont});
-    }));
+    this.Tag = 0.000000;
+    this._CaseName = "Cont";
+    this.Item = Item;
   });
-  Async_Sleep = (function (milliseconds)
+  Async_1_Int32__ContInt32.prototype.CompareTo = (function (that)
   {
-    return Async_FromContinuations((function (tupledArg)
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Tag < that.Tag) ? -1.000000 : ((this.Tag == that.Tag) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
     {
-      var cont = tupledArg.Item1;
-      var econt = tupledArg.Item2;
-      var ccont = tupledArg.Item3;
-      return (function (value)
-      {
-        ;
-      })(Async_setTimeout((function (_arg1)
-      {
-        var _temp3;
-        return cont(_temp3);
-      }), milliseconds));
-    }));
-  });
-  Async_StartImmediate = (function (workflow, cancellationToken)
-  {
-    var _temp2;
-    if ((cancellationToken.Tag == "Some")) 
-    {
-      var v = cancellationToken.Value;
-      _temp2 = v;
+      return diff;
     }
     else
     {
-      _temp2 = (new i_CancellationToken__ctor({Tag: "None"}));
+      var __diff = 0.000000;
+      __diff = this.Item.CompareTo(that.Item);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
     };
-    var token = _temp2;
-    var f = workflow.Item;
-    var aux = (new i_AsyncParamsAux__ctor({contents: 0.000000}, (function (value)
-    {
-      ;
-    }), (function (value)
-    {
-      ;
-    }), token));
-    return f((new i_AsyncParams_1__ctor((function (value)
-    {
-      ;
-    }), aux)));
   });
-  Async_get_async = (function ()
+  Async_1_Object__ContObject_ = (function (Item)
   {
-    return (new i_AsyncBuilder__ctor());
+    this.Tag = 0.000000;
+    this._CaseName = "Cont";
+    this.Item = Item;
   });
-  Async_invokeCont = (function (k, value)
+  Async_1_Object__ContObject_.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Tag < that.Tag) ? -1.000000 : ((this.Tag == that.Tag) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Item.CompareTo(that.Item);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  Async_1_Unit__ContUnit_ = (function (Item)
+  {
+    this.Tag = 0.000000;
+    this._CaseName = "Cont";
+    this.Item = Item;
+  });
+  Async_1_Unit__ContUnit_.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = ((this.Tag < that.Tag) ? -1.000000 : ((this.Tag == that.Tag) ? 0.000000 : 1.000000));
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Item.CompareTo(that.Item);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        return 0.000000;
+      };
+    };
+  });
+  Async_2_get_async$ = (function ()
+  {
+    return (new AsyncBuilder___ctor$());
+  });
+  Async_2_invokeCont$Int32_Int32 = (function (k, value)
   {
     return k.Cont(value);
   });
-  Async_protectedCont = (function (f)
+  Async_2_invokeCont$Unit_Unit_ = (function (k, value)
   {
-    return (new Async_1_Cont((function (args)
+    return k.Cont(value);
+  });
+  Async_2_protectedCont$Int32_Int32 = (function (f)
+  {
+    return (new Async_1_Int32__ContInt32((function (args)
     {
-      args.Aux.CancellationToken.ThrowIfCancellationRequested();
-      args.Aux.StackCounter.contents = (args.Aux.StackCounter.contents + 1.000000);
+      CancellationToken__ThrowIfCancellationRequested$(args.Aux.CancellationToken);
+      args.Aux.StackCounter.contents = (args.Aux.StackCounter.contents + 1);
       null;
-      if ((args.Aux.StackCounter.contents.CompareTo(1000.000000) > 0.000000)) 
+      if ((args.Aux.StackCounter.contents > 1000)) 
       {
-        args.Aux.StackCounter.contents = 0.000000;
+        args.Aux.StackCounter.contents = 0;
         null;
-        return Async_setTimeout((function (unitVar0)
+        return Async_2_setTimeout$Unit_Unit_((function (unitVar0)
         {
           return f(args);
         }), 1.000000);
@@ -453,250 +710,144 @@ var i_CancellationToken__ctor, i_CancellationTokenSource__ctor, i_AsyncParams_1_
       };
     })));
   });
-  Async_setTimeout = (function (handler, milliseconds)
+  Async_2_protectedCont$Object_Object_ = (function (f)
+  {
+    return (new Async_1_Object__ContObject_((function (args)
+    {
+      CancellationToken__ThrowIfCancellationRequested$(args.Aux.CancellationToken);
+      args.Aux.StackCounter.contents = (args.Aux.StackCounter.contents + 1);
+      null;
+      if ((args.Aux.StackCounter.contents > 1000)) 
+      {
+        args.Aux.StackCounter.contents = 0;
+        null;
+        return Async_2_setTimeout$Unit_Unit_((function (unitVar0)
+        {
+          return f(args);
+        }), 1.000000);
+      }
+      else
+      {
+        return f(args);
+      };
+    })));
+  });
+  Async_2_protectedCont$Unit_Unit_ = (function (f)
+  {
+    return (new Async_1_Unit__ContUnit_((function (args)
+    {
+      CancellationToken__ThrowIfCancellationRequested$(args.Aux.CancellationToken);
+      args.Aux.StackCounter.contents = (args.Aux.StackCounter.contents + 1);
+      null;
+      if ((args.Aux.StackCounter.contents > 1000)) 
+      {
+        args.Aux.StackCounter.contents = 0;
+        null;
+        return Async_2_setTimeout$Unit_Unit_((function (unitVar0)
+        {
+          return f(args);
+        }), 1.000000);
+      }
+      else
+      {
+        return f(args);
+      };
+    })));
+  });
+  Async_2_setTimeout$Object_Object_ = (function (handler, milliseconds)
   {
     return setTimeout(handler, milliseconds);
   });
-  Program_increment = (function (n)
+  Async_2_setTimeout$Unit_Unit_ = (function (handler, milliseconds)
   {
-    return (function (builder_)
-    {
-      return builder_.Delay((function (unitVar)
-      {
-        return builder_.Bind(Async_Sleep(1000.000000), (function (_arg1)
-        {
-          return builder_.Return((n + 1.000000));
-        }));
-      }));
-    })(Async_get_async());
+    return setTimeout(handler, milliseconds);
   });
-  Program_log = (function (msg)
+  Async__FromContinuations$Object_Object_ = (function (f)
   {
-    var tag = (("\u003cp\u003e" + msg) + "\u003c/p\u003e");
-    return (function (value)
-    {
-      ;
-    })(Program_op_Dynamic(jQuery, "results").append([tag]));
-  });
-  Program_main = (function (unitVar0)
-  {
-    return (function (arg00)
-    {
-      return Async_StartImmediate(arg00, {Tag: "None"});
-    })((function (builder_)
-    {
-      return builder_.Delay((function (unitVar)
-      {
-        return builder_.Bind(Async_AwaitJQueryEvent((function (o)
-        {
-          return Program_op_Dynamic(jQuery, "document").ready(o);
-        })), (function (_arg1)
-        {
-          var x = _arg1;
-          var cts = (new i_CancellationTokenSource__ctor());
-          Async_StartImmediate(Program_worker(0.000000), {Tag: "Some", Value: cts.get_Token()});
-          (function (value)
-          {
-            ;
-          })(Program_op_Dynamic(jQuery, "stop").click((function (__arg1)
-          {
-            return (function (value)
-            {
-              return value;
-            })(cts.Cancel());
-          })));
-          return builder_.Zero();
-        }));
-      }));
-    })(Async_get_async()));
-  });
-  Program_op_Dynamic = (function (jq, name)
-  {
-    return jq(("#" + name));
-  });
-  Program_worker = (function (n)
-  {
-    return (function (builder_)
-    {
-      return builder_.Delay((function (unitVar)
-      {
-        return builder_.Bind(Async_AwaitJQueryEvent((function (f)
-        {
-          return Program_op_Dynamic(jQuery, "next").click((function (delegateArg)
-          {
-            return f(delegateArg);
-          }));
-        })), (function (_arg1)
-        {
-          var v = _arg1;
-          return builder_.Bind(Program_increment(n), (function (_arg2)
-          {
-            var _n = _arg2;
-            Program_log(("Count: " + _n.toString()));
-            return builder_.ReturnFrom(Program_worker(_n));
-          }));
-        }));
-      }));
-    })(Async_get_async());
-  });
-  i_AsyncBuilder__ctor = (function (unitVar0)
-  {
-    ;
-  });
-  i_AsyncBuilder__ctor.prototype.Bind = (function (_arg1, f)
-  {
-    var x = this;
-    var v = _arg1.Item;
     return (function (_f)
     {
-      return Async_protectedCont(_f);
+      return Async_2_protectedCont$Object_Object_(_f);
     })((function (k)
     {
-      var cont = (function (a)
-      {
-        var patternInput = f(a);
-        var r = patternInput.Item;
-        return r(k);
-      });
-      return v((new i_AsyncParams_1__ctor(cont, k.Aux)));
+      return f((new TupleFSharpFunc_2_Object__Unit__FSharpFunc_2_String__Unit__FSharpFunc_2_String__Unit_(k.Cont, k.Aux.ExceptionCont, k.Aux.CancelledCont)));
     }));
   });
-  i_AsyncBuilder__ctor.prototype.Delay = (function (f)
+  Async__FromContinuations$Unit_Unit_ = (function (f)
   {
-    var x = this;
     return (function (_f)
     {
-      return Async_protectedCont(_f);
+      return Async_2_protectedCont$Unit_Unit_(_f);
     })((function (k)
     {
-      var _temp5;
-      var _temp6;
-      _temp5 = f(_temp6);
-      var patternInput = _temp5;
-      var r = patternInput.Item;
-      return r(k);
+      return f((new TupleFSharpFunc_2_Unit__Unit__FSharpFunc_2_String__Unit__FSharpFunc_2_String__Unit_(k.Cont, k.Aux.ExceptionCont, k.Aux.CancelledCont)));
     }));
   });
-  i_AsyncBuilder__ctor.prototype.Zero = (function (unitVar1)
+  Async__Sleep$ = (function (milliseconds)
   {
-    var x = this;
-    return (function (f)
+    return Async__FromContinuations$Unit_Unit_((function (tupledArg)
     {
-      return Async_protectedCont(f);
-    })((function (k)
-    {
-      var _temp7;
-      return Async_invokeCont(k, _temp7);
+      var cont = tupledArg.Items[0.000000];
+      var econt = tupledArg.Items[1.000000];
+      var ccont = tupledArg.Items[2.000000];
+      return (function (value)
+      {
+        var ignored0 = value;
+      })(Async_2_setTimeout$Object_Object_((function (_arg1)
+      {
+        var _279;
+        return cont(_279);
+      }), milliseconds));
     }));
   });
-  i_AsyncBuilder__ctor.prototype.ReturnFrom = (function (w)
+  Async__StartImmediate$ = (function (workflow, cancellationToken)
   {
-    var x = this;
-    return w;
-  });
-  i_AsyncBuilder__ctor.prototype.Return = (function (v)
-  {
-    var x = this;
-    return (function (f)
+    var _6;
+    if ((cancellationToken.Tag == 1.000000)) 
     {
-      return Async_protectedCont(f);
-    })((function (k)
+      var v = Option__GetValue$CancellationToken_CancellationToken_(cancellationToken);
+      _6 = v;
+    }
+    else
     {
-      return Async_invokeCont(k, v);
-    }));
-  });
-  i_AsyncBuilder__ctor.prototype.While = (function (cond, body)
-  {
-    var __ = this;
-    var x = __;
-    var loop;
-    loop = (function (unitVar0)
+      _6 = (new CancellationToken___ctor$({Tag: 0.000000}));
+    };
+    var token = _6;
+    var f = workflow.Item;
+    var aux = (new AsyncParamsAux___ctor$({contents: 0}, (function (value)
     {
-      var _temp10;
-      var _temp11;
-      _temp10 = cond(_temp11);
-      if (_temp10) 
-      {
-        return x.Bind(body, loop);
-      }
-      else
-      {
-        return x.Zero();
-      };
-    });
-    var _temp8;
-    return loop(_temp8);
-  });
-  i_AsyncBuilder__ctor.prototype.Combine = (function (work1, work2)
-  {
-    var __ = this;
-    return __.Bind(work1, (function (unitVar0)
+      var ignored0 = value;
+    }), (function (value)
     {
-      return work2;
-    }));
-  });
-  i_AsyncBuilder__ctor.prototype.For = (function (seq, body)
-  {
-    var __ = this;
-    var en = seq.GetEnumerator();
-    var x = __;
-    var loop;
-    loop = (function (unitVar0)
+      var ignored0 = value;
+    }), token));
+    return f((new AsyncParams_1_Unit___ctor$Unit_((function (value)
     {
-      if (en.MoveNext()) 
-      {
-        return x.Bind(body(en.get_Current()), loop);
-      }
-      else
-      {
-        return x.Zero();
-      };
-    });
-    var _temp12;
-    return loop(_temp12);
+      var ignored0 = value;
+    }), aux)));
   });
-  i_AsyncParamsAux__ctor = (function (StackCounter, ExceptionCont, CancelledCont, CancellationToken)
+  CancellationTokenSource__Cancel$ = (function (x, unitVar1)
   {
-    this.StackCounter = StackCounter;
-    this.ExceptionCont = ExceptionCont;
-    this.CancelledCont = CancelledCont;
-    this.CancellationToken = CancellationToken;
+    Option__GetValue$FSharpRef_1_Boolean_FSharpRef_1_Boolean_(x.token.Cell).contents = true;
   });
-  i_AsyncParams_1__ctor = (function (Cont, Aux)
+  CancellationTokenSource___ctor$ = (function (unitVar0)
   {
-    this.Cont = Cont;
-    this.Aux = Aux;
+    this.token = (new CancellationToken___ctor$({Tag: 1.000000, Value: {contents: false}}));
   });
-  i_CancellationTokenSource__ctor = (function (unitVar0)
+  CancellationTokenSource__get_Token$ = (function (x, unitVar1)
   {
-    this.token = (new i_CancellationToken__ctor({Tag: "Some", Value: {contents: false}}));
-  });
-  i_CancellationTokenSource__ctor.prototype.get_Token = (function (unitVar1)
-  {
-    var x = this;
     return x.token;
   });
-  i_CancellationTokenSource__ctor.prototype.Cancel = (function (unitVar1)
+  CancellationToken__ThrowIfCancellationRequested$ = (function (x, unitVar1)
   {
-    var x = this;
-    x.token.Cell.Value.contents = true;
-  });
-  i_CancellationToken__ctor = (function (Cell)
-  {
-    this.Cell = Cell;
-  });
-  i_CancellationToken__ctor.prototype.ThrowIfCancellationRequested = (function (unitVar1)
-  {
-    var x = this;
     var matchValue = x.Cell;
-    if ((matchValue.Tag == "Some")) 
+    if ((matchValue.Tag == 1.000000)) 
     {
-      var _temp1;
-      var cell = matchValue.Value;
-      _temp1 = cell.contents;
-      if (_temp1) 
+      var _103;
+      var cell = Option__GetValue$FSharpRef_1_Boolean_FSharpRef_1_Boolean_(matchValue);
+      _103 = cell.contents;
+      if (_103) 
       {
-        var _cell = matchValue.Value;
+        var _cell = Option__GetValue$FSharpRef_1_Boolean_FSharpRef_1_Boolean_(matchValue);
         throw ("OperationCancelledException");
         return null;
       }
@@ -710,7 +861,202 @@ var i_CancellationToken__ctor, i_CancellationTokenSource__ctor, i_AsyncParams_1_
       ;
     };
   });
-  return Program_main()
+  CancellationToken___ctor$ = (function (Cell)
+  {
+    this.Cell = Cell;
+  });
+  CancellationToken___ctor$.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Cell.CompareTo(that.Cell);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      return 0.000000;
+    };
+  });
+  Option__GetValue$CancellationToken_CancellationToken_ = (function (option)
+  {
+    return option.Value;
+  });
+  Option__GetValue$FSharpRef_1_Boolean_FSharpRef_1_Boolean_ = (function (option)
+  {
+    return option.Value;
+  });
+  Option__GetValue$Object_Object_ = (function (option)
+  {
+    return option.Value;
+  });
+  Program__increment$ = (function (n)
+  {
+    return (function (builder_)
+    {
+      return AsyncBuilder__Delay$Int32_Int32(builder_, (function (unitVar)
+      {
+        return AsyncBuilder__Bind$Unit__Int32_Unit__Int32(builder_, Async__Sleep$(1000), (function (_arg1)
+        {
+          return AsyncBuilder__Return$Int32_Int32(builder_, (n + 1));
+        }));
+      }));
+    })(Async_2_get_async$());
+  });
+  Program__log$ = (function (msg)
+  {
+    var tag = (("\u003cp\u003e" + msg) + "\u003c/p\u003e");
+    return (function (value)
+    {
+      var ignored0 = value;
+    })(Program__op_Dynamic$(jQuery, "results").append([tag]));
+  });
+  Program__main$ = (function (unitVar0)
+  {
+    return (function (arg00)
+    {
+      return Async__StartImmediate$(arg00, {Tag: 0.000000});
+    })((function (builder_)
+    {
+      return AsyncBuilder__Delay$Unit_Unit_(builder_, (function (unitVar)
+      {
+        return AsyncBuilder__Bind$Object__Unit_Object__Unit_(builder_, Async_1_AwaitJQueryEvent$Object_Object_((function (o)
+        {
+          return Program__op_Dynamic$(jQuery, "document").ready(o);
+        })), (function (_arg1)
+        {
+          var x = _arg1;
+          var cts = (new CancellationTokenSource___ctor$());
+          Async__StartImmediate$(Program__worker$Unit_Unit_(0), {Tag: 1.000000, Value: CancellationTokenSource__get_Token$(cts)});
+          (function (value)
+          {
+            var ignored0 = value;
+          })(Program__op_Dynamic$(jQuery, "stop").click((function (__arg1)
+          {
+            return (function (value)
+            {
+              return value;
+            })(CancellationTokenSource__Cancel$(cts));
+          })));
+          return AsyncBuilder__Zero$(builder_);
+        }));
+      }));
+    })(Async_2_get_async$()));
+  });
+  Program__op_Dynamic$ = (function (jq, name)
+  {
+    return jq(("#" + name));
+  });
+  Program__worker$Unit_Unit_ = (function (n)
+  {
+    return (function (builder_)
+    {
+      return AsyncBuilder__Delay$Unit_Unit_(builder_, (function (unitVar)
+      {
+        return AsyncBuilder__Bind$Object__Unit_Object__Unit_(builder_, Async_1_AwaitJQueryEvent$Object_Object_((function (f)
+        {
+          return Program__op_Dynamic$(jQuery, "next").click((function (delegateArg)
+          {
+            return f(delegateArg);
+          }));
+        })), (function (_arg1)
+        {
+          var v = _arg1;
+          return AsyncBuilder__Bind$Int32__Unit_Int32_Unit_(builder_, Program__increment$(n), (function (_arg2)
+          {
+            var _n = _arg2;
+            Program__log$(("Count: " + _n.toString()));
+            return AsyncBuilder__ReturnFrom$Unit_Unit_(builder_, Program__worker$Unit_Unit_(_n));
+          }));
+        }));
+      }));
+    })(Async_2_get_async$());
+  });
+  TupleFSharpFunc_2_Object__Unit__FSharpFunc_2_String__Unit__FSharpFunc_2_String__Unit_ = (function (Item0, Item1, Item2)
+  {
+    this.Items = [Item0, Item1, Item2];
+    this.Items = [Item0, Item1, Item2];
+    this.Items = [Item0, Item1, Item2];
+  });
+  TupleFSharpFunc_2_Object__Unit__FSharpFunc_2_String__Unit__FSharpFunc_2_String__Unit_.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Items[0.000000].CompareTo(that.Items[0.000000]);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Items[1.000000].CompareTo(that.Items[1.000000]);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        var ___diff = 0.000000;
+        ___diff = this.Items[2.000000].CompareTo(that.Items[2.000000]);
+        diff = ___diff;
+        if ((diff != 0.000000)) 
+        {
+          return diff;
+        }
+        else
+        {
+          return 0.000000;
+        };
+      };
+    };
+  });
+  TupleFSharpFunc_2_Unit__Unit__FSharpFunc_2_String__Unit__FSharpFunc_2_String__Unit_ = (function (Item0, Item1, Item2)
+  {
+    this.Items = [Item0, Item1, Item2];
+    this.Items = [Item0, Item1, Item2];
+    this.Items = [Item0, Item1, Item2];
+  });
+  TupleFSharpFunc_2_Unit__Unit__FSharpFunc_2_String__Unit__FSharpFunc_2_String__Unit_.prototype.CompareTo = (function (that)
+  {
+    var diff = 0.000000;
+    var _diff = 0.000000;
+    _diff = this.Items[0.000000].CompareTo(that.Items[0.000000]);
+    diff = _diff;
+    if ((diff != 0.000000)) 
+    {
+      return diff;
+    }
+    else
+    {
+      var __diff = 0.000000;
+      __diff = this.Items[1.000000].CompareTo(that.Items[1.000000]);
+      diff = __diff;
+      if ((diff != 0.000000)) 
+      {
+        return diff;
+      }
+      else
+      {
+        var ___diff = 0.000000;
+        ___diff = this.Items[2.000000].CompareTo(that.Items[2.000000]);
+        diff = ___diff;
+        if ((diff != 0.000000)) 
+        {
+          return diff;
+        }
+        else
+        {
+          return 0.000000;
+        };
+      };
+    };
+  });
+  return Program__main$()
 });
   </script>
 
