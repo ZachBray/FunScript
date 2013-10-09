@@ -57,17 +57,20 @@ let replaceIfAvailable (compiler:InternalCompiler.ICompiler) (mb : MethodBase) c
    | Some mi -> upcast mi
 
 let deconstructTuple (tupleVar : Var) =
-    let elementTypes = FSharpType.GetTupleElements tupleVar.Type
-    let elementVars =
-        elementTypes |> Array.mapi (fun i elementType ->
-            Var(sprintf "%s_%i" tupleVar.Name i, elementType, tupleVar.IsMutable))
-        |> Array.toList
-    let elementExprs = elementVars |> List.map Expr.Var
-    let tupleConstructionExpr =
-        match elementExprs with
-        | [] -> Expr.Value(()) 
-        | _ -> Expr.NewTuple elementExprs
-    elementVars, tupleConstructionExpr
+    if tupleVar.Type = typeof<unit> then
+        [tupleVar], Expr.Value(())
+    else
+        let elementTypes = FSharpType.GetTupleElements tupleVar.Type
+        let elementVars =
+            elementTypes |> Array.mapi (fun i elementType ->
+                Var(sprintf "%s_%i" tupleVar.Name i, elementType, tupleVar.IsMutable))
+            |> Array.toList
+        let elementExprs = elementVars |> List.map Expr.Var
+        let tupleConstructionExpr =
+            match elementExprs with
+            | [] -> Expr.Value(()) 
+            | _ -> Expr.NewTuple elementExprs
+        elementVars, tupleConstructionExpr
 
 let extractVars (mb : MethodBase) (argCounts : CompilationArgumentCountsAttribute) = function
     | DerivedPatterns.Lambdas(vars, bodyExpr) ->

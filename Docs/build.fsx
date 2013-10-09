@@ -7,6 +7,7 @@
 #r "../ThirdParty/Ionic.Zip.dll"
 open System.IO
 open System.Text.RegularExpressions
+open System.Diagnostics
 open FSharp.Literate
 open Ionic.Zip
 
@@ -120,6 +121,12 @@ let sampleFiles  =
   [ funScriptRoot ++ "Examples/Mario/Web", outputPath ++ "samples/mario" 
     funScriptRoot ++ "Examples/Pacman/Web", outputPath ++ "samples/pacman" ]
 
+
+let generateCode() =
+    for name, sampleSource, _ in samples do 
+        use p = Process.Start(sampleSource ++ "bin" ++ "Debug" ++ sprintf "%s.exe" name, "--only-generate-code")
+        p.WaitForExit()
+
 // --------------------------------------------------------------------------------------
 // Build the FunScript web site
 // --------------------------------------------------------------------------------------
@@ -179,5 +186,5 @@ let generateDocs () =
 // --------------------------------------------------------------------------------------
 // Run me :-)
 // --------------------------------------------------------------------------------------
-
+generateCode ()
 generateDocs ()

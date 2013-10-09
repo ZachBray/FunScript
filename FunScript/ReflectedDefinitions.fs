@@ -120,11 +120,16 @@ let private propertyGetting =
    CompilerComponent.create <| fun split compiler returnStategy ->
       function
       | Patterns.PropertyGet(List objExpr, pi, exprs) ->
-         let mapping = pi.GetCustomAttribute<CompilationMappingAttribute>()
          let isField = 
+            let mapping = pi.GetCustomAttribute<CompilationMappingAttribute>()
             mapping <> Unchecked.defaultof<_> &&
             mapping.SourceConstructFlags = SourceConstructFlags.Value
-         match isField, objExpr, exprs with
+         let isModuleLetBound =
+            let dt = pi.DeclaringType
+            let mapping = dt.GetCustomAttribute<CompilationMappingAttribute>()
+            mapping <> Unchecked.defaultof<_> &&
+            mapping.SourceConstructFlags = SourceConstructFlags.Module
+         match isField || isModuleLetBound, objExpr, exprs with
          | true, [], [] ->
             let property = getPropertyField split compiler pi objExpr exprs
             [ returnStategy.Return <| Reference property ]

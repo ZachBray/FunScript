@@ -39,13 +39,13 @@
   <ItemGroup>
     <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="FunScript">
-      <HintPath>..\Lib\FunScript.dll</HintPath>
+      <HintPath>..\..\FunScript.TypeScript\bin\Debug\FunScript.dll</HintPath>
     </Reference>
     <Reference Include="FunScript.TypeScript">
-      <HintPath>..\Lib\FunScript.TypeScript.dll</HintPath>
+      <HintPath>..\..\FunScript.TypeScript\bin\Debug\FunScript.TypeScript.dll</HintPath>
     </Reference>
     <Reference Include="FunScript.TypeScript.Interop">
-      <HintPath>..\Lib\FunScript.TypeScript.Interop.dll</HintPath>
+      <HintPath>..\..\FunScript.TypeScript\bin\Debug\FunScript.TypeScript.Interop.dll</HintPath>
     </Reference>
     <Reference Include="System.Net" />
     <Reference Include="System.Web" />

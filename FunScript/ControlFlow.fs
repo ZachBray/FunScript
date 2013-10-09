@@ -26,19 +26,21 @@ let private forLoop =
       | _ -> []
 
 let private whileLoop =
-   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
-      let (|Return|) = compiler.Compile
-      function
-      | Patterns.WhileLoop(condExpr, Return ReturnStrategies.inplace block) ->
-         //TODO: Don't use a lambda when it is uneccessary! PERF!
-         let condBody = compiler.Compile ReturnStrategies.returnFrom condExpr
-         let condLambda = Lambda([], Block condBody)
-         let condVar = compiler.NextTempVar()
-         [ 
-           yield DeclareAndAssign(condVar, condLambda)
-           yield WhileLoop(Apply(Reference condVar, []), Block block)
-         ]
-      | _ -> []
+    CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+        let (|Return|) = compiler.Compile
+        function
+        | Patterns.WhileLoop(condExpr, Return ReturnStrategies.inplace block) ->
+            match compiler.Compile ReturnStrategies.returnFrom condExpr with
+            | [AST.Return condExpr] ->
+                [ WhileLoop(condExpr, Block block) ]
+            | condBody ->
+                let condLambda = Lambda([], Block condBody)
+                let condVar = compiler.NextTempVar()
+                [ 
+                    yield DeclareAndAssign(condVar, condLambda)
+                    yield WhileLoop(Apply(Reference condVar, []), Block block)
+                ]
+        | _ -> []
 
 let private ifThenElse =
    CompilerComponent.create <| fun (|Split|) compiler returnStategy ->

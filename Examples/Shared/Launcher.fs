@@ -126,12 +126,17 @@ type Runtime private() =
     System.IO.File.Delete filename
     System.IO.File.WriteAllText(filename, sourceWrapped)
 
-    // Starting the web server
-    let url = sprintf "http://localhost:%d/" port
-    let server = HttpServer.Start(url, root)
-    printfn "Starting web server at %s" url
-    if browse then 
-      System.Diagnostics.Process.Start(url) |> ignore
+    let shouldOnlyGenerateCode =
+        System.Environment.GetCommandLineArgs() 
+        |> Array.exists ((=) "--only-generate-code")
 
-    System.Console.ReadLine() |> ignore
-    server.Stop()
+    if not shouldOnlyGenerateCode then
+        // Starting the web server
+        let url = sprintf "http://localhost:%d/" port
+        let server = HttpServer.Start(url, root)
+        printfn "Starting web server at %s" url
+        if browse then 
+          System.Diagnostics.Process.Start(url) |> ignore
+
+        System.Console.ReadLine() |> ignore
+        server.Stop()

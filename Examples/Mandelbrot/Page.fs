@@ -36,16 +36,13 @@ let maxX = 0.5
 let minY = -1.4
 let maxY = 1.4
 
-let inBound (p : Complex) : bool =
-    p.r*p.r + p.i*p.i < 4.0
-
 let iteratePoint (s : Complex) (p : Complex) : Complex =
     { r = s.r + p.r*p.r - p.i*p.i; i = s.i + 2.0 * p.i * p.r }
 
 let getIterationCount (p : Complex) =
     let mutable z = p
     let mutable i = 0
-    while i < maxIter && inBound z do
+    while i < maxIter && (z.r*z.r + z.i*z.i < 4.0) do
       z <- iteratePoint p z
       i <- i + 1
     i
