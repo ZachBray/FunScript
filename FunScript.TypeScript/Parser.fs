@@ -1,400 +1,530 @@
-﻿module internal FunScript.TypeScript.Parser
-
+﻿#if INTERACTIVE
+#r "..\ThirdParty\FParsecCS.dll"
+#r "..\ThirdParty\FParsec.dll"
+#else
+module internal FunScript.TypeScript.Parser
 open AST
-open System.Reflection
-open System.IO
-open System.Text
+#endif
 
-let private withoutComments(stream:StreamReader) =
-   let consume() = stream.Read() |> char
-   let peek() = stream.Peek() |> char
-   let throwAway() = consume() |> ignore
-   let sb = StringBuilder()
-   let append(c:char) =
-      sb.Append c |> ignore
+open FParsec
 
-   let rec read() =
-      if not stream.EndOfStream then
-         match consume(), peek() with
-         | '/', '/' -> throwAway(); ignoreLine()
-         | '/', '*' -> throwAway(); ignoreCommentedSection()
-         | c, _ -> 
-            append c
-            read()
+let test p str =
+    match run p str with
+    | Success(result, _, _)   -> printfn "Success: %A" result
+    | Failure(errorMsg, _, _) -> printfn "Failure: %s" errorMsg
 
-   and ignoreLine() =
-      if not stream.EndOfStream then
-         printf "*"
-         match consume() with
-         | '\n' -> read()
-         | _ -> ignoreLine()
+let (<!>) (p: Parser<_,_>) label : Parser<_,_> =
+    fun stream ->
+        printfn "%A: Entering %s" stream.Position label
+        let reply = p stream
+        printfn "%A: Leaving %s (%A)" stream.Position label reply.Status
+        reply
 
-   and ignoreCommentedSection() =
-      if not stream.EndOfStream then
-         match consume(), peek() with
-         | '*', '/' -> throwAway(); read()
-         | _ -> ignoreCommentedSection()
+let str = pstring
 
-   read()
-   sb.ToString()
+let stringLiteralBetween braceChar =
+    let escape =  
+        anyOf [yield braceChar; yield! "\\/bfnrt"]
+        |>> function
+            | 'b' -> "\b"
+            | 'f' -> "\u000C"
+            | 'n' -> "\n"
+            | 'r' -> "\r"
+            | 't' -> "\t"
+            | c   -> string c
 
-let parse(stream:StreamReader) =
-   let text = withoutComments stream
+    let unicodeEscape =
+        let hex2int c = (int c &&& 15) + (int c >>> 6)*9
 
-   // ranges
-   let ws = set ['\n'; ' '; '\t'; '\r']
-   let numeric = set ['0' .. '9']
-   let lowercase = set ['a' .. 'z']
-   let uppercase = set ['A' .. 'Z']
-   let quotes = "\"" |> Seq.toArray
-   let specialSymbols = set ['$'; '_'; '.']
-   let alpha = lowercase + uppercase
-   let dot = set ['.']
-   let alphaNumeric = alpha + numeric + specialSymbols + set quotes + dot
+        str "u" >>. pipe4 hex hex hex hex (fun h3 h2 h1 h0 ->
+            (hex2int h3)*4096 + (hex2int h2)*256 + (hex2int h1)*16 + hex2int h0
+            |> char |> string
+        )
 
-   let furthestPos = ref 0
+    let escapedCharSnippet = str "\\" >>. (escape <|> unicodeEscape)
+    let normalCharSnippet  = manySatisfy (fun c -> c <> braceChar && c <> '\\')
 
-   let skip (range:char Set) pos =
-      let rec skip i =
-         if i < text.Length && 
-            range.Contains text.[i] 
-         then skip (i+1)
-         else i
-      skip pos
 
-   let startsWith (textToFind:string) pos =
-      let pos = skip ws pos
-      let rec startsWith i =
-         i >= textToFind.Length || (
-            (pos + i) < text.Length &&
-            text.[pos + i] = textToFind.[i] &&
-            startsWith (i+1))
-      furthestPos := max pos !furthestPos
-      if startsWith 0 then Some <| pos + textToFind.Length
-      else None
+    between (str (braceChar.ToString())) (str (braceChar.ToString()))
+            (stringsSepBy normalCharSnippet escapedCharSnippet)
 
-   let (|Consume|_|) textToFind pos = startsWith textToFind pos
+let stringLiteralAux =
+    choice [
+        stringLiteralBetween '"'
+        stringLiteralBetween '\''
+    ]
 
-   let take (range:char Set) pos =
-      let rec count i =
-         if i < text.Length && range.Contains text.[i] then count (i+1)
-         else i
-      let pos = skip ws pos
-      furthestPos := max pos !furthestPos
-      match count pos with
-      | n when n > pos -> 
-         let toEmit = text.Substring(pos, n - pos).Trim(quotes)
-         Some(toEmit, n)
-      | _ -> None
+let singlelineComment =
+    attempt(skipString "//" >>. notFollowedBy (skipString "/" >>. spaces >>. skipString "<") >>. skipRestOfLine true)
 
-   let (|Take|_|) = take
+//TODO: Nested comments...
+let multilineComment =
+    skipString "/*" >>. skipCharsTillString "*/" true System.Int32.MaxValue
 
-   let rec (|ListOf|_|) ((|Element|_|) as el) separator ending = function
-      | Element (el, Consume separator (ListOf el separator ending (els, p))) -> Some(el::els, p)
-      | Element (el, Consume ending p) -> Some([el], p)
-      | Consume ending p -> Some([], p)
-      | _ -> None
-   
-   let listOf el sep start ending = function
-      | Consume start (ListOf el sep ending (els, p)) -> Some (els, p)
-      | _ -> None
+let choice_attempt ps =
+    choice (ps |> Seq.map attempt)
 
-   let getTypeFromName = function
-      | "void" -> Void
-      | "bool" -> Boolean
-      | "number" -> Number
-      | "string" -> String
-      | "any" -> Any
-      | name -> Interface name
+let ws = 
+    choice [
+        spaces1
+        // Non-breaking space: &nbsp; char code #160
+        charReturn ' ' ()
+        multilineComment
+        singlelineComment
+    ] |> skipMany
 
-   let rec (|Type|_|) pos =
-      let x = 10
-      match pos with
-      // TODO: There is a recursion bug here to do with consuming arrays.
-      //       Therefore, we have had to special case some. This might not be enough for
-      //       all cases.
-      | Take alphaNumeric (name, Consume "[]" (Consume "[]" (Consume "[]" p))) ->
-         Some(Array(Array(Array(getTypeFromName name))), p)
-      | Take alphaNumeric (name, Consume "[]" (Consume "[]" p)) ->
-         Some(Array(Array(getTypeFromName name)), p)
-      | Take alphaNumeric (name, Consume "[]" p) ->
-         Some(Array(getTypeFromName name), p)
-      | Take alphaNumeric (name, p) ->
-         let t = getTypeFromName name
-         Some(t, p)
-      | ParameterList (paras, Consume "=>" (Type(t, p))) ->
-         Some(Lambda(paras, t), p)
-      | ObjectPropertyList false (props, Consume "[]" p) ->
-         Some(Array(Structural props), p)
-      | ObjectPropertyList false (props, p) ->
-         Some(Structural(props), p)
-      | _ -> None
+let ws1 = 
+    choice [
+        spaces1
+        // Non-breaking space: &nbsp; char code #160
+        charReturn ' ' ()
+        multilineComment
+        singlelineComment
+    ] |> skipMany1
 
-   and (|Var|_|) = function
-      | Take alphaNumeric (name, Consume "?" (Consume ":" (Type (t, p)))) ->
-         let var = 
-           { TSVariable.Name = name
-             TSVariable.Type = t
-             TSVariable.IsOptional = true }
-         Some(var, p)
-      | Take alphaNumeric (name, Consume ":" (Type (t, p))) ->
-         let var = 
-           { TSVariable.Name = name
-             TSVariable.Type = t
-             TSVariable.IsOptional = false }
-         Some(var, p)
-      | Take alphaNumeric (name, Consume "?" p) ->
-         let var = 
-           { TSVariable.Name = name
-             TSVariable.Type = Any
-             TSVariable.IsOptional = true }
-         Some(var, p)
-      | Take alphaNumeric (name, p) ->
-         let var = 
-           { TSVariable.Name = name
-             TSVariable.Type = Any
-             TSVariable.IsOptional = false }
-         Some(var, p)
-      | _ -> None
+let str_ws s = pstring s .>> ws
+let stringReturn_ws s x = stringReturn s x .>> ws
+let stringReturn_ws1 s x = attempt(stringReturn s x .>> ws1)
 
-   and (|Indexer|_|) p =
-      match p with
-      | Consume "[" (Take alphaNumeric (name, Consume ":" (Type (t, Consume "]" (Consume ":" (Type(retT, p))))))) ->
-         let parameter =
-           { TSParameter.Var = 
-               {  TSVariable.Name = name
-                  TSVariable.Type = t
-                  TSVariable.IsOptional = false } 
-             TSParameter.IsParamArray = false }
-         let func =
-           { TSFunction.Name = name
-             TSFunction.IsOptional = false
-             TSFunction.Parameters = [parameter]
-             TSFunction.Type = retT }
-         Some(func, p)
-      | Consume "[" (Take alphaNumeric (name, Consume "]" (Type(retT, p)))) ->
-         let parameter =
-           { TSParameter.Var = 
-               {  TSVariable.Name = name
-                  TSVariable.Type = Any
-                  TSVariable.IsOptional = false } 
-             TSParameter.IsParamArray = false }
-         let func =
-           { TSFunction.Name = name
-             TSFunction.IsOptional = false
-             TSFunction.Parameters = [parameter]
-             TSFunction.Type = retT }
-         Some(func, p)
-      | Consume "[" (Take alphaNumeric (name, Consume ":" (Type (t, Consume "]" p)))) ->
-         let parameter =
-           { TSParameter.Var = 
-               {  TSVariable.Name = name
-                  TSVariable.Type = t
-                  TSVariable.IsOptional = false } 
-             TSParameter.IsParamArray = false }
-         let func =
-           { TSFunction.Name = name
-             TSFunction.IsOptional = false
-             TSFunction.Parameters = [parameter]
-             TSFunction.Type = Any }
-         Some(func, p)
-      | Consume "[" (Take alphaNumeric (name, Consume "]" p)) ->
-         let parameter =
-           { TSParameter.Var = 
-               {  TSVariable.Name = name
-                  TSVariable.Type = Any
-                  TSVariable.IsOptional = false } 
-             TSParameter.IsParamArray = false }
-         let func =
-           { TSFunction.Name = name
-             TSFunction.IsOptional = false
-             TSFunction.Parameters = [parameter]
-             TSFunction.Type = Any }
-         Some(func, p)
-      | _ -> None
+let stringLiteral = stringLiteralAux .>> ws
 
-   and parameter = function
-      | Consume "..." (Var (v, p)) ->
-         let parameter =
-            { TSParameter.Var = v
-              TSParameter.IsParamArray = true }
-         Some (parameter, p)
-      | Var (v, p) ->
-         let parameter =
-            { TSParameter.Var = v
-              TSParameter.IsParamArray = false }
-         Some (parameter, p)
-      | _ -> None
-      
-   and (|ParameterList|_|) = listOf parameter "," "(" ")"
+let pbool_ws =
+    choice [
+        stringReturn_ws "true" true
+        stringReturn_ws "false" false
+    ] .>> ws
 
-   and (|Function|_|) = function
-      | ParameterList (paras, Consume ":" (Type (t, p))) ->
-         let func =
-           { TSFunction.Name = ""
-             TSFunction.Parameters = paras
-             TSFunction.Type = t
-             TSFunction.IsOptional = false }
-         Some(func, p)
-      | Take alphaNumeric (name, ParameterList (paras, Consume ":" (Type (t, p)))) ->
-         let func =
-           { TSFunction.Name = name
-             TSFunction.Parameters = paras
-             TSFunction.Type = t 
-             TSFunction.IsOptional = false}
-         Some(func, p)
-      | Consume "?" (ParameterList (paras, Consume ":" (Type (t, p)))) ->
-         let func =
-           { TSFunction.Name = ""
-             TSFunction.Parameters = paras
-             TSFunction.Type = t
-             TSFunction.IsOptional = true}
-         Some(func, p)
-      | Take alphaNumeric (name, Consume "?" (ParameterList (paras, Consume ":" (Type (t, p))))) ->
-         let func =
-           { TSFunction.Name = name
-             TSFunction.Parameters = paras
-             TSFunction.Type = t 
-             TSFunction.IsOptional = true }
-         Some(func, p)
-      | ParameterList (paras, p) ->
-         let func =
-           { TSFunction.Name = ""
-             TSFunction.Parameters = paras
-             TSFunction.Type = Void
-             TSFunction.IsOptional = false }
-         Some(func, p)
-      | Take alphaNumeric (name, ParameterList (paras, p)) ->
-         let func =
-           { TSFunction.Name = name
-             TSFunction.Parameters = paras
-             TSFunction.Type = Void 
-             TSFunction.IsOptional = false }
-         Some(func, p)
-      | Consume "?" (ParameterList (paras, p)) ->
-         let func =
-           { TSFunction.Name = ""
-             TSFunction.Parameters = paras
-             TSFunction.Type = Void
-             TSFunction.IsOptional = true }
-         Some(func, p)
-      | Take alphaNumeric (name, Consume "?" (ParameterList (paras, p))) ->
-         let func =
-           { TSFunction.Name = name
-             TSFunction.Parameters = paras
-             TSFunction.Type = Void 
-             TSFunction.IsOptional = true }
-         Some(func, p)
-      | _ -> None
+let pfloat_ws = 
+    pfloat .>> ws
 
-   and (|ObjProperty|_|) isStatic = function
-      | Consume "static" (ObjProperty true (f, p)) ->
-        Some(f, p)
-      | Function (f, p) -> 
-         let x = 0
-         Some(Method(f,isStatic), p)
-      | Indexer (f, p) -> Some(Indexer(f, isStatic), p)
-      | Var (v, p) -> Some(Property(v, isStatic), p)      
-      | _ -> None
+let pint32_ws =
+    pint32 .>> ws
 
-   and objProperty = (|ObjProperty|_|)
+let identifier =
+    let isIdentifierFirstChar c = isLetter c || c = '_' || c = '$'
+    let isIdentifierChar c = isLetter c || isDigit c || c = '_' || c = '$'
 
-   and (|ObjectPropertyList|_|) isStatic = listOf (objProperty isStatic) ";" "{" "}"
+    many1Satisfy2L isIdentifierFirstChar isIdentifierChar "identifier" 
+    .>> ws
 
-   let (|GlobalVar|_|) = function
-      | Consume "var" (Var (v, Consume ";" p)) -> 
-         Some(DeclareVar v, p)
-      | _ -> None
-   
-   let (|GlobalFunc|_|) = function
-      | Consume "function" (Function (f, Consume ";" p)) ->
-         Some(DeclareFunction f, p)
-      | _ -> None
+let listBetweenStrings sOpen sClose sSep pElement =
+    between (str_ws sOpen) (str_ws sClose)
+            // TODO: split out cases for sepBy and sepEndBy
+            (sepEndBy (pElement .>> ws) (str_ws sSep))
+    .>> ws
 
-   let (|GlobalObject|_|) = function
-      | Consume "var" (Take alphaNumeric (name, Consume ":" (ObjectPropertyList true (props, p)))) ->
-         let obj =
-           { TSObject.Name = name
-             TSObject.Members = props 
-             TSObject.SuperTypes = [] }
-         Some (DeclareObject obj, p)
-      | _ -> None
-   
-   let (|SuperTypeList|_|) = listOf (take alphaNumeric) "," "extends" ""
+let sepByComma1 pElement =
+    sepBy1 pElement (str_ws ",")
 
-   let (|GlobalInterface|_|) = function
-      | Take alphaNumeric (name, SuperTypeList (superTypes, ObjectPropertyList false (props, p))) ->
-         let obj =
-           { TSObject.Name = name
-             TSObject.Members = props 
-             TSObject.SuperTypes = superTypes }
-         Some(DeclareInterface obj, p)
-      | Take alphaNumeric (name, ObjectPropertyList false (props, p)) ->
-         let obj =
-           { TSObject.Name = name
-             TSObject.Members = props 
-             TSObject.SuperTypes = [] }
-         Some(DeclareInterface obj, p)
-      | _ -> None
+let sepEndByUntil pElement sepStr pUntil =
+    many1Till (pElement .>> str_ws sepStr) (followedBy pUntil)
 
-   let (|EnumCaseList|_|) = listOf (take alphaNumeric) "," "{" "}"
+let typeReference, typeReferenceRef = createParserForwardedToRef()
+let objectType, objectTypeRef = createParserForwardedToRef()
+let typeSpec, typeSpecRef = createParserForwardedToRef()
 
-   let (|GlobalEnum|_|) = function
-      | Consume "enum" (Take alphaNumeric (name, EnumCaseList (names, p))) ->
-         Some(DeclareEnum(name, names), p)
-      | _ -> None
+let extendsClause =
+    choice [
+        str_ws "extends" >>. typeSpec |>> Some
+        preturn None
+    ]
 
-   let rec (|GlobalModule|_|) = function
-      | Consume "module" (Take alphaNumeric (name, DeclarationList (declarations, p))) ->
-         Some(DeclareModule(name, declarations), p)
-      | _ -> None
+let extendsReferenceClause =
+    choice [
+        str_ws "extends" >>. typeReference |>> Some
+        preturn None
+    ]
 
-   and (|GlobalImportModule|_|) = function
-      | Consume "import" (Take alphaNumeric (alias, (Consume "=" (Consume "module" (Consume "(" (Take alphaNumeric (moduleName, Consume ")" (Consume ";" p))))))))
-          -> Some(ImportModule(alias, moduleName), p) 
-      | _ -> None
-      
-   and declaration = function
-      | Consume "declare" p ->
-         match p with
-         | GlobalVar (v, p)
-         | GlobalFunc (v, p)
-         | GlobalEnum (v, p)
-         | GlobalObject (v, p)
-         | Consume "interface" (GlobalInterface (v, p))
-         | GlobalModule (v, p) 
-            -> Some(v, p)
-         | _ -> None
-      | Consume "export" p ->
-         match p with
-         | Consume "class" (GlobalInterface (DeclareInterface obj,p)) ->
-            Some(DeclareClass obj, p)
-         | GlobalVar (v, p)
-         | GlobalFunc (v, p)
-         | GlobalEnum (v, p)
-         | Consume "interface" (GlobalInterface (v, p))
-         | GlobalModule (v, p)
-            -> Some(v, p)
-         | _ -> None
-      | GlobalVar (v, p)
-      | GlobalFunc (v, p)
-      | GlobalModule (v,p)
-      | GlobalEnum (v,p)
-      | Consume "interface" (GlobalInterface (v, p))
-      | GlobalImportModule(v, p)
-         -> Some(v, p)              
-      | _ -> None
+let typeParam =
+    identifier .>>. extendsClause |>> TypeParameter
 
-   and (|DeclarationList|_|) = listOf declaration "" "{" "}"
+let typeParams =
+    choice [
+        listBetweenStrings "<" ">" "," typeParam
+        preturn []
+    ]
 
-   let (|Declaration|_|) = declaration
+let typeArgs =
+    choice [
+        listBetweenStrings "<" ">" "," typeSpec
+        preturn []
+    ]
 
-   let rec rest acc = function
-      | Declaration (d, p) -> rest (d::acc) p
-      | p -> acc, p
+let entityName =
+    sepBy1 identifier (str_ws ".")
+    |>> EntityName
 
-   let results, p = rest [] 0
-   let leftOver = text.Substring(!furthestPos).Trim()
-   let hasLeftOvers = leftOver.Length > 0
-   if hasLeftOvers then failwithf "error near: %s" leftOver
-   else results
+do  typeReferenceRef := entityName .>>. typeArgs |>> TypeReference
+
+let interfaceExtendsClause =
+    choice [
+        str_ws "extends" >>. sepBy typeReference (str_ws ",")
+        preturn []
+    ] |>> InterfaceExtendsClause
+
+let propertyName =
+    choice [
+        pint32 |>> NameNumericLiteral
+        stringLiteral |>> NameStringLiteral
+        identifier |>> NameIdentifier
+    ]
+
+let optionality =
+    choice [
+        str_ws "?" >>. preturn true
+        preturn false
+    ]
+
+let predefinedType =
+    choice [
+        stringReturn_ws "any" Any
+        stringReturn_ws "number" Number
+        stringReturn_ws "boolean" Boolean
+        stringReturn_ws "string" String
+        stringReturn_ws "void" Void
+    ]
+
+let typeAnnotation =
+    str_ws ":" >>. typeSpec |>> TypeAnnotation
+
+let publicOrPrivate =
+    choice [
+        stringReturn_ws1 "public" Public
+        stringReturn_ws1 "private" Private
+    ]
+
+let requiredParameter =
+    choice_attempt [
+        identifier .>>. (str_ws ":" >>. stringLiteral) |>> StringEnumParameter
+
+        opt publicOrPrivate .>>. identifier .>>. opt typeAnnotation
+        |>> (fun ((pp, id), t) -> VariableParameter(pp, id, t))
+    ]
+    
+
+let literalValue =
+    choice [
+        pbool_ws |>> BooleanValue
+        pfloat_ws |>> NumberValue
+        stringLiteral |>> StringValue
+        stringReturn_ws "null" NullValue
+        stringReturn_ws "undefined" NullValue
+        identifier |>> UnknownValue
+    ]
+
+let initialiser =
+    str_ws "=" >>. literalValue
+
+let optionalParameter =
+    choice_attempt [
+        opt publicOrPrivate .>>. identifier .>> str_ws "?"
+        .>>. opt typeAnnotation
+        |>> (fun ((pp, id), t) -> OptionalParameter(pp, id, t))
+
+        opt publicOrPrivate .>>. identifier
+        .>>. opt typeAnnotation
+        .>>. initialiser
+        |>> (fun (((pp, id), t), v) -> DefaultParameter(pp, id, t, v))
+    ]
+
+let restParameter =
+    str_ws "..." >>. identifier .>>. opt typeAnnotation
+    |>> RestParameter
+
+let paramList =
+    between (str_ws "(") (str_ws ")") 
+        (choice_attempt [
+            
+            sepEndByUntil requiredParameter "," optionalParameter
+            .>>. sepEndByUntil optionalParameter "," restParameter
+            .>>. restParameter
+            |>> (fun ((rps, ops), r) -> ParameterList(rps, ops, Some r))
+
+            sepEndByUntil optionalParameter "," restParameter
+            .>>. restParameter
+            |>> (fun (ops, r) -> ParameterList([], ops, Some r))
+
+            sepEndByUntil requiredParameter "," restParameter
+            .>>. restParameter
+            |>> (fun (rps, r) -> ParameterList(rps, [], Some r))
+
+            restParameter |>> (fun r -> ParameterList([], [], Some r))
+
+            sepEndByUntil requiredParameter "," optionalParameter
+            .>>. sepByComma1 optionalParameter
+            |>> (fun (rps, ops) -> ParameterList(rps, ops, None))
+
+            sepByComma1 optionalParameter
+            |>> (fun ops -> ParameterList([], ops, None))
+
+            sepByComma1 requiredParameter
+            |>> (fun rps -> ParameterList(rps, [], None))
+
+            preturn (ParameterList([], [], None))
+        ])
+
+let objectLiteral = objectType |>> LiteralObjectType
+
+let constructorLiteral = 
+    str_ws "new" >>. typeParams .>>. paramList .>>. (str_ws "=>" >>. typeSpec)
+    |>> (fun ((tps, ps), rt) -> LiteralConstructorType(tps, ps, rt))
+
+let functionLiteral =
+    typeParams .>>. paramList .>>. (str_ws "=>" >>. typeSpec)
+    |>> (fun ((tps, ps), rt) -> LiteralFunctionType(tps, ps, rt))
+
+let followedByArraySig pSpec =
+    pSpec .>> str_ws "[" .>> str_ws "]" |>> LiteralArrayType
+
+let typeQuery =
+    str_ws "typeof" >>. entityName |>> TypeQuery
+
+let typeLiteralPrime, typeLiteralPrimeRef = createParserForwardedToRef()
+
+do  typeLiteralPrimeRef :=
+        choice_attempt [
+            str_ws "[" .>> str_ws "]" >>. typeLiteralPrime |>> (fun g -> fun x -> LiteralArrayType(Literal(g x)))
+            //typeLiteral |>> Literal |> followedByArraySig
+            preturn id
+        ]
+
+/// Note: rearranged due to indirect left recursion!
+let typeLiteral =
+    let prime pElement = pElement .>>. typeLiteralPrime |>> (fun (x, f) -> f x)
+    choice_attempt [
+        objectLiteral |> prime
+        constructorLiteral |> prime
+        functionLiteral |> prime
+        predefinedType |>> Predefined |> followedByArraySig |> prime
+        typeReference |>> Reference |> followedByArraySig |> prime
+        typeQuery |>> Query |> followedByArraySig |> prime
+    ]
+
+/// Note: rearranged due to indirect left recursion!
+do  typeSpecRef :=
+        choice_attempt [
+            typeLiteral |>> Literal
+            typeQuery |>> Query
+            predefinedType |>> Predefined
+            typeReference |>> Reference
+        ]
+
+
+
+let propertySignature =
+    propertyName .>>. optionality .>>. opt typeAnnotation
+    |>> (fun ((n, o), t) -> PropertySignature(n, o, t))
+
+let callSignature =
+    typeParams .>>. paramList .>>. opt typeAnnotation
+    |>> (fun ((n, ps), t) -> CallSignature(n, ps, t))
+
+let constructSignature =
+    str_ws "new" >>. typeParams .>>. paramList .>>. opt typeAnnotation
+    |>> (fun ((n, ps), t) -> ConstructSignature(n, ps, t))
+
+let indexSignature =
+    choice_attempt [
+        str_ws "[" >>. identifier .>> str_ws ":" .>> str_ws "string" 
+        .>> str_ws "]" .>>. typeAnnotation
+        |>> IndexSignatureString
+
+        str_ws "[" >>. identifier .>> str_ws ":" .>> str_ws "number" 
+        .>> str_ws "]" .>>. typeAnnotation
+        |>> IndexSignatureNumber
+    ]
+
+let methodSignature =
+    propertyName .>>. optionality .>>. callSignature
+    |>> (fun ((n, o), cs) -> MethodSignature(n, o, cs))
+
+let typeMember =
+    choice_attempt [
+        constructSignature |>> MemberConstructSignature
+        methodSignature |>> MemberMethodSignature
+        propertySignature |>> MemberPropertySignature
+        callSignature |>> MemberCallSignature
+        indexSignature |>> MemberIndexSignature
+    ]
+
+do 
+    objectTypeRef :=
+        between (str_ws "{") (str_ws "}") 
+            (many (typeMember .>> opt(str_ws ";"))) |>> ObjectType
+
+let exportAssignment =
+    str_ws "export" >>. str_ws "=" >>. identifier
+    |>> ExportAssignment
+
+let interfaceDeclaration =
+    str_ws "interface" >>. identifier .>>. typeParams 
+    .>>. interfaceExtendsClause .>>. objectType 
+    |>> (fun (((id, tps), ex), t) -> InterfaceDeclaration(id, tps, ex, t))
+
+let importDeclaration =
+    str_ws "import" >>. identifier .>>. entityName
+    |>> ImportDeclaration
+
+let externalModuleReference =
+    str_ws "require" >>. choice [
+        str_ws "(" >>. stringLiteral .>> str_ws ")"
+        stringLiteral 
+    ]
+    |>> ExternalModuleReference
+
+let externalImportDeclaration =
+    str_ws "import" >>. identifier .>>. (str_ws "=" >>. externalModuleReference)
+    |>> ExternalImportDeclaration
+
+let implementsClause =
+    choice [
+        str_ws "implements" >>. sepBy typeReference (str_ws ",")
+        preturn []
+    ]
+
+let classHeritage =
+    extendsReferenceClause .>>. implementsClause
+    |>> ClassHeritage
+    
+let staticness =
+    choice [
+        stringReturn_ws "static" true
+        preturn false
+    ]
+
+let ambientMemberDeclaration =
+    choice_attempt [
+        opt publicOrPrivate .>>. staticness .>>. propertyName .>>. callSignature
+        |>> (fun (((pp, s), n), c) -> AmbientMethodDeclaration(pp, s, n, c))
+
+        opt publicOrPrivate .>>. staticness .>>. propertyName .>>. opt typeAnnotation
+        |>> (fun (((pp, s), n), t) -> AmbientPropertyDeclaration(pp, s, n, t))
+    ]
+
+let ambientClassBodyElement =
+    choice [
+        str_ws "constructor" >>. paramList
+        |>> AmbientConstructorDeclaration
+
+        ambientMemberDeclaration |>> AmbientMemberDeclaration
+
+        indexSignature |>> AmbientIndexSignature
+    ]
+
+let ambientEnumMember =
+    choice_attempt [
+        propertyName .>>. (str_ws "=" >>. pint32_ws) |>> NumberedCase
+
+        propertyName |>> NamedCase
+    ]
+
+let commonAmbientElementDeclaration =
+    choice [
+        str_ws "var" >>. identifier .>>. opt typeAnnotation .>> opt (str_ws ";")
+        |>> AmbientVariableDeclaration
+
+        str_ws "function" >>. identifier .>>. callSignature .>> opt (str_ws ";")
+        |>> AmbientFunctionDeclaration
+
+        str_ws "class" >>. identifier .>>. typeParams .>>. classHeritage
+        .>>. (between (str_ws "{") (str_ws "}") (many (ambientClassBodyElement .>> opt (str_ws ";")))) .>> opt (str_ws ";")
+        |>> (fun (((id, tps), ch), els) -> AmbientClassDeclaration(id, tps, ch, els))
+
+        str_ws "enum" >>. identifier
+        .>>. listBetweenStrings "{" "}" "," ambientEnumMember .>> opt (str_ws ";")
+        |>> AmbientEnumDeclaration
+    ]
+
+
+let exportedness =
+    choice [
+        stringReturn_ws "export" true
+        preturn false
+    ]
+
+let ambientModuleElement, ambientModuleElementRef = createParserForwardedToRef()
+
+let ambientModuleDeclaration =
+    str_ws "module" >>. entityName 
+    .>>. between (str_ws "{") (str_ws "}") (many ambientModuleElement)
+    
+
+do  ambientModuleElementRef :=
+    choice_attempt [
+        exportedness .>>. commonAmbientElementDeclaration
+        |>> AmbientModuleElement
+
+        exportedness .>>. interfaceDeclaration .>> opt (str_ws ";")
+        |>> InterfaceDeclarationElement
+
+        exportedness .>>. ambientModuleDeclaration .>> opt (str_ws ";")
+        |>> (fun (e, (n, els)) -> AmbientModuleDeclarationElement(e, n, els))
+
+        exportedness .>>. importDeclaration .>> opt (str_ws ";")
+        |>> ImportDeclarationElement
+    ]
+
+let ambientExternalModuleElement =
+    choice_attempt [
+        ambientModuleElement |>> ExternalAmbientModuleElement
+        exportAssignment .>> opt (str_ws ";") |>> ExternalExportAssignment
+        exportedness .>>. externalImportDeclaration .>> opt (str_ws ";")
+        |>> ExternalAbientImportDeclaration
+    ]
+
+let ambientDeclaration =
+    choice_attempt [
+
+        str_ws "declare" >>. commonAmbientElementDeclaration
+        |>> CommonAmbientElementDeclaration
+        
+        str_ws "declare" >>. ambientModuleDeclaration |>> AmbientModuleDeclaration
+
+        str_ws "declare" >>. str_ws "module" >>. stringLiteral
+        .>>. between (str_ws "{") (str_ws "}") (many ambientExternalModuleElement)
+        |>> AmbientExternalModuleDeclaration
+    ]
+
+
+let rootReference =
+    choice_attempt [
+        str_ws "///" >>. str_ws "<reference" >>. str_ws "path=" >>. stringLiteral 
+        .>> str_ws "/>" |>> File
+
+        str_ws "///" >>. str_ws "<reference" >>. str_ws "no-default-lib=\"" >>. pbool_ws 
+        .>> str_ws "\"" .>> str_ws "/>" |>> NoDefaultLib
+    ]
+
+let declarationElement =
+    choice_attempt [
+        exportAssignment |>> RootExportAssignment
+        exportedness .>>. interfaceDeclaration |>> RootInterfaceDeclaration
+        exportedness .>>. importDeclaration |>> RootImportDeclaration
+        exportedness .>>. externalImportDeclaration |>> RootExternalImportDeclaration
+        exportedness .>>. ambientDeclaration |>> RootAmbientDeclaration
+        rootReference |>> RootReference
+    ]
+
+let declarationsFile : Parser<_, unit> = 
+    ws >>. many declarationElement .>> eof
+    |>> DeclarationsFile
+
+let parseDeclarationsFile str = 
+    match run declarationsFile str with
+    | Success(r,_,_) -> r
+    | Failure(msg,err,_) -> failwithf "%s" msg
+
+//let lib = System.IO.File.ReadAllText(__SOURCE_DIRECTORY__ + @"\..\Examples\Typings\lib.d.ts")
+//let lib = System.IO.File.ReadAllText(__SOURCE_DIRECTORY__ + @"\..\Examples\Typings\jquery.d.ts")
+//let lib = System.IO.File.ReadAllText(__SOURCE_DIRECTORY__ + @"\..\Examples\Typings\jqueryui.d.ts")
+//let lib = System.IO.File.ReadAllText(__SOURCE_DIRECTORY__ + @"\..\Examples\Typings\knockout.d.ts")
+//let lib = System.IO.File.ReadAllText(__SOURCE_DIRECTORY__ + @"\..\Examples\Typings\fullCalendar.d.ts")
+//let lib = System.IO.File.ReadAllText(__SOURCE_DIRECTORY__ + @"\..\Examples\Typings\foundation.d.ts")
+//let lib = System.IO.File.ReadAllText(__SOURCE_DIRECTORY__ + @"\..\Examples\Typings\underscore.d.ts")
+//let lib = System.IO.File.ReadAllText(__SOURCE_DIRECTORY__ + @"\..\Examples\Typings\SharePoint.d.ts")
+//let lib = System.IO.File.ReadAllText(__SOURCE_DIRECTORY__ + @"\..\Examples\Typings\signalr.d.ts")
+//let lib = System.IO.File.ReadAllText(__SOURCE_DIRECTORY__ + @"\..\Examples\Typings\winjs.d.ts")
+//let lib = System.IO.File.ReadAllText(__SOURCE_DIRECTORY__ + @"\..\Examples\Typings\winrt.d.ts")
+//let lib = System.IO.File.ReadAllText(__SOURCE_DIRECTORY__ + @"\..\Examples\Typings\d3.d.ts")
+//let lib = System.IO.File.ReadAllText(__SOURCE_DIRECTORY__ + @"\..\Examples\Typings\ember.d.ts")
+//do  test declarationsFile lib

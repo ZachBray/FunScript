@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>164139cf-07d4-468f-b6a8-9b92504c38e4</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <RootNamespace>FunScript.TypeScript</RootNamespace>
     <AssemblyName>FunScript.TypeScript</AssemblyName>
     <Name>FunScript.TypeScript</Name>
@@ -35,25 +35,42 @@
     <DocumentationFile>bin\Release\FunScript.TypeScript.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="System" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Net" />
-    <Reference Include="System.Core" />
-  </ItemGroup>
-  <ItemGroup>
-    <!-- <Compile Include="ProvidedTypes.fsi" /> -->
-    <Compile Include="ProvidedTypes.fs" />
-    <Compile Include="AST.fs" />
-    <Compile Include="Parser.fs" />
-    <Compile Include="TypeGenerator.fs" />
-    <Compile Include="Provider.fs" />
-  </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets" Condition=" Exists('$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets')" />
+  <ItemGroup>
+    <Compile Include="AST.fs" />
+    <Compile Include="Parser.fs" />
+    <Compile Include="TypeGenerator.fs" />
+    <Compile Include="Program.fs" />
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="FParsec">
+      <HintPath>..\ThirdParty\FParsec.dll</HintPath>
+    </Reference>
+    <Reference Include="FParsecCS">
+      <HintPath>..\ThirdParty\FParsecCS.dll</HintPath>
+    </Reference>
+    <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="Ionic.Zip">
+      <HintPath>..\ThirdParty\Ionic.Zip.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Core" />
+    <ProjectReference Include="..\FunScript.Interop\FunScript.Interop.fsproj">
+      <Name>FunScript.Interop</Name>
+      <Project>{1397ecef-2a65-49ce-afa1-b9884671bbb9}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\FunScript\FunScript.fsproj">
+      <Project>e0916e67-d3b0-4c3a-ad18-4146882fcedd</Project>
+      <Name>FunScript</Name>
+    </ProjectReference>
+  </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -61,14 +78,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup>
-    <ProjectReference Include="..\FunScript\FunScript.fsproj">
-      <Project>e0916e67-d3b0-4c3a-ad18-4146882fcedd</Project>
-      <Name>FunScript</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FunScript.TypeScript.Interop\FunScript.TypeScript.Interop.fsproj">
-      <Project>{0803BEFE-9F5F-4A5F-8572-6A8B5D089506}</Project>
-      <Name>FunScript.TypeScript.Interop</Name>
-    </ProjectReference>
-  </ItemGroup>
 </Project>

@@ -77,6 +77,11 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FunScript.Interop\FunScript.Interop.fsproj">
+      <Name>FunScript.Interop</Name>
+      <Project>{1397ecef-2a65-49ce-afa1-b9884671bbb9}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\FunScript\FunScript.fsproj">
       <Name>FunScript</Name>
       <Project>e0916e67-d3b0-4c3a-ad18-4146882fcedd</Project>

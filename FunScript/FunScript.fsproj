@@ -44,7 +44,6 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes.fs" />
     <Compile Include="AttributeHelpers.fs" />
     <Compile Include="ExprExtensions.fs" />
     <Compile Include="Core\LanguagePrimitives.fs" />
@@ -95,6 +94,13 @@
     <Compile Include="Tuples.fs" />
     <Compile Include="ReflectedDefinitions.fs" />
     <Compile Include="Compiler.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FunScript.Interop\FunScript.Interop.fsproj">
+      <Name>FunScript.Interop</Name>
+      <Project>{1397ecef-2a65-49ce-afa1-b9884671bbb9}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>

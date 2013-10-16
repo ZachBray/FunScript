@@ -12,3 +12,8 @@ type InlineAttribute() =
 type JSEmitAttribute(emit:string) =
    inherit System.Attribute()
    member __.Emit = emit
+
+[<AttributeUsage(AttributeTargets.Property|||AttributeTargets.Method)>]
+type JSEmitInlineAttribute(emit:string) =
+   inherit System.Attribute()
+   member __.Emit = emit
