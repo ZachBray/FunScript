@@ -33,20 +33,33 @@ let openFileOrUri resolutionFolder (fileName:string) =
             else fileName
         new StreamReader(file)
 
-open Microsoft.CSharp
 open System.CodeDom.Compiler
 
 let compile outputAssembly references source =
-    let provider = CSharpCodeProvider.CreateProvider("CSharp")
+    use provider = new Microsoft.FSharp.Compiler.CodeDom.FSharpCodeProvider()
     let parameters = CompilerParameters(OutputAssembly = outputAssembly)
-    parameters.ReferencedAssemblies.Add "FSharp.Core.dll" |> ignore<int>
-    parameters.ReferencedAssemblies.Add "FunScript.Interop.dll" |> ignore<int>
-    parameters.ReferencedAssemblies.AddRange references 
-    let results = provider.CompileAssemblyFromSource(parameters, [|source|])
+    let addLocalReference path = 
+        let currentDirectory = Environment.CurrentDirectory
+        let fullPath = Path.Combine(currentDirectory, path)
+        parameters.ReferencedAssemblies.Add fullPath |> ignore<int>
+    let msCorLib = typeof<int>.Assembly.Location
+    parameters.ReferencedAssemblies.Add msCorLib |> ignore<int>
+    let fsCorLib = @"C:\Program Files (x86)\Reference Assemblies\Microsoft\FSharp\3.0\Runtime\v4.0\FSharp.Core.dll"
+    parameters.ReferencedAssemblies.Add fsCorLib |> ignore<int>
+    addLocalReference "FunScript.Interop.dll"
+    parameters.ReferencedAssemblies.AddRange references
+    let sourceFile = outputAssembly + ".fs"
+    File.WriteAllText(sourceFile, source)
+    /// This is to get the code dom to work!
+    if System.Environment.GetEnvironmentVariable("FSHARP_BIN") = null then
+        let defaultFSharpBin = @"C:\Program Files (x86)\Microsoft SDKs\F#\3.0\Framework\v4.0"
+        if Directory.Exists defaultFSharpBin then
+            Environment.SetEnvironmentVariable("FSHARP_BIN", defaultFSharpBin)
+        else failwith "Expected FSHARP_BIN environment variable to be set."
+    let results = provider.CompileAssemblyFromFile(parameters, [|sourceFile|])
     match [| for err in results.Errors -> err |] with
     | [||] -> true
-    | errors -> 
-        File.WriteAllText(outputAssembly + ".cs", source)
+    | errors ->
         printf "Failed to compile. \n%A" (errors |> Array.map (fun err -> err.ErrorText))
         false
 
@@ -55,7 +68,7 @@ let executeOnText outputFolder inputs =
         inputs
         |> Seq.map (fun (name, contents) -> name, Parser.parseDeclarationsFile contents)
         |> Seq.toList
-        |> TypeGenerator.buildCode
+        |> TypeGenerator.Compiler.generateTypes
     if not(Directory.Exists outputFolder) then
         Directory.CreateDirectory outputFolder |> ignore
 //    let dir = DirectoryInfo(outputFolder)
@@ -63,7 +76,7 @@ let executeOnText outputFolder inputs =
 //    files |> Seq.toArray |> Array.iter (fun file -> file.Delete())
     let assemblyLocation moduleName =
         Path.Combine(outputFolder, "FunScript.TypeScript.Binding." + moduleName + ".dll")
-    outputFiles |> Array.fold (fun acc (name, dependencies, contents) ->
+    outputFiles |> List.fold (fun acc (name, contents, dependencies) ->
         let hasDependencies =
             dependencies |> List.forall (fun x -> acc |> Set.contains x)
         let wasSuccessful =

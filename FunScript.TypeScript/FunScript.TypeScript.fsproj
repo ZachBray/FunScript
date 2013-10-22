@@ -53,6 +53,9 @@
     <Reference Include="FParsecCS">
       <HintPath>..\ThirdParty\FParsecCS.dll</HintPath>
     </Reference>
+    <Reference Include="FSharp.Compiler.CodeDom">
+      <HintPath>..\ThirdParty\FSharp.Compiler.CodeDom.dll</HintPath>
+    </Reference>
     <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Ionic.Zip">
       <HintPath>..\ThirdParty\Ionic.Zip.dll</HintPath>

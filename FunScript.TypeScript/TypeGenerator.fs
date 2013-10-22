@@ -5,57 +5,352 @@ open System.Collections.Generic
 open Microsoft.FSharp.Core.Printf
 open FunScript.TypeScript.AST 
 
-type Staticness =
-    | Static
-    | NonStatic
+module List =
+    let topologicalSortBy selectKey selectDependencies xs =
+        let rec topologicalSortBy xs =
+            seq {
+                match xs with
+                | [] -> ()
+                | _ ->
+                    let noDeps, someDeps =
+                        xs |> List.partition (fun (_, unresolved, _) -> unresolved = [])
 
-type TypeKind =
-    | Interface
-    | Class
+                    if noDeps = [] then
+                        someDeps |> List.map (fun (key, unresolved, _) -> key, unresolved)
+                        |> failwithf  "Cycle detected: \n%A" 
 
-type MemberKind =
-    | Method of TypeParameter list * Type list * TypeAnnotation option
-    | Property of TypeAnnotation option
+                    yield! noDeps |> Seq.map (fun (_, _, out) -> out)
 
-let (|Staticness|) = function   
-    | true -> Static
-    | false -> NonStatic
+                    let resolved = noDeps |> Seq.map (fun (key, _, _) -> key) |> set
 
-type ReferencePosition =
-    | UsedInConstraint
-    | UsedInDeclaration
+                    let nextDeps =
+                        someDeps |> List.map (fun (key, unresolved, out) ->
+                            key, 
+                            unresolved |> List.filter (resolved.Contains >> not),
+                            out)
 
-type TypeUsageContext = {
-    UsagePosition : ReferencePosition
-    EntityName : EntityName
-    TypeParameters : TypeParameter list
-}
+                    yield! topologicalSortBy nextDeps
+            }
+        xs 
+        |> List.map (fun x -> 
+            let key = selectKey x
+            let dependencies = selectDependencies x
+            key, dependencies, (x, key, dependencies))
+        |> topologicalSortBy
 
+[<AutoOpen>]
+module private Domain =
 
-let keywords =
-    Set [|"abstract"; "as"; "base"; "bool"; "break"; "byte"; "case"; "catch"; "char";
-    "checked"; "class"; "const"; "continue"; "decimal"; "default"; "delegate";
-    "do"; "double"; "else"; "enum"; "event"; "explicit"; "extern"; "false";
-    "finally"; "fixed"; "float"; "for"; "foreach"; "goto"; "if"; "implicit";
-    "in"; "int"; "interface"; "internal"; "is"; "lock"; "long"; "namespace";
-    "new"; "null"; "object"; "operator"; "out"; "override"; "params";
-    "private"; "protected"; "public"; "readonly"; "ref"; "return"; "sbyte";
-    "sealed"; "short"; "sizeof"; "stackalloc"; "static"; "string"; "struct";
-    "switch"; "this"; "throw"; "true"; "try"; "typeof"; "uint"; "ulong";
-    "unchecked"; "unsafe"; "ushort"; "using"; "virtual"; "void"; "volatile";
-    "while"|]
+    type Staticness =
+        | Static
+        | NonStatic
 
-let buildCode(definitionFiles) =
-    let auxCount = ref 0
+    type Name = string
 
-    let emitted = HashSet()
-    let code = StringBuilder()
-    
-    let declaredInterfaces = Dictionary()
-    let awaitingDeclaration = Dictionary()
-    let anonymous = Dictionary()
+    type TypeRef = 
+        | TypeRef of string list * TypeRef list
 
-    let codef fmt = kprintf (code.AppendLine >> ignore) fmt
+        static member exists f x =
+            let rec existsAux f (TypeRef(n, ts) as t) =
+                f t || ts |> List.exists (existsAux f)
+            existsAux f x
+
+        static member map f x =
+            let rec mapAux f (TypeRef(n, xs)) =
+                f (TypeRef(n, xs |> List.map (mapAux f)))
+            mapAux f x
+
+        static member collect f x =
+            let rec collectAux f (TypeRef(n, xs) as t) =
+                seq {
+                    yield! xs |> Seq.collect (collectAux f)
+                    yield f t
+                }
+            collectAux f x
+
+        static member mapName f x =
+            TypeRef.map (fun (TypeRef(n, ps)) -> TypeRef(f n, ps)) x
+
+    type GenericConstraint = TypeRef * TypeRef
+    type SuperType = TypeRef
+    type ParentType = TypeRef
+    type ReturnType = TypeRef
+    type GenericParameter = TypeRef
+    type ParameterType = TypeRef
+
+    type FFIMemberParameter =
+        | Fixed of string
+        | Variable of string * ParameterType
+        | InlineArray of string * ParameterType
+
+    type FFIMemberElement =
+        | Method of GenericParameter list * GenericConstraint list * FFIMemberParameter list * ReturnType
+        | Index of ParameterType * ReturnType
+        | Property of ReturnType
+
+    type FFIElement =
+        | Enum of TypeRef * (PropertyName * int option) list
+        | Member of ParentType * PropertyName option * Staticness * FFIMemberElement
+        | Interface of TypeRef * GenericConstraint list * SuperType list
+
+    let (|Staticness|) = function   
+        | true -> Static
+        | false -> NonStatic
+
+module private FFIMapping =
+
+    let index = ref 0
+    let getIndex() = incr index; !index
+
+    let predefinedTypeToTypeRef x =
+        let name =
+            match x with
+            | Any -> "obj"
+            | Number -> "float"
+            | Boolean -> "bool"
+            | String -> "string"
+            | Void -> "unit"
+        TypeRef([name], [])
+
+    let rec typeReferenceToTypeRef k parentType (TypeReference(EntityName xs, ys)) =
+        TypeRef(xs |> List.rev, ys |> List.map (typeToTypeRef k parentType))
+
+    and typeToTypeRef k parentType = function
+        | Predefined x -> predefinedTypeToTypeRef x
+        | Reference x -> typeReferenceToTypeRef k parentType x
+        | Query _ -> predefinedTypeToTypeRef Any (* TODO *)
+        | Literal x -> literalTypeToTypeRef k parentType x
+
+    and literalTypeToTypeRef k parentType = function
+        | LiteralObjectType x -> objectTypeToTypeRef k parentType x
+        | LiteralArrayType x -> TypeRef(["Array"], [x |> typeToTypeRef k parentType])
+        | LiteralFunctionType(_, xs, y)
+        | LiteralConstructorType(_, xs, y) -> 
+            // TODO: constraints from type parameters
+            let rs = parameterListToTypeRefs k parentType xs
+            let s = typeToTypeRef k parentType y
+            TypeRef(["Func"; "System"], [yield! rs; yield s])
+
+    and objectTypeToTypeRef k (TypeRef(tns, _), isInterface) (ObjectType xs as z) =
+        let ns = 
+            match isInterface, tns with 
+            | _, [] -> []
+            | false, ns -> ns
+            | true, _::ns -> ns
+        let name = sprintf "AnonymousType%i" (getIndex())
+        let y = TypeRef(name :: ns, [])
+        Interface(y, [], []) |> k
+        fromObjectType k y z
+        y
+        
+    and typeAnnotationOptionToTypeRef k parentType = function
+        | Some(TypeAnnotation x) -> typeToTypeRef k parentType x
+        | None -> predefinedTypeToTypeRef Any
+
+    and parameterListToTypeRefs k parentType xs =
+        parameterListToFFIMemberParameters k parentType xs
+        |> List.map (function
+            | Variable(_, x) | InlineArray(_, x) -> x
+            | Fixed _ -> predefinedTypeToTypeRef String)
+
+    and parameterListToFFIMemberParameters k parentType (ParameterList(xs, ys, z)) =
+        [
+            yield! xs |> Seq.map (requiredParameterToMemberParameter k parentType)
+            yield! ys |> Seq.map (optionalParameterToMemberParameter k parentType)
+            yield! z |> Option.toArray |> Seq.map (restParameterToMemberParameter k parentType)
+        ]
+
+    and toLowerCamelCase(str : string) =
+        str.[0..0].ToLower() + str.[1..]
+        
+    and requiredParameterToMemberParameter k parentType = function
+        | VariableParameter(_, x, y) -> Variable(toLowerCamelCase x, typeAnnotationOptionToTypeRef k parentType y)
+        | StringEnumParameter(_, x) -> Fixed(toLowerCamelCase x)
+
+    and optionalParameterToMemberParameter k parentType = function
+        | OptionalParameter(_, x, y)
+        | DefaultParameter(_, x, y, _) -> Variable(toLowerCamelCase x, typeAnnotationOptionToTypeRef k parentType y)
+
+    and restParameterToMemberParameter k parentType (RestParameter(n, x)) =
+        let y = match x with Some(TypeAnnotation z) -> z | None -> Predefined Any
+        let t = literalTypeToTypeRef k parentType (LiteralArrayType y)
+        InlineArray(toLowerCamelCase n, t)
+
+    and typeParameterToTypeRef(TypeParameter(name, _)) = TypeRef([name], [])
+
+    and typeParameterToTypeConstraint k parentType (TypeParameter(_, ys) as x) =
+        ys |> Option.map (fun y -> typeParameterToTypeRef x, typeToTypeRef k parentType y)
+
+    and interfaceExtendsClauseToTypeRefs k parentType (InterfaceExtendsClause xs) =
+        xs |> List.map (typeReferenceToTypeRef k parentType)
+
+    and classHeritageToTypeRefs k parentType (ClassHeritage(x, ys)) =
+        let zs = ys |> List.map (typeReferenceToTypeRef k parentType)
+        match x with
+        | None -> zs
+        | Some r -> typeReferenceToTypeRef k parentType r :: zs
+
+    and fromSignature k x y z xs ys r =
+        let genericParameters = xs |> List.map typeParameterToTypeRef
+        let constraints = xs |> List.choose (typeParameterToTypeConstraint k x)
+        let parameters = parameterListToFFIMemberParameters k x ys
+        let meth = Method(genericParameters, constraints, parameters, r)
+        Member(fst x, y, z, meth) |> k : unit
+
+    and fromCallSignature k x y z (CallSignature(xs, ys, zs)) =
+        let returnType = typeAnnotationOptionToTypeRef k x zs
+        fromSignature k x y z xs ys returnType
+
+    and fromConstructSignature k x (ConstructSignature(xs, ys, zs)) =
+        let returnType =
+            match zs with
+            | None -> fst x
+            | Some _ -> typeAnnotationOptionToTypeRef k x zs
+        fromSignature k x None Static xs ys returnType
+
+    and fromIndexSignature k x y =
+        let n, z, r =
+            match y with
+            | IndexSignatureNumber(n, TypeAnnotation z) -> n, z, TypeRef(["int"], [])
+            | IndexSignatureString(n, TypeAnnotation z) -> n, z, predefinedTypeToTypeRef String
+        let returnType = typeToTypeRef k x z
+        Member(fst x, None, NonStatic, Index(r, returnType)) |> k
+
+    and fromMethodSignature k x s (MethodSignature(y, _, z)) =
+        fromCallSignature k x (Some y) s z
+
+    and fromPropertySignature k x s (PropertySignature(y, _, z)) =
+        let returnType = typeAnnotationOptionToTypeRef k x z
+        Member(fst x, Some y, s, Property returnType) |> k
+
+    and fromTypeMember k x = function
+        | MemberCallSignature y -> fromCallSignature k x None NonStatic y
+        | MemberConstructSignature y -> fromConstructSignature k x y
+        | MemberIndexSignature y -> fromIndexSignature k x y
+        | MemberMethodSignature y -> fromMethodSignature k x NonStatic y
+        | MemberPropertySignature y -> fromPropertySignature k x NonStatic y
+
+    and fromObjectType k x (ObjectType ys) = 
+        for y in ys do fromTypeMember k (x, true) y
+
+    and fromInterface k ns (InterfaceDeclaration(name, xs, ys, z)) =
+        let parameters = xs |> List.map typeParameterToTypeRef
+        let x = TypeRef(name::ns, parameters)
+        let constraints = xs |> List.choose (typeParameterToTypeConstraint k (x, true))
+        let superTypes = interfaceExtendsClauseToTypeRefs k (x, true) ys
+        Interface(x, constraints, superTypes) |> k
+        fromObjectType k x z
+
+    and fromAmbientClassBodyElement k x = function
+        | AmbientConstructorDeclaration y -> 
+            fromConstructSignature k x (ConstructSignature([], y, None))
+        | AmbientIndexSignature y ->
+            fromIndexSignature k x y
+        | AmbientMemberDeclaration(AmbientMethodDeclaration(o, Staticness y, z, r)) ->
+            fromMethodSignature k x y (MethodSignature(z, false, r))
+        | AmbientMemberDeclaration(AmbientPropertyDeclaration(o, Staticness y, z, r)) ->
+            fromPropertySignature k x y (PropertySignature(z, false, r))
+
+    and fromClassDeclaration k ns n xs y zs =
+        let parameters = xs |> List.map typeParameterToTypeRef
+        let x = TypeRef(n::ns, parameters)
+        let constraints = xs |> List.choose (typeParameterToTypeConstraint k (x, true))
+        let superTypes = classHeritageToTypeRefs k (x, true) y
+        Interface(x, constraints, superTypes) |> k
+        for z in zs do fromAmbientClassBodyElement k (x, true) z
+
+    and fromEnumDeclaration k ns n xs =
+        let x = TypeRef(n::ns, [])
+        let members = 
+            xs |> List.map (function
+                | NamedCase n -> n, None
+                | NumberedCase(n, i) -> n, Some i)
+        Enum(x, members) |> k
+
+    and fromFunctionDeclaration k ns n x =
+        let t = TypeRef(ns, [])
+        let y = Some(NameIdentifier n)
+        fromCallSignature k (t, false) y Static x
+
+    and fromVariableDeclaration k ns n x =
+        let t = TypeRef(ns, [])
+        let y = NameIdentifier n
+        fromPropertySignature k (t, false) Static (PropertySignature(y, false, x))
+
+    and fromCommonAmbientElement k ns = function
+        | AmbientClassDeclaration(n, xs, y, zs) -> fromClassDeclaration k ns n xs y zs
+        | AmbientEnumDeclaration(n, xs) -> fromEnumDeclaration k ns n xs
+        | AmbientFunctionDeclaration(n, x) -> fromFunctionDeclaration k ns n x
+        | AmbientVariableDeclaration(n, x) -> fromVariableDeclaration k ns n x
+
+    and fromAmbientModuleElement k ns = function
+        | AmbientModuleDeclarationElement(_, EntityName xs, ys) ->
+            ys |> List.iter (fromAmbientModuleElement k ((xs |> List.rev) @ ns))
+        | AmbientModuleElement(_, x) ->
+            fromCommonAmbientElement k ns x
+        | ImportDeclarationElement _ -> ()
+        | InterfaceDeclarationElement(_, x) ->
+            fromInterface k ns x
+
+    and fromAmbientExternalModuleElement k ns = function  
+        | ExternalAbientImportDeclaration _ 
+        | ExternalExportAssignment _ -> ()
+        | ExternalAmbientModuleElement x -> fromAmbientModuleElement k ns x 
+
+    and fromAmbientDeclaration k ns = function
+        | CommonAmbientElementDeclaration x -> 
+            fromCommonAmbientElement k ns x
+        | AmbientExternalModuleDeclaration(n, xs) -> 
+            xs |> List.iter (fromAmbientExternalModuleElement k (n::ns))
+        | AmbientModuleDeclaration(EntityName xs, ys) ->
+            ys |> List.iter (fromAmbientModuleElement k ((xs |> List.rev) @ ns))
+
+    and fromDeclarationElement k = function
+        | RootExportAssignment _
+        | RootImportDeclaration _ 
+        | RootExternalImportDeclaration _
+        | RootReference _ -> ()
+        | RootInterfaceDeclaration(_, x) -> fromInterface k [] x
+        | RootAmbientDeclaration(_, x) -> fromAmbientDeclaration k [] x
+
+module Identifier =
+
+    let csharpKeywords =
+        Set [|"abstract"; "as"; "base"; "bool"; "break"; "byte"; "case"; "catch"; "char";
+            "checked"; "class"; "const"; "continue"; "decimal"; "default"; "delegate";
+            "do"; "double"; "else"; "enum"; "event"; "explicit"; "extern"; "false";
+            "finally"; "fixed"; "float"; "for"; "foreach"; "goto"; "if"; "implicit";
+            "in"; "int"; "interface"; "internal"; "is"; "lock"; "long"; "namespace";
+            "new"; "null"; "object"; "operator"; "out"; "override"; "params";
+            "private"; "protected"; "public"; "readonly"; "ref"; "return"; "sbyte";
+            "sealed"; "short"; "sizeof"; "stackalloc"; "static"; "string"; "struct";
+            "switch"; "this"; "throw"; "true"; "try"; "typeof"; "uint"; "ulong";
+            "unchecked"; "unsafe"; "ushort"; "using"; "virtual"; "void"; "volatile";
+            "while"|]
+
+    let fsharpKeywords =
+        Set [|"async"; "method"; "atomic"; "mixin"; "break"; "namespace"; "checked";
+            "object"; "component"; "process"; "const"; "property"; "constraint";
+            "protected"; "constructor"; "public"; "continue"; "pure"; "decimal";
+            "readonly"; "eager"; "return"; "enum"; "sealed"; "event"; "switch";
+            "external"; "virtual"; "fixed"; "void"; "functor"; "volatile"; "include";
+            "where"; "abstract"; "lsl"; "and"; "lsr"; "as"; "lxor"; "assert"; "match";
+            "member"; "asr"; "mod"; "begin"; "module"; "class"; "mutable"; "namespace";
+            "default"; "new"; "delegate"; "null"; "do"; "of"; "done"; "open";
+            "downcast"; "or"; "downto"; "override"; "else"; "rec"; "end"; "sig";
+            "exception"; "static"; "false"; "struct"; "finally"; "then"; "for"; "to";
+            "fun"; "true"; "function"; "try"; "if"; "type"; "in"; "val"; "inherit";
+            "when"; "inline"; "upcast"; "interface"; "while"; "land"; "with"; "lor";
+            "measure"; "atomic"; "break"; "checked"; "component"; "const";
+            "constraint"; "constructor"; "continue"; 
+            "eager"; "event"; "external"; "fixed"; "functor"; "include";
+            "method"; "mixin"; "object"; "parallel"; "process"; "protected"; "pure";
+            "sealed"; "tailcall"; "trait"; "virtual"; "volatile"; "asr"; "land"; "lor";
+            "lsl"; "lsr"; "lxor"; "mod"; "sig"; "int"; "sbyte"; "byte"; "uint";
+            "uint32"; "int32"; "int64"; "uint64"; "int16"; "uint16"; "float";
+            "decimal"; "float32"; "bool"; "obj"; "unit"; "global" |]
+
+    let keywords = csharpKeywords + fsharpKeywords
 
     let sanitise str =
         [   " ", "_"
@@ -69,6 +364,7 @@ let buildCode(definitionFiles) =
             else
                 let almostSane =
                     str |> String.collect(function
+                        | '\'' -> "'"
                         | '_' -> "_"
                         | c when c >= 'a' && c <= 'z' -> c.ToString()
                         | c when c >= 'A' && c <= 'Z' -> c.ToString()
@@ -77,840 +373,461 @@ let buildCode(definitionFiles) =
                 let firstC = almostSane.[0] 
                 if firstC >= '0' && firstC <= '9' then "_" + almostSane
                 else almostSane
+
+    let fromPropertyName = function
+        | NameIdentifier n -> sanitise n, sprintf ".%s" n
+        | NameNumericLiteral i -> sprintf "``%i``" i, sprintf "[%i]" i
+        | NameStringLiteral s -> sprintf "``%s``" s, sprintf "[\"%s\"]" s
+
+module private Generate =
+    
+    /// Creates a key based on what F# would consider a unique type.
+    /// For example IFoo<'a, 'b> and IFoo<'b, 'c> would clash and
+    /// must be merged for this reason.
+    let typeRefToTypeKey(TypeRef(ns, ps)) = 
+        ns, ps.Length
+
+    /// Groups ffi elements by the name of the parent type and 
+    /// its number of generic parameters.
+    let groupByParentType xs =
+        xs |> Seq.groupBy (function
+            | Enum(x, _)
+            | Interface(x, _, _)
+            | Member(x, _, _, _) -> typeRefToTypeKey x)
+        |> Seq.map (fun (x, ys) -> x, set ys)
+        |> Map.ofSeq
+
+    let predefinedTypeRefs =
+        TypeRef(["int"], []) ::
+        List.map (FFIMapping.predefinedTypeToTypeRef)  [
+            Any
+            Number
+            Boolean
+            String
+            Void
+        ]
+
+    let predefinedNs =
+        set (predefinedTypeRefs |> List.map (fun (TypeRef(ns, _)) -> ns))
+
+    let predefinedTypeKeys =
+        set (predefinedTypeRefs |> List.map typeRefToTypeKey)
+
+    let nameCode ns =
+        match ns with
+        | [] -> None
+        | ["Array"] -> Some "array"
+        | _ -> 
+            let sanitise =
+                if predefinedNs.Contains ns then id
+                else Identifier.sanitise
+            ns |> List.rev |> List.map sanitise |> String.concat "." |> Some
+
+    let namespaceCode ns =
+        match nameCode ns with
+        | None -> "global"
+        | Some namespaceCode -> namespaceCode
+
+    let extractNamespaceCode = function
+        | TypeRef([], _) -> failwith "Expected a valid TypeRef"
+        | TypeRef(_::ns, _) -> namespaceCode ns
+
+    /// Tries to return a (name * namespace * parameter list) tuple for declaring
+    /// types. This doesn't search the type space to resolve the type.
+    let (|TypeDeclarationId|_|) = function
+        | TypeRef(n::ns, gps) -> Some(Identifier.sanitise n, namespaceCode ns, gps)
+        | _ -> None
+
+    let enumCode t ms =
+        match t with
+        | TypeDeclarationId(nameId, namespaceId, []) ->
+            let cases = 
+                ms |> List.mapi (fun i (x, y) -> 
+                    Identifier.fromPropertyName x |> fst, defaultArg y i)
+            let code =
+                [
+                    yield sprintf """
+namespace %s
+
+type %s = """               namespaceId nameId
+                
+                    for name, i in cases do
+                        yield sprintf """
+        | %s = %i"""            name i
+                ] |> String.concat ""
+            Some(code, Set.empty, typeRefToTypeKey t, None)
+        | _ -> 
+            printfn "[ERROR] Invalid Enum TypeRef: %A" t
+            None
+        
+    /// Tries to resolve a TypeRef from the generic type parameters at the location
+    /// or the known types in the current module or the referenced modules.
+    let resolveTypeRef typesByKey (TypeRef(baseNs,_) as baseT) genericTypeParameters t =
+
+        let rec tryResolve basePart ((finalPart, paramCount) as x) = 
+            let typeSpace = finalPart @ basePart
+            let hasType = 
+                typeSpace = ["Func"; "System"] ||
+                (typeSpace = ["Array"] && paramCount <= 1) ||
+                predefinedTypeKeys.Contains (typeSpace, paramCount) ||
+                typesByKey |> List.exists (fun f -> f (typeSpace, paramCount))
+            if hasType then Some typeSpace
+            else
+                match basePart with
+                | [] -> None
+                | _::subBasePart -> tryResolve subBasePart x
+
+        t |> TypeRef.map (fun (TypeRef(_, ps) as t) ->
+            if genericTypeParameters |> Set.contains t then t
+            else
+                match tryResolve baseNs (typeRefToTypeKey t) with
+                | Some r -> TypeRef(r, ps)
+                | None -> failwithf "[ERROR] Unable to resolve TypeRef: %A (from TypeRef: %A)" t baseT)
+
+    /// Returns the F# string representing the type ref. It assumes that the generic
+    /// parameters have been mapped into F# friendly back-ticked type refs and that
+    /// all types have been resolved.
+    let rec typeReferenceCode (TypeRef(ns, gps)) =
+        let nameCode = nameCode ns
+        match nameCode, gps with
+        | None, _ -> failwith "[ERROR] Cannot emit empty TypeRef reference."
+        | Some "array", [] -> "array<obj>"
+        | Some nc, [] -> nc
+        | Some nc, gps -> 
+                let parameters = gps |> Seq.map typeReferenceCode |> String.concat ", "
+                sprintf "%s<%s>" nc parameters
+
+    /// This is to work around the restriction where you cannot have a type parameter
+    /// that `a :> `b[]
+    let replaceArrayWithIList x =
+        x |> TypeRef.map (function
+            | TypeRef(["Array"], ps) -> TypeRef(List.rev ["System"; "Collections"; "Generic"; "IList"], ps)
+            | x -> x)
+
+    /// Builds the code segment specifying a sub type relationship type constraint.
+    let constraintCode gps (x,y) =
+        match x with
+        | TypeRef([gn], []) ->
+            Some(sprintf "%s :> %s" (typeReferenceCode x) (typeReferenceCode (replaceArrayWithIList y)))
+        | _ -> 
+            printfn "[WARN] Ignoring incompatible constraint: %A :> %A" x y
+            None
+
+    let constrainedGenericParameterCode gps gcs =
+        match gps with
+        | [] -> None
+        | _ -> 
+            let parameters = gps |> Seq.map typeReferenceCode |> String.concat ", "
+            match gcs with
+            | [] -> Some(sprintf "<%s>" parameters)
+            | _ ->
+                let constraintProperties = 
+                    gcs |> List.choose (constraintCode gps) |> String.concat " and "
+                Some(sprintf "<%s when %s>" parameters constraintProperties)
+
+    let constrainedTypeReferenceCode (TypeRef(ns, gps)) gcs  =
+        let nameCode = nameCode ns
+        match nameCode with
+        | None -> failwith "[ERROR] Cannot emit empty TypeRef reference."
+        | Some nc ->
+            match constrainedGenericParameterCode gps gcs with
+            | None -> nc, ns |> List.head
+            | Some genericDef -> nc + genericDef, (ns |> List.head) + genericDef
+
+    let fixGenericParameterName = function
+        | TypeRef([gn], []) -> TypeRef([sprintf "'%s" gn], [])
+        | x -> failwithf "[ERROR] Invalid Generic Parameter TypeRef: %A" x
+
+
+    /// Replaces all references to generic parameters in the given type ref
+    /// with an F# friendly generic parameter name.
+    let replaceGenericParameters gps x =
+        x |> TypeRef.map (fun t -> 
+            defaultArg (gps |> Map.tryFind t) t)
+
+    let fixGenericParameters gps =
+        let fixedGps = gps |> List.map fixGenericParameterName
+        let fixedGpsSet = set fixedGps
+        let gpsFixMapping = List.zip gps fixedGps |> Map.ofList
+        let fix = replaceGenericParameters gpsFixMapping
+        fixedGps, fixedGpsSet, fix
+
+    let interfaceCode typesByKey (TypeRef(ns, gps) as t) gcs sts =
+        try
+            let fixedGps, fixedGpsSet, fix = fixGenericParameters gps
+            let fix = fix >> resolveTypeRef typesByKey t fixedGpsSet
+            let fixedGcs = gcs |> List.map (fun (x, y) -> fix x, fix y)
+            let fixedSts = sts |> List.map fix
+            let dependencies = 
+                let gpsKeys = fixedGpsSet |> Set.map typeRefToTypeKey
+                let possibleDeps = fixedSts @ (fixedGcs |> List.map snd)
+                let expandedDeps = possibleDeps |> Seq.collect (TypeRef.collect typeRefToTypeKey) |> set
+                expandedDeps - gpsKeys
+            let interfaceSignature, localSignature =
+                constrainedTypeReferenceCode (TypeRef(ns, fixedGps)) fixedGcs
+            //TypeRef(ns, fixedGps), fixedGcs, fixedSts, interfaceSignature
+
+            let interfaceDeclaration =
+                sprintf """
+namespace %s
+type %s ="""        (extractNamespaceCode t) localSignature
+            let interfaceBodyEls =
+                fixedSts |> List.map typeReferenceCode
+                |> List.map (fun typeRef ->
+                    sprintf """
+        inherit %s""" typeRef)
+            let interfaceBody =
+                match interfaceBodyEls with
+                | [] -> " interface end"
+                | _ -> interfaceBodyEls |> String.concat ""
+            Some(interfaceDeclaration + interfaceBody + System.Environment.NewLine,
+                 dependencies,
+                 typeRefToTypeKey t, 
+                 Some(interfaceSignature, fixedGps))
+        with ex ->
+            printfn "%s" ex.Message
+            None
         
 
-    let stringify(str : string) =
-        str.Replace("\"", "\\\"")
+    /// Returns the code of the type declarations needed for a given
+    /// module of FFI elements. This filters out the types already
+    /// declared in dependencies. Also, returns a map from type key
+    /// to type signature.
+    let typeDeclarationsAndSignatures (moduleElements : Map<_,_>) typesByKey =
+        let typesByKeyInclCurrentModule =
+            moduleElements.ContainsKey :: typesByKey
 
-    let buildTypeNameFromEntityName (EntityName path) = 
-        match path with
-        | [] -> failwith "Expected something"
-        | _ -> path |> List.map sanitise |> String.concat "."
+        moduleElements |> Map.toSeq |> Seq.choose (fun (typeKey, els) ->
+            let wasAlreadyDeclared = typesByKey |> List.exists (fun f -> f typeKey)
+            if wasAlreadyDeclared then None
+            else 
+                let typeFound =
+                    els |> Seq.tryPick (function    
+                        | Interface(t, gcs, sts) -> interfaceCode typesByKeyInclCurrentModule t gcs sts
+                        | Enum(t, ms) -> enumCode t ms
+                        | Member _ -> None)
+                match typeFound with
+                | None -> interfaceCode typesByKeyInclCurrentModule (TypeRef("Globals" :: fst typeKey, [])) [] []
+                | _ -> typeFound
+        ) |> Seq.toList
+        |> List.topologicalSortBy 
+            (fun (_, _, x, _) -> x) 
+            (fun (_, xs, _, _) -> 
+                xs |> Set.toList |> List.filter (fun x -> 
+                    typesByKey |> List.exists (fun f -> f x) |> not &&
+                    predefinedTypeKeys |> Set.contains x |> not))
+        |> Seq.map (fun (x, _, _) -> x)
+        |> Seq.fold (fun (allCode : StringBuilder, typeSigs) (codeFragment, _, typeKey, typeSignature) ->
+            allCode.Append codeFragment, 
+            typeSigs |> Map.add typeKey typeSignature
+        ) (StringBuilder(), Map.empty)
+        |> fun (allCode, typeSigs) -> allCode.ToString(), typeSigs
+        
 
-    let buildNamespaceFromEntityName (EntityName path) =
-        match path with
-        | [] -> None, None
-        | _ -> 
-            let csNs = path |> List.map sanitise |> String.concat "."
-            let jsNs = path |> String.concat "."
-            Some csNs, Some jsNs
+    /// Creates a function to rename a methods generic parameters
+    /// where they conflict with the types generic parameters.
+    let collisionFix fixedGpsSet methodGps =
+        let collisonAvoidanceMap =
+            let rec makeSafe count = function
+                | TypeRef([n], ps) as t ->
+                    let testT =
+                        if count = 0 then t
+                        else TypeRef([sprintf "%s%i" n count], ps)
+                    if fixedGpsSet |> Set.contains testT then makeSafe (count + 1) t
+                    else testT
+                | t -> t
+            methodGps |> List.map (fun t -> t, makeSafe 0 t)
+            |> List.filter (fun (x, y) -> x <> y)
+            |> Map.ofList
+        TypeRef.map (fun x -> defaultArg (collisonAvoidanceMap.TryFind x) x)
+        
+    let mapParameterType fix = function
+        | Variable(name, t) -> Variable(name, fix t)
+        | InlineArray(name, t) -> InlineArray(name, fix t)
+        | Fixed _ as x -> x
 
-    let buildPredefinedTypeReference = function
-        | Any -> "object"
-        | Number -> "double"
-        | Boolean -> "bool"
-        | String -> "string"
-        | Void -> "Microsoft.FSharp.Core.Unit"
+    let parameterCode = function
+        | Variable(name, t) -> "", Some(sprintf "%s : %s" (Identifier.sanitise name) (typeReferenceCode t))
+        | InlineArray(name, t) -> "", Some(sprintf "[<System.ParamArray>] %s : %s[]" (Identifier.sanitise name) (typeReferenceCode t))
+        | Fixed v -> v, None
 
-    let rec buildReferenceToTypeReference usageContext (TypeReference(en, ta)) =
-        let entityName = buildTypeNameFromEntityName en
-        match ta with
-        | [] ->
-            match entityName with
-            | "Array" -> "object[]"
-            | _ -> entityName
-        | tas -> 
-            let args = 
-                tas |> List.map (buildReferenceToType usageContext)
-                |> String.concat ", "
-            sprintf "%s<%s>" entityName args
+    let javaScriptTypeCode (TypeRef(ns, _)) =
+        ns |> List.rev |> String.concat "."
 
-    and buildReferenceToType usageContext = function
-        | Predefined pt -> buildPredefinedTypeReference pt
-        | Reference tr -> buildReferenceToTypeReference usageContext tr
-        | Literal tl -> buildReferenceToTypeLiteral usageContext tl
-        | Query _ -> buildPredefinedTypeReference Any
-
-    and buildReferenceToTypeLiteral (usageContext : TypeUsageContext) = function
-        | LiteralObjectType objType -> 
-            incr auxCount
-            let id = !auxCount
-            let name = sprintf "IAnonymousType%i" id
-            let heritage = ClassHeritage(None, [])
-            buildObjectType Class usageContext.EntityName name usageContext.TypeParameters heritage objType
-            let tpStr, _ =
-                buildTypeParameters usageContext.EntityName usageContext.TypeParameters usageContext.TypeParameters
-            let csNs, _ = buildNamespaceFromEntityName usageContext.EntityName
-            let typeName =
-                match csNs with
-                | None -> sprintf "%s%s" name tpStr
-                | Some ns -> sprintf "%s.%s%s" ns name tpStr
-            let (EntityName path) = usageContext.EntityName
-            let args = 
-                usageContext.TypeParameters |> List.map (fun (TypeParameter(id, _)) ->
-                    TypeArgument.Reference(TypeReference(EntityName [id], [])))
-            let t = Reference(TypeReference(EntityName(path @ [name]), args))
-            anonymous.[typeName] <- t
-            typeName
-        | LiteralArrayType t -> 
-            match usageContext.UsagePosition with
-            | UsedInDeclaration _ ->
-                sprintf "%s[]" (buildReferenceToType usageContext t)
-            | UsedInConstraint ->
-                //Note: this is because of C#'s limited generic constraints
-                sprintf "System.Collections.Generic.IList<%s>" (buildReferenceToType usageContext t)
-        | LiteralFunctionType(tps, ps, t) 
-        | LiteralConstructorType(tps, ps, t)->
-            match tps with
-            | [] -> buildLambdaType usageContext ps t
-            | _ -> buildReferenceToType usageContext (Predefined Any)
-
-    and buildLambdaType usageContext (ParameterList(req, opt, rest)) t =
-        match req, opt, rest with
-        | req, opt, None -> 
-            let reqs = req |> Seq.map (function
-                | StringEnumParameter _ -> 
-                    buildReferenceToType usageContext (Predefined String)
-                | VariableParameter(_, _, ta) -> 
-                    buildReferenceToTypeAnnotation usageContext.EntityName usageContext.TypeParameters ta)
-            let opts = opt |> Seq.map (function
-                | DefaultParameter(_, _, ta, _)
-                | OptionalParameter(_, _, ta) -> 
-                    buildReferenceToTypeAnnotation usageContext.EntityName usageContext.TypeParameters ta)
-            let rt = buildReferenceToType usageContext t
-            let argTs = Seq.append reqs opts |> Seq.toList
-            let argTsStr =
-                match argTs with
-                | [] -> "Microsoft.FSharp.Core.Unit"
-                | _ -> argTs |> String.concat ", "
-            sprintf "global::System.Func<%s, %s>" argTsStr rt
-        | _ -> buildReferenceToType usageContext (Predefined Any)
-
-    and buildReferenceToTypeAnnotation entityName tps typeAnnotation =
-        let usageContext = {
-            UsagePosition = UsedInDeclaration
-            EntityName = entityName
-            TypeParameters = tps
-        }
-        match typeAnnotation with
-        | None -> buildReferenceToType usageContext (Predefined Any)
-        | Some (TypeAnnotation t) -> buildReferenceToType usageContext t
-
-    and buildReferenceToTypeParameter entityName tps (TypeParameter(id, t)) =
-        match t with
-        | None -> id, []
-        | Some t ->
-            let usageContext = {
-                UsagePosition = UsedInConstraint
-                EntityName = entityName
-                TypeParameters = tps
-            }
-            let baseTypeName = buildReferenceToType usageContext t
-            id, [sprintf "%s : %s" id baseTypeName]
-
-    and buildTypeParameters entityName classTps tps =
-        let typeParams, typeConstraints =
-            tps |> List.map (buildReferenceToTypeParameter entityName classTps)
-            |> List.unzip
-        let typeContraintClause =
-            match typeConstraints |> List.concat with
-            | [] -> ""
-            | tcs -> "\n          where " + (tcs |> String.concat "\n           where ")
-        let typeParamStr =
-            match typeParams with
-            | [] -> ""
-            | tps -> sprintf "<%s>" (tps |> String.concat ", ")
-        typeParamStr, typeContraintClause
-
-    and buildRequiredParameter entityName classTps = function
-        | VariableParameter(_, id, typeAnnotation) ->
-            let returnTypeName = buildReferenceToTypeAnnotation entityName classTps typeAnnotation
-            fun i -> "", Some(sprintf "%s %s" returnTypeName (sanitise id)), sprintf "{%i}" i
-        | StringEnumParameter(id, value) ->
-            fun _ -> sanitise value, None, sprintf "\"%s\"" value
-
-    and buildOptionalParameter entityName classTps = function
-        //TODO: Support all versions/default values
-        | OptionalParameter(_, id, typeAnnotation)
-        | DefaultParameter(_, id, typeAnnotation, _) ->
-            let returnTypeName = buildReferenceToTypeAnnotation entityName classTps typeAnnotation
-            fun i -> "", Some(sprintf "%s %s" returnTypeName (sanitise id)), sprintf "{%i}" i
-
-    and buildRestParameter entityName classTps (RestParameter(id, typeAnnotation)) =
-        let returnTypeName = buildReferenceToTypeAnnotation entityName classTps typeAnnotation
-        // Note: this is a bit dodgy. Could be made less strIngly typed.
-        let adjustedReturnTypeName =
-            if returnTypeName.EndsWith "[]" then returnTypeName
-            elif returnTypeName.StartsWith "Array<" && returnTypeName.EndsWith ">" then
-                let startLength = "Array<".Length
-                let endLength = ">".Length
-                returnTypeName.Substring(startLength, returnTypeName.Length - startLength - endLength) + "[]"
-            else "object[]"
-        fun i -> "", Some(sprintf "params %s %s" adjustedReturnTypeName (sanitise id)), sprintf "{%i...}" i
-
-    and buildParameters entityName classTps staticness (ParameterList(reqs, opts, rest)) =
-        let paramShift = if staticness = Static then 0 else 1
-        let specializations, parameters, emits = 
-            seq {
-                yield! reqs |> Seq.map (buildRequiredParameter entityName classTps)
-                yield! opts |> Seq.map (buildOptionalParameter entityName classTps)
-                yield! rest |> Option.toList |> List.map (buildRestParameter entityName classTps)
-            } |> Seq.mapi (fun i f -> f (i + paramShift))
-            |> Seq.toArray
-            |> Array.unzip3
-        specializations |> String.concat "",
-        sprintf "(%s)" (parameters |> Seq.choose id |> String.concat ", "),
-        sprintf "(%s)" (emits |> String.concat ", ")
-
-    /// Removes any reference to object literals and instead replaces it with a type reference.
-    and solidifyReturnType typeAnnotation typeFullName =
-        match typeAnnotation with
-        | None -> None
-        | Some _ -> 
-            match anonymous.TryGetValue typeFullName with
-            | false, _ -> typeAnnotation
-            | true, t -> Some(TypeAnnotation t)
-
-    and buildReferenceToCallSignatureAndReturnType entityName classTps staticness typeKind methodName (CallSignature(tps, ps, typeAnnotation)) =
-        let typeFullName = buildReferenceToTypeAnnotation entityName classTps typeAnnotation
-        let typeParamStr, typeConstraintClause = buildTypeParameters entityName classTps tps
-        let specialization, parameters, emitCall = buildParameters entityName (classTps @ tps) staticness ps
-        let impl = if typeKind = Interface then ";" else " { throw new global::System.Exception(); }"
-        let returnType = solidifyReturnType typeAnnotation typeFullName
-        sprintf "%s %s%s%s%s %s%s"
-            typeFullName (sanitise methodName) specialization typeParamStr parameters typeConstraintClause impl,
-        emitCall,
-        returnType
-
-    and buildReferenceToCallSignature entityName classTps staticness typeKind methodName callSig =
-        let signature, emit, _ = 
-            buildReferenceToCallSignatureAndReturnType 
-                entityName classTps staticness typeKind methodName callSig
-        signature, emit
-
-    and buildGenericDeclaration typeKind
-                         namespaceName className (typeParams, genericConstraints) heritageStr
-                         signatures =
-        let typeName, accessModifier =
-            match typeKind with
-            | Class -> "partial class", "public "
-            | Interface -> "partial interface", ""
-        let memberSignatures =
-            signatures |> Seq.filter (fun (_, _, signature : string) ->
-                let sigKey = signature.Replace("params", "").Replace(" ", "")
-                let key = namespaceName, className, typeParams, sigKey
-                emitted.Add key)
-            |> Seq.map (fun (emitCode, staticness, signature) ->
-                let staticness = if staticness = Static then "static " else ""
-                sprintf """        [FunScript.JSEmitInline("%s")]
-        %s%s%s
-"""                 (stringify emitCode) accessModifier staticness signature)
-            |> String.concat ""
-
-
-        match namespaceName with
-        | None ->
-            codef """
-public %s %s%s %s %s
-{
-%s
-}
-"""             typeName (sanitise className) typeParams heritageStr genericConstraints 
-                memberSignatures
-        | Some namespaceName ->
-            codef """
-namespace %s {
-    public %s %s%s %s %s
-    {
-%s
-    }
-}"""            namespaceName typeName (sanitise className) typeParams heritageStr genericConstraints
-                memberSignatures
-
-
-    and buildDeclaration arg = buildGenericDeclaration Class arg
-    and buildInterfaceDeclaration arg = buildGenericDeclaration Interface arg
-
-//    // TODO: What about on interfaces? Do we need to maintain a mapping?
-//    and tryClaim entityName className classTps typeKind memberName memberKind =
-//        let numbered str i =
-//            match i with
-//            | 0 -> str
-//            | _ -> sprintf "%s%i" str i
-//        let rec tryClaimAux i j =
-//            let className = numbered className i
-//            let memberName = numbered memberName j
-//            let key = entityName, className, classTps
-//            match claims.TryGetValue key with
-//            | false, _ -> 
-//                let innerClaims = Dictionary()
-//                innerClaims.Add(memberName, [memberKind]) 
-//                claims.Add(key, (Some typeKind, innerClaims))
-//                className, memberName
-//            | true, (foundKind, innerClaims) ->
-//                match foundKind with
-//                | Some kind when kind = typeKind ->
-//                    match innerClaims.TryGetValue memberName with
-//                    | false, _ -> 
-//                        innerClaims.Add(memberName, [memberKind])
-//                        className, memberName
-//                    | true, kinds ->
-//                        match memberKind with
-//                        | Property _ -> tryClaimAux i (j+1)
-//                        | Method(tps, ps, t) ->
-//                            let isInvalid = 
-//                                kinds |> List.exists (function
-//                                    | Property _ -> true
-//                                    | x -> x = memberKind)
-//                            if isInvalid then tryClaimAux i (j+1)
-//                            else className, memberName
-//                | Some _ | None -> tryClaimAux (i+1) 0
-//        tryClaimAux 0 0
-
-    and buildVariableDeclaration entityName classTps varName typeAnnotation =
-        let nsCs, nsJs = buildNamespaceFromEntityName entityName
-        let typeFullName = buildReferenceToTypeAnnotation entityName classTps typeAnnotation
-        let emitCode = 
-            match nsJs with 
-            | None -> varName
-            | Some ns -> sprintf "%s.%s" ns varName
-        let signature = sprintf "%s %s { get; set; }" typeFullName (sanitise varName)
-        buildDeclaration nsCs "Globals" ("","") "" [emitCode, Static, signature]
-
-    and buildFunctionDeclaration entityName classTps name callSignature =
-        let nsCs, nsJs = buildNamespaceFromEntityName entityName
-        let signature, emitCall = 
-            buildReferenceToCallSignature entityName classTps Static Class name callSignature
-        let emitCode = 
-            match nsJs with 
-            | None -> sprintf "%s%s" name emitCall
-            | Some ns -> sprintf "%s.%s%s" ns name emitCall
-        buildDeclaration nsCs "Globals" ("","") "" [emitCode, Static, signature]
-
-    and buildPropertyName = function
-        | NameIdentifier id -> sanitise id, id
-        | NameStringLiteral id -> sanitise id, sprintf "[\"%s\"]" id
-        | NameNumericLiteral n -> sprintf "_%i" n, sprintf "[%i]" n 
-
-    and buildPropertyDeclaration propMap entityName classTps staticness propName typeAnnotation =
-        let _, nsJs = buildNamespaceFromEntityName entityName
-        let nameCs, nameJs = buildPropertyName propName
-        let typeFullName = buildReferenceToTypeAnnotation entityName classTps typeAnnotation
-        let signature = sprintf "%s %s { get; set; }" typeFullName nameCs
-        let emit = 
-            match nsJs, staticness with
-            | None, Static -> nameJs
-            | Some nsJs, Static -> sprintf "%s.%s" nsJs nameJs
-            | _, NonStatic -> sprintf "{0}.%s" nameJs
-        let returnType = solidifyReturnType typeAnnotation typeFullName
-        propMap |> Option.iter (fun propMap ->
-            propMap := !propMap |> Map.add propName returnType)
-        emit, staticness, signature
-
-    and buildMethodDeclaration propMap entityName classTps staticness typeKind propName callSignature =
-        let _, nsJs = buildNamespaceFromEntityName entityName
-        let nameCs, nameJs = buildPropertyName propName
-        let preEmit = 
-            match nsJs, staticness with
-            | None, Static -> ""
-            | Some nsJs, Static -> sprintf "%s." nsJs
-            | _, NonStatic -> "{0}."
-        let signature, emitCall, returnType = 
-            buildReferenceToCallSignatureAndReturnType entityName classTps staticness typeKind nameCs callSignature
-        propMap |> Option.iter (fun propMap ->
-            propMap := !propMap |> Map.add propName returnType)
-        let emit = sprintf "%s%s%s" preEmit nameJs emitCall
-        emit, staticness, signature
-
-    and buildCallDeclaration entityName classTps staticness typeKind callSignature =
-        let _, nsJs = buildNamespaceFromEntityName entityName
-        let preEmit = 
-            match nsJs, staticness with
-            | None, Static -> ""
-            | Some nsJs, Static -> nsJs
-            | _, NonStatic -> "{0}"
-        let signature, emitCall = 
-            buildReferenceToCallSignature entityName classTps staticness typeKind "Invoke" callSignature
-        preEmit + emitCall, staticness, signature
-
-    and buildAmbientMemberDeclaration entityName classTps = function
-        | AmbientPropertyDeclaration(_, Staticness staticness, propName, typeAnnotation) ->
-            buildPropertyDeclaration None entityName classTps staticness propName typeAnnotation
-        | AmbientMethodDeclaration(_, Staticness staticness, propName, callSignature) ->
-            buildMethodDeclaration None entityName classTps staticness Class propName callSignature
-
-    and buildIndexSignature entityName classTps typeKind indexSig =
-        let indexType, typeAnnotation =
-            match indexSig with
-            | IndexSignatureNumber(_, typeAnnotation) -> "int", typeAnnotation
-            | IndexSignatureString(_, typeAnnotation) -> "string", typeAnnotation
-        let typeFullName = buildReferenceToTypeAnnotation entityName classTps (Some typeAnnotation)
-        let impl =
-            match typeKind with
-            | Interface -> "{ get; set; }"
-            | Class -> """
-        {
-            get { throw new global::System.Exception(); }
-            set { throw new global::System.Exception(); }
-        }"""
-        let signature =
-            sprintf "%s this[%s i] %s" typeFullName indexType impl
-        let emit = "{0}[{1}]"
-        emit, NonStatic, signature
-             
-    and buildConstructorDeclaration ((EntityName path) as entityName) className classTps tps ps ta =
-        let _, nsJs = buildNamespaceFromEntityName entityName
-        let classTas = classTps |> List.map (fun (TypeParameter(id, _)) -> Reference(TypeReference(EntityName [id], [])))
-        let ta = defaultArg ta (TypeAnnotation(Reference(TypeReference(EntityName(path @ [className]), classTas))))
-        let signature, emitCall = 
-            buildReferenceToCallSignature entityName classTps Static Class "Create" (CallSignature(tps, ps, Some ta))
-        let emit = 
-            match nsJs with
-            | None -> sprintf "%s%s" className emitCall
-            | Some ns -> sprintf "%s.%s%s" ns className emitCall
-        emit, Static, signature
-
-    and buildClassBodyElement entityName className classTps = function
-        | AmbientConstructorDeclaration ps ->
-            buildConstructorDeclaration entityName className classTps [] ps None
-        | AmbientMemberDeclaration memberDecl ->
-            buildAmbientMemberDeclaration entityName classTps memberDecl
-        | AmbientIndexSignature indexSignature ->
-            buildIndexSignature entityName classTps Class indexSignature
-
-    and buildClassHeritage entityName classTps (ClassHeritage(extendsClause, implementsClauses)) =
-        let usageContext = {
-            UsagePosition = UsedInDeclaration
-            EntityName = entityName
-            TypeParameters = classTps
-        }
-        let extends = 
-            extendsClause |> Option.map (buildReferenceToTypeReference usageContext)
-        let implements = 
-            implementsClauses |> List.map (buildReferenceToTypeReference usageContext)
-        let superTypes =
-            match extends with
-            | None -> implements
-            | Some x -> x::implements
-        let heritageStr =
-            match superTypes with
-            | [] -> ""
-            | _ -> sprintf " : %s" (superTypes |> String.concat ", ")
-        heritageStr
-
-    and getInterfaceDeclarationKeys basePath ((EntityName supPath) as entityName) count =
-        [
-            yield entityName, count
-            match basePath with
-            | None -> ()
-            | Some(EntityName basePath) -> 
-                let parts xs =
-                    let rec parts acc = function
-                        | [] -> []::acc
-                        | x::xs -> parts (xs::acc) xs
-                    parts [xs |> List.rev] (xs |> List.rev) |> List.map List.rev
-                for basePathPart in parts basePath do
-                    yield EntityName(basePathPart @ supPath), count
-        ] |> Seq.distinct
-
-    and emptyMemberTable() = lazy Map.empty
-
-    and buildMemberTable members = lazy members
-
-    // TODO: It would be nice to do this without all the string hacks!
-    and applyParamsToMemberTable interfaceTps classInterfaceTas (membersDelayed : _ Lazy) =
-        lazy
-            let members = membersDelayed.Value
-
-            let tpsLookup =
-                List.map2 (fun (TypeParameter(id, _)) ta ->
-                    let search = Reference(TypeReference(EntityName [id], []))
-                    search, ta) interfaceTps classInterfaceTas
-                |> Map.ofList
-
-            let rec mapType = function
-                | (Predefined _ as preDef) -> preDef
-                | (Reference tr as ref) ->
-                    match tpsLookup.TryFind ref with
-                    | None -> Reference(mapReference tr)
-                    | Some rep -> rep
-                | Literal l -> Literal(mapLiteral l)
-                | Query _ -> Predefined Any
-
-            and mapReference (TypeReference(entityName, tps)) =
-                TypeReference(entityName, tps |> List.map mapType)
-
-            and mapLiteral = function
-                | LiteralObjectType(ObjectType members) ->
-                    LiteralObjectType(ObjectType(members |> List.map mapMember))
-                | LiteralArrayType t ->
-                    LiteralArrayType(mapType t)
-                | LiteralConstructorType(tps, ps, t) ->
-                    LiteralConstructorType(tps, mapParameterList ps, mapType t)
-                | LiteralFunctionType(tps, ps, t) ->
-                    LiteralFunctionType(tps, mapParameterList ps, mapType t)
-
-            and mapMember = function
-                | MemberCallSignature callSig ->
-                    MemberCallSignature(
-                        mapCallSignature callSig)
-                | MemberConstructSignature(ConstructSignature(tps, ps, ta)) ->
-                    MemberConstructSignature(
-                        ConstructSignature(mapCallParameters(tps, ps, ta)))
-                | MemberIndexSignature indexSignature ->
-                    MemberIndexSignature(
-                        mapIndexSignature indexSignature)
-                | MemberMethodSignature(MethodSignature(name, isOpt, callSig)) ->
-                    MemberMethodSignature(
-                        MethodSignature(name, isOpt, mapCallSignature callSig))
-                | MemberPropertySignature(PropertySignature(name, isOpt, ta)) ->
-                    MemberPropertySignature(
-                        PropertySignature(name, isOpt, ta |> Option.map mapTypeAnnotation))
-                
-            and mapCallSignature(CallSignature(tps, ps, ta)) =
-                CallSignature(mapCallParameters(tps, ps, ta))
-
-            and mapCallParameters(tps, ps, ta) =
-                tps, mapParameterList ps, ta |> Option.map mapTypeAnnotation
-
-            and mapTypeAnnotation(TypeAnnotation t) =
-                TypeAnnotation(mapType t)
-
-            and mapIndexSignature = function
-                | IndexSignatureString(id, ta) -> IndexSignatureString(id, mapTypeAnnotation ta)
-                | IndexSignatureNumber(id, ta) -> IndexSignatureNumber(id, mapTypeAnnotation ta)
-
-            and mapParameterList(ParameterList(reqs, opts, rest)) =
-                ParameterList(
-                    reqs |> List.map mapRequiredParameter,
-                    opts |> List.map mapOptionalParameter,
-                    rest |> Option.map mapRestParameter)
-
-            and mapRequiredParameter = function
-                | VariableParameter(acc, id, ta) -> 
-                    VariableParameter(acc, id, ta |> Option.map mapTypeAnnotation)
-                | x -> x
-
-            and mapOptionalParameter = function
-                | DefaultParameter(acc, id, ta, initVal) ->
-                    DefaultParameter(acc, id, ta |> Option.map mapTypeAnnotation, initVal)
-                | OptionalParameter(acc, id, ta) ->
-                    OptionalParameter(acc, id, ta |> Option.map mapTypeAnnotation)
-
-            and mapRestParameter(RestParameter(id, ta)) =
-                RestParameter(id, ta |> Option.map mapTypeAnnotation)
-
-            members |> Map.map (fun propName ta -> 
-                ta |> Option.map (fun (TypeAnnotation t) -> 
-                    TypeAnnotation(mapType t)))
-
-    and mergeMemberTables (membersADelayed : _ Lazy) (membersBDelayed : _ Lazy) =
-        lazy 
-            let membersA = membersADelayed.Value
-            let membersB = membersBDelayed.Value
-            membersA |> Map.foldBack Map.add membersB
-
-    and updateTriggers key f =
-        let current =
-            match awaitingDeclaration.TryGetValue key with
-            | false, _ -> Map.empty
-            | true, xs -> xs
-        let next = f current
-        if next |> Map.isEmpty then awaitingDeclaration.Remove key |> ignore
-        else awaitingDeclaration.[key] <- next
-
-    /// For topological declaration based on interface inheritance hierarchy.
-    and awaitDeclaration ((_, listenerName) as listenerId) baseEntityName (ClassHeritage(_, implementsClauses)) f =
-        let rec awaitDeclarationAux acc = function
-            | [] -> f acc
-            | TypeReference(entityName, args)::reqs ->
-                let keys = getInterfaceDeclarationKeys (Some baseEntityName) entityName args.Length
-                let triggerId = System.Guid.NewGuid()
-                let hasExecuted = ref false
-                let additionalTrigger = fun key ->
-                    if not !hasExecuted then
-                        hasExecuted := true
-                        for key in keys do updateTriggers key (Map.remove triggerId)
-                        let interfaceTps, members = declaredInterfaces.[key]
-                        let parameterisedMembers = 
-                            applyParamsToMemberTable interfaceTps args members
-                        awaitDeclarationAux (mergeMemberTables parameterisedMembers acc) reqs
-                let readyKey =
-                    keys |> Seq.tryFind (declaredInterfaces.TryGetValue >> fst)
-                if listenerName = "ICheckedObserver" then
-                    printfn "..."
-                match readyKey with
-                | Some key -> additionalTrigger key
-                | None ->
-                    for key in keys do
-                        updateTriggers key (Map.add triggerId (listenerId, additionalTrigger))
-        awaitDeclarationAux (emptyMemberTable()) implementsClauses
-
-    and notifyDeclaration (EntityName path) interfaceName interfaceTps members =
-        let fullEntityName = EntityName(path @ [interfaceName])
-        let key = getInterfaceDeclarationKeys None fullEntityName (List.length interfaceTps) |> Seq.head
-        match declaredInterfaces.TryGetValue key with
-        | false, _ ->
-            declaredInterfaces.Add(key, (interfaceTps, buildMemberTable members))
-            match awaitingDeclaration.TryGetValue key with
-            | false, _ -> ()
-            | true, triggers -> triggers |> Map.iter (fun _ (_, f) -> f key)
-            awaitingDeclaration.Remove key |> ignore<bool>
-        | true, (interfaceTps, memberTable) ->
-            declaredInterfaces.[key] <- (interfaceTps, mergeMemberTables memberTable (buildMemberTable members))
-            let name = buildTypeNameFromEntityName fullEntityName
-            printfn "[WARN] Interface '%s' is split into multiple parts." name
-
-    and buildClassDeclaration entityName name tps heritage bodyEls =
-        let nsCs, nsJs = buildNamespaceFromEntityName entityName
-        let typeParamStr, typeConstraintClause = buildTypeParameters entityName tps tps // or [] tps ???
-        let heritageStr = buildClassHeritage entityName tps heritage
-        awaitDeclaration (entityName, name) entityName heritage (fun memberTableDelayed ->
-            let memberTable = memberTableDelayed.Value
-            let adjustedEls =
-                bodyEls |> List.map (fun el ->
+    let typeExtensionCode typesByKey ns signature fixedGps members =
+        let fixedGpsSet = set fixedGps
+        let membersCode =
+            members |> Seq.map (fun (TypeRef(_, gps) as t, pn, s, el) ->
+                let fixMap = List.zip gps fixedGps |> Map.ofList
+                let fixGenericTypeParameters = 
+                    TypeRef.map (fun x -> defaultArg (fixMap.TryFind x) x)
+                let fixedT = fixGenericTypeParameters t
+                let name, accessCode = 
+                    match pn with
+                    | None -> "Create", ""
+                    | Some pn -> Identifier.fromPropertyName pn
+                let callCode =
+                    let baseAccess, seedI =
+                        match s with
+                        | Static -> javaScriptTypeCode t, 0
+                        | NonStatic -> "{0}", 1
                     match el with
-                    | AmbientMemberDeclaration decl ->
-                        match decl with
-                        | AmbientMethodDeclaration(acc, s, propertyName, CallSignature(tps, ps, _)) ->
-                            match memberTable.TryFind propertyName with
-                            | None -> el
-                            | Some ta -> 
-                                AmbientMemberDeclaration(
-                                    AmbientMethodDeclaration(acc, s, propertyName, 
-                                        CallSignature(tps, ps, ta)))
-                        | AmbientPropertyDeclaration(acc, s, propertyName, _) ->
-                            match memberTable.TryFind propertyName with
-                            | None -> el
-                            | Some ta -> 
-                                AmbientMemberDeclaration(
-                                    AmbientPropertyDeclaration(acc, s, propertyName, ta))
-                    | _ -> el)
-            buildDeclaration 
-                nsCs name (typeParamStr, typeConstraintClause)
-                heritageStr
-                (adjustedEls |> List.map (buildClassBodyElement entityName name tps))
-        )
+                    | Property _ -> baseAccess + accessCode
+                    | Method(_, _, ps, _) -> 
+                        let parameterCode =
+                            ps |> List.fold (fun (i, acc) -> function
+                                | Fixed v -> i, sprintf "\"%s\"" v :: acc
+                                | Variable _ -> i + 1, sprintf "{%i}" i :: acc
+                                | InlineArray _ -> i + 1, sprintf "{%i...}" i :: acc) (seedI, [])
+                            |> snd |> List.rev |> String.concat ", "
+                        sprintf "%s%s(%s)" baseAccess accessCode parameterCode
+                    | Index _ ->
+                        sprintf "%s[{%i}]" baseAccess seedI
+                let signature =
+                    match el with
+                    | Property r -> 
+                        let rCode = typeReferenceCode(fixGenericTypeParameters r)
+                        sprintf "%s with get() : %s = failwith \"never\" and set (v : %s) : unit = failwith \"never\"" name rCode rCode
+                    | Method(methodGps, methodGcs, ps, r) ->
+                        let partiallyFixedMethodGps, _, fixGenericNames = fixGenericParameters methodGps
+                        let collisionFix = fixGenericNames >> collisionFix fixedGpsSet partiallyFixedMethodGps
+                        let fixedMethodGps = methodGps |> List.map collisionFix
+                        let allGps = set fixedMethodGps + fixedGpsSet
+                        let combinedFix = collisionFix >> fixGenericTypeParameters >> resolveTypeRef typesByKey t allGps
+                        let fixedGcs = methodGcs |> List.map (fun (x, y) -> combinedFix x, combinedFix y)
+                        let fixedPs = ps |> List.map (mapParameterType combinedFix)
+                        let specialization, parametersCode = 
+                            let specs, pCodes = fixedPs |> List.map parameterCode |> List.unzip
+                            specs |> String.concat "", pCodes |> List.choose id |> String.concat ", "
+                        let fixedR = combinedFix r
+                        let genericDef = defaultArg (constrainedGenericParameterCode fixedMethodGps fixedGcs) ""
+                        sprintf "%s%s%s(%s) : %s = failwith \"never\"" 
+                            name specialization genericDef parametersCode (typeReferenceCode fixedR)
+                    | Index(p, r) ->
+                        let pCode = typeReferenceCode(fixGenericTypeParameters p)
+                        let rCode = typeReferenceCode(fixGenericTypeParameters r)
+                        sprintf "%s with get(i : %s) : %s = failwith \"never\" and set (i : %s) (v : %s) : unit = failwith \"never\"" name pCode rCode pCode rCode
+                let root =
+                    match s with
+                    | Static -> "static member "
+                    | NonStatic -> "member __."
+                sprintf """
+        //[<JSEmitInline(%s)>]
+        %s%s"""         callCode root signature 
+            ) |> String.concat ""
 
-    and buildTypeMember propMap entityName className classTps typeKind = function
-        | MemberPropertySignature(PropertySignature(name, _, typeAnnotation)) ->
-            buildPropertyDeclaration propMap entityName classTps NonStatic name typeAnnotation |> Some
-        | MemberCallSignature callSignature ->
-            buildCallDeclaration entityName classTps NonStatic typeKind callSignature |> Some
-        | MemberConstructSignature(ConstructSignature(tps, ps, ta)) ->
-            //TODO: Should we consider the type params here?
-            match typeKind with
-            | Class -> buildConstructorDeclaration entityName className classTps tps ps ta |> Some
-            | Interface -> 
-                buildObjectType 
-                    Class entityName (className + "Factory") 
-                    classTps (ClassHeritage(None, [])) (ObjectType [MemberConstructSignature(ConstructSignature(tps, ps, ta))])
-                None
-        | MemberIndexSignature indexSignature ->
-            buildIndexSignature entityName classTps typeKind indexSignature |> Some
-        | MemberMethodSignature(MethodSignature(name, _, callSignature)) ->
-            buildMethodDeclaration propMap entityName classTps NonStatic typeKind name callSignature |> Some
+        let namespaceCode =
+            match ns with
+            | [] -> None
+            | _::ns -> nameCode ns
 
-    and buildObjectType typeKind entityName name tps heritage (ObjectType members) =
-        let nsCs, nsJs = buildNamespaceFromEntityName entityName
-        let typeParamStr, typeConstraintClause = buildTypeParameters entityName tps tps // or [] tps ???
-        let heritageStr = buildClassHeritage entityName tps heritage
-        let buildDecl =
-            match typeKind with
-            | Class -> buildDeclaration
-            | Interface -> buildInterfaceDeclaration
-        awaitDeclaration (entityName, name) entityName heritage (fun memberTableDelayed ->
-            let memberTable = memberTableDelayed.Value
-            let adjustedMembers =
-                members 
-                |> List.map (fun m ->
-                    match m with
-                    | MemberMethodSignature
-                            (MethodSignature(propName, isOpt, CallSignature(tps,ps,_))) ->
-                        match memberTable.TryFind propName with
-                        | Some ta -> 
-                            MemberMethodSignature(
-                                MethodSignature(propName, isOpt, CallSignature(tps,ps,ta)))
-                        | None -> m
-                    | MemberPropertySignature
-                            (PropertySignature(propName, isOpt, _)) ->
-                        match memberTable.TryFind propName with
-                        | Some ta -> 
-                            MemberPropertySignature(
-                                PropertySignature(propName, isOpt, ta))
-                        | None -> m
-                    | _ -> m)
-            let propMap = 
-                match typeKind with
-                | Interface -> Some(ref Map.empty)
-                | Class -> None
-            let codeToEmit =
-                adjustedMembers
-                |> List.choose (buildTypeMember propMap entityName name tps typeKind)
-                |> List.map (fun ((_, staticness, _) as x) ->
-                    assert(typeKind <> Interface || staticness = NonStatic); x)
-            buildDecl 
-                nsCs name (typeParamStr, typeConstraintClause)
-                heritageStr
-                codeToEmit
-            propMap |> Option.iter (fun propMap ->
-                notifyDeclaration entityName name tps !propMap)
-        )
+        let typeExtensionDefinitionCode =
+            match signature, namespaceCode with
+            | None, None -> 
+                sprintf "    type Globals with "
+            | None, Some namespaceCode ->
+                sprintf "    type %s.Globals with " namespaceCode
+            | Some(signature : string), _ -> 
+                if signature.StartsWith "array<" then
+                    let parts = 
+                        signature.Split([|"array<"; ">"|], System.StringSplitOptions.RemoveEmptyEntries)
+                    sprintf "    type %s ``[]`` with " parts.[0]
+                else
+                    sprintf "    type %s with " signature
 
-    let buildInterfaceDeclaration entityName 
-        (InterfaceDeclaration(name, tps, InterfaceExtendsClause extends, objType)) =
-        let heritage = ClassHeritage(None, extends)
-        buildObjectType Interface entityName name tps heritage objType
+        System.Environment.NewLine +
+        typeExtensionDefinitionCode + System.Environment.NewLine +
+        membersCode + System.Environment.NewLine
 
-    let buildAmbientEnumMember = function
-        | NamedCase propertyName -> 
-            buildPropertyName propertyName |> fst
-        | NumberedCase(propertyName, i) ->
-            let name = buildPropertyName propertyName |> fst
-            sprintf "%s = %i" name i
 
-    let buildAmbientEnumDeclaration entityName name members =
-        let nsCs, _ = buildNamespaceFromEntityName entityName
-        let membersDef =
-            members |> List.map buildAmbientEnumMember
-            |> String.concat ", "
-        match nsCs with
-        | None ->
-            codef """
-public enum %s
-{
-    %s
-}
-"""             name membersDef
-        | Some nsCs ->
-            codef """
-namespace %s {
-    public enum %s
-    {
-        %s
-    }
-}"""            nsCs name membersDef
+    let typeExtensions signaturesByKey moduleElements =
+        let precursor = """
+namespace global
 
-    let buildCommonAmbientElement entityName = function
-        | AmbientVariableDeclaration(name, typeAnnotation) ->
-            buildVariableDeclaration entityName [] name typeAnnotation
-        | AmbientFunctionDeclaration(name, callSignature) ->
-            buildFunctionDeclaration entityName [] name callSignature
-        | AmbientClassDeclaration(name, tps, heritage, bodyEls) ->
-            buildClassDeclaration entityName name tps heritage bodyEls
-        | AmbientEnumDeclaration(name, members) ->
-            buildAmbientEnumDeclaration entityName name members
+[<AutoOpen>]
+module TypeExtensions =
 
-    let (@.) (EntityName firstParts) (EntityName secondParts) =
-        EntityName(firstParts @ secondParts)
+"""
+        let signaturesByKeyTest =
+            signaturesByKey |> List.map (fun (x : Map<_,_>) -> x.ContainsKey)
+        moduleElements |> Map.toSeq |> Seq.choose (fun ((ns, _) as typeKey, els) ->
+            let members = 
+                els |> Seq.choose (function
+                    | Member(t, pn, s, el) -> Some(t, pn, s, el)
+                    | _ -> None)
+                |> Seq.toList
+            match members with
+            | [] -> None
+            | _ ->
+                let out =
+                    match signaturesByKey |> List.tryPick (Map.tryFind typeKey) |> Option.bind id with
+                    | None -> typeExtensionCode signaturesByKeyTest ns None [] members
+                    | Some(signature, fixedGps) -> typeExtensionCode signaturesByKeyTest ns (Some signature) fixedGps members
+                Some out)
+        |> Seq.fold (fun (acc : StringBuilder) code -> acc.Append code) (StringBuilder().Append precursor)
+        |> fun sb -> sb.ToString()
 
-    let rec buildAmbientModuleElement entityName = function
-        | AmbientModuleElement(_, el) -> 
-            buildCommonAmbientElement entityName el
-        | InterfaceDeclarationElement(_, interfaceDecl) ->
-            buildInterfaceDeclaration entityName interfaceDecl
-        | AmbientModuleDeclarationElement(_, subEntityName, els) ->
-            let fullEntityname = entityName @. subEntityName
-            els |> List.iter
-                (buildAmbientModuleElement fullEntityname)
-        | ImportDeclarationElement _ -> ()
+module Compiler =
 
-    let buildAmbientExternalModuleElement entityName = function
-        | ExternalAmbientModuleElement el ->
-            buildAmbientModuleElement entityName el
-        | ExternalExportAssignment _
-        | ExternalAbientImportDeclaration _ -> ()
-
-    let buildAmbientDeclaration entityName = function
-        | CommonAmbientElementDeclaration el -> 
-            buildCommonAmbientElement entityName el
-        | AmbientModuleDeclaration(subEntityName, els) ->
-            let fullEntityname = entityName @. subEntityName
-            els |> List.iter
-                (buildAmbientModuleElement fullEntityname)
-        | AmbientExternalModuleDeclaration(name, els) ->
-            let subNames = 
-                name.Split [|'.'|] 
-                |> Array.map (fun name -> name.Replace(" ", ""))
-                |> Array.toList
-            let fullEntityName = entityName @. (EntityName subNames)
-            els |> List.iter
-                (buildAmbientExternalModuleElement fullEntityName)
-
-    let buildModuleNameFromPath modulePath =
+    let convertPathToModuleName modulePath =
         let moduleName = System.IO.Path.GetFileName modulePath
         let moduleName =
             if moduleName.EndsWith ".d.ts" then 
                 moduleName.Substring(0, moduleName.Length - ".d.ts".Length)
             else moduleName
-        let saneName = sanitise(moduleName).ToLower()
+        let saneName = Identifier.sanitise(moduleName).ToLower()
         saneName
 
-    let buildDeclarationElement = function
-        | RootExportAssignment _
-        | RootImportDeclaration _ 
-        | RootExternalImportDeclaration _ -> ()
-        | RootReference ref ->
-            match ref with
-            | File modulePath ->
-                let saneName = buildModuleNameFromPath modulePath
-                codef "using FunScript.TypeScript.%s;" saneName
-            | NoDefaultLib _ -> ()
-        | RootInterfaceDeclaration(_, inter) -> 
-            buildInterfaceDeclaration (EntityName []) inter
-        | RootAmbientDeclaration(_, decl) -> 
-            buildAmbientDeclaration (EntityName []) decl
-
-    let definitionsModules =
-        definitionFiles |> List.map (fun (name, decls) ->
-            let moduleName = (sanitise name).ToLower()
-            moduleName, decls)
-
-    let getDependencies (moduleName, DeclarationsFile decls) =
+    let findModuleDependencies (moduleName, DeclarationsFile decls) =
         let isLib =
             decls |> List.exists (function
                 | RootReference(NoDefaultLib true) -> true
                 | _ -> false)
         let rest =
             decls |> List.choose (function
-                | RootReference(File path) -> Some(buildModuleNameFromPath path)
+                | RootReference(File path) -> Some(convertPathToModuleName path)
                 | _ -> None)
-        if isLib then (moduleName, decls), rest
-        else (moduleName, decls), "lib" :: rest
+        if isLib then rest
+        else "lib" :: rest
                 
-    let orderedDeclarations =
-        let rec sortByDependency modules =
-            seq {
-                match modules with
-                | [] -> ()
-                | _ ->
-                    let noDeps, someDeps =
-                        modules |> List.partition (fun (_, unresolved, _) -> unresolved = [])
+    let orderByCompilationDependencies declarationModules =
+        declarationModules |> List.topologicalSortBy 
+            fst findModuleDependencies
 
-                    if noDeps = [] then
-                        someDeps |> List.map (fun ((name, _), unresolved, _) -> name, unresolved)
-                        |> failwithf  "TypeScript reference cycle detected: \n%A" 
+    let generateTypes declarationFiles =
 
-                    yield! noDeps |> Seq.map (fun ((name, decls), _, allDeps) -> name, decls, allDeps)
+        let modules =
+            declarationFiles |> List.map (fun (name, decls) ->
+                let moduleName = (Identifier.sanitise name).ToLower()
+                moduleName, decls)
 
-                    let resolved = noDeps |> Seq.map (fun ((name, _), _, _) -> name) |> set
+        let modulesInCompilationOrder =
+            orderByCompilationDependencies modules
+            |> Seq.toList
 
-                    let nextDeps =
-                        someDeps |> List.map (fun (nameAndDecls, unresolved, allDeps) ->
-                            nameAndDecls, 
-                            unresolved |> List.filter (resolved.Contains >> not),
-                            allDeps)
+        let codeByModule =
+            modulesInCompilationOrder
+            |> List.fold (fun (codeOut, moduleTypes : Map<string, Map<string list * int, (string * TypeRef list) option>>) ((_, DeclarationsFile decls), moduleName, moduleDependencies) ->
+                let xs = ResizeArray()
+                decls |> List.iter (FFIMapping.fromDeclarationElement xs.Add)
+                let elementsByNameKey = 
+                    xs |> Seq.groupBy (function
+                        | Interface(t, _, _) 
+                        | Enum(t, _)
+                        | Member(t, _, _, _) -> Generate.typeRefToTypeKey t)
+                    |> Seq.map (fun (k, vs) -> k, vs |> Seq.toList)
+                    |> Map.ofSeq
+                let dependencySigs =
+                    moduleDependencies |> List.map (fun n -> moduleTypes |> Map.find n)
+                let typesByKey = dependencySigs |> List.map (fun x -> x.ContainsKey)
+                let declarationCode, sigs = 
+                    Generate.typeDeclarationsAndSignatures elementsByNameKey typesByKey
+                let extensionCode =
+                    Generate.typeExtensions (sigs :: dependencySigs) elementsByNameKey
+                let code = declarationCode + System.Environment.NewLine + extensionCode
+                codeOut |> Map.add moduleName code, moduleTypes |> Map.add moduleName sigs
+            ) (Map.empty, Map.empty)
+            |> fst
 
-                    yield! sortByDependency nextDeps
-            }
-        let initialDependencies = 
-            definitionsModules |> List.map getDependencies
-            |> List.map (fun (x, ys) -> x, ys, ys)
-        sortByDependency initialDependencies |> Seq.toArray
-
-    let outputFiles =
-        orderedDeclarations |> Array.map (fun (moduleName, decls, allDeps) ->
-            printfn "Generating types for %s..." moduleName
-            //if moduleName <> "lib" then
-                //codef "using FunScript.TypeScript.lib;"
-            //codef "namespace FunScript.TypeScript.%s {" moduleName
-            decls |> List.iter buildDeclarationElement
-            //codef "}"
-            let output = code.ToString()
-            code.Clear() |> ignore
-            moduleName, allDeps, output)
-    for KeyValue((entityName, count), listeners) in awaitingDeclaration do
-        let listenerIds = listeners |> Map.toArray |> Array.map (snd >> fst)
-        let typeName = buildTypeNameFromEntityName entityName
-        printfn "[WARN] '%s`%i' did not satisfy some dependencies: \n%A" typeName count listenerIds
-    outputFiles
+        modulesInCompilationOrder |> List.map (fun (_, name, deps) ->
+            name, codeByModule |> Map.find name, deps)
