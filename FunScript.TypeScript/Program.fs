@@ -71,12 +71,10 @@ let executeOnText outputFolder inputs =
         |> TypeGenerator.Compiler.generateTypes
     if not(Directory.Exists outputFolder) then
         Directory.CreateDirectory outputFolder |> ignore
-//    let dir = DirectoryInfo(outputFolder)
-//    let files = dir.EnumerateFiles("*.g.cs", SearchOption.TopDirectoryOnly)
-//    files |> Seq.toArray |> Array.iter (fun file -> file.Delete())
     let assemblyLocation moduleName =
         Path.Combine(outputFolder, "FunScript.TypeScript.Binding." + moduleName + ".dll")
     outputFiles |> List.fold (fun acc (name, contents, dependencies) ->
+        printfn "Generating assembly for %s..." name
         let hasDependencies =
             dependencies |> List.forall (fun x -> acc |> Set.contains x)
         let wasSuccessful =

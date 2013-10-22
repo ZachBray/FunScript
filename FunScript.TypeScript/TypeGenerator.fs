@@ -77,6 +77,8 @@ module private Domain =
     type ReturnType = TypeRef
     type GenericParameter = TypeRef
     type ParameterType = TypeRef
+    type Destination = string list
+    type Source = string list
 
     type FFIMemberParameter =
         | Fixed of string
@@ -92,6 +94,7 @@ module private Domain =
         | Enum of TypeRef * (PropertyName * int option) list
         | Member of ParentType * PropertyName option * Staticness * FFIMemberElement
         | Interface of TypeRef * GenericConstraint list * SuperType list
+        | Import of Destination * Source
 
     let (|Staticness|) = function   
         | true -> Static
@@ -131,14 +134,14 @@ module private FFIMapping =
             let s = typeToTypeRef k parentType y
             TypeRef(["Func"; "System"], [yield! rs; yield s])
 
-    and objectTypeToTypeRef k (TypeRef(tns, _), isInterface) (ObjectType xs as z) =
+    and objectTypeToTypeRef k (TypeRef(tns, classGps), (isInterface, methodGps)) (ObjectType xs as z) =
         let ns = 
             match isInterface, tns with 
             | _, [] -> []
             | false, ns -> ns
             | true, _::ns -> ns
         let name = sprintf "AnonymousType%i" (getIndex())
-        let y = TypeRef(name :: ns, [])
+        let y = TypeRef(name :: ns, classGps @ methodGps)
         Interface(y, [], []) |> k
         fromObjectType k y z
         y
@@ -190,8 +193,9 @@ module private FFIMapping =
         | None -> zs
         | Some r -> typeReferenceToTypeRef k parentType r :: zs
 
-    and fromSignature k x y z xs ys r =
+    and fromSignature k (x1, (x2, x3)) y z xs ys r =
         let genericParameters = xs |> List.map typeParameterToTypeRef
+        let x = x1, (x2, x3 @ genericParameters)
         let constraints = xs |> List.choose (typeParameterToTypeConstraint k x)
         let parameters = parameterListToFFIMemberParameters k x ys
         let meth = Method(genericParameters, constraints, parameters, r)
@@ -231,13 +235,13 @@ module private FFIMapping =
         | MemberPropertySignature y -> fromPropertySignature k x NonStatic y
 
     and fromObjectType k x (ObjectType ys) = 
-        for y in ys do fromTypeMember k (x, true) y
+        for y in ys do fromTypeMember k (x, (true, [])) y
 
     and fromInterface k ns (InterfaceDeclaration(name, xs, ys, z)) =
         let parameters = xs |> List.map typeParameterToTypeRef
         let x = TypeRef(name::ns, parameters)
-        let constraints = xs |> List.choose (typeParameterToTypeConstraint k (x, true))
-        let superTypes = interfaceExtendsClauseToTypeRefs k (x, true) ys
+        let constraints = xs |> List.choose (typeParameterToTypeConstraint k (x, (true, [])))
+        let superTypes = interfaceExtendsClauseToTypeRefs k (x, (true, [])) ys
         Interface(x, constraints, superTypes) |> k
         fromObjectType k x z
 
@@ -254,10 +258,10 @@ module private FFIMapping =
     and fromClassDeclaration k ns n xs y zs =
         let parameters = xs |> List.map typeParameterToTypeRef
         let x = TypeRef(n::ns, parameters)
-        let constraints = xs |> List.choose (typeParameterToTypeConstraint k (x, true))
-        let superTypes = classHeritageToTypeRefs k (x, true) y
+        let constraints = xs |> List.choose (typeParameterToTypeConstraint k (x, (true, [])))
+        let superTypes = classHeritageToTypeRefs k (x, (true, [])) y
         Interface(x, constraints, superTypes) |> k
-        for z in zs do fromAmbientClassBodyElement k (x, true) z
+        for z in zs do fromAmbientClassBodyElement k (x, (true, [])) z
 
     and fromEnumDeclaration k ns n xs =
         let x = TypeRef(n::ns, [])
@@ -270,12 +274,12 @@ module private FFIMapping =
     and fromFunctionDeclaration k ns n x =
         let t = TypeRef(ns, [])
         let y = Some(NameIdentifier n)
-        fromCallSignature k (t, false) y Static x
+        fromCallSignature k (t, (false, [])) y Static x
 
     and fromVariableDeclaration k ns n x =
         let t = TypeRef(ns, [])
         let y = NameIdentifier n
-        fromPropertySignature k (t, false) Static (PropertySignature(y, false, x))
+        fromPropertySignature k (t, (false, [])) Static (PropertySignature(y, false, x))
 
     and fromCommonAmbientElement k ns = function
         | AmbientClassDeclaration(n, xs, y, zs) -> fromClassDeclaration k ns n xs y zs
@@ -283,18 +287,25 @@ module private FFIMapping =
         | AmbientFunctionDeclaration(n, x) -> fromFunctionDeclaration k ns n x
         | AmbientVariableDeclaration(n, x) -> fromVariableDeclaration k ns n x
 
+    and fromImportDeclaration k ns (ImportDeclaration(x, EntityName xs)) =
+        k (Import(x::ns, xs |> List.rev))
+
     and fromAmbientModuleElement k ns = function
         | AmbientModuleDeclarationElement(_, EntityName xs, ys) ->
             ys |> List.iter (fromAmbientModuleElement k ((xs |> List.rev) @ ns))
         | AmbientModuleElement(_, x) ->
             fromCommonAmbientElement k ns x
-        | ImportDeclarationElement _ -> ()
+        | ImportDeclarationElement(_, x) -> 
+            fromImportDeclaration k ns x
         | InterfaceDeclarationElement(_, x) ->
             fromInterface k ns x
 
+    and fromExternalImportAssignment k ns (ExternalImportDeclaration(x, ExternalModuleReference y)) =
+        k (Import(x::ns, [y]))
+
     and fromAmbientExternalModuleElement k ns = function  
-        | ExternalAbientImportDeclaration _ 
         | ExternalExportAssignment _ -> ()
+        | ExternalAbientImportDeclaration(_, x) -> fromExternalImportAssignment k ns x
         | ExternalAmbientModuleElement x -> fromAmbientModuleElement k ns x 
 
     and fromAmbientDeclaration k ns = function
@@ -308,8 +319,8 @@ module private FFIMapping =
     and fromDeclarationElement k = function
         | RootExportAssignment _
         | RootImportDeclaration _ 
-        | RootExternalImportDeclaration _
         | RootReference _ -> ()
+        | RootExternalImportDeclaration(_, x) -> fromExternalImportAssignment k [] x
         | RootInterfaceDeclaration(_, x) -> fromInterface k [] x
         | RootAmbientDeclaration(_, x) -> fromAmbientDeclaration k [] x
 
@@ -391,10 +402,14 @@ module private Generate =
     /// its number of generic parameters.
     let groupByParentType xs =
         xs |> Seq.groupBy (function
+            | Import _ -> None
             | Enum(x, _)
             | Interface(x, _, _)
-            | Member(x, _, _, _) -> typeRefToTypeKey x)
-        |> Seq.map (fun (x, ys) -> x, set ys)
+            | Member(x, _, _, _) -> Some(typeRefToTypeKey x))
+        |> Seq.choose (fun (x, ys) ->
+            match x with
+            | Some x -> Some(x, set ys)
+            | None -> None)
         |> Map.ofSeq
 
     let predefinedTypeRefs =
@@ -605,7 +620,7 @@ type %s ="""        (extractNamespaceCode t) localSignature
                     els |> Seq.tryPick (function    
                         | Interface(t, gcs, sts) -> interfaceCode typesByKeyInclCurrentModule t gcs sts
                         | Enum(t, ms) -> enumCode t ms
-                        | Member _ -> None)
+                        | Member _ | Import _ -> None)
                 match typeFound with
                 | None -> interfaceCode typesByKeyInclCurrentModule (TypeRef("Globals" :: fst typeKey, [])) [] []
                 | _ -> typeFound
@@ -652,7 +667,25 @@ type %s ="""        (extractNamespaceCode t) localSignature
         | Fixed v -> v, None
 
     let javaScriptTypeCode (TypeRef(ns, _)) =
-        ns |> List.rev |> String.concat "."
+        match ns with
+        | [] -> "window"
+        | _ -> ns |> List.rev |> String.concat "."
+
+    /// See: http://stackoverflow.com/questions/19516961/why-cant-you-use-generic-type-parameters-in-constraints-on-type-extensions
+    let bugFixTypeExtensionGenericConstraint fixedGpsSet fixedMethodGps fixedGcs =
+        let notAllowableGcs, allowableGcs =
+            fixedGcs |> List.partition (fun (x, y) ->
+                y |> TypeRef.exists (fun z -> fixedGpsSet |> Set.contains z))
+        let notAllowableMap = notAllowableGcs |> Map.ofList
+        let fix = TypeRef.map (fun x -> defaultArg (notAllowableMap.TryFind x) x)
+// TOO STRICT: Need to take into account parameters and return type too!
+//        let allowableGps = 
+//            fixedMethodGps |> List.filter (fun x -> 
+//                allowableGcs |> List.exists (fun (y, z) ->
+//                    y |> TypeRef.exists ((=) x) ||
+//                    z |> TypeRef.exists ((=) x)))
+        let allowableGps = fixedMethodGps
+        fix, allowableGps, allowableGcs
 
     let typeExtensionCode typesByKey ns signature fixedGps members =
         let fixedGpsSet = set fixedGps
@@ -661,6 +694,8 @@ type %s ="""        (extractNamespaceCode t) localSignature
                 let fixMap = List.zip gps fixedGps |> Map.ofList
                 let fixGenericTypeParameters = 
                     TypeRef.map (fun x -> defaultArg (fixMap.TryFind x) x)
+                let fixAndResolve = 
+                    fixGenericTypeParameters >> resolveTypeRef typesByKey t fixedGpsSet
                 let fixedT = fixGenericTypeParameters t
                 let name, accessCode = 
                     match pn with
@@ -676,7 +711,7 @@ type %s ="""        (extractNamespaceCode t) localSignature
                     | Method(_, _, ps, _) -> 
                         let parameterCode =
                             ps |> List.fold (fun (i, acc) -> function
-                                | Fixed v -> i, sprintf "\"%s\"" v :: acc
+                                | Fixed v -> i, sprintf "\\\"%s\\\"" v :: acc
                                 | Variable _ -> i + 1, sprintf "{%i}" i :: acc
                                 | InlineArray _ -> i + 1, sprintf "{%i...}" i :: acc) (seedI, [])
                             |> snd |> List.rev |> String.concat ", "
@@ -686,7 +721,7 @@ type %s ="""        (extractNamespaceCode t) localSignature
                 let signature =
                     match el with
                     | Property r -> 
-                        let rCode = typeReferenceCode(fixGenericTypeParameters r)
+                        let rCode = typeReferenceCode(fixAndResolve r)
                         sprintf "%s with get() : %s = failwith \"never\" and set (v : %s) : unit = failwith \"never\"" name rCode rCode
                     | Method(methodGps, methodGcs, ps, r) ->
                         let partiallyFixedMethodGps, _, fixGenericNames = fixGenericParameters methodGps
@@ -695,6 +730,9 @@ type %s ="""        (extractNamespaceCode t) localSignature
                         let allGps = set fixedMethodGps + fixedGpsSet
                         let combinedFix = collisionFix >> fixGenericTypeParameters >> resolveTypeRef typesByKey t allGps
                         let fixedGcs = methodGcs |> List.map (fun (x, y) -> combinedFix x, combinedFix y)
+                        let allowableFix, fixedMethodGps, fixedGcs = 
+                            bugFixTypeExtensionGenericConstraint fixedGpsSet fixedMethodGps fixedGcs
+                        let combinedFix = combinedFix >> allowableFix
                         let fixedPs = ps |> List.map (mapParameterType combinedFix)
                         let specialization, parametersCode = 
                             let specs, pCodes = fixedPs |> List.map parameterCode |> List.unzip
@@ -704,15 +742,15 @@ type %s ="""        (extractNamespaceCode t) localSignature
                         sprintf "%s%s%s(%s) : %s = failwith \"never\"" 
                             name specialization genericDef parametersCode (typeReferenceCode fixedR)
                     | Index(p, r) ->
-                        let pCode = typeReferenceCode(fixGenericTypeParameters p)
-                        let rCode = typeReferenceCode(fixGenericTypeParameters r)
+                        let pCode = typeReferenceCode(fixAndResolve p)
+                        let rCode = typeReferenceCode(fixAndResolve r)
                         sprintf "%s with get(i : %s) : %s = failwith \"never\" and set (i : %s) (v : %s) : unit = failwith \"never\"" name pCode rCode pCode rCode
                 let root =
                     match s with
                     | Static -> "static member "
                     | NonStatic -> "member __."
                 sprintf """
-        //[<JSEmitInline(%s)>]
+        [<FunScript.JSEmitInline("%s")>]
         %s%s"""         callCode root signature 
             ) |> String.concat ""
 
@@ -746,6 +784,8 @@ namespace global
 
 [<AutoOpen>]
 module TypeExtensions =
+
+    do ()
 
 """
         let signaturesByKeyTest =
@@ -801,6 +841,8 @@ module Compiler =
                 let moduleName = (Identifier.sanitise name).ToLower()
                 moduleName, decls)
 
+        printfn "Ordering modules..."
+
         let modulesInCompilationOrder =
             orderByCompilationDependencies modules
             |> Seq.toList
@@ -812,16 +854,19 @@ module Compiler =
                 decls |> List.iter (FFIMapping.fromDeclarationElement xs.Add)
                 let elementsByNameKey = 
                     xs |> Seq.groupBy (function
+                        | Import _ -> None
                         | Interface(t, _, _) 
                         | Enum(t, _)
-                        | Member(t, _, _, _) -> Generate.typeRefToTypeKey t)
-                    |> Seq.map (fun (k, vs) -> k, vs |> Seq.toList)
+                        | Member(t, _, _, _) -> Some(Generate.typeRefToTypeKey t))
+                    |> Seq.choose (fun (k, vs) -> k |> Option.map (fun k -> k, vs |> Seq.toList))
                     |> Map.ofSeq
+                printfn "Generating type signatures for %s..." moduleName
                 let dependencySigs =
                     moduleDependencies |> List.map (fun n -> moduleTypes |> Map.find n)
                 let typesByKey = dependencySigs |> List.map (fun x -> x.ContainsKey)
                 let declarationCode, sigs = 
                     Generate.typeDeclarationsAndSignatures elementsByNameKey typesByKey
+                printfn "Generating type extensions for %s..." moduleName
                 let extensionCode =
                     Generate.typeExtensions (sigs :: dependencySigs) elementsByNameKey
                 let code = declarationCode + System.Environment.NewLine + extensionCode
