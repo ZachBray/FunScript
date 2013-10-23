@@ -125,11 +125,16 @@ let main(args : string[]) =
             executeOnDirectory inputFolder outputFolder
             0
         | _ ->  
+            #if DEBUG
             executeOnDirectory 
                 @"C:\TI\FunScript\FunScript.TypeScript\bin\Debug\Typings"
-                @"C:\TI\FunScript\FunScript.TypeScript\bin\Debug\Typings.Compiled" 
+                @"C:\TI\FunScript\FunScript.TypeScript\bin\Debug\Typings.Compiled"
+            System.Console.ReadLine() |> ignore
+            0
+            #else
             printfn "Expected FunScript.TypeScript.exe --download-into <folder-path> | --generate-types <folder-path> --output-folder <folder-path>"
             1
+            #endif
     with ex ->
         printfn "%O" ex
         1
