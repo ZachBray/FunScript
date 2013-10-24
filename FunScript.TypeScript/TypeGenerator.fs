@@ -517,7 +517,7 @@ type %s ="""               namespaceId nameId
                 let hasType = 
                     typeSpace = ["Func"; "System"] ||
                     (typeSpace = ["Array"] && paramCount <= 1) ||
-                    (typeSpace = ["IList"; "Generic"; "Collections"; "System"] && paramCount <= 1) ||
+                    (typeSpace = ["IList"; "Generic"; "Collections"; "System"] && paramCount = 1) ||
                     predefinedTypeKeys.Contains (typeSpace, paramCount) ||
                     typesByKey |> List.exists (fun f -> f (typeSpace, paramCount))
                 if hasType then Some typeSpace
@@ -550,6 +550,7 @@ type %s ="""               namespaceId nameId
     /// that `a :> `b[]
     let replaceArrayWithIList x =
         x |> TypeRef.map (function
+            | TypeRef(["Array"], []) -> TypeRef(List.rev ["System"; "Collections"; "Generic"; "IList"], [TypeRef(["obj"], [])])
             | TypeRef(["Array"], ps) -> TypeRef(List.rev ["System"; "Collections"; "Generic"; "IList"], ps)
             | x -> x)
 
@@ -611,7 +612,7 @@ type %s ="""               namespaceId nameId
                 let gpsKeys = fixedGpsSet |> Set.map typeRefToTypeKey
                 let possibleDeps = fixedSts @ (fixedGcs |> List.map snd)
                 let expandedDeps = possibleDeps |> Seq.collect (TypeRef.collect typeRefToTypeKey) |> set
-                expandedDeps - gpsKeys
+                (expandedDeps - gpsKeys) |> Set.remove (typeRefToTypeKey t)
             let interfaceSignature, localSignature =
                 constrainedTypeReferenceCode (TypeRef(ns, fixedGps)) fixedGcs
             //TypeRef(ns, fixedGps), fixedGcs, fixedSts, interfaceSignature
@@ -726,80 +727,84 @@ type %s ="""        (extractNamespaceCode t) localSignature
         let fixedGpsSet = set fixedGps
         let membersCode =
             members |> Seq.choose (fun (TypeRef(_, gps) as t, pn, s, el) ->
-                let fixMap = List.zip gps fixedGps |> Map.ofList
-                let fixGenericTypeParameters = 
-                    TypeRef.map (fun x -> defaultArg (fixMap.TryFind x) x)
-                let fixAndResolve = 
-                    fixGenericTypeParameters >> resolveTypeRef typeImports typesByKey t fixedGpsSet
-                let fixedT = fixGenericTypeParameters t
-                let name, accessCode = 
-                    match pn with
-                    | None -> "Create", ""
-                    | Some pn -> Identifier.fromPropertyName pn
-                let callCode =
-                    let baseAccess, seedI =
-                        match s with
-                        | Static -> javaScriptTypeCode t, 0
-                        | NonStatic -> "{0}", 1
-                    match el with
-                    | Property _ -> baseAccess + accessCode
-                    | Method(_, _, ps, _) -> 
-                        let parameterCode =
-                            ps |> List.fold (fun (i, acc) -> function
-                                | Fixed v -> i, sprintf "\\\"%s\\\"" v :: acc
-                                | Variable _ -> i + 1, sprintf "{%i}" i :: acc
-                                | InlineArray _ -> i + 1, sprintf "{%i...}" i :: acc) (seedI, [])
-                            |> snd |> List.rev |> String.concat ", "
-                        sprintf "%s%s(%s)" baseAccess accessCode parameterCode
-                    | Index _ ->
-                        sprintf "%s[{%i}]" baseAccess seedI
-                let memberSignature, key =
-                    match el with
-                    | Property r -> 
-                        let fixedR = fixAndResolve r
-                        let rCode = typeReferenceCode fixedR
-                        sprintf "%s with get() : %s = failwith \"never\" and set (v : %s) : unit = failwith \"never\"" name rCode rCode,
-                        ("", Property fixedR)
-                    | Method(methodGps, methodGcs, ps, r) ->
-                        let partiallyFixedMethodGps, _, fixGenericNames = fixGenericParameters methodGps
-                        let collisionFix = fixGenericNames >> collisionFix fixedGpsSet partiallyFixedMethodGps
-                        let fixedMethodGps = methodGps |> List.map collisionFix
-                        let allGps = set fixedMethodGps + fixedGpsSet
-                        let combinedFix = collisionFix >> fixGenericTypeParameters >> resolveTypeRef typeImports typesByKey t allGps
-                        let fixedGcs = methodGcs |> List.map (fun (x, y) -> combinedFix x, combinedFix y)
-                        let allowableFix, fixedMethodGps, fixedGcs = 
-                            bugFixTypeExtensionGenericConstraint fixedGpsSet fixedMethodGps fixedGcs
-                        let combinedFix = combinedFix >> allowableFix
-                        let fixedPs = ps |> List.map (mapParameterType combinedFix)
-                        let specialization, parametersCode = 
-                            let specs, pCodes = fixedPs |> List.map parameterCode |> List.unzip
-                            specs |> String.concat "", pCodes |> List.choose id |> String.concat ", "
-                        let fixedR = combinedFix r
-                        let genericDef = defaultArg (constrainedGenericParameterCode fixedMethodGps fixedGcs) ""
-                        let keyPs =
-                            fixedPs |> List.map (function
-                                | Fixed x -> Fixed x
-                                | Variable(_, t) -> Variable("", t)
-                                | InlineArray(_, t) -> Variable("", t))
-                        sprintf "%s%s%s(%s) : %s = failwith \"never\"" 
-                            name specialization genericDef parametersCode (typeReferenceCode fixedR),
-                        (specialization, Method(fixedMethodGps, fixedGcs, keyPs, fixedR))
-                    | Index(p, r) ->
-                        let fixedP = fixAndResolve p
-                        let fixedR = fixAndResolve r
-                        let pCode = typeReferenceCode fixedP
-                        let rCode = typeReferenceCode fixedR
-                        sprintf "%s with get(i : %s) : %s = failwith \"never\" and set (i : %s) (v : %s) : unit = failwith \"never\"" name pCode rCode pCode rCode,
-                        ("", Index(fixedP, fixedR))
-                if isMemberDefined (signature, pn, s, key) then None
-                else
-                    let root =
-                        match s with
-                        | Static -> "static member "
-                        | NonStatic -> "member __."
-                    Some(sprintf """
+                try
+                    let fixMap = List.zip gps fixedGps |> Map.ofList
+                    let fixGenericTypeParameters = 
+                        TypeRef.map (fun x -> defaultArg (fixMap.TryFind x) x)
+                    let fixAndResolve = 
+                        fixGenericTypeParameters >> resolveTypeRef typeImports typesByKey t fixedGpsSet
+                    let fixedT = fixGenericTypeParameters t
+                    let name, accessCode = 
+                        match pn with
+                        | None -> "Create", ""
+                        | Some pn -> Identifier.fromPropertyName pn
+                    let callCode =
+                        let baseAccess, seedI =
+                            match s with
+                            | Static -> javaScriptTypeCode t, 0
+                            | NonStatic -> "{0}", 1
+                        match el with
+                        | Property _ -> baseAccess + accessCode
+                        | Method(_, _, ps, _) -> 
+                            let parameterCode =
+                                ps |> List.fold (fun (i, acc) -> function
+                                    | Fixed v -> i, sprintf "\\\"%s\\\"" v :: acc
+                                    | Variable _ -> i + 1, sprintf "{%i}" i :: acc
+                                    | InlineArray _ -> i + 1, sprintf "{%i...}" i :: acc) (seedI, [])
+                                |> snd |> List.rev |> String.concat ", "
+                            sprintf "%s%s(%s)" baseAccess accessCode parameterCode
+                        | Index _ ->
+                            sprintf "%s[{%i}]" baseAccess seedI
+                    let memberSignature, key =
+                        match el with
+                        | Property r -> 
+                            let fixedR = fixAndResolve r
+                            let rCode = typeReferenceCode fixedR
+                            sprintf "%s with get() : %s = failwith \"never\" and set (v : %s) : unit = failwith \"never\"" name rCode rCode,
+                            ("", Property fixedR)
+                        | Method(methodGps, methodGcs, ps, r) ->
+                            let partiallyFixedMethodGps, _, fixGenericNames = fixGenericParameters methodGps
+                            let collisionFix = fixGenericNames >> collisionFix fixedGpsSet partiallyFixedMethodGps
+                            let fixedMethodGps = methodGps |> List.map collisionFix
+                            let allGps = set fixedMethodGps + fixedGpsSet
+                            let combinedFix = collisionFix >> fixGenericTypeParameters >> resolveTypeRef typeImports typesByKey t allGps
+                            let fixedGcs = methodGcs |> List.map (fun (x, y) -> combinedFix x, combinedFix y)
+                            let allowableFix, fixedMethodGps, fixedGcs = 
+                                bugFixTypeExtensionGenericConstraint fixedGpsSet fixedMethodGps fixedGcs
+                            let combinedFix = combinedFix >> allowableFix
+                            let fixedPs = ps |> List.map (mapParameterType combinedFix)
+                            let specialization, parametersCode = 
+                                let specs, pCodes = fixedPs |> List.map parameterCode |> List.unzip
+                                specs |> String.concat "", pCodes |> List.choose id |> String.concat ", "
+                            let fixedR = combinedFix r
+                            let genericDef = defaultArg (constrainedGenericParameterCode fixedMethodGps fixedGcs) ""
+                            let keyPs =
+                                fixedPs |> List.map (function
+                                    | Fixed x -> Fixed x
+                                    | Variable(_, t) -> Variable("", t)
+                                    | InlineArray(_, t) -> Variable("", t))
+                            sprintf "%s%s%s(%s) : %s = failwith \"never\"" 
+                                name specialization genericDef parametersCode (typeReferenceCode fixedR),
+                            (specialization, Method(fixedMethodGps, fixedGcs, keyPs, fixedR))
+                        | Index(p, r) ->
+                            let fixedP = fixAndResolve p
+                            let fixedR = fixAndResolve r
+                            let pCode = typeReferenceCode fixedP
+                            let rCode = typeReferenceCode fixedR
+                            sprintf "%s with get(i : %s) : %s = failwith \"never\" and set (i : %s) (v : %s) : unit = failwith \"never\"" name pCode rCode pCode rCode,
+                            ("", Index(fixedP, fixedR))
+                    if isMemberDefined (signature, pn, s, key) then None
+                    else
+                        let root =
+                            match s with
+                            | Static -> "static member "
+                            | NonStatic -> "member __."
+                        Some(sprintf """
             [<FunScript.JSEmitInline("%s")>]
-            %s%s"""             callCode root memberSignature )
+            %s%s"""                 callCode root memberSignature )
+                with ex ->
+                    printfn "[ERROR] %s" ex.Message
+                    None
                 ) 
             |> String.concat ""
 

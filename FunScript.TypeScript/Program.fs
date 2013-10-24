@@ -1,16 +1,19 @@
-﻿module FunScript.TypeScript.Program
+﻿module FunScript.TypeScript.Provider
 
 open System
+open System.Reflection
 open System.IO
 open System.Net
 open System.Net.Security
+open System.CodeDom.Compiler
 
+open Microsoft.FSharp.Core.CompilerServices
+open Samples.FSharp.ProvidedTypes
 open Ionic.Zip
 
 open FunScript.TypeScript.AST
 open FunScript.TypeScript.Parser
 open FunScript.TypeScript.TypeGenerator
-
 
 let openUriStream uri =
     let acceptAllCerts = RemoteCertificateValidationCallback(fun _ _ _ _ -> true)
@@ -32,8 +35,6 @@ let openFileOrUri resolutionFolder (fileName:string) =
             if fileName.StartsWith ".." then Path.Combine(resolutionFolder, fileName)
             else fileName
         new StreamReader(file)
-
-open System.CodeDom.Compiler
 
 let compile outputAssembly references source =
     use provider = new Microsoft.FSharp.Compiler.CodeDom.FSharpCodeProvider()
@@ -63,78 +64,108 @@ let compile outputAssembly references source =
         printf "Failed to compile. \n%A" (errors |> Array.map (fun err -> err.ErrorText))
         false
 
-let executeOnText outputFolder inputs =
+let generateAssembliesLazily cacheKey inputs =
     let outputFiles =
         inputs
         |> Seq.map (fun (name, contents) -> name, Parser.parseDeclarationsFile contents)
         |> Seq.toList
         |> TypeGenerator.Compiler.generateTypes
-    if not(Directory.Exists outputFolder) then
-        Directory.CreateDirectory outputFolder |> ignore
     let assemblyLocation moduleName =
-        Path.Combine(outputFolder, "FunScript.TypeScript.Binding." + moduleName + ".dll")
-    outputFiles |> List.fold (fun acc (name, contents, dependencies) ->
-        printfn "Generating assembly for %s..." name
-        let hasDependencies =
-            dependencies |> List.forall (fun x -> acc |> Set.contains x)
-        let wasSuccessful =
-            hasDependencies &&
-            compile 
-                (assemblyLocation name) 
-                (dependencies |> List.toArray |> Array.map assemblyLocation) 
-                contents
-        if wasSuccessful then acc |> Set.add name
-        else acc) Set.empty
-    |> ignore
-
-let executeOnDirectory inputFolder outputFolder =
-    let dir = DirectoryInfo(inputFolder)
-    let files = dir.EnumerateFiles("*.d.ts", SearchOption.AllDirectories)
-    files |> Seq.map (fun file -> 
-        file.Name.Substring(0, file.Name.Length - ".d.ts".Length), 
-        file.OpenText().ReadToEnd())
-    |> executeOnText outputFolder
+        let tempDir = Path.GetTempPath()
+        Path.Combine(tempDir, "FunScript.TypeScript.Binding." + moduleName + "-" + cacheKey + ".dll")
+    let outputMappings =
+        outputFiles |> Seq.map (fun (name, contents, dependencies) ->
+            name, (contents, dependencies))
+        |> Map.ofSeq
+    let rec forceCreation name =
+        let contents, dependencies = outputMappings.[name]
+        let moduleLocation = assemblyLocation name
+        if File.Exists moduleLocation then
+            Some moduleLocation
+        else
+            printfn "Generating assembly for %s..." name
+            let hasDependencies =
+                dependencies |> List.forall (forceCreation >> Option.isSome)
+            let wasSuccessful =
+                hasDependencies &&
+                compile 
+                    moduleLocation
+                    (dependencies |> List.toArray |> Array.map assemblyLocation) 
+                    contents
+            if wasSuccessful then Some moduleLocation
+            else None
+    outputFiles |> List.map (fun (name, _, _) ->
+        name, lazy forceCreation name)
     
-let download (baseDirectory : string) =
-    if not (Directory.Exists baseDirectory) then
-        Directory.CreateDirectory baseDirectory |> ignore
-    printfn "Downloading DefinitelyTyped repository..."
-    use stream = openUriStream "https://github.com/borisyankov/DefinitelyTyped/archive/master.zip"
-    use memStream = new MemoryStream()
-    stream.CopyTo memStream
-    let typesFile = System.Environment.CurrentDirectory + @"\Types.zip"
-    File.WriteAllBytes(typesFile, memStream.ToArray())
-    let zip = ZipFile.Read typesFile
-    zip.Entries 
-    |> Seq.filter (fun entry ->
-        entry.FileName.EndsWith ".d.ts" && not (entry.FileName.Contains "test"))
-    |> Seq.iter (fun entry -> 
-        use stream = entry.OpenReader()
-        use reader = new StreamReader(stream)
-        let path = Path.Combine(baseDirectory, Path.GetFileName entry.FileName)
-        File.WriteAllText(path, reader.ReadToEnd()))
+let loadDefaultLib() =
+    let ass = typeof<AST.AmbientClassBodyElement>.Assembly
+    use stream = ass.GetManifestResourceStream("lib.d.ts")
+    use reader = new StreamReader(stream)
+    "lib", reader.ReadToEnd()
 
-[<EntryPoint>]
-let main(args : string[]) =
-    try
-        match args with
-        | [| "--download-into"; outputFolder |] ->
-            download outputFolder
-            0
-        | [| "--generate-types"; inputFolder; "--output-folder"; outputFolder |] ->
-            executeOnDirectory inputFolder outputFolder
-            0
-        | _ ->  
-            #if DEBUG
-            executeOnDirectory 
-                @"C:\TI\FunScript\FunScript.TypeScript\bin\Debug\Typings"
-                @"C:\TI\FunScript\FunScript.TypeScript\bin\Debug\Typings.Compiled"
-            System.Console.ReadLine() |> ignore
-            0
-            #else
-            printfn "Expected FunScript.TypeScript.exe --download-into <folder-path> | --generate-types <folder-path> --output-folder <folder-path>"
-            1
-            #endif
-    with ex ->
-        printfn "%O" ex
-        1
+// DefaultUri = "https://github.com/borisyankov/DefinitelyTyped/archive/master.zip"
+let downloadTypesZip cacheKey zipUri =
+    let tempDir = Path.GetTempPath()
+    let tempFile = Path.Combine(tempDir, sprintf "%s.zip" cacheKey)
+    if not (File.Exists tempFile) then
+        printfn "Downloading DefinitelyTyped repository..."
+        use stream = openUriStream zipUri
+        use memStream = new MemoryStream()
+        stream.CopyTo memStream
+        File.WriteAllBytes(tempFile, memStream.ToArray())
+    let zip = ZipFile.Read tempFile
+    let moduleContents =
+        zip.Entries 
+        |> Seq.filter (fun entry ->
+            entry.FileName.EndsWith ".d.ts" && not (entry.FileName.Contains "test"))
+        |> Seq.map (fun entry -> 
+            use stream = entry.OpenReader()
+            use reader = new StreamReader(stream)
+            let filename = Path.GetFileName entry.FileName
+            let moduleName = filename.Substring(0, filename.Length - ".d.ts".Length)
+            moduleName, reader.ReadToEnd())
+        |> Seq.toList
+    let hasLib = moduleContents |> Seq.exists (fst >> ((=) "lib"))
+    if hasLib then moduleContents
+    else loadDefaultLib() :: moduleContents
+
+[<TypeProvider>]
+type public TypeScriptTypeProvider(cfg : TypeProviderConfig) as this =
+    inherit TypeProviderForNamespaces() 
+    
+    let ns = "FunScript.TypeScript"
+    let ass = Assembly.GetExecutingAssembly()
+    
+    let providerType = 
+        ProvidedTypeDefinition(ass, ns, "TypeScriptProvider", Some typeof<obj>, HideObjectMethods = true)
+
+    let parameters = 
+        [
+            ProvidedStaticParameter("CacheKey", typeof<string>, "NoKey")
+            ProvidedStaticParameter("TypeZipUri", typeof<string>, "https://github.com/borisyankov/DefinitelyTyped/archive/master.zip")
+        ]
+
+    let buildTypeGraph requestedName cacheKey zipUri = 
+        let reqType = ProvidedTypeDefinition(ass, ns, requestedName, Some typeof<obj>)
+        let modules = downloadTypesZip cacheKey zipUri
+        let moduleAssemblies = generateAssembliesLazily cacheKey modules
+        reqType.AddMembers(
+            [
+                for moduleName, assemblyLocation in moduleAssemblies do
+                    let moduleType = ProvidedTypeDefinition(moduleName, Some typeof<obj>, HideObjectMethods = true)
+                    moduleType.AddAssemblyTypesAsNestedTypesDelayed(fun () ->
+                        match assemblyLocation.Value with
+                        | None -> null
+                        | Some path -> Assembly.LoadFrom path)
+                    yield moduleType
+            ])
+        reqType
+    do 
+        providerType.DefineStaticParameters(parameters, fun name -> function
+            | [| :? string as cacheKey; :? string as zipUri |] -> buildTypeGraph name cacheKey zipUri
+            | _ -> failwith "Invalid type parameters.")
+        this.RegisterRuntimeAssemblyLocationAsProbingFolder(cfg)
+        this.AddNamespace(ns, [providerType])
+
+[<TypeProviderAssembly>]
+do()
