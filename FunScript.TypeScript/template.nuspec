@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package>
+    <metadata>
+        <id>FunScript.TypeScript.Binding.{package}</id>
+        <authors>Zach Bray, Tomas Petricek, Phillip Trelford, James Feiwirth, Robert Pickering</authors>
+        <version>{version}</version>
+        <projectUrl>http://www.funscript.info</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>FunScript binding for {package} (BETA version).</description>
+        <copyright>Copyright 2013</copyright>
+        <tags>F# JavaScript FunScript</tags>
+        <dependencies>
+{dependencies}
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="FunScript.TypeScript.Binding.{package}.dll" target="lib\net40\" />
+    </files>
+</package>

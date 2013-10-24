@@ -1,14 +1,13 @@
 ﻿module FunScript.TypeScript.Provider
 
 open System
+open System.Diagnostics
 open System.Reflection
 open System.IO
 open System.Net
 open System.Net.Security
 open System.CodeDom.Compiler
 
-open Microsoft.FSharp.Core.CompilerServices
-open Samples.FSharp.ProvidedTypes
 open Ionic.Zip
 
 open FunScript.TypeScript.AST
@@ -39,15 +38,12 @@ let openFileOrUri resolutionFolder (fileName:string) =
 let compile outputAssembly references source =
     use provider = new Microsoft.FSharp.Compiler.CodeDom.FSharpCodeProvider()
     let parameters = CompilerParameters(OutputAssembly = outputAssembly)
-    let addLocalReference path = 
-        let currentDirectory = Environment.CurrentDirectory
-        let fullPath = Path.Combine(currentDirectory, path)
-        parameters.ReferencedAssemblies.Add fullPath |> ignore<int>
     let msCorLib = typeof<int>.Assembly.Location
     parameters.ReferencedAssemblies.Add msCorLib |> ignore<int>
     let fsCorLib = @"C:\Program Files (x86)\Reference Assemblies\Microsoft\FSharp\3.0\Runtime\v4.0\FSharp.Core.dll"
     parameters.ReferencedAssemblies.Add fsCorLib |> ignore<int>
-    addLocalReference "FunScript.Interop.dll"
+    let funScriptInterop = typeof<FunScript.JSEmitInlineAttribute>.Assembly.Location
+    parameters.ReferencedAssemblies.Add funScriptInterop |> ignore<int>
     parameters.ReferencedAssemblies.AddRange references
     let sourceFile = outputAssembly + ".fs"
     File.WriteAllText(sourceFile, source)
@@ -64,15 +60,16 @@ let compile outputAssembly references source =
         printf "Failed to compile. \n%A" (errors |> Array.map (fun err -> err.ErrorText))
         false
 
-let generateAssembliesLazily cacheKey inputs =
+let generateAssembliesLazily tempDir inputs =
+    if not(Directory.Exists tempDir) then
+        Directory.CreateDirectory tempDir |> ignore
     let outputFiles =
         inputs
         |> Seq.map (fun (name, contents) -> name, Parser.parseDeclarationsFile contents)
         |> Seq.toList
         |> TypeGenerator.Compiler.generateTypes
     let assemblyLocation moduleName =
-        let tempDir = Path.GetTempPath()
-        Path.Combine(tempDir, "FunScript.TypeScript.Binding." + moduleName + "-" + cacheKey + ".dll")
+        Path.Combine(tempDir, "FunScript.TypeScript.Binding." + moduleName + ".dll")
     let outputMappings =
         outputFiles |> Seq.map (fun (name, contents, dependencies) ->
             name, (contents, dependencies))
@@ -81,18 +78,20 @@ let generateAssembliesLazily cacheKey inputs =
         let contents, dependencies = outputMappings.[name]
         let moduleLocation = assemblyLocation name
         if File.Exists moduleLocation then
-            Some moduleLocation
+            Some(moduleLocation, dependencies)
         else
             printfn "Generating assembly for %s..." name
             let hasDependencies =
                 dependencies |> List.forall (forceCreation >> Option.isSome)
+            let dependencyLocations =
+                dependencies |> List.toArray |> Array.map assemblyLocation
             let wasSuccessful =
                 hasDependencies &&
                 compile 
                     moduleLocation
-                    (dependencies |> List.toArray |> Array.map assemblyLocation) 
+                    dependencyLocations
                     contents
-            if wasSuccessful then Some moduleLocation
+            if wasSuccessful then Some(moduleLocation, dependencies)
             else None
     outputFiles |> List.map (fun (name, _, _) ->
         name, lazy forceCreation name)
@@ -104,9 +103,8 @@ let loadDefaultLib() =
     "lib", reader.ReadToEnd()
 
 // DefaultUri = "https://github.com/borisyankov/DefinitelyTyped/archive/master.zip"
-let downloadTypesZip cacheKey zipUri =
-    let tempDir = Path.GetTempPath()
-    let tempFile = Path.Combine(tempDir, sprintf "%s.zip" cacheKey)
+let downloadTypesZip tempDir zipUri =
+    let tempFile = Path.Combine(tempDir, "Types.zip")
     if not (File.Exists tempFile) then
         printfn "Downloading DefinitelyTyped repository..."
         use stream = openUriStream zipUri
@@ -129,43 +127,56 @@ let downloadTypesZip cacheKey zipUri =
     if hasLib then moduleContents
     else loadDefaultLib() :: moduleContents
 
-[<TypeProvider>]
-type public TypeScriptTypeProvider(cfg : TypeProviderConfig) as this =
-    inherit TypeProviderForNamespaces() 
-    
-    let ns = "FunScript.TypeScript"
-    let ass = Assembly.GetExecutingAssembly()
-    
-    let providerType = 
-        ProvidedTypeDefinition(ass, ns, "TypeScriptProvider", Some typeof<obj>, HideObjectMethods = true)
+let template =
+    lazy
+        let ass = typeof<AST.AmbientClassBodyElement>.Assembly
+        use stream = ass.GetManifestResourceStream("template.nuspec")
+        use reader = new StreamReader(stream)
+        reader.ReadToEnd()
 
-    let parameters = 
-        [
-            ProvidedStaticParameter("CacheKey", typeof<string>, "NoKey")
-            ProvidedStaticParameter("TypeZipUri", typeof<string>, "https://github.com/borisyankov/DefinitelyTyped/archive/master.zip")
-        ]
+let nuspec name version dependencies =
+    let deps =
+        dependencies 
+        |> Seq.map (fun n -> sprintf "        <dependency id=\"FunScript.TypeScript.Binding.%s\" version=\"%s\" />" n version) 
+        |> String.concat System.Environment.NewLine
+    template.Value
+        .Replace("{package}", name)
+        .Replace("{version}", version)
+        .Replace("{dependencies}", deps)
 
-    let buildTypeGraph requestedName cacheKey zipUri = 
-        let reqType = ProvidedTypeDefinition(ass, ns, requestedName, Some typeof<obj>)
-        let modules = downloadTypesZip cacheKey zipUri
-        let moduleAssemblies = generateAssembliesLazily cacheKey modules
-        reqType.AddMembers(
-            [
-                for moduleName, assemblyLocation in moduleAssemblies do
-                    let moduleType = ProvidedTypeDefinition(moduleName, Some typeof<obj>, HideObjectMethods = true)
-                    moduleType.AddAssemblyTypesAsNestedTypesDelayed(fun () ->
-                        match assemblyLocation.Value with
-                        | None -> null
-                        | Some path -> Assembly.LoadFrom path)
-                    yield moduleType
-            ])
-        reqType
-    do 
-        providerType.DefineStaticParameters(parameters, fun name -> function
-            | [| :? string as cacheKey; :? string as zipUri |] -> buildTypeGraph name cacheKey zipUri
-            | _ -> failwith "Invalid type parameters.")
-        this.RegisterRuntimeAssemblyLocationAsProbingFolder(cfg)
-        this.AddNamespace(ns, [providerType])
+let uploadPackage tempDir key version moduleName assLoc deps =
+    printfn "Generating nuspec for %s..." moduleName
+    let nuspecFile = Path.Combine(tempDir, sprintf "FunScript.TypeScript.Binding.%s.nuspec" moduleName)
+    File.WriteAllText(nuspecFile, nuspec moduleName version deps)
+    let packProcess = Process.Start("nuget.exe", sprintf "pack %s" nuspecFile)
+    packProcess.WaitForExit()
+    let pushProcess = 
+        Process.Start(
+            "nuget.exe", 
+            sprintf "push FunScript.TypeScript.Binding.%s.%s.nupkg %s" moduleName version key)
+    pushProcess.WaitForExit()
 
-[<TypeProviderAssembly>]
-do()
+[<EntryPoint>]
+let main args =
+    try
+        let tempDir = System.Environment.CurrentDirectory
+        let outDir = Path.Combine(tempDir, "Output")
+        let nugetKey, zipUri =
+            match args with
+            | [| "--version"; version; "--push"; nugetKey; zipUri |] -> Some(version, nugetKey), zipUri
+            | [| zipUri |] -> None, zipUri
+            | _ -> None, "https://github.com/borisyankov/DefinitelyTyped/archive/master.zip"
+        downloadTypesZip tempDir zipUri
+        |> generateAssembliesLazily outDir
+        |> Seq.iter (fun (moduleName, locations) -> 
+            match nugetKey with
+            | None -> ()
+            | Some(version, key) -> 
+                match locations.Value with
+                | None -> ()
+                | Some (assLoc, deps) ->
+                    uploadPackage outDir key version moduleName assLoc deps)
+        0
+    with ex -> 
+        printfn "[ERROR] %s" (ex.ToString())
+        1

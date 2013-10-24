@@ -23,6 +23,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\Debug\FunScript.TypeScript.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
+    <StartArguments>--version 1.1.0.0 --push My-Fake-Key https://github.com/borisyankov/DefinitelyTyped/archive/master.zip</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -41,8 +42,10 @@
   <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets" Condition=" Exists('$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets')" />
   <ItemGroup>
     <EmbeddedResource Include="lib.d.ts" />
-    <Compile Include="ProvidedTypes-0.4.fsi" />
-    <Compile Include="ProvidedTypes-0.4.fs" />
+    <EmbeddedResource Include="template.nuspec" />
+    <Content Include="NuGet.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Compile Include="AST.fs" />
     <Compile Include="Parser.fs" />
     <Compile Include="TypeGenerator.fs" />
