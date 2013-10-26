@@ -163,9 +163,11 @@ let main args =
         let outDir = Path.Combine(tempDir, "Output")
         let nugetKey, zipUri =
             match args with
-            | [| "--version"; version; "--push"; nugetKey; zipUri |] -> Some(version, nugetKey), zipUri
-            | [| zipUri |] -> None, zipUri
-            | _ -> None, "https://github.com/borisyankov/DefinitelyTyped/archive/master.zip"
+            | [| "--version"; version; "--push"; nugetKey; zipUri |] -> Some(version, nugetKey), Some zipUri
+            | [| "--version"; version; "--push"; nugetKey |] -> Some(version, nugetKey), None
+            | [| zipUri |] -> None, Some zipUri
+            | _ -> None, None
+        let zipUri = defaultArg zipUri "https://github.com/borisyankov/DefinitelyTyped/archive/master.zip"
         downloadTypesZip tempDir zipUri
         |> generateAssembliesLazily outDir
         |> Seq.iter (fun (moduleName, locations) -> 

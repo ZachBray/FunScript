@@ -63,6 +63,7 @@ type JSExpr =
    | UnaryOp of string * JSExpr
    | BinaryOp of JSExpr * string * JSExpr
    | TernaryOp of JSExpr * string * JSExpr * string * JSExpr
+   | EmitExpr of (int * VariableScope ref -> string)
    member value.Print((Newline newL) as padding, scope:VariableScope ref) =
       match value with
       | Null -> "null"
@@ -126,6 +127,7 @@ type JSExpr =
             (lhsExpr.Print(padding, scope)) lSymbol 
             (midExpr.Print(padding, scope)) rSymbol 
             (rhsExpr.Print(padding, scope))
+      | EmitExpr code -> code(padding, scope)
 
 and JSStatement =
    | Declare of Var list
@@ -141,6 +143,7 @@ and JSStatement =
    | Scope of JSBlock
    | Return of JSExpr
    | Do of JSExpr
+   | EmitStatement of (int * VariableScope ref -> string)
    | Empty
    member statement.Print((Newline newL) as padding, scope) =
       match statement with
@@ -205,10 +208,10 @@ and JSStatement =
          sprintf "return %s" (expr.Print(padding, scope))
       | Do expr -> expr.Print(padding, scope)
       | Empty -> ""
+      | EmitStatement code -> code(padding, scope)
 
 and JSBlock = 
    | Block of JSStatement list
-   | EmitBlock of string
    member block.Print((Newline newL) as padding, scope) =
       let (Newline paddedNewL) = padding + 1
       match block with
@@ -222,8 +225,6 @@ and JSBlock =
                |> String.concat (sprintf ";%s" paddedNewL)
             if padding = 0 then filling
             else sprintf "{%s%s;%s}" paddedNewL filling newL
-      | EmitBlock code ->
-         sprintf "{%s%s%s}" paddedNewL code newL
 
    member block.Print() =
       block.Print(0, ref VariableScope.Empty)

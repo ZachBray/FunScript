@@ -1,9 +1,8 @@
 <Project DefaultTargets="BuildAll" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     
     <ItemGroup>
+        <ProjectsToBuild Include="FunScript.Interop\FunScript.Interop.fsproj" />
         <ProjectsToBuild Include="FunScript\FunScript.fsproj" />
-        <ProjectsToBuild Include="FunScript.TypeScript.Interop\FunScript.TypeScript.Interop.fsproj" />
-        <ProjectsToBuild Include="FunScript.TypeScript\FunScript.TypeScript.fsproj" />
         <ProjectsToBuild Include="FunScript.BrowserAPI\FunScript.BrowserAPI.fsproj" />
         <ProjectsToBuild Include="FunScript.Data\FunScript.Data.fsproj" />
     </ItemGroup>

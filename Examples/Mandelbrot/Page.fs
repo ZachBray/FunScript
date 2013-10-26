@@ -11,21 +11,6 @@ open FunScript
 type Complex = { r : double; i : double }
 type Color = { r : int; g : int; b : int; a : int }
 
-[<JSEmit("return document.getElementById({0});")>]
-let getElement (x:string) : 'a = failwith "never"
-
-[<JSEmit("return {0}.getContext(\"2d\");")>]
-let getContext (o : obj) : 'a = failwith "never"
-
-[<JSEmit("return {0}.createImageData({1},{2});")>]
-let createImageData (ctx : obj, width : int, height : int) : 'a = failwith "never"
-
-[<JSEmit("{0}.putImageData({1},0,0);")>]
-let putImageData (ctx : obj, data : obj) : unit = failwith "never"
-
-[<JSEmit("{0}.data[{1}]={2};")>]
-let setPixel (img : obj, index : int, value : int) : unit = failwith "never"
-
 let maxIter = 512
 
 let height = 800
@@ -58,17 +43,18 @@ let getCoordColor (x : int, y : int) : Color =
     iterCountToColor i
 
 let showSet() =
-    let ctx = getElement("canvas") |> getContext
-    let img = createImageData(ctx, width, height)
+    let ctx = Globals.document.getElementsByTagName_canvas().[0].getContext_2d()
+    
+    let img = ctx.createImageData(float width, float height)
     for y = 0 to height-1 do
         for x = 0 to width-1 do
             let index = (x + y * width) * 4
             let color = getCoordColor (x, y)
-            setPixel(img, index+0, color.r)
-            setPixel(img, index+1, color.g)
-            setPixel(img, index+2, color.b)
-            setPixel(img, index+3, color.a)
-    putImageData(ctx, img)
+            img.data.[index+0] <- float color.r
+            img.data.[index+1] <- float color.g
+            img.data.[index+2] <- float color.b
+            img.data.[index+3] <- float color.a
+    ctx.putImageData(img, 0., 0.)
 
 let main() =
     showSet()

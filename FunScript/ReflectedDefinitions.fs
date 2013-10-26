@@ -28,7 +28,7 @@ let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list)
          |> List.fold (fun (acc:string) (i,v) ->
             acc.Replace(sprintf "{%i}" i, v.Name)
             ) meth.Emit
-      [ Assign(Reference var, Lambda(vars, EmitBlock code)) ]
+      [ Assign(Reference var, Lambda(vars, Block[EmitStatement(fun _ -> code)])) ]
    | _ when mb.IsConstructor ->
       [  
          yield Assign(Reference var, Lambda(vars, Block(compiler.Compile ReturnStrategies.inplace bodyExpr)))
@@ -68,6 +68,106 @@ let private createConstruction
       [ yield! decls |> List.concat
         yield returnStategy.Return <| New(consRef.Name, refs) ]
    | _ -> []
+
+
+let (|OptionPattern|_|) = function
+    | Patterns.NewUnionCase(uci, []) when 
+            uci.Tag = 0 && 
+            uci.DeclaringType.Name = typeof<obj option>.Name ->
+        Some(None)
+    | Patterns.NewUnionCase(uci, [expr]) when 
+            uci.Tag = 1 && 
+            uci.DeclaringType.Name = typeof<obj option>.Name ->
+        Some(Some expr)
+    | _ -> None
+
+let tryReplace (x : string) y (str : string) =
+    let newStr = str.Replace(x, y)
+    if str <> newStr then Some newStr
+    else None
+
+let orElse f = function
+    | None -> f()
+    | Some _ as x -> x
+
+let private createEmitInlineExpr (|Split|) (emit : JSEmitInlineAttribute) exprs =
+    let isOptionalParam i =
+        emit.Emit.Contains (sprintf "{?%i}" i)
+    let decls, refs =
+        exprs |> List.mapi (fun i ->
+            function
+            | OptionPattern None when isOptionalParam i -> None
+            | OptionPattern(Some(Split(decls, ref))) when isOptionalParam i -> Some(decls, (i, ref))
+            | Split(decls, ref) -> Some(decls, (i, ref)))
+        |> List.choose id
+        |> List.toArray
+        |> Array.unzip
+    let refMap = refs |> Map.ofArray
+
+    decls |> Seq.concat |> Seq.toList,
+    EmitExpr(fun (padding, scope) ->
+        let rec build i acc =
+            let next =
+                match refMap.TryFind i with
+                | None -> 
+                    acc |> tryReplace (sprintf ", {?%i}" i) ""
+                    |> orElse (fun () ->
+                        acc |> tryReplace (sprintf ", {%i...}" i) "")
+                    |> orElse (fun () ->
+                        acc |> tryReplace (sprintf ",{%i...}" i) "")
+                    |> orElse (fun () ->
+                        acc |> tryReplace (sprintf "{?%i}" i) "")
+                    |> orElse (fun () ->
+                        acc |> tryReplace (sprintf "{%i...}" i) "")
+                | Some (ref : JSExpr) ->
+                    acc |> tryReplace (sprintf "{%i}" i) (ref.Print(padding, scope))
+                    |> orElse (fun () ->
+                        acc |> tryReplace (sprintf "{?%i}" i) (ref.Print(padding, scope)))
+                    |> orElse (fun () ->
+                        acc |> tryReplace (sprintf ", {%i...}" i) (sprintf ", %s, {%i...}" (ref.Print(padding, scope)) (i+1)))
+                    |> orElse (fun () ->
+                        acc |> tryReplace (sprintf ",{%i...}" i) (sprintf ", %s, {%i...}" (ref.Print(padding, scope)) (i+1)))
+                    |> orElse (fun () ->
+                        acc |> tryReplace (sprintf "{%i...}" i) (sprintf "%s, {%i...}" (ref.Print(padding, scope)) (i+1)))
+            match next with
+            | None -> acc
+            | Some nextAcc -> build (i+1) nextAcc
+        build 0 emit.Emit)
+
+
+let private (|JSEmitInlineMethod|_|) (mi : MethodInfo) =
+    match mi.GetCustomAttribute<JSEmitInlineAttribute>() with
+    | x when x = Unchecked.defaultof<_> -> None
+    | attr -> Some(mi, attr)
+        
+let (@.) x ys =
+    match x with
+    | Some y -> y :: ys
+    | None -> ys
+
+let private jsEmitInlineMethodCalling =
+    CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+        function
+        | Patterns.Call(objExpr, JSEmitInlineMethod(mi, attr), exprs) ->
+            let allExprs = objExpr @. exprs |> List.toArray
+            let argExprs, k =
+                let nameParts = mi.Name.Split [|'.'|]
+                if nameParts |> Array.exists (fun part -> part.StartsWith "set_") then
+                    let (Split(valDecl, valExpr)) = allExprs.[allExprs.Length - 1]
+                    allExprs.[.. allExprs.Length - 1] |> Array.toList,
+                    fun (propDecls, propExpr) ->
+                        valDecl @ propDecls @ [Assign(propExpr, valExpr)],
+                        JSExpr.Null
+                else allExprs |> Array.toList, id
+            let decls, ref =
+                createEmitInlineExpr (|Split|) attr argExprs
+                |> k
+            [
+                yield! decls
+                yield returnStategy.Return ref
+            ]
+        | _ -> []
+             
 
 let private (|SpecialOp|_|) = Quote.specialOp
 
@@ -192,6 +292,7 @@ let private constructingInstances =
       | _ -> []
 
 let components = [ 
+   jsEmitInlineMethodCalling
    methodCalling
    propertyGetting
    propertySetting

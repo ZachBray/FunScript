@@ -17,3 +17,13 @@ type JSEmitAttribute(emit:string) =
 type JSEmitInlineAttribute(emit:string) =
    inherit System.Attribute()
    member __.Emit = emit
+
+namespace global
+
+open FunScript
+
+[<AutoOpen>]
+module TypeExtensions =
+    
+    [<JSEmitInlineAttribute("({})")>]
+    let createEmpty<'a>() : 'a = failwith "never"

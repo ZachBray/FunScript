@@ -14,12 +14,8 @@ open FSharp.Data
 
 type MovieDb = ApiaryProvider<"themoviedb">
 
-type j = TypeScript.Api<"../Typings/jquery.d.ts">
-let jQuery (command:string) = j.jQuery.Invoke(command)
-let (?) jq name = jQuery("#" + name)
-
-type System.Object with
-  member x.asJQuery() : j.JQuery = unbox x
+let jQuery(selector : string) = Globals.Dollar.Invoke selector
+let (?) jq name = jq("#" + name)
 
 // ------------------------------------------------------------------
 // Main function
@@ -62,10 +58,11 @@ let main() =
     res.Results 
     |> Seq.ofArray
     |> Seq.iteri (fun index item ->
+        
         let link = 
-          jQuery("<a>").attr("data-toggle", "modal").asJQuery().
-            attr("href", "#detailsDialog").asJQuery().text(item.Title).asJQuery().
-            click(fun _ -> showDetails item.Id |> Async.StartImmediate ).asJQuery()
+          jQuery("<a>").attr("data-toggle", "modal").
+            attr("href", "#detailsDialog").text(item.Title).
+            click(fun e -> showDetails item.Id |> Async.StartImmediate; null)
 
         let details = jQuery("<ul>")
         let date = 
@@ -73,28 +70,27 @@ let main() =
           | None -> "(not known)"
           | Some dt -> dt.ToString()
         jQuery("<li>").html("<strong>Released:</strong> " + date).
-          asJQuery().appendTo(details) |> ignore
+          appendTo(details) |> ignore
         jQuery("<li>").html("<strong>Average vote:</strong> " + item.VoteAverage.ToString()).
-          asJQuery().appendTo(details) |> ignore
+          appendTo(details) |> ignore
         jQuery("<li>").html("<strong>Popularity:</strong> " + item.Popularity.ToString()).
-          asJQuery().appendTo(details) |> ignore
+          appendTo(details) |> ignore
 
-        let body = jQuery("<div>").addClass("searchResult").asJQuery()
-        jQuery("<h3>").append([| box link |]).asJQuery().appendTo(body) |> ignore
-        jQuery("<img>").attr("src", root + item.PosterPath).asJQuery().appendTo(body) |> ignore
+        let body = jQuery("<div>").addClass("searchResult")
+        jQuery("<h3>").append([| box link |]).appendTo(body) |> ignore
+        jQuery("<img>").attr("src", root + item.PosterPath).appendTo(body) |> ignore
         details.appendTo(body) |> ignore
-        jQuery("<div>").addClass("clearer").asJQuery().appendTo(body) |> ignore
+        jQuery("<div>").addClass("clearer").appendTo(body) |> ignore
         body.appendTo(jQuery?results) |> ignore )}
 
   // ----------------------------------------------------------------
   // Movie search
 
   jQuery?searchButton.click(fun () ->
-    let id = jQuery?searchInput.``val``() :?> string
+    let id = jQuery?searchInput._val() :?> string
     search id |> Async.StartImmediate )
 
 // ------------------------------------------------------------------
-let components = 
-  FunScript.Interop.Components.all @
+let components =
   FunScript.Data.Components.DataProviders  
 do Runtime.Run(components=components, directory="Web")

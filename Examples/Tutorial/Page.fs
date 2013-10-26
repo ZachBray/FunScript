@@ -28,7 +28,6 @@ attribute (an alias for `ReflectedDefinition`):
 module Page
 
 open FunScript
-open FunScript.TypeScript
 
 (**
 The `FunScript.TypeScript` namespace contains the TypeScript provider, which is 
@@ -41,28 +40,20 @@ with types. It uses _definition files_ (`*.d.ts`) to specify the types of existi
 JavaScript libraries. FunScript can import information from TypeScript definition files 
 and generate F# types for accessing the DOM and calling external JavaScript libraries.
 
-The following two lines import definitions for [jQuery](https://github.com/ZachBray/FunScript/blob/master/Examples/Typings/jquery.d.ts)
-and [JavaScript DOM](https://github.com/ZachBray/FunScript/blob/master/Examples/Typings/lib.d.ts) 
-from TypeScript:
+In this file we have imported definitions for jQuery and the JavaScript DOM.
 *)
 
-type j = Api<"../Typings/jquery.d.ts">
-type lib = Api<"../Typings/lib.d.ts">
-
 (**
-The generated types `j` and `lib` enclose all functionality that is documented by
-the Type Script definition file including nested types, global variables and functions.
-
 ## Hello World
 
-Let's now use the `lib` type to write a typical Hello world sample.
+Let's now write a typical Hello world sample.
 The global `window` object available in the browser can be accessed 
-using `lib.window`. When you type `lib.window.` in F#, you will get an autocomplete
+using `Globals.window`. When you type `Globals.window.` in F#, you will get an autocomplete
 suggestion including the `alert` function:
 *)
 
-let hello () = 
-  lib.window.alert("Hello world!")
+let hello () =
+  Globals.window.alert("Hello world!")
 
 (**
 This snippet defines a function `hello` that can be translated to JavaScript 
@@ -74,15 +65,15 @@ You can use any JavaScript library as long as there is a TypeScript definition
 for it (the [Definitely Typed](https://github.com/borisyankov/DefinitelyTyped) 
 contains a number of them).
 
-The `$("...")` command known from jQuery can be invoked by typing `j.jQuery.Invoke("...")`.
+The `$("...")` command known from jQuery can be invoked by typing `Globals.Dollar.Invoke("...")`.
 To simplify the access to elements by ID, we can define the F# _dynamic operator_
-and write just `j.jQuery?helloWorld` instead of `j.jQuery.Invoke("#helloWorld")`. The
+and write just `jq?helloWorld` instead of `Globals.Dollar.Invoke("#helloWorld")`. The
 following snippet gives the necessary definitions:
 *)
 
-// Allows writing j.jQuery?name for element access
-let (?) (jq:j.JQueryStatic) name = 
-  jq.Invoke("#" + name)
+// Allows writing jq?name for element access
+let jq(selector : string) = Globals.Dollar.Invoke selector
+let (?) jq name = jq("#" + name)
 
 (**
 The `?` operator takes a parameter of type `j.JQueryStatic` which is a (generated)
@@ -91,7 +82,7 @@ important - the important fact is that we can now easily access DOM elements:
 *)
 
 let main() = 
-  j.jQuery?helloWorld.click(hello)
+  jq?helloWorld.click(hello)
 
 (** 
 The `mainHello` function will be later called when the web page is loaded. It
@@ -107,11 +98,4 @@ finds the function in the above section). To start the launcher, the `Page.fs`
 file ends with the following line:
 *)
 
-do Runtime.Run(components=Interop.Components.all)
-
-(**
-The `components` parameter can be used to specify additional FunScript compiler
-components. In this case, we just specify components required by the TypeScript
-type provider (that enables us to use DOM and jQuery). You can use additional
-optional parameters to configure the Web server and the launcher.
-*)
+do Runtime.Run()

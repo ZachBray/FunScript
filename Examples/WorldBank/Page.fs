@@ -29,10 +29,9 @@ need to configure the provider to call WorldBank asynchronously:
 
 type WorldBank = WorldBankDataProvider<Asynchronous=true>
 
-type j = TypeScript.Api<"../Typings/jquery.d.ts">
-type h = TypeScript.Api<"../Typings/highcharts.d.ts">
-
-let jQuery (command:string) = j.jQuery.Invoke(command)
+// Allows writing jq?name for element access
+let jq(selector : string) = Globals.Dollar.Invoke selector
+let (?) jq name = jq("#" + name)
 
 (**
 In addition to referencing the WorldBank, the snippet also loaded jQuery 
@@ -75,16 +74,16 @@ for for each country. This can be done using the `jQuery` function defined earli
 let makeCheckInfos() = 
   countries () |> Array.mapi (fun index country ->
     // Create the checkbox element
-    let input = jQuery("<input>")
+    let input = jq("<input>")
     input.attr("type", "checkbox") |> ignore
     // Create label with checkbox & text
-    let label = jQuery("<label>")
+    let label = jq("<label>")
     label.append([| box input |]) |> ignore
     label.append([| box country.Name |]) |> ignore
     // Append elements to one of 3 columns
-    let panel = floor (index % 3) + 1
+    let panel = (index % 3) + 1
     let panelId = "#countryList" + panel.ToString()
-    label.appendTo(jQuery(panelId)) |> ignore
+    label.appendTo(jq(panelId)) |> ignore
     // Return the country and checkbox element
     country, input )
 
@@ -115,29 +114,43 @@ let main() =
 
   // Render the chart based on checkboxes
   let render () = async {
-    let opts = h.HighchartsOptions()
+    let opts = createEmpty<HighchartsOptions>()
     let title = "School enrollment, tertiary (% gross)"
     // Create a line chart in div element with id 'chart'
-    opts.chart <- h.HighchartsChartOptions()
-    opts.chart.renderTo <- "chart"
-    opts.chart.``type`` <- "line"
-    opts.title <- h.HighchartsTitleOptions(text = title)
+    let titleOptions = createEmpty<HighchartsTitleOptions>()
+    titleOptions.text <- title
+    opts.title <- titleOptions
+    let subTitleOptions = createEmpty<HighchartsSubtitleOptions>()
+    subTitleOptions.text <- "Source: WorldBank"
+    opts.subtitle <- subTitleOptions
     opts.series <- [| |]
+    
     
     // Create series we want to render
     for country, check in infos do
-      if check.is(":checked") |> unbox then
+      if check._is ":checked" then
         // Asynchronously load data without blocking
         let! vals = country.Indicators.``School enrollment, tertiary (% gross)``
         // Convert data to format required by HighCharts
-        let data = vals |> Seq.map (fun (k, v) -> 
-          [| number k; number v |]) |> Array.ofSeq
+        let data = 
+            vals |> Seq.map (fun (k, v) ->
+                let p = createEmpty<HighchartsDataPoint>() 
+                p.x <- number k
+                p.y <- v
+                p)
+            |> Seq.toArray
         // Create new data series and add it to the chart
-        let series = h.HighchartsSeriesOptions(data=data, name=country.Name)
-        opts.series.push(series)
+        let series = createEmpty<HighchartsSeriesOptions>()
+        series.data <- unbox data
+        series.name <- country.Name
+        series._type <- "line"
+        
+        opts.series.push(series) |> ignore
     // Invoke constructor on a chart prototype
-    clone(h.Highcharts.Chart, opts) |> ignore }
-  
+    let chartElement = jq?chart
+    chartElement.highcharts(opts) |> ignore
+  }
+
   // Register click handlers
   render () |> Async.StartImmediate
   infos |> Array.iter (fun (_, check) ->
@@ -167,6 +180,5 @@ runner as usual:
 *)
 
 let components = 
-  FunScript.Data.Components.DataProviders @ 
-  FunScript.Interop.Components.all
+  FunScript.Data.Components.DataProviders
 do Runtime.Run(components=components, directory="Web")

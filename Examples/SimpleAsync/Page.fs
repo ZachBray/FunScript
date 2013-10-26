@@ -7,17 +7,13 @@
 module Program
 
 open FunScript
-open FunScript.TypeScript
 open System.Threading
-
-type j = FunScript.TypeScript.Api<"..\\Typings\\jquery.d.ts">
-type lib = FunScript.TypeScript.Api<"..\\Typings\\lib.d.ts">
 
 // ----------------------------------------------------------------------------
 // Mini implementation of some F# async primitives
 
 type Async =
-  static member AwaitJQueryEvent(f : ('T -> obj) -> j.JQuery) : Async<'T> = 
+  static member AwaitJQueryEvent(f : ('T -> obj) -> JQuery) : Async<'T> = 
     Async.FromContinuations(fun (cont, econt, ccont) ->
       let named = ref None
       named := Some (f (fun v -> 
@@ -28,11 +24,12 @@ type Async =
 // ----------------------------------------------------------------------------
 // Demo using mini F# async
 
-let (?) (jq:j.JQueryStatic) name = jq.Invoke("#" + name)
+let j (selector : string) = Globals.Dollar.Invoke(selector)
+let (?) jq name = jq("#" + name)
 
 let log(msg:string) =
    let tag = "<p>" + msg + "</p>"
-   j.jQuery?results.append [| tag :> obj |]
+   j?results.append [| tag :> obj |]
    |> ignore
 
 let increment(n) = 
@@ -43,7 +40,7 @@ let increment(n) =
 
 let rec worker(n) = 
   async { 
-    let! v = Async.AwaitJQueryEvent(fun f -> j.jQuery?next.click(f))
+    let! v = Async.AwaitJQueryEvent(fun f -> j?next.click(f))
     let! n = increment(n)
     do log ("Count: " + n.ToString())
     return! worker(n)
@@ -51,13 +48,13 @@ let rec worker(n) =
 
 let main() = 
   async {
-    let! x = Async.AwaitJQueryEvent(fun o -> j.jQuery?document.ready o)
+    let! x = Async.AwaitJQueryEvent(fun o -> j?document.ready o)
     let cts = new CancellationTokenSource()
     Async.StartImmediate(worker 0, cts.Token)
-    j.jQuery?stop.click(fun _ -> box <| cts.Cancel()) |> ignore
+    j?stop.click(fun _ -> box <| cts.Cancel()) |> ignore
   } |> Async.StartImmediate
 
 
 // ----------------------------------------------------------------------------
 
-do Runtime.Run(components=Interop.Components.all)
+do Runtime.Run()

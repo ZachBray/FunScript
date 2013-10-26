@@ -81,9 +81,11 @@ module private Domain =
     type Source = string list
     type IsExport = bool
 
+    type Optionality = Required | Optional
+
     type FFIMemberParameter =
         | Fixed of string
-        | Variable of string * ParameterType
+        | Variable of string * ParameterType * Optionality
         | InlineArray of string * ParameterType
 
     type FFIMemberElement =
@@ -95,6 +97,7 @@ module private Domain =
         | Enum of TypeRef * (PropertyName * int option) list
         | Member of ParentType * PropertyName option * Staticness * FFIMemberElement
         | Interface of TypeRef * GenericConstraint list * SuperType list
+        | Delegate of TypeRef * ParameterType list * ReturnType
         | Import of IsExport * Destination * Source
 
     let (|Staticness|) = function   
@@ -131,9 +134,11 @@ module private FFIMapping =
         | LiteralFunctionType(_, xs, y)
         | LiteralConstructorType(_, xs, y) -> 
             // TODO: constraints from type parameters
-            let rs = parameterListToTypeRefs k parentType xs
+            let rs : _ list = parameterListToTypeRefs k parentType xs
             let s = typeToTypeRef k parentType y
-            TypeRef(["Func"; "System"], [yield! rs; yield s])
+            if rs.Length < 9 then
+                TypeRef(["Func"; "System"], [yield! rs; yield s])
+            else predefinedTypeToTypeRef Any
 
     and objectTypeToTypeRef k (TypeRef(tns, classGps), (isInterface, methodGps)) (ObjectType xs as z) =
         let ns = 
@@ -154,7 +159,7 @@ module private FFIMapping =
     and parameterListToTypeRefs k parentType xs =
         parameterListToFFIMemberParameters k parentType xs
         |> List.map (function
-            | Variable(_, x) | InlineArray(_, x) -> x
+            | Variable(_, x, _) | InlineArray(_, x) -> x
             | Fixed _ -> predefinedTypeToTypeRef String)
 
     and parameterListToFFIMemberParameters k parentType (ParameterList(xs, ys, z)) =
@@ -162,19 +167,21 @@ module private FFIMapping =
             yield! xs |> Seq.map (requiredParameterToMemberParameter k parentType)
             yield! ys |> Seq.map (optionalParameterToMemberParameter k parentType)
             yield! z |> Option.toArray |> Seq.map (restParameterToMemberParameter k parentType)
-        ]
+        ]        
+
     and requiredParameterToMemberParameter k parentType = function
-        | VariableParameter(_, x, y) -> Variable(x, typeAnnotationOptionToTypeRef k parentType y)
+        | VariableParameter(_, x, y) -> Variable(x, typeAnnotationOptionToTypeRef k parentType y, Required)
         | StringEnumParameter(_, x) -> Fixed x
 
     and optionalParameterToMemberParameter k parentType = function
         | OptionalParameter(_, x, y)
-        | DefaultParameter(_, x, y, _) -> Variable(x, typeAnnotationOptionToTypeRef k parentType y)
+        | DefaultParameter(_, x, y, _) -> Variable(x, typeAnnotationOptionToTypeRef k parentType y, Optional)
 
     and restParameterToMemberParameter k parentType (RestParameter(n, x)) =
-        let y = match x with Some(TypeAnnotation z) -> z | None -> Predefined Any
-        let t = literalTypeToTypeRef k parentType (LiteralArrayType y)
-        InlineArray(n, t)
+        let y = match x with Some(TypeAnnotation z) -> z | None -> Literal(LiteralArrayType(Predefined Any))
+        // NOTE: we are assuming that the type is in array form already
+        //      let t = literalTypeToTypeRef k parentType (LiteralArrayType y)
+        InlineArray(n, typeToTypeRef k parentType y)
 
     and typeParameterToTypeRef(TypeParameter(name, _)) = TypeRef([name], [])
 
@@ -190,13 +197,27 @@ module private FFIMapping =
         | None -> zs
         | Some r -> typeReferenceToTypeRef k parentType r :: zs
 
+    and parameterListToFFIMemberParametersPermutations k parentType (ParameterList(xs, ys, z)) =
+        [
+            yield parameterListToFFIMemberParameters k parentType (ParameterList(xs, ys, None))
+            match z with
+            | None -> ()
+            | Some _ ->
+                yield 
+                    parameterListToFFIMemberParameters k parentType (ParameterList(xs, ys, z))
+                    |> List.map (function
+                        | Variable(name, t, _) -> Variable(name, t, Required)
+                        | x -> x)
+        ]
+
     and fromSignature k (x1, (x2, x3)) y z xs ys r =
         let genericParameters = xs |> List.map typeParameterToTypeRef
         let x = x1, (x2, x3 @ genericParameters)
         let constraints = xs |> List.choose (typeParameterToTypeConstraint k x)
-        let parameters = parameterListToFFIMemberParameters k x ys
-        let meth = Method(genericParameters, constraints, parameters, r)
-        Member(fst x, y, z, meth) |> k : unit
+        let paramPermutations = parameterListToFFIMemberParametersPermutations k x ys
+        for parameters in paramPermutations do
+            let meth = Method(genericParameters, constraints, parameters, r)
+            Member(fst x, y, z, meth) |> k : unit
 
     and fromCallSignature k x y z (CallSignature(xs, ys, zs)) =
         let returnType = typeAnnotationOptionToTypeRef k x zs
@@ -415,11 +436,16 @@ module private Generate =
     let typeRefToTypeKey(TypeRef(ns, ps)) = 
         ns, ps.Length
 
+    let typeRefToDelegateTypeKey = function
+        | TypeRef(n::ns, ps) -> Some((n + "Delegate")::ns, ps.Length)
+        | _ -> None
+
     /// Groups ffi elements by the name of the parent type and 
     /// its number of generic parameters.
     let groupByParentType xs =
         xs |> Seq.groupBy (function
             | Import _ -> None
+            | Delegate(x, _, _)
             | Enum(x, _)
             | Interface(x, _, _)
             | Member(x, _, _, _) -> Some(typeRefToTypeKey x))
@@ -445,6 +471,7 @@ module private Generate =
     let predefinedTypeKeys =
         set (predefinedTypeRefs |> List.map typeRefToTypeKey)
         |> Set.add (["IList"; "Generic"; "Collections"; "System"], 1)
+        |> Set.add (["Array"], 1)
 
     let nameCode ns =
         match ns with
@@ -494,7 +521,7 @@ type %s ="""               namespaceId nameId
         
     /// Tries to resolve a TypeRef from the generic type parameters at the location
     /// or the known types in the current module or the referenced modules.
-    let resolveTypeRef typeImports typesByKey (TypeRef(baseNs,_) as baseT) genericTypeParameters t =
+    let resolveTypeRef canHaveDelegate typeImports typesByKey (TypeRef(baseNs,_) as baseT) genericTypeParameters t =
 
         let rec tryReplace acc n =
             match n with
@@ -515,9 +542,6 @@ type %s ="""               namespaceId nameId
             let typeSpaces = [typeSpace; tryReplace [] typeSpace] |> Seq.distinct
             typeSpaces |> Seq.tryPick (fun typeSpace ->
                 let hasType = 
-                    typeSpace = ["Func"; "System"] ||
-                    (typeSpace = ["Array"] && paramCount <= 1) ||
-                    (typeSpace = ["IList"; "Generic"; "Collections"; "System"] && paramCount = 1) ||
                     predefinedTypeKeys.Contains (typeSpace, paramCount) ||
                     typesByKey |> List.exists (fun f -> f (typeSpace, paramCount))
                 if hasType then Some typeSpace
@@ -526,12 +550,25 @@ type %s ="""               namespaceId nameId
                     | [] -> None
                     | _::subBasePart -> tryResolve subBasePart x)
 
-        t |> TypeRef.map (fun (TypeRef(_, ps) as t) ->
+        t |> TypeRef.map (fun (TypeRef(ns, ps) as t) ->
             if genericTypeParameters |> Set.contains t then t
             else
-                match tryResolve baseNs (typeRefToTypeKey t) with
-                | Some r -> TypeRef(r, ps)
-                | None -> failwithf "[ERROR] Unable to resolve TypeRef: %A (from TypeRef: %A)" t baseT)
+                match ns, ps with
+                | ["Array"],[] -> TypeRef(["Array"], [TypeRef(["obj"], [])]) 
+                | ["Array"], [gp] -> TypeRef(["Array"], [gp])
+                | ["IList"; "Generic"; "Collections"; "System"], [_]
+                | ["Func"; "System"], _ -> t
+                | _ ->
+                    let keys = [
+                        if canHaveDelegate then 
+                            match typeRefToDelegateTypeKey t with
+                            | None -> ()
+                            | Some k -> yield k
+                        yield typeRefToTypeKey t
+                    ]
+                    match keys |> List.tryPick (tryResolve baseNs) with
+                    | Some r -> TypeRef(r, ps)
+                    | None -> failwithf "[ERROR] Unable to resolve TypeRef: %A (from TypeRef: %A)" t baseT)
 
     /// Returns the F# string representing the type ref. It assumes that the generic
     /// parameters have been mapped into F# friendly back-ticked type refs and that
@@ -540,7 +577,7 @@ type %s ="""               namespaceId nameId
         let nameCode = nameCode ns
         match nameCode, gps with
         | None, _ -> failwith "[ERROR] Cannot emit empty TypeRef reference."
-        | Some "array", [] -> "array<obj>"
+        //| Some "array", [] -> "array<obj>"
         | Some nc, [] -> nc
         | Some nc, gps -> 
                 let parameters = gps |> Seq.map typeReferenceCode |> String.concat ", "
@@ -558,7 +595,7 @@ type %s ="""               namespaceId nameId
     let constraintCode gps (x,y) =
         match x with
         | TypeRef([gn], []) ->
-            Some(sprintf "%s :> %s" (typeReferenceCode x) (typeReferenceCode (replaceArrayWithIList y)))
+            Some(sprintf "%s :> %s" (typeReferenceCode x) (typeReferenceCode y))
         | _ -> 
             printfn "[WARN] Ignoring incompatible constraint: %A :> %A" x y
             None
@@ -580,9 +617,11 @@ type %s ="""               namespaceId nameId
         match nameCode with
         | None -> failwith "[ERROR] Cannot emit empty TypeRef reference."
         | Some nc ->
+            let ncParts = nc.Split [|'.'|]
+            let localNc = ncParts.[ncParts.Length - 1]
             match constrainedGenericParameterCode gps gcs with
-            | None -> nc, ns |> List.head
-            | Some genericDef -> nc + genericDef, (ns |> List.head) + genericDef
+            | None -> nc, localNc
+            | Some genericDef -> nc + genericDef, localNc + genericDef
 
     let fixGenericParameterName = function
         | TypeRef([gn], []) -> TypeRef([sprintf "'%s" gn], [])
@@ -602,12 +641,46 @@ type %s ="""               namespaceId nameId
         let fix = replaceGenericParameters gpsFixMapping
         fixedGps, fixedGpsSet, fix
 
+    let delegateCode typeImports typesByKey (TypeRef(ns, gps) as t) ps r =
+        try
+            let fixedGps, fixedGpsSet, fix = fixGenericParameters gps
+            let fix = fix >> resolveTypeRef true typeImports typesByKey t fixedGpsSet
+            let fixedPs = ps |> List.map fix
+            let fixedR = fix r
+            let dependencies = 
+                let gpsKeys = fixedGpsSet |> Set.map typeRefToTypeKey
+                let expandedDeps =
+                    [yield fixedR; yield! fixedPs] 
+                    |> Seq.collect (TypeRef.collect typeRefToTypeKey) 
+                    |> set
+                (expandedDeps - gpsKeys) |> Set.remove (typeRefToTypeKey t)
+            let delegateSignature, localSignature =
+                constrainedTypeReferenceCode (TypeRef(ns, fixedGps)) []
+            let parameterCode = 
+                match fixedPs with
+                | [] -> "unit"
+                | _ -> fixedPs |> Seq.map typeReferenceCode |> String.concat " * "
+            let returnCode = typeReferenceCode fixedR
+            let delegateDeclaration =
+                sprintf """
+namespace %s
+type %s = delegate of %s -> %s
+"""                 (extractNamespaceCode t) localSignature parameterCode returnCode
+            Some(delegateDeclaration,
+                 dependencies,
+                 typeRefToTypeKey t, 
+                 Some(delegateSignature, fixedGps))
+        with ex ->
+            printfn "[ERROR] %s" ex.Message
+            None
+
     let interfaceCode typeImports typesByKey (TypeRef(ns, gps) as t) gcs sts =
         try
             let fixedGps, fixedGpsSet, fix = fixGenericParameters gps
-            let fix = fix >> resolveTypeRef typeImports typesByKey t fixedGpsSet
-            let fixedGcs = gcs |> List.map (fun (x, y) -> fix x, fix y)
-            let fixedSts = sts |> List.map (replaceArrayWithIList >> fix) |> Seq.distinct |> Seq.toList
+            let fixImport = fix >> resolveTypeRef false typeImports typesByKey t fixedGpsSet
+            let fix = fix >> resolveTypeRef true typeImports typesByKey t fixedGpsSet
+            let fixedGcs = gcs |> List.map (fun (x, y) -> fix x, fix(replaceArrayWithIList y))
+            let fixedSts = sts |> List.map (replaceArrayWithIList >> fixImport) |> Seq.distinct |> Seq.toList
             let dependencies = 
                 let gpsKeys = fixedGpsSet |> Set.map typeRefToTypeKey
                 let possibleDeps = fixedSts @ (fixedGcs |> List.map snd)
@@ -635,7 +708,7 @@ type %s ="""        (extractNamespaceCode t) localSignature
                  typeRefToTypeKey t, 
                  Some(interfaceSignature, fixedGps))
         with ex ->
-            printfn "%s" ex.Message
+            printfn "[ERROR] %s" ex.Message
             None
         
 
@@ -652,10 +725,15 @@ type %s ="""        (extractNamespaceCode t) localSignature
             if wasAlreadyDeclared then None
             else 
                 let typeFound =
-                    els |> Seq.tryPick (function    
+                    els |> Seq.tryPick (function
+                        | Interface(TypeRef(["Array"], _) as t, gcs, sts)
+                        | Interface(TypeRef(["array"], _) as t, gcs, sts) ->
+                            interfaceCode typeImports typesByKeyInclCurrentModule t gcs sts
+                            |> Option.map (fun (c, x, y, z) -> "", x, y, z)
                         | Interface(t, gcs, sts) -> interfaceCode typeImports typesByKeyInclCurrentModule t gcs sts
                         | Enum(t, []) -> interfaceCode typeImports typesByKeyInclCurrentModule t [] []
                         | Enum(t, ms) -> enumCode t ms
+                        | Delegate(t, ps, r) -> delegateCode typeImports typesByKeyInclCurrentModule t ps r
                         | Member _ | Import _ -> None)
                 match typeFound with
                 | None -> interfaceCode typeImports typesByKeyInclCurrentModule (TypeRef("Globals" :: fst typeKey, [])) [] []
@@ -666,7 +744,8 @@ type %s ="""        (extractNamespaceCode t) localSignature
             (fun (_, xs, _, _) -> 
                 xs |> Set.toList |> List.filter (fun x -> 
                     typesByKey |> List.exists (fun f -> f x) |> not &&
-                    predefinedTypeKeys |> Set.contains x |> not))
+                    predefinedTypeKeys |> Set.contains x |> not &&
+                    fst x <> ["Func"; "System"]))
         |> Seq.map (fun (x, _, _) -> x)
         |> Seq.fold (fun (allCode : StringBuilder, typeSigs) (codeFragment, _, typeKey, typeSignature) ->
             allCode.Append codeFragment, 
@@ -693,14 +772,23 @@ type %s ="""        (extractNamespaceCode t) localSignature
         TypeRef.map (fun x -> defaultArg (collisonAvoidanceMap.TryFind x) x)
         
     let mapParameterType fix = function
-        | Variable(name, t) -> Variable(name, fix t)
+        | Variable(name, t, opt) -> Variable(name, fix t, opt)
         | InlineArray(name, t) -> InlineArray(name, fix t)
         | Fixed _ as x -> x
 
     let parameterCode = function
-        | Variable(name, t) -> "", Some(sprintf "%s : %s" (Identifier.sanitiseLowerCamelCase name) (typeReferenceCode t))
-        | InlineArray(name, t) -> "", Some(sprintf "[<System.ParamArray>] %s : %s[]" (Identifier.sanitiseLowerCamelCase name) (typeReferenceCode t))
-        | Fixed v -> Identifier.sanitise v, None
+        | Variable(name, t, Required) -> 
+            "", Some(sprintf "%s : %s" (Identifier.sanitiseLowerCamelCase name) (typeReferenceCode t))
+        | Variable(name, t, Optional) ->
+            "", Some(sprintf "?%s : %s" (Identifier.sanitiseLowerCamelCase name) (typeReferenceCode t))
+        | InlineArray(name, t) -> 
+            "", Some(sprintf "[<System.ParamArray>] %s : %s" (Identifier.sanitiseLowerCamelCase name) (typeReferenceCode t))
+        | Fixed v -> 
+            let specialization = 
+                let n = Identifier.sanitise v
+                if n.StartsWith "_" then n
+                else "_" + n
+            specialization, None
 
     let javaScriptTypeCode (TypeRef(ns, _)) =
         match ns with
@@ -723,8 +811,18 @@ type %s ="""        (extractNamespaceCode t) localSignature
         let allowableGps = fixedMethodGps
         fix, allowableGps, allowableGcs
 
+    let usedNames = ref Set.empty
+    let rec compiledName name i =
+        let compName = if i = 0 then name else sprintf "%s%i" name i 
+        if !usedNames |> Set.contains compName then
+            compiledName name (i+1)
+        else 
+            usedNames := !usedNames |> Set.add compName
+            compName
+
     let typeExtensionCode typeImports isMemberDefined typesByKey ns signature fixedGps members =
         let fixedGpsSet = set fixedGps
+
         let membersCode =
             members |> Seq.choose (fun (TypeRef(_, gps) as t, pn, s, el) ->
                 try
@@ -732,42 +830,46 @@ type %s ="""        (extractNamespaceCode t) localSignature
                     let fixGenericTypeParameters = 
                         TypeRef.map (fun x -> defaultArg (fixMap.TryFind x) x)
                     let fixAndResolve = 
-                        fixGenericTypeParameters >> resolveTypeRef typeImports typesByKey t fixedGpsSet
+                        fixGenericTypeParameters >> resolveTypeRef true typeImports typesByKey t fixedGpsSet
                     let fixedT = fixGenericTypeParameters t
                     let name, accessCode = 
-                        match pn with
-                        | None -> "Create", ""
-                        | Some pn -> Identifier.fromPropertyName pn
+                        match pn, el with
+                        | None, Index _ -> "Item", ""
+                        | None, _ -> "Invoke", ""
+                        | Some pn, _ -> Identifier.fromPropertyName pn
+                    let baseAccess, seedI =
+                        match s with
+                        | Static -> javaScriptTypeCode t, 0
+                        | NonStatic -> "{0}", 1
+                    let fullAccess = baseAccess + accessCode
                     let callCode =
-                        let baseAccess, seedI =
-                            match s with
-                            | Static -> javaScriptTypeCode t, 0
-                            | NonStatic -> "{0}", 1
                         match el with
-                        | Property _ -> baseAccess + accessCode
+                        | Property _ -> fullAccess
                         | Method(_, _, ps, _) -> 
                             let parameterCode =
                                 ps |> List.fold (fun (i, acc) -> function
                                     | Fixed v -> i, sprintf "\\\"%s\\\"" v :: acc
-                                    | Variable _ -> i + 1, sprintf "{%i}" i :: acc
+                                    | Variable(_,_,Required) -> i + 1, sprintf "{%i}" i :: acc
+                                    | Variable(_,_,Optional) -> i + 1, sprintf "{?%i}" i :: acc
                                     | InlineArray _ -> i + 1, sprintf "{%i...}" i :: acc) (seedI, [])
                                 |> snd |> List.rev |> String.concat ", "
-                            sprintf "%s%s(%s)" baseAccess accessCode parameterCode
+                            sprintf "%s(%s)" fullAccess parameterCode
                         | Index _ ->
-                            sprintf "%s[{%i}]" baseAccess seedI
-                    let memberSignature, key =
+                            sprintf "%s[{%i}]" fullAccess seedI
+                    let memberSignature, key, auxMemberSignature =
                         match el with
                         | Property r -> 
                             let fixedR = fixAndResolve r
                             let rCode = typeReferenceCode fixedR
                             sprintf "%s with get() : %s = failwith \"never\" and set (v : %s) : unit = failwith \"never\"" name rCode rCode,
-                            ("", Property fixedR)
+                            ("", Property fixedR), 
+                            None
                         | Method(methodGps, methodGcs, ps, r) ->
                             let partiallyFixedMethodGps, _, fixGenericNames = fixGenericParameters methodGps
                             let collisionFix = fixGenericNames >> collisionFix fixedGpsSet partiallyFixedMethodGps
                             let fixedMethodGps = methodGps |> List.map collisionFix
                             let allGps = set fixedMethodGps + fixedGpsSet
-                            let combinedFix = collisionFix >> fixGenericTypeParameters >> resolveTypeRef typeImports typesByKey t allGps
+                            let combinedFix = collisionFix >> fixGenericTypeParameters >> resolveTypeRef true typeImports typesByKey t allGps
                             let fixedGcs = methodGcs |> List.map (fun (x, y) -> combinedFix x, combinedFix y)
                             let allowableFix, fixedMethodGps, fixedGcs = 
                                 bugFixTypeExtensionGenericConstraint fixedGpsSet fixedMethodGps fixedGcs
@@ -781,27 +883,56 @@ type %s ="""        (extractNamespaceCode t) localSignature
                             let keyPs =
                                 fixedPs |> List.map (function
                                     | Fixed x -> Fixed x
-                                    | Variable(_, t) -> Variable("", t)
-                                    | InlineArray(_, t) -> Variable("", t))
-                            sprintf "%s%s%s(%s) : %s = failwith \"never\"" 
-                                name specialization genericDef parametersCode (typeReferenceCode fixedR),
-                            (specialization, Method(fixedMethodGps, fixedGcs, keyPs, fixedR))
+                                    | Variable(_, t, _) -> Variable("", t, Required)
+                                    | InlineArray(_, t) -> Variable("", t, Required))
+                            let specializedName = name + specialization
+                            let canHaveSetter = 
+                                let hasSpecialArgs =
+                                    fixedPs |> List.exists (function
+                                        | Fixed _ | InlineArray _ -> true
+                                        | Variable _ -> false)
+                                fixedPs.Length < 9 &&
+                                not hasSpecialArgs
+                            let auxMethod =
+                                if canHaveSetter then
+                                    let auxName = sprintf "``%s <-``" (specializedName.Trim [|'`'|])
+                                    let auxArgs = 
+                                        fixedPs |> List.map (function
+                                            | Variable(_, t, _) -> t
+                                            | _ -> failwith "never")
+                                    let paramT = TypeRef(["Func"; "System"], [yield! auxArgs; yield fixedR])
+                                    let paramCode = typeReferenceCode paramT
+                                    Some(sprintf "%s%s(func : %s) : unit = failwith \"never\"" auxName genericDef paramCode,
+                                         sprintf "%s = {%i}" fullAccess seedI)
+                                else None
+                            sprintf "%s%s(%s) : %s = failwith \"never\"" 
+                                specializedName genericDef parametersCode (typeReferenceCode fixedR),
+                            (specialization, Method(fixedMethodGps, fixedGcs, keyPs, fixedR)),
+                            auxMethod
                         | Index(p, r) ->
                             let fixedP = fixAndResolve p
                             let fixedR = fixAndResolve r
                             let pCode = typeReferenceCode fixedP
                             let rCode = typeReferenceCode fixedR
                             sprintf "%s with get(i : %s) : %s = failwith \"never\" and set (i : %s) (v : %s) : unit = failwith \"never\"" name pCode rCode pCode rCode,
-                            ("", Index(fixedP, fixedR))
+                            ("", Index(fixedP, fixedR)),
+                            None
                     if isMemberDefined (signature, pn, s, key) then None
                     else
+                        let compiledName = compiledName name 0
                         let root =
                             match s with
                             | Static -> "static member "
                             | NonStatic -> "member __."
-                        Some(sprintf """
-            [<FunScript.JSEmitInline("%s")>]
-            %s%s"""                 callCode root memberSignature )
+                        sprintf """
+            [<FunScript.JSEmitInline("%s"); CompiledName("%s")>]
+            %s%s"""                 callCode compiledName root memberSignature
+                        |> Option.foldBack (fun (auxSignature, auxCallCode) acc  ->
+                            sprintf """%s
+            [<FunScript.JSEmitInline("%s"); CompiledName("%sAux")>]
+            %s%s"""                 acc auxCallCode compiledName root auxSignature)
+                            auxMemberSignature
+                        |> Some
                 with ex ->
                     printfn "[ERROR] %s" ex.Message
                     None
@@ -891,6 +1022,24 @@ module Compiler =
         declarationModules |> List.topologicalSortBy 
             fst findModuleDependencies
 
+    let private findAndConvertDelegates hasPriorDefinition elementsByNameKey =
+        elementsByNameKey |> Seq.collect (fun (k, els) ->
+            match els with
+            | [Interface(_, [], []); Member(TypeRef(_,gps) as t, None, NonStatic, Method([], [], ps, r))]
+            | [Member(TypeRef(_,gps) as t, None, NonStatic, Method([], [], ps, r)); Interface(_, [], [])]
+                when ps |> List.forall (function Variable _ -> true | _ -> false) &&
+                        not (hasPriorDefinition  k) ->
+                let args = ps |> List.map (function Variable(_, t, _) -> t | _ -> failwith "never")
+                match Generate.typeRefToDelegateTypeKey t with
+                | Some dk ->
+                    [
+                        dk, [Delegate(TypeRef(fst dk, gps), args, r)]
+                        k, els
+                    ]
+                | None -> [k, els]
+            | _ -> [k, els]
+        )
+
     let generateTypes declarationFiles =
 
         let modules =
@@ -938,13 +1087,18 @@ module Compiler =
                     if isDefined then
                         printfn "[WARN] Ignoring a duplicate member table entry: %A." memberKey
                     isDefined
+                let dependencySigs =
+                    moduleDependencies |> List.map (fun n -> moduleTypes |> Map.find n)
+                let typesByKey = dependencySigs |> List.map (fun (x : Map<_,_>) -> x.ContainsKey)
                 let elementsByNameKey = 
                     xs |> Seq.groupBy (function
                         | Import _ -> None
+                        | Delegate(t, _, _)
                         | Interface(t, _, _) 
                         | Enum(t, _)
                         | Member(t, _, _, _) -> Some(Generate.typeRefToTypeKey t))
                     |> Seq.choose (fun (k, vs) -> k |> Option.map (fun k -> k, vs |> Seq.toList))
+                    |> findAndConvertDelegates (fun k -> typesByKey |> List.exists (fun f -> f k))
                     |> Map.ofSeq
                 let exportedTypeImports =
                     xs |> Seq.choose (function
@@ -957,9 +1111,6 @@ module Compiler =
                     exportedTypeImports ::
                     (moduleDependencies |> List.map (fun n -> typeImports |> Map.find n))
                 printfn "Generating type signatures for %s..." moduleName
-                let dependencySigs =
-                    moduleDependencies |> List.map (fun n -> moduleTypes |> Map.find n)
-                let typesByKey = dependencySigs |> List.map (fun (x : Map<_,_>) -> x.ContainsKey)
                 let declarationCode, sigs = 
                     Generate.typeDeclarationsAndSignatures elementsByNameKey allTypeImports typesByKey
                 printfn "Generating type extensions for %s..." moduleName

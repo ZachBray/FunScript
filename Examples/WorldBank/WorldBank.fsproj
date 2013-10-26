@@ -55,20 +55,32 @@
     <Compile Include="Page.fs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="FParsec">
+      <HintPath>..\..\FunScript.TypeScript\bin\Debug\FParsec.dll</HintPath>
+    </Reference>
+    <Reference Include="FParsecCS">
+      <HintPath>..\..\FunScript.TypeScript\bin\Debug\FParsecCS.dll</HintPath>
+    </Reference>
     <Reference Include="FSharp.Data">
       <HintPath>..\..\ThirdParty\FSharp.Data.dll</HintPath>
     </Reference>
     <Reference Include="FunScript">
-      <HintPath>..\..\FunScript.TypeScript\bin\Debug\FunScript.dll</HintPath>
+      <HintPath>..\..\FunScript\bin\Debug\FunScript.dll</HintPath>
     </Reference>
     <Reference Include="FunScript.Data">
       <HintPath>..\..\FunScript.Data\bin\Debug\FunScript.Data.dll</HintPath>
     </Reference>
-    <Reference Include="FunScript.TypeScript">
-      <HintPath>..\..\FunScript.TypeScript\bin\Debug\FunScript.TypeScript.dll</HintPath>
+    <Reference Include="FunScript.Interop">
+      <HintPath>..\..\FunScript\bin\Debug\FunScript.Interop.dll</HintPath>
     </Reference>
-    <Reference Include="FunScript.TypeScript.Interop">
-      <HintPath>..\..\FunScript.TypeScript\bin\Debug\FunScript.TypeScript.Interop.dll</HintPath>
+    <Reference Include="FunScript.TypeScript.Binding.highcharts">
+      <HintPath>..\Typings\FunScript.TypeScript.Binding.highcharts.dll</HintPath>
+    </Reference>
+    <Reference Include="FunScript.TypeScript.Binding.jquery">
+      <HintPath>..\Typings\FunScript.TypeScript.Binding.jquery.dll</HintPath>
+    </Reference>
+    <Reference Include="FunScript.TypeScript.Binding.lib">
+      <HintPath>..\Typings\FunScript.TypeScript.Binding.lib.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

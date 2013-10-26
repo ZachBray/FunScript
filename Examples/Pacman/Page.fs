@@ -19,9 +19,6 @@ the dots on the board before the monsters eat him?
 module Program
 
 open FunScript
-open FunScript.TypeScript
-
-type ts = Api<"../Typings/lib.d.ts">
 
 let cyand = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAiUlEQVQoU8WSURKAIAhE8Sh6Fc/tVfQoJdqiMDTVV4wfufAAmw3kxEHUz4pA1I8OJVjAKZZ6+XiC0ATTB/gW2mEFtlpHLqaktrQ6TxUQSRCAPX2AWPMLyM0VmPOcV8palxt6uoAMpDjfWJt+o6cr0DPDnfYjyL94NwIcYjXcR/FuYklcxrZ3OO0Ep4dJ/3dR5jcAAAAASUVORK5CYII="
 let oranged = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAgklEQVQoU8WS0RGAIAxDZRRYhblZBUZBsBSaUk/9kj9CXlru4g7r1FxBdsFpGwoa2NwrYIFPEIeM6QS+hQQMYC70EjzuuOlt6gT5kRGGTf0Cx5qfwJYOYIw0L6W1bg+09Al2wAcCS8Y/WjqAZhluxD/B3ghZBO6n1sadzLLEbNSg8pzXIVLvbNvPwAAAAABJRU5ErkJggg=="
@@ -57,10 +54,9 @@ arrays in the following section, so that the game is stand-alone and easily port
 
 // Create image using the specified data
 let createImage data =
-  let img = ts.document.createElement("image")
-  let image = unbox<ts.HTMLImageElement>(img)   
-  image.src <- data
-  unbox<ts.HTMLElement>(image)
+  let img = Globals.document.createElement_img()
+  img.src <- data
+  img
 
 // Define the structure of the maze using ASCII
 let maze = ("\
@@ -164,7 +160,7 @@ let draw f (lines:int[]) =
       if pattern <> 0 then f (x,y)
   )
 
-let createBrush (context:ts.CanvasRenderingContext2D) (r,g,b,a) =
+let createBrush (context:CanvasRenderingContext2D) (r,g,b,a) =
   let id = context.createImageData(float 1,float 1)
   let d = id.data
   d.[0] <- float r; d.[1] <- float g
@@ -172,11 +168,10 @@ let createBrush (context:ts.CanvasRenderingContext2D) (r,g,b,a) =
   id
 
 let createBackground () =
-  let canv = ts.document.createElement("canvas")
-  let background = unbox<ts.HTMLCanvasElement>(canv)   
+  let background = Globals.document.createElement_canvas() 
   background.width <- 256.
   background.height <- 256.  
-  let context = background.getContext("2d")
+  let context = background.getContext_2d()
   context.fillStyle <- "rgb(0,0,0)"
   context.fillRect (0., 0. , 256., 256.);
   let blue = createBrush context (63,63,255,255)
@@ -192,16 +187,15 @@ let createBackground () =
         context.putImageData
           (brush, float (x*8 + x'), float (y*8 + y'))
       draw f tile
-  unbox<ts.HTMLElement>(background)
+  background
 
 let countDots () =
   maze |> Array.sumBy (fun line -> 
     line.ToCharArray() 
     |> Array.sumBy (function '.' -> 1 | 'o' -> 1 | _ -> 0))
 
-let clearCell background (x,y) =
-  let background = unbox<ts.HTMLCanvasElement>(background)
-  let context = background.getContext("2d")
+let clearCell (background : HTMLCanvasElement) (x,y) =
+  let context = background.getContext_2d()
   context.fillStyle <- "rgb(0,0,0)"
   context.fillRect (float (x*8), float (y*8), 8., 8.);
 
@@ -216,7 +210,7 @@ let wrap (x,y) (dx,dy) =
     else x
   x + dx, y + dy
 
-type Ghost(image:ts.HTMLElement,x,y,v) =
+type Ghost(image:HTMLImageElement,x,y,v) =
   let mutable x' = x
   let mutable y' = y
   let mutable v' = v
@@ -276,8 +270,8 @@ let route_home =
   numbers
 
 let fillValue (x,y) (ex,ey) =
-  let bx = int (ts.Math.floor(float ((x+6+ex)/8)))
-  let by = int (ts.Math.floor(float ((y+6+ey)/8)))
+  let bx = int (Globals.Math.floor(float ((x+6+ex)/8)))
+  let by = int (Globals.Math.floor(float ((y+6+ey)/8)))
   route_home.[by].[bx]
 
 let fillUp (x,y) = fillValue (x,y) (0,-4)
@@ -309,8 +303,10 @@ let chooseDirection (ghost:Ghost) =
       |> Array.map fst
       |> Array.filter (not << isBackwards)
       |> fun xs ->
-        let i = ts.Math.random() * float xs.Length
-        xs.[int (ts.Math.floor i)]
+        if xs.Length = 0 then 0, 0
+        else
+            let i = Globals.Math.random() * float xs.Length
+            xs.[int (Globals.Math.floor i)]
   dx,dy
 
 (** 
@@ -321,8 +317,7 @@ type Keys() =
   let mutable keysPressed = Set.empty
   member keys.Reset () = keysPressed <- Set.empty
   member keys.IsPressed keyCode = Set.contains keyCode keysPressed
-  member keys.Update (e,pressed) =
-    let e = (unbox<ts.KeyboardEventExtensions>(e))
+  member keys.Update (e : KeyboardEvent, pressed) =
     let keyCode = int e.keyCode
     let op =  if pressed then Set.add else Set.remove
     keysPressed <- op keyCode keysPressed
@@ -345,8 +340,8 @@ type Pacman () =
       |  0, -1 -> pu1, pu2
       |  0,  1 -> pd1, pd2
       |  _,  _ -> !lastp, !lastp
-    let x' = int (ts.Math.floor(float (!x/6)))
-    let y' = int (ts.Math.floor(float (!y/6)))
+    let x' = int (Globals.Math.floor(float (!x/6)))
+    let y' = int (Globals.Math.floor(float (!y/6)))
     let p = if (x' + y') % 2 = 0 then p1 else p2
     lastp := p
     p
@@ -364,11 +359,10 @@ let playLevel (keys:Keys, onLevelCompleted, onGameOver) =
     line.ToCharArray() 
     |> Array.map (fun c -> c))
 
-  let canv = ts.document.getElementById("canvas")
-  let canvas = unbox<ts.HTMLCanvasElement>(canv)
+  let canvas = Globals.document.getElementsByTagName_canvas().[0]
   canvas.width <- 256.
   canvas.height <- 256.  
-  let context = canvas.getContext("2d")
+  let context = canvas.getContext_2d()
   context.fillStyle <- "rgb(0,0,0)"
   context.fillRect (0., 0. , 256., 256.);
   let bonusImages = 
@@ -424,8 +418,8 @@ let playLevel (keys:Keys, onLevelCompleted, onGameOver) =
     y := y'
 
   let eatPills () =
-    let tx = int (ts.Math.floor(float ((!x+6)/8)))
-    let ty = int (ts.Math.floor(float ((!y+6)/8)))     
+    let tx = int (Globals.Math.floor(float ((!x+6)/8)))
+    let ty = int (Globals.Math.floor(float ((!y+6)/8)))     
     let c = pills.[ty].[tx]
     if c = '.' then
       pills.[ty].[tx] <- ' '
@@ -461,7 +455,7 @@ let playLevel (keys:Keys, onLevelCompleted, onGameOver) =
           if not ghost.IsReturning then
             sound "EatGhost.wav"
             ghost.IsReturning <- true
-            let added = int (ts.Math.pow(2.,float !bonus))
+            let added = int (Globals.Math.pow(2.,float !bonus))
             score := !score + added * 200 
             let image = bonusImages.[!bonus]
             bonuses := (100, (image, ghost.X, ghost.Y)) :: !bonuses
@@ -533,7 +527,7 @@ let playLevel (keys:Keys, onLevelCompleted, onGameOver) =
     render ()
     if !dotsLeft = 0 then onLevelCompleted()
     elif !energy <= 0 then onGameOver()
-    else ts.setTimeout(update, 1000. / 60.) |> ignore
+    else Globals.setTimeout(update, 1000. / 60.) |> ignore
 
   update()
 
@@ -543,42 +537,39 @@ let playLevel (keys:Keys, onLevelCompleted, onGameOver) =
 
 let rec game (keys:Keys) =
   keys.Reset()
-  let canv = ts.document.getElementById("canvas")
-  let canvas = unbox<ts.HTMLCanvasElement>(canv)
-  let context = canvas.getContext("2d")
+  let canvas = Globals.document.getElementsByTagName_canvas().[0]
+  let context = canvas.getContext_2d()
   let drawText(text,x,y) =
     context.fillStyle <- "white"
     context.font <- "bold 8px";
     context.fillText(text, x, y)
   let levelCompleted () =
     drawText("COMPLETED",96.,96.)
-    ts.setTimeout((fun () -> game(keys)),5000.) |> ignore 
+    Globals.setTimeout((fun () -> game(keys)),5000.) |> ignore 
   let gameOver () =
     drawText("GAME OVER",96.,96.)
-    ts.setTimeout((fun () -> game(keys)),5000.) |> ignore
+    Globals.setTimeout((fun () -> game(keys)),5000.) |> ignore
   let start () =
     let background = createBackground()
     context.drawImage(background, 0., 0.)
     context.fillStyle <- "white"
     context.font <- "bold 8px";
     drawText("CLICK TO START", 88., 96.)
-    canvas.AsHTMLElement().onclick <- (fun e -> 
-      canvas.AsHTMLElement().onclick <- null
+    canvas.onclick <- (fun e -> 
+      canvas.onclick <- null
       playLevel (keys, levelCompleted, gameOver)
       box true
     )
 
-  let canv = ts.document.getElementById("canvas")
-  let canvas = unbox<ts.HTMLCanvasElement>(canv)
+  let canvas = Globals.document.getElementsByTagName_canvas().[0]
   canvas.width <- 256.
   canvas.height <- 256.  
   start()
   
 let main () =
   let keys = Keys()
-  let listener (f:obj -> unit) = unbox<ts.EventListener> f
-  ts.addEventListener("keydown", listener (fun e -> keys.Update(e, true)))
-  ts.addEventListener("keyup", listener (fun e -> keys.Update(e, false)))  
+  Globals.addEventListener_keydown(fun e -> keys.Update(e, true); null)
+  Globals.addEventListener_keyup(fun e -> keys.Update(e, false); null)
   game (keys)  
 
-do Runtime.Run(directory="Web", components=Interop.Components.all)
+do Runtime.Run(directory="Web")

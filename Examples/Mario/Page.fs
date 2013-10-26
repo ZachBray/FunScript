@@ -14,10 +14,6 @@
 module Program
 
 open FunScript
-open FunScript.TypeScript
-
-/// Use the type script type provider to import core JavaScript libraries
-type ts = Api<"../Typings/lib.d.ts">
 
 /// Handles keydown and keyup events of the window and exposes them
 /// using the 'arrows' property (which is a tuple int*int with -1 if the
@@ -26,38 +22,36 @@ module Keyboard =
   let mutable keysPressed = Set.empty
   let code x = if keysPressed.Contains(x) then 1 else 0
   let arrows () = (code 39 - code 37, code 38 - code 40)
-  let update (e,pressed) =
-      let e = (unbox<ts.KeyboardEventExtensions>(e))
+  let update (e : KeyboardEvent, pressed) =
       let keyCode = int e.keyCode
       let op =  if pressed then Set.add else Set.remove
       keysPressed <- op keyCode keysPressed
   let init () =
-      ts.addEventListener("keydown", unbox<ts.EventListener>(fun e -> update(e, true)))
-      ts.addEventListener("keyup", unbox<ts.EventListener>(fun e -> update(e,false)))    
+      Globals.addEventListener_keydown(fun e -> update(e, true); null)
+      Globals.addEventListener_keyup(fun e -> update(e, false); null)  
 
 /// Basic functionality for creating and rendering window using HTML canvas
 /// (the functions here fill the window, set position of image and create image)
 module Window =
-  let canvas () = unbox<ts.HTMLCanvasElement>(ts.document.getElementById("canvas"))
-  let context () = canvas().getContext("2d")
+  let canvas = lazy Globals.document.getElementsByTagName_canvas().[0]
+  let context = lazy canvas.Value.getContext_2d()
 
   let ($) s n = s + n.ToString()
   let rgb r g b = "rgb(" $ r $ "," $ g $ "," $ b $ ")"
 
   let filled color rect =
-      let ctx = context()   
+      let ctx = context.Value  
       ctx.fillStyle <- color
       ctx.fillRect rect    
 
-  let position (x,y) img =
-      let img = unbox<ts.HTMLElement>(img)
-      img.style.posLeft <- x
-      img.style.posTop <- canvas().AsHTMLElement().offsetTop + y
+  let position (x,y) (img : HTMLImageElement) =
+      img.style.left <- x.ToString() + "px"
+      img.style.top <- (canvas.Value.offsetTop + y).ToString() + "px"
 
-  let dimensions () = canvas().width, canvas().height
+  let dimensions () = canvas.Value.width, canvas.Value.height
 
   let image (src:string) = 
-      let image = unbox<ts.HTMLImageElement>(ts.document.getElementById("image"))
+      let image = Globals.document.getElementsByTagName_img().[0]
       if image.src.IndexOf(src) = -1 then image.src <- src
       image
 
@@ -154,10 +148,10 @@ let main() =
   let rec update mario () =
       let mario = mario |> step (Keyboard.arrows())
       render (w,h) mario      
-      ts.setTimeout(update mario, 1000. / 60.) |> ignore
+      Globals.setTimeout(update mario, 1000. / 60.) |> ignore
   // Start the game with Mario in the center
   let mario = { x=0.; y=0.; vx=0.; vy=0.; dir="right" }
-  update mario
+  update mario ()
    
 (*** hide ***)
-do FunScript.Runtime.Run(directory="Web", components=FunScript.Interop.Components.all)
+do FunScript.Runtime.Run(directory="Web")
