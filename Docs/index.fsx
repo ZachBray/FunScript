@@ -16,7 +16,8 @@ open FunScript
 
 // Access standard JavaScript libraries in a type-safe way.
 // Generate strongly-typed interfaces from TypeScript 0.9.x 
-// definitions files.
+// definitions files or use any of the 280+ pre-built library
+// mappings (hosted on NuGet).
 #I "../Examples/Typings/"
 #r "FunScript.TypeScript.Binding.lib.dll"
 #r "FunScript.TypeScript.Binding.jquery.dll"
