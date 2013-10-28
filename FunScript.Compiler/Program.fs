@@ -58,5 +58,5 @@ let main argv =
         ArgParser.Usage(args, usage = usageText)
     else
         // need to give more control of the components?
-        compile !assemPath !outPath Interop.Components.all
+        compile !assemPath !outPath []//Interop.Components.all
     0

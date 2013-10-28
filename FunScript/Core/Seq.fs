@@ -106,12 +106,12 @@ let Unfold f seed =
 
 let Append xs ys =
    Delay <| fun () ->
-      let enums = Enumerator xs, Enumerator ys
+      let enums = lazy Enumerator xs, lazy Enumerator ys
       enums |> Unfold (function
-         | (curr, next) as enums when curr.MoveNext() ->
-            Some (curr.Current, enums)
-         | (curr, next) when next.MoveNext() ->
-            Some (next.Current, (next, curr))
+         | (curr, next) as enums when curr.Value.MoveNext() ->
+            Some (curr.Value.Current, enums)
+         | (curr, next) when next.Value.MoveNext() ->
+            Some (next.Value.Current, (next, curr))
          | _ -> None)
 
 let Skip n xs =

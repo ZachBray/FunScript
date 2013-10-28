@@ -32,6 +32,9 @@
     <DocumentationFile>bin\Release\FunScript.BrowserAPI.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FunScript.Interop">
+      <HintPath>..\FunScript\bin\Debug\FunScript.Interop.dll</HintPath>
+    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="System" />

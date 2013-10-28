@@ -30,6 +30,22 @@ let ``yield from in seq expressions works``() =
       @@>
 
 [<Test>]
+let ``infinite seq expressions work``() =
+   check  
+      <@@ 
+        let rec green () = seq { 
+            yield "green"
+            yield! yellow() }
+        and yellow () = seq { 
+            yield "yellow"
+            yield! red() }
+        and red () = seq { 
+            yield "red" 
+            yield! green() }
+        green() |> Seq.nth 12
+      @@>
+
+[<Test>]
 let ``combine in seq expressions works``() =
    check  
       <@@ 
