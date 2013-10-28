@@ -93,13 +93,21 @@ let orElse f = function
 let private createEmitInlineExpr (|Split|) (emit : JSEmitInlineAttribute) exprs =
     let isOptionalParam i =
         emit.Emit.Contains (sprintf "{?%i}" i)
+    let isArrayParam i =
+        emit.Emit.Contains (sprintf "{%i...}" i) &&
+        not(emit.Emit.Contains (sprintf "{%i" (i+1))) &&
+        not(emit.Emit.Contains (sprintf "{?%i" (i+1)))
     let decls, refs =
         exprs |> List.mapi (fun i ->
             function
-            | OptionPattern None when isOptionalParam i -> None
-            | OptionPattern(Some(Split(decls, ref))) when isOptionalParam i -> Some(decls, (i, ref))
-            | Split(decls, ref) -> Some(decls, (i, ref)))
-        |> List.choose id
+            | OptionPattern None when isOptionalParam i -> []
+            | OptionPattern(Some(Split(decls, ref))) when isOptionalParam i -> [decls, (i, ref)]
+            | Patterns.NewArray(_, exprs) when isArrayParam i ->
+                // Note: Assuming that this is the last parameter
+                exprs |> List.mapi (fun j (Split(decls, ref)) ->
+                    decls, ((i+j), ref))
+            | Split(decls, ref) -> [decls, (i, ref)])
+        |> List.concat
         |> List.toArray
         |> Array.unzip
     let refMap = refs |> Map.ofArray
