@@ -114,11 +114,10 @@ let main() =
 
   // Render the chart based on checkboxes
   let render () = async {
+    // Create a line chart
     let opts = createEmpty<HighchartsOptions>()
-    let title = "School enrollment, tertiary (% gross)"
-    // Create a line chart in div element with id 'chart'
     let titleOptions = createEmpty<HighchartsTitleOptions>()
-    titleOptions.text <- title
+    titleOptions.text <- "School enrollment, tertiary (% gross)"
     opts.title <- titleOptions
     let subTitleOptions = createEmpty<HighchartsSubtitleOptions>()
     subTitleOptions.text <- "Source: WorldBank"

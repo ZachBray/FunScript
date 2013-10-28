@@ -1,59 +1,83 @@
----
-header: FunScript
-tagline: F# to JavaScript with type providers
----
+//---
+//header: FunScript
+//tagline: F# to JavaScript with type providers
+//---
 
-    [hide]
-    open FSharp.Data
-    open FunScript
-    open FunScript.TypeScript
-    
-    type System.Array with
-      member x.push(element:obj) = ()
-
+(**
 <div class="row"><div class="large-7 columns" id="hp-snippet">
+*)
 
-    // Access standard JavaScript libraries in a type-safe way
-    type j = Api<"../../Examples/Typings/jquery.d.ts">
-    type h = Api<"../../Examples/Typings/highcharts.d.ts">
+// Allow access to the F# AST
+[<ReflectedDefinition>]
+module Sample
 
-    // Integrate REST APIs with F# 3.0 type providers
-    type WorldBank = WorldBankDataProvider<Asynchronous=true>
-    let data = WorldBank.GetDataContext()
+open FSharp.Data
+open FunScript
 
-    // Get full type checking for external data sources!
-    let countries = 
-      [ data.Countries.Denmark
-        data.Countries.``Czech Republic``
-        data.Countries.``United Kingdom``
-        data.Countries.``United States`` ]
+// Access standard JavaScript libraries in a type-safe way.
+// Generate strongly-typed interfaces from TypeScript 0.9.x 
+// definitions files.
+#I "../Examples/Typings/"
+#r "FunScript.TypeScript.Binding.lib.dll"
+#r "FunScript.TypeScript.Binding.jquery.dll"
+#r "FunScript.TypeScript.Binding.highcharts.dll"
 
-    // Write asynchronous computations without callbacks
-    let render () = async {
-      let chart = h.HighchartsOptions((*[omit:(...)]*)chart = h.HighchartsChartOptions(renderTo = "chart", ``type`` = "line"), title = h.HighchartsTitleOptions(text = "University enrollment"), series = [| |] (*[/omit]*))
-      for country in countries do
+// Integrate REST APIs with F# 3.0 type providers
+type WorldBank = WorldBankDataProvider<Asynchronous=true>
+let data = WorldBank.GetDataContext()
 
-        // Access data sets in a statically typed way
-        let data = country.Indicators
-        let! l = data.``School enrollment, tertiary (% gross)``
+// Get full type checking for external data sources!
+let countries = 
+  [ data.Countries.Denmark
+    data.Countries.``Czech Republic``
+    data.Countries.``United Kingdom``
+    data.Countries.``United States`` ]
 
-        // Add line series to the chart
-        h.HighchartsSeriesOptions(data=l, name=country.Name)
-        |> chart.series.push }
+// Easily define strongly-typed Foreign Function Interfaces
+// (FFIs) to access unmapped functions
+[<JSEmitInlineAttribute("({0} * 1.0)")>]
+let number(x : int) : float = failwith "never"
 
+// Write asynchronous computations without callbacks
+let render () = async {
+  let chart = createEmpty<HighchartsOptions>()
+  chart.series <- [| |]
+  for country in countries do
+
+    // Access data sets in a statically typed way
+    let data = country.Indicators
+    let! l = data.``School enrollment, tertiary (% gross)``
+
+    // Add line series to the chart
+    let seriesOpts = createEmpty<HighchartsSeriesOptions>()
+    seriesOpts.name <- country.Name
+    seriesOpts.data <- 
+        [| for t, y in l -> [| number t; y |] :> obj |]
+
+    // Use a standard library function 
+    // through ...Binding.lib.dll
+    chart.series.push seriesOpts |> ignore 
+}
+
+(*** hide ***)
+#r "../ThirdParty/FSharp.Data.dll"
+#r "../FunScript/bin/Debug/FunScript.dll"
+#r "../FunScript.Interop/bin/Debug/FunScript.Interop.dll"
+
+(**
 
   <div class="row"><div class="large-6 columns">
 
 ### Contributions
 
-FunScript is open-source and has been created by F# experts and active community contributors.
+FunScript is open-source and created by F# experts and active community contributors.
 
  - Zach Bray ([@zbray](https://twitter.com/zbray))
  - Tomas Petricek ([@tomaspetricek](https://twitter.com/tomaspetricek))
  - Robert Pickering ([@robertpi](http://twitter.com/robertpi))
  - James Freiwirth ([@endeavour](https://github.com/endeavour))
 
-Help us make [improve FunScript](contribute.html)!
+Help us [improve FunScript](contribute.html)!
 
   </div><div class="large-6 columns">
 
@@ -83,9 +107,9 @@ asynchronous computations easily without explicit callbacks.
 
 ## What do you get
 
- * Write **client-side code in F#** with the full comfort of MonoDevelop, Visual Studio, Vim or Emacs 
+ * Write **client-side code in F#** with the full comfort of MonoDevelop, Visual Studio, [TsunamiIDE](http://tsunami.io/) Vim or Emacs 
  * Get **autocomplete and tooltips** for the HTML DOM, jQuery and other popular JavaScript libraries
- * Use language with **generics** and support for **asynchronous** programming 
+ * Use language with **generics**, **reflection** and support for **asynchronous** programming 
  * Process JSON and call REST APIs using F# 3.0 type providers with no hassle!
 
 ## FunScript on Channel 9
@@ -102,3 +126,4 @@ and connect to [The Movie Database](http://www.themoviedb.org/).
 
 </div>
 </div>
+*)

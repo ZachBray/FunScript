@@ -82,11 +82,19 @@ let funScriptRoot = source ++ "../"   // Root with FunScript projects
 
 let funScriptFiles = [
    funScriptRoot ++ "FunScript/bin/Debug/FunScript.dll"
-   funScriptRoot ++ "FunScript.TypeScript.Interop/bin/Debug/FunScript.TypeScript.Interop.dll"
-   funScriptRoot ++ "FunScript.TypeScript/bin/Debug/FunScript.TypeScript.dll"
+   funScriptRoot ++ "FunScript.Interop/bin/Debug/FunScript.Interop.dll"
+   funScriptRoot ++ "FunScript.BrowserAPI/bin/Debug/FunScript.BrowserAPI.dll"
    funScriptRoot ++ "ThirdParty/FSharp.Data.dll"
    funScriptRoot ++ "ThirdParty/FSharp.Data.Experimental.dll"
    funScriptRoot ++ "FunScript.Data/bin/Debug/FunScript.Data.dll"
+]
+
+let funscriptTypingFiles = [
+    funScriptRoot ++ "Examples/Typings/FunScript.TypeScript.Binding.lib.dll"
+    funScriptRoot ++ "Examples/Typings/FunScript.TypeScript.Binding.jquery.dll"
+    funScriptRoot ++ "Examples/Typings/FunScript.TypeScript.Binding.jqueryui.dll"
+    funScriptRoot ++ "Examples/Typings/FunScript.TypeScript.Binding.highcharts.dll"
+    funScriptRoot ++ "Examples/Typings/FunScript.TypeScript.Binding.google_maps.dll"
 ]
 
 let createDownloadZip() =
@@ -99,7 +107,8 @@ let createDownloadZip() =
 
 /// Command line options needed when type-checking sample FunScript projects
 let funScriptReferences = 
-   funScriptFiles |> Seq.map (sprintf "-r:\"%s\"") |> String.concat " "
+   funScriptFiles |> Seq.append funscriptTypingFiles 
+   |> Seq.map (sprintf "-r:\"%s\"") |> String.concat " "
 
 let pageTemplate = source ++ "template" ++ "page-template.html"     // General page template
 let sampleTemplate = source ++ "template" ++ "sample-template.html" // Sample with live preview
@@ -152,6 +161,19 @@ let generateDocs () =
         replacements = [ "root", root ] @ headers)
     File.Delete(tempInputDoc)
 
+  // Process all script files in the source directory
+  for doc in Directory.GetFiles(source, "*.fsx") do
+    if Path.GetFileNameWithoutExtension doc <> "build" then
+        printfn " - processing page: %s" (Path.GetFileName(doc))
+        let headers, tempInputDoc = getTempFileAndHeader doc
+        Literate.ProcessScriptFile
+          ( tempInputDoc, pageTemplate, outputPath ++ (Path.GetFileNameWithoutExtension(doc) + ".html"),
+            lineNumbers = false, compilerOptions = funScriptReferences, 
+            replacements = [ "root", root ] @ headers)
+        File.Delete(tempInputDoc)
+
+  generateCode ()
+
   // Generate HTML for all listed samples 
   for name, sampleSource, webDir in samples do
     printfn " - processing sample: %s" name
@@ -186,5 +208,5 @@ let generateDocs () =
 // --------------------------------------------------------------------------------------
 // Run me :-)
 // --------------------------------------------------------------------------------------
-generateCode ()
+
 generateDocs ()
