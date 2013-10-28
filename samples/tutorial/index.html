@@ -99,15 +99,13 @@ attribute (an alias for <code>ReflectedDefinition</code>):</p>
 <span class="l">2: </span>
 <span class="l">3: </span>
 <span class="l">4: </span>
-<span class="l">5: </span>
 </pre>
 </td>
 <td class="snippet"><pre class="fssnip">
 [&lt;<span onmouseout="hideTip(event, 'fs1', 1)" onmouseover="showTip(event, 'fs1', 1)" class="i">FunScript</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs2', 2)" onmouseover="showTip(event, 'fs2', 2)" class="i">JS</span>&gt;]
 <span class="k">module</span> <span onmouseout="hideTip(event, 'fs3', 3)" onmouseover="showTip(event, 'fs3', 3)" class="i">Page</span>
 
-<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 4)" onmouseover="showTip(event, 'fs1', 4)" class="i">FunScript</span>
-<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 5)" onmouseover="showTip(event, 'fs1', 5)" class="i">FunScript</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs4', 6)" onmouseover="showTip(event, 'fs4', 6)" class="i">TypeScript</span></pre>
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 4)" onmouseover="showTip(event, 'fs1', 4)" class="i">FunScript</span></pre>
 </td>
 </tr>
 </table><p>The <code>FunScript.TypeScript</code> namespace contains the TypeScript provider, which is 
@@ -120,27 +118,12 @@ with types. It uses <em>definition files</em> (<code>*.d.ts</code>) to specify t
 JavaScript libraries. FunScript can import information from TypeScript definition files 
 and generate F# types for accessing the DOM and calling external JavaScript libraries.</p>
 
-<p>The following two lines import definitions for <a href="https://github.com/ZachBray/FunScript/blob/master/Examples/Typings/jquery.d.ts">jQuery</a>
-and <a href="https://github.com/ZachBray/FunScript/blob/master/Examples/Typings/lib.d.ts">JavaScript DOM</a> 
-from TypeScript:</p>
-<table class="pre"><tr><td class="lines"><pre class="fssnip">
-<span class="l">1: </span>
-<span class="l">2: </span>
-</pre>
-</td>
-<td class="snippet"><pre class="fssnip">
-<span class="k">type</span> <span onmouseout="hideTip(event, 'fs5', 7)" onmouseover="showTip(event, 'fs5', 7)" class="i">j</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs6', 8)" onmouseover="showTip(event, 'fs6', 8)" class="i">Api</span><span class="o">&lt;</span><span class="s">&quot;</span><span class="s">.</span><span class="s">.</span><span class="s">/</span><span class="s">Typings</span><span class="s">/</span><span class="s">jquery</span><span class="s">.</span><span class="s">d</span><span class="s">.</span><span class="s">ts</span><span class="s">&quot;</span><span class="o">&gt;</span>
-<span class="k">type</span> <span onmouseout="hideTip(event, 'fs7', 9)" onmouseover="showTip(event, 'fs7', 9)" class="i">lib</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs6', 10)" onmouseover="showTip(event, 'fs6', 10)" class="i">Api</span><span class="o">&lt;</span><span class="s">&quot;</span><span class="s">.</span><span class="s">.</span><span class="s">/</span><span class="s">Typings</span><span class="s">/</span><span class="s">lib</span><span class="s">.</span><span class="s">d</span><span class="s">.</span><span class="s">ts</span><span class="s">&quot;</span><span class="o">&gt;</span></pre>
-</td>
-</tr>
-</table><p>The generated types <code>j</code> and <code>lib</code> enclose all functionality that is documented by
-the Type Script definition file including nested types, global variables and functions.</p>
-
+<p>In this file we have imported definitions for jQuery and the JavaScript DOM.</p>
 <h2>Hello World</h2>
 
-<p>Let's now use the <code>lib</code> type to write a typical Hello world sample.
+<p>Let's now write a typical Hello world sample.
 The global <code>window</code> object available in the browser can be accessed 
-using <code>lib.window</code>. When you type <code>lib.window.</code> in F#, you will get an autocomplete
+using <code>Globals.window</code>. When you type <code>Globals.window.</code> in F#, you will get an autocomplete
 suggestion including the <code>alert</code> function:</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip">
 <span class="l">1: </span>
@@ -148,8 +131,8 @@ suggestion including the <code>alert</code> function:</p>
 </pre>
 </td>
 <td class="snippet"><pre class="fssnip">
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs8', 11)" onmouseover="showTip(event, 'fs8', 11)" class="i">hello</span> () <span class="o">=</span> 
-  <span onmouseout="hideTip(event, 'fs7', 12)" onmouseover="showTip(event, 'fs7', 12)" class="i">lib</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs9', 13)" onmouseover="showTip(event, 'fs9', 13)" class="i">window</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs10', 14)" onmouseover="showTip(event, 'fs10', 14)" class="i">alert</span>(<span class="s">&quot;</span><span class="s">Hello</span><span class="s"> </span><span class="s">world</span><span class="s">!</span><span class="s">&quot;</span>)</pre>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs4', 5)" onmouseover="showTip(event, 'fs4', 5)" class="i">hello</span> () <span class="o">=</span>
+  <span onmouseout="hideTip(event, 'fs5', 6)" onmouseover="showTip(event, 'fs5', 6)" class="i">Globals</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs6', 7)" onmouseover="showTip(event, 'fs6', 7)" class="i">window</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 8)" onmouseover="showTip(event, 'fs7', 8)" class="i">alert</span>(<span class="s">&quot;</span><span class="s">Hello</span><span class="s"> </span><span class="s">world</span><span class="s">!</span><span class="s">&quot;</span>)</pre>
 </td>
 </tr>
 </table><p>This snippet defines a function <code>hello</code> that can be translated to JavaScript 
@@ -161,9 +144,9 @@ You can use any JavaScript library as long as there is a TypeScript definition
 for it (the <a href="https://github.com/borisyankov/DefinitelyTyped">Definitely Typed</a> 
 contains a number of them).</p>
 
-<p>The <code>$("...")</code> command known from jQuery can be invoked by typing <code>j.jQuery.Invoke("...")</code>.
+<p>The <code>$("...")</code> command known from jQuery can be invoked by typing <code>Globals.Dollar.Invoke("...")</code>.
 To simplify the access to elements by ID, we can define the F# <em>dynamic operator</em>
-and write just <code>j.jQuery?helloWorld</code> instead of <code>j.jQuery.Invoke("#helloWorld")</code>. The
+and write just <code>jq?helloWorld</code> instead of <code>Globals.Dollar.Invoke("#helloWorld")</code>. The
 following snippet gives the necessary definitions:</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip">
 <span class="l">1: </span>
@@ -172,9 +155,9 @@ following snippet gives the necessary definitions:</p>
 </pre>
 </td>
 <td class="snippet"><pre class="fssnip">
-<span class="c">// Allows writing j.jQuery?name for element access</span>
-<span class="k">let</span> (<span class="o">?</span>) (<span onmouseout="hideTip(event, 'fs11', 15)" onmouseover="showTip(event, 'fs11', 15)" class="i">jq</span><span class="o">:</span><span onmouseout="hideTip(event, 'fs5', 16)" onmouseover="showTip(event, 'fs5', 16)" class="i">j</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 17)" onmouseover="showTip(event, 'fs12', 17)" class="i">JQueryStatic</span>) <span onmouseout="hideTip(event, 'fs13', 18)" onmouseover="showTip(event, 'fs13', 18)" class="i">name</span> <span class="o">=</span> 
-  <span onmouseout="hideTip(event, 'fs11', 19)" onmouseover="showTip(event, 'fs11', 19)" class="i">jq</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs14', 20)" onmouseover="showTip(event, 'fs14', 20)" class="i">Invoke</span>(<span class="s">&quot;</span><span class="s">#</span><span class="s">&quot;</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs13', 21)" onmouseover="showTip(event, 'fs13', 21)" class="i">name</span>)</pre>
+<span class="c">// Allows writing jq?name for element access</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs8', 9)" onmouseover="showTip(event, 'fs8', 9)" class="i">jq</span>(<span onmouseout="hideTip(event, 'fs9', 10)" onmouseover="showTip(event, 'fs9', 10)" class="i">selector</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs10', 11)" onmouseover="showTip(event, 'fs10', 11)" class="i">string</span>) <span class="o">=</span> <span onmouseout="hideTip(event, 'fs5', 12)" onmouseover="showTip(event, 'fs5', 12)" class="i">Globals</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 13)" onmouseover="showTip(event, 'fs11', 13)" class="i">Dollar</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 14)" onmouseover="showTip(event, 'fs12', 14)" class="i">Invoke</span> <span onmouseout="hideTip(event, 'fs9', 15)" onmouseover="showTip(event, 'fs9', 15)" class="i">selector</span>
+<span class="k">let</span> (<span class="o">?</span>) <span onmouseout="hideTip(event, 'fs13', 16)" onmouseover="showTip(event, 'fs13', 16)" class="i">jq</span> <span onmouseout="hideTip(event, 'fs14', 17)" onmouseover="showTip(event, 'fs14', 17)" class="i">name</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs13', 18)" onmouseover="showTip(event, 'fs13', 18)" class="i">jq</span>(<span class="s">&quot;</span><span class="s">#</span><span class="s">&quot;</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs14', 19)" onmouseover="showTip(event, 'fs14', 19)" class="i">name</span>)</pre>
 </td>
 </tr>
 </table><p>The <code>?</code> operator takes a parameter of type <code>j.JQueryStatic</code> which is a (generated)
@@ -186,8 +169,8 @@ important - the important fact is that we can now easily access DOM elements:</p
 </pre>
 </td>
 <td class="snippet"><pre class="fssnip">
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs15', 22)" onmouseover="showTip(event, 'fs15', 22)" class="i">main</span>() <span class="o">=</span> 
-  <span onmouseout="hideTip(event, 'fs5', 23)" onmouseover="showTip(event, 'fs5', 23)" class="i">j</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs16', 24)" onmouseover="showTip(event, 'fs16', 24)" class="i">jQuery</span><span class="o">?</span><span class="i">helloWorld</span><span class="o">.</span><span class="i">click</span>(<span onmouseout="hideTip(event, 'fs8', 25)" onmouseover="showTip(event, 'fs8', 25)" class="i">hello</span>)</pre>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs15', 20)" onmouseover="showTip(event, 'fs15', 20)" class="i">main</span>() <span class="o">=</span> 
+  <span onmouseout="hideTip(event, 'fs8', 21)" onmouseover="showTip(event, 'fs8', 21)" class="i">jq</span><span class="o">?</span><span class="i">helloWorld</span><span class="o">.</span><span class="i">click</span>(<span onmouseout="hideTip(event, 'fs4', 22)" onmouseover="showTip(event, 'fs4', 22)" class="i">hello</span>)</pre>
 </td>
 </tr>
 </table><p>The <code>mainHello</code> function will be later called when the web page is loaded. It
@@ -206,33 +189,25 @@ file ends with the following line:</p>
 </pre>
 </td>
 <td class="snippet"><pre class="fssnip">
-<span class="k">do</span> <span class="i">Runtime</span><span class="o">.</span><span class="i">Run</span>(<span class="i">components</span><span class="o">=</span><span onmouseout="hideTip(event, 'fs17', 26)" onmouseover="showTip(event, 'fs17', 26)" class="i">Interop</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs18', 27)" onmouseover="showTip(event, 'fs18', 27)" class="i">Components</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs19', 28)" onmouseover="showTip(event, 'fs19', 28)" class="i">all</span>)</pre>
+<span class="k">do</span> <span class="i">Runtime</span><span class="o">.</span><span class="i">Run</span>()</pre>
 </td>
 </tr>
-</table><p>The <code>components</code> parameter can be used to specify additional FunScript compiler
-components. In this case, we just specify components required by the TypeScript
-type provider (that enables us to use DOM and jQuery). You can use additional
-optional parameters to configure the Web server and the launcher.</p>
-
+</table>
       <div class="tip" id="fs1">namespace FunScript</div>
 <div class="tip" id="fs2">type JS = ReflectedDefinitionAttribute<br /><br />Full name: FunScript.JS</div>
 <div class="tip" id="fs3">module Page</div>
-<div class="tip" id="fs4">namespace FunScript.TypeScript</div>
-<div class="tip" id="fs5">type j = Api&lt;...&gt;<br /><br />Full name: Page.j</div>
-<div class="tip" id="fs6">type Api<br /><br />Full name: FunScript.TypeScript.Api</div>
-<div class="tip" id="fs7">type lib = Api&lt;...&gt;<br /><br />Full name: Page.lib</div>
-<div class="tip" id="fs8">val hello : unit -&gt; Unit<br /><br />Full name: Page.hello</div>
-<div class="tip" id="fs9">property Api&lt;...&gt;.window: Api&lt;...&gt;.Window</div>
-<div class="tip" id="fs10">Api&lt;...&gt;.Window.alert() : Unit<br />Api&lt;...&gt;.Window.alert(message: string) : Unit</div>
-<div class="tip" id="fs11">val jq : Api&lt;...&gt;.JQueryStatic</div>
-<div class="tip" id="fs12">type JQueryStatic =<br />&#160;&#160;new : unit -&gt; JQueryStatic<br />&#160;&#160;member Callbacks : flags: obj -&gt; JQueryCallback<br />&#160;&#160;member Invoke : unit -&gt; JQuery + 6 overloads<br />&#160;&#160;member ajax : url: string * settings: JQueryAjaxSettings -&gt; Unit<br />&#160;&#160;member ajaxPrefilter : handler: Func&lt;obj,obj,JQueryXHR,obj&gt; -&gt; obj + 1 overload<br />&#160;&#160;member ajaxSetup : options: obj -&gt; Unit<br />&#160;&#160;member browser : JQueryBrowserInfo with get, set<br />&#160;&#160;member contains : container: Element * contained: Element -&gt; bool<br />&#160;&#160;member css : e: obj * propertyName: obj -&gt; Unit + 3 overloads<br />&#160;&#160;member data : element: Element * key: string * value: obj -&gt; Object<br />&#160;&#160;...<br /><br />Full name: FunScript.TypeScript.Api,files=&quot;../Typings/jquery.d.ts&quot;.JQueryStatic</div>
-<div class="tip" id="fs13">val name : string</div>
-<div class="tip" id="fs14">Api&lt;...&gt;.JQueryStatic.Invoke() : Api&lt;...&gt;.JQuery<br />Api&lt;...&gt;.JQueryStatic.Invoke(selector: string) : Api&lt;...&gt;.JQuery<br />Api&lt;...&gt;.JQueryStatic.Invoke(element: Api&lt;...&gt;.Element) : Api&lt;...&gt;.JQuery<br />Api&lt;...&gt;.JQueryStatic.Invoke(elementArray: Api&lt;...&gt;.Element []) : Api&lt;...&gt;.JQuery<br />Api&lt;...&gt;.JQueryStatic.Invoke(object: Api&lt;...&gt;.JQuery) : Api&lt;...&gt;.JQuery<br />Api&lt;...&gt;.JQueryStatic.Invoke(func: Api&lt;...&gt;.Function) : Api&lt;...&gt;.JQuery<br />Api&lt;...&gt;.JQueryStatic.Invoke(selector: string, context: obj) : Api&lt;...&gt;.JQuery</div>
-<div class="tip" id="fs15">val main : unit -&gt; Api&lt;...&gt;.JQuery<br /><br />Full name: Page.main</div>
-<div class="tip" id="fs16">property Api&lt;...&gt;.jQuery: Api&lt;...&gt;.JQueryStatic</div>
-<div class="tip" id="fs17">namespace FunScript.Interop</div>
-<div class="tip" id="fs18">module Components<br /><br />from FunScript.Interop</div>
-<div class="tip" id="fs19">val all : InternalCompiler.CompilerComponent list<br /><br />Full name: FunScript.Interop.Components.all</div>
+<div class="tip" id="fs4">val hello : unit -&gt; unit<br /><br />Full name: Page.hello</div>
+<div class="tip" id="fs5">type Globals<br /><br />Full name: Globals</div>
+<div class="tip" id="fs6">property Globals.window: Window</div>
+<div class="tip" id="fs7">member Window.alert : ?message:string -&gt; unit</div>
+<div class="tip" id="fs8">val jq : selector:string -&gt; JQuery<br /><br />Full name: Page.jq</div>
+<div class="tip" id="fs9">val selector : string</div>
+<div class="tip" id="fs10">Multiple items<br />val string : value:&#39;T -&gt; string<br /><br />Full name: Microsoft.FSharp.Core.Operators.string<br /><br />--------------------<br />type string = System.String<br /><br />Full name: Microsoft.FSharp.Core.string</div>
+<div class="tip" id="fs11">property Globals.Dollar: JQueryStatic</div>
+<div class="tip" id="fs12">member JQueryStatic.Invoke : unit -&gt; JQuery<br />member JQueryStatic.Invoke : element:Element -&gt; JQuery<br />member JQueryStatic.Invoke : _object:AnonymousType814 -&gt; JQuery<br />member JQueryStatic.Invoke : elementArray:Element array -&gt; JQuery<br />member JQueryStatic.Invoke : _object:JQuery -&gt; JQuery<br />member JQueryStatic.Invoke : func:Function -&gt; JQuery<br />member JQueryStatic.Invoke : array:obj array -&gt; JQuery<br />member JQueryStatic.Invoke : selector:string * ?context:obj -&gt; JQuery</div>
+<div class="tip" id="fs13">val jq : (string -&gt; &#39;a)</div>
+<div class="tip" id="fs14">val name : string</div>
+<div class="tip" id="fs15">val main : unit -&gt; JQuery<br /><br />Full name: Page.main</div>
 
     </div>
     <div class="large-3 columns">
@@ -290,19 +265,26 @@ optional parameters to configure the Web server and the launcher.</p>
   <!-- JavaScript code from the sample goes here... -->
   <script type="text/javascript">
     $(document).ready(function () {
-var Page__op_Dynamic$, Page__main$, Page__hello$;
+var Page__op_Dynamic$JQuery_JQuery_, Page__main$, Page__jq$, Page__hello$;
   Page__hello$ = (function (unitVar0)
   {
-    return window.alert("Hello world!");
+    return window.window.alert("Hello world!");
+  });
+  Page__jq$ = (function (selector)
+  {
+    return window.$(selector);
   });
   Page__main$ = (function (unitVar0)
   {
-    return Page__op_Dynamic$(jQuery, "helloWorld").click((function (arg00_)
+    return Page__op_Dynamic$JQuery_JQuery_((function (selector)
+    {
+      return Page__jq$(selector);
+    }), "helloWorld").click((function (arg00_)
     {
       return Page__hello$();
     }));
   });
-  Page__op_Dynamic$ = (function (jq, name)
+  Page__op_Dynamic$JQuery_JQuery_ = (function (jq, name)
   {
     return jq(("#" + name));
   });

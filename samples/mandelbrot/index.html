@@ -131,36 +131,6 @@
 <span class="l">55: </span>
 <span class="l">56: </span>
 <span class="l">57: </span>
-<span class="l">58: </span>
-<span class="l">59: </span>
-<span class="l">60: </span>
-<span class="l">61: </span>
-<span class="l">62: </span>
-<span class="l">63: </span>
-<span class="l">64: </span>
-<span class="l">65: </span>
-<span class="l">66: </span>
-<span class="l">67: </span>
-<span class="l">68: </span>
-<span class="l">69: </span>
-<span class="l">70: </span>
-<span class="l">71: </span>
-<span class="l">72: </span>
-<span class="l">73: </span>
-<span class="l">74: </span>
-<span class="l">75: </span>
-<span class="l">76: </span>
-<span class="l">77: </span>
-<span class="l">78: </span>
-<span class="l">79: </span>
-<span class="l">80: </span>
-<span class="l">81: </span>
-<span class="l">82: </span>
-<span class="l">83: </span>
-<span class="l">84: </span>
-<span class="l">85: </span>
-<span class="l">86: </span>
-<span class="l">87: </span>
 </pre>
 </td>
 <td class="snippet"><pre class="fssnip">
@@ -172,83 +142,53 @@
 <span class="k">type</span> <span onmouseout="hideTip(event, 'fs4', 4)" onmouseover="showTip(event, 'fs4', 4)" class="i">Complex</span> <span class="o">=</span> { <span onmouseout="hideTip(event, 'fs5', 5)" onmouseover="showTip(event, 'fs5', 5)" class="i">r</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs6', 6)" onmouseover="showTip(event, 'fs6', 6)" class="i">double</span>; <span onmouseout="hideTip(event, 'fs7', 7)" onmouseover="showTip(event, 'fs7', 7)" class="i">i</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs6', 8)" onmouseover="showTip(event, 'fs6', 8)" class="i">double</span> }
 <span class="k">type</span> <span onmouseout="hideTip(event, 'fs8', 9)" onmouseover="showTip(event, 'fs8', 9)" class="i">Color</span> <span class="o">=</span> { <span onmouseout="hideTip(event, 'fs9', 10)" onmouseover="showTip(event, 'fs9', 10)" class="i">r</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs10', 11)" onmouseover="showTip(event, 'fs10', 11)" class="i">int</span>; <span onmouseout="hideTip(event, 'fs11', 12)" onmouseover="showTip(event, 'fs11', 12)" class="i">g</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs10', 13)" onmouseover="showTip(event, 'fs10', 13)" class="i">int</span>; <span onmouseout="hideTip(event, 'fs12', 14)" onmouseover="showTip(event, 'fs12', 14)" class="i">b</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs10', 15)" onmouseover="showTip(event, 'fs10', 15)" class="i">int</span>; <span onmouseout="hideTip(event, 'fs13', 16)" onmouseover="showTip(event, 'fs13', 16)" class="i">a</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs10', 17)" onmouseover="showTip(event, 'fs10', 17)" class="i">int</span> }
 
-[&lt;<span onmouseout="hideTip(event, 'fs14', 18)" onmouseover="showTip(event, 'fs14', 18)" class="i">JSEmit</span>(<span class="s">&quot;</span><span class="s">return</span><span class="s"> </span><span class="s">document</span><span class="s">.</span><span class="s">getElementById</span><span class="s">(</span><span class="s">{</span><span class="s">0</span><span class="s">}</span><span class="s">)</span><span class="s">;</span><span class="s">&quot;</span>)&gt;]
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs15', 19)" onmouseover="showTip(event, 'fs15', 19)" class="i">getElement</span> (<span onmouseout="hideTip(event, 'fs16', 20)" onmouseover="showTip(event, 'fs16', 20)" class="i">x</span><span class="o">:</span><span onmouseout="hideTip(event, 'fs17', 21)" onmouseover="showTip(event, 'fs17', 21)" class="i">string</span>) <span class="o">:</span> <span class="o">&#39;</span><span class="i">a</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs18', 22)" onmouseover="showTip(event, 'fs18', 22)" class="i">failwith</span> <span class="s">&quot;</span><span class="s">never</span><span class="s">&quot;</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs14', 18)" onmouseover="showTip(event, 'fs14', 18)" class="i">maxIter</span> <span class="o">=</span> <span class="n">512</span>
 
-[&lt;<span onmouseout="hideTip(event, 'fs14', 23)" onmouseover="showTip(event, 'fs14', 23)" class="i">JSEmit</span>(<span class="s">&quot;</span><span class="s">return</span><span class="s"> </span><span class="s">{</span><span class="s">0</span><span class="s">}</span><span class="s">.</span><span class="s">getContext</span><span class="s">(</span><span class="s">\&quot;</span><span class="s">2</span><span class="s">d</span><span class="s">\&quot;</span><span class="s">)</span><span class="s">;</span><span class="s">&quot;</span>)&gt;]
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs19', 24)" onmouseover="showTip(event, 'fs19', 24)" class="i">getContext</span> (<span onmouseout="hideTip(event, 'fs20', 25)" onmouseover="showTip(event, 'fs20', 25)" class="i">o</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs21', 26)" onmouseover="showTip(event, 'fs21', 26)" class="i">obj</span>) <span class="o">:</span> <span class="o">&#39;</span><span class="i">a</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs18', 27)" onmouseover="showTip(event, 'fs18', 27)" class="i">failwith</span> <span class="s">&quot;</span><span class="s">never</span><span class="s">&quot;</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs15', 19)" onmouseover="showTip(event, 'fs15', 19)" class="i">height</span> <span class="o">=</span> <span class="n">800</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs16', 20)" onmouseover="showTip(event, 'fs16', 20)" class="i">width</span> <span class="o">=</span> <span class="n">1000</span>
 
-[&lt;<span onmouseout="hideTip(event, 'fs14', 28)" onmouseover="showTip(event, 'fs14', 28)" class="i">JSEmit</span>(<span class="s">&quot;</span><span class="s">return</span><span class="s"> </span><span class="s">{</span><span class="s">0</span><span class="s">}</span><span class="s">.</span><span class="s">createImageData</span><span class="s">(</span><span class="s">{</span><span class="s">1</span><span class="s">}</span><span class="s">,</span><span class="s">{</span><span class="s">2</span><span class="s">}</span><span class="s">)</span><span class="s">;</span><span class="s">&quot;</span>)&gt;]
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs22', 29)" onmouseover="showTip(event, 'fs22', 29)" class="i">createImageData</span> (<span onmouseout="hideTip(event, 'fs23', 30)" onmouseover="showTip(event, 'fs23', 30)" class="i">ctx</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs21', 31)" onmouseover="showTip(event, 'fs21', 31)" class="i">obj</span>, <span onmouseout="hideTip(event, 'fs24', 32)" onmouseover="showTip(event, 'fs24', 32)" class="i">width</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs10', 33)" onmouseover="showTip(event, 'fs10', 33)" class="i">int</span>, <span onmouseout="hideTip(event, 'fs25', 34)" onmouseover="showTip(event, 'fs25', 34)" class="i">height</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs10', 35)" onmouseover="showTip(event, 'fs10', 35)" class="i">int</span>) <span class="o">:</span> <span class="o">&#39;</span><span class="i">a</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs18', 36)" onmouseover="showTip(event, 'fs18', 36)" class="i">failwith</span> <span class="s">&quot;</span><span class="s">never</span><span class="s">&quot;</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs17', 21)" onmouseover="showTip(event, 'fs17', 21)" class="i">minX</span> <span class="o">=</span> <span class="o">-</span><span class="n">2.1</span> 
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs18', 22)" onmouseover="showTip(event, 'fs18', 22)" class="i">maxX</span> <span class="o">=</span> <span class="n">0.5</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs19', 23)" onmouseover="showTip(event, 'fs19', 23)" class="i">minY</span> <span class="o">=</span> <span class="o">-</span><span class="n">1.4</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs20', 24)" onmouseover="showTip(event, 'fs20', 24)" class="i">maxY</span> <span class="o">=</span> <span class="n">1.4</span>
 
-[&lt;<span onmouseout="hideTip(event, 'fs14', 37)" onmouseover="showTip(event, 'fs14', 37)" class="i">JSEmit</span>(<span class="s">&quot;</span><span class="s">{</span><span class="s">0</span><span class="s">}</span><span class="s">.</span><span class="s">putImageData</span><span class="s">(</span><span class="s">{</span><span class="s">1</span><span class="s">}</span><span class="s">,</span><span class="s">0</span><span class="s">,</span><span class="s">0</span><span class="s">)</span><span class="s">;</span><span class="s">&quot;</span>)&gt;]
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs26', 38)" onmouseover="showTip(event, 'fs26', 38)" class="i">putImageData</span> (<span onmouseout="hideTip(event, 'fs23', 39)" onmouseover="showTip(event, 'fs23', 39)" class="i">ctx</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs21', 40)" onmouseover="showTip(event, 'fs21', 40)" class="i">obj</span>, <span onmouseout="hideTip(event, 'fs27', 41)" onmouseover="showTip(event, 'fs27', 41)" class="i">data</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs21', 42)" onmouseover="showTip(event, 'fs21', 42)" class="i">obj</span>) <span class="o">:</span> <span onmouseout="hideTip(event, 'fs28', 43)" onmouseover="showTip(event, 'fs28', 43)" class="i">unit</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs18', 44)" onmouseover="showTip(event, 'fs18', 44)" class="i">failwith</span> <span class="s">&quot;</span><span class="s">never</span><span class="s">&quot;</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs21', 25)" onmouseover="showTip(event, 'fs21', 25)" class="i">iteratePoint</span> (<span onmouseout="hideTip(event, 'fs22', 26)" onmouseover="showTip(event, 'fs22', 26)" class="i">s</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs4', 27)" onmouseover="showTip(event, 'fs4', 27)" class="i">Complex</span>) (<span onmouseout="hideTip(event, 'fs23', 28)" onmouseover="showTip(event, 'fs23', 28)" class="i">p</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs4', 29)" onmouseover="showTip(event, 'fs4', 29)" class="i">Complex</span>) <span class="o">:</span> <span onmouseout="hideTip(event, 'fs4', 30)" onmouseover="showTip(event, 'fs4', 30)" class="i">Complex</span> <span class="o">=</span>
+    { <span onmouseout="hideTip(event, 'fs5', 31)" onmouseover="showTip(event, 'fs5', 31)" class="i">r</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs22', 32)" onmouseover="showTip(event, 'fs22', 32)" class="i">s</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 33)" onmouseover="showTip(event, 'fs5', 33)" class="i">r</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs23', 34)" onmouseover="showTip(event, 'fs23', 34)" class="i">p</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 35)" onmouseover="showTip(event, 'fs5', 35)" class="i">r</span><span class="o">*</span><span onmouseout="hideTip(event, 'fs23', 36)" onmouseover="showTip(event, 'fs23', 36)" class="i">p</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 37)" onmouseover="showTip(event, 'fs5', 37)" class="i">r</span> <span class="o">-</span> <span onmouseout="hideTip(event, 'fs23', 38)" onmouseover="showTip(event, 'fs23', 38)" class="i">p</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 39)" onmouseover="showTip(event, 'fs7', 39)" class="i">i</span><span class="o">*</span><span onmouseout="hideTip(event, 'fs23', 40)" onmouseover="showTip(event, 'fs23', 40)" class="i">p</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 41)" onmouseover="showTip(event, 'fs7', 41)" class="i">i</span>; <span onmouseout="hideTip(event, 'fs7', 42)" onmouseover="showTip(event, 'fs7', 42)" class="i">i</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs22', 43)" onmouseover="showTip(event, 'fs22', 43)" class="i">s</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 44)" onmouseover="showTip(event, 'fs7', 44)" class="i">i</span> <span class="o">+</span> <span class="n">2.0</span> <span class="o">*</span> <span onmouseout="hideTip(event, 'fs23', 45)" onmouseover="showTip(event, 'fs23', 45)" class="i">p</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 46)" onmouseover="showTip(event, 'fs7', 46)" class="i">i</span> <span class="o">*</span> <span onmouseout="hideTip(event, 'fs23', 47)" onmouseover="showTip(event, 'fs23', 47)" class="i">p</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 48)" onmouseover="showTip(event, 'fs5', 48)" class="i">r</span> }
 
-[&lt;<span onmouseout="hideTip(event, 'fs14', 45)" onmouseover="showTip(event, 'fs14', 45)" class="i">JSEmit</span>(<span class="s">&quot;</span><span class="s">{</span><span class="s">0</span><span class="s">}</span><span class="s">.</span><span class="s">data</span><span class="s">[</span><span class="s">{</span><span class="s">1</span><span class="s">}</span><span class="s">]</span><span class="s">=</span><span class="s">{</span><span class="s">2</span><span class="s">}</span><span class="s">;</span><span class="s">&quot;</span>)&gt;]
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs29', 46)" onmouseover="showTip(event, 'fs29', 46)" class="i">setPixel</span> (<span onmouseout="hideTip(event, 'fs30', 47)" onmouseover="showTip(event, 'fs30', 47)" class="i">img</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs21', 48)" onmouseover="showTip(event, 'fs21', 48)" class="i">obj</span>, <span onmouseout="hideTip(event, 'fs31', 49)" onmouseover="showTip(event, 'fs31', 49)" class="i">index</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs10', 50)" onmouseover="showTip(event, 'fs10', 50)" class="i">int</span>, <span onmouseout="hideTip(event, 'fs32', 51)" onmouseover="showTip(event, 'fs32', 51)" class="i">value</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs10', 52)" onmouseover="showTip(event, 'fs10', 52)" class="i">int</span>) <span class="o">:</span> <span onmouseout="hideTip(event, 'fs28', 53)" onmouseover="showTip(event, 'fs28', 53)" class="i">unit</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs18', 54)" onmouseover="showTip(event, 'fs18', 54)" class="i">failwith</span> <span class="s">&quot;</span><span class="s">never</span><span class="s">&quot;</span>
-
-<span class="c">(*[&lt;Literal&gt;] </span>
-<span class="c">let maxIter = 512</span>
-<span class="c">[&lt;Literal&gt;]</span>
-<span class="c">let height = 800</span>
-<span class="c">[&lt;Literal&gt;]</span>
-<span class="c">let width = 1000</span>
-
-<span class="c">[&lt;Literal&gt;]</span>
-<span class="c">let minX = -2.1 </span>
-<span class="c">[&lt;Literal&gt;]</span>
-<span class="c">let maxX = 0.5</span>
-<span class="c">[&lt;Literal&gt;]</span>
-<span class="c">let minY = -1.4</span>
-<span class="c">[&lt;Literal&gt;]</span>
-<span class="c">let maxY = 1.4*)</span>
-
-<span class="k">let</span> <span class="k">mutable</span> <span onmouseout="hideTip(event, 'fs33', 55)" onmouseover="showTip(event, 'fs33', 55)" class="i">maxIter</span> <span class="o">=</span> <span class="n">512</span>
-
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs34', 56)" onmouseover="showTip(event, 'fs34', 56)" class="i">height</span> <span class="o">=</span> <span class="n">800</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs35', 57)" onmouseover="showTip(event, 'fs35', 57)" class="i">width</span> <span class="o">=</span> <span class="n">1000</span>
-
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs36', 58)" onmouseover="showTip(event, 'fs36', 58)" class="i">minX</span> <span class="o">=</span> <span class="o">-</span><span class="n">2.1</span> 
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs37', 59)" onmouseover="showTip(event, 'fs37', 59)" class="i">maxX</span> <span class="o">=</span> <span class="n">0.5</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs38', 60)" onmouseover="showTip(event, 'fs38', 60)" class="i">minY</span> <span class="o">=</span> <span class="o">-</span><span class="n">1.4</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs39', 61)" onmouseover="showTip(event, 'fs39', 61)" class="i">maxY</span> <span class="o">=</span> <span class="n">1.4</span>
-
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs40', 62)" onmouseover="showTip(event, 'fs40', 62)" class="i">iteratePoint</span> (<span onmouseout="hideTip(event, 'fs41', 63)" onmouseover="showTip(event, 'fs41', 63)" class="i">s</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs4', 64)" onmouseover="showTip(event, 'fs4', 64)" class="i">Complex</span>) (<span onmouseout="hideTip(event, 'fs42', 65)" onmouseover="showTip(event, 'fs42', 65)" class="i">p</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs4', 66)" onmouseover="showTip(event, 'fs4', 66)" class="i">Complex</span>) <span class="o">:</span> <span onmouseout="hideTip(event, 'fs4', 67)" onmouseover="showTip(event, 'fs4', 67)" class="i">Complex</span> <span class="o">=</span>
-    { <span onmouseout="hideTip(event, 'fs5', 68)" onmouseover="showTip(event, 'fs5', 68)" class="i">r</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs41', 69)" onmouseover="showTip(event, 'fs41', 69)" class="i">s</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 70)" onmouseover="showTip(event, 'fs5', 70)" class="i">r</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs42', 71)" onmouseover="showTip(event, 'fs42', 71)" class="i">p</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 72)" onmouseover="showTip(event, 'fs5', 72)" class="i">r</span><span class="o">*</span><span onmouseout="hideTip(event, 'fs42', 73)" onmouseover="showTip(event, 'fs42', 73)" class="i">p</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 74)" onmouseover="showTip(event, 'fs5', 74)" class="i">r</span> <span class="o">-</span> <span onmouseout="hideTip(event, 'fs42', 75)" onmouseover="showTip(event, 'fs42', 75)" class="i">p</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 76)" onmouseover="showTip(event, 'fs7', 76)" class="i">i</span><span class="o">*</span><span onmouseout="hideTip(event, 'fs42', 77)" onmouseover="showTip(event, 'fs42', 77)" class="i">p</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 78)" onmouseover="showTip(event, 'fs7', 78)" class="i">i</span>; <span onmouseout="hideTip(event, 'fs7', 79)" onmouseover="showTip(event, 'fs7', 79)" class="i">i</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs41', 80)" onmouseover="showTip(event, 'fs41', 80)" class="i">s</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 81)" onmouseover="showTip(event, 'fs7', 81)" class="i">i</span> <span class="o">+</span> <span class="n">2.0</span> <span class="o">*</span> <span onmouseout="hideTip(event, 'fs42', 82)" onmouseover="showTip(event, 'fs42', 82)" class="i">p</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 83)" onmouseover="showTip(event, 'fs7', 83)" class="i">i</span> <span class="o">*</span> <span onmouseout="hideTip(event, 'fs42', 84)" onmouseover="showTip(event, 'fs42', 84)" class="i">p</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 85)" onmouseover="showTip(event, 'fs5', 85)" class="i">r</span> }
-
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs43', 86)" onmouseover="showTip(event, 'fs43', 86)" class="i">getIterationCount</span> (<span onmouseout="hideTip(event, 'fs42', 87)" onmouseover="showTip(event, 'fs42', 87)" class="i">p</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs4', 88)" onmouseover="showTip(event, 'fs4', 88)" class="i">Complex</span>) <span class="o">=</span>
-    <span class="k">let</span> <span class="k">mutable</span> <span onmouseout="hideTip(event, 'fs44', 89)" onmouseover="showTip(event, 'fs44', 89)" class="i">z</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs42', 90)" onmouseover="showTip(event, 'fs42', 90)" class="i">p</span>
-    <span class="k">let</span> <span class="k">mutable</span> <span onmouseout="hideTip(event, 'fs45', 91)" onmouseover="showTip(event, 'fs45', 91)" class="i">i</span> <span class="o">=</span> <span class="n">0</span>
-    <span class="k">while</span> <span onmouseout="hideTip(event, 'fs45', 92)" onmouseover="showTip(event, 'fs45', 92)" class="i">i</span> <span class="o">&lt;</span> <span onmouseout="hideTip(event, 'fs33', 93)" onmouseover="showTip(event, 'fs33', 93)" class="i">maxIter</span> <span class="o">&amp;&amp;</span> (<span onmouseout="hideTip(event, 'fs44', 94)" onmouseover="showTip(event, 'fs44', 94)" class="i">z</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 95)" onmouseover="showTip(event, 'fs5', 95)" class="i">r</span><span class="o">*</span><span onmouseout="hideTip(event, 'fs44', 96)" onmouseover="showTip(event, 'fs44', 96)" class="i">z</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 97)" onmouseover="showTip(event, 'fs5', 97)" class="i">r</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs44', 98)" onmouseover="showTip(event, 'fs44', 98)" class="i">z</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 99)" onmouseover="showTip(event, 'fs7', 99)" class="i">i</span><span class="o">*</span><span onmouseout="hideTip(event, 'fs44', 100)" onmouseover="showTip(event, 'fs44', 100)" class="i">z</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 101)" onmouseover="showTip(event, 'fs7', 101)" class="i">i</span> <span class="o">&lt;</span> <span class="n">4.0</span>) <span class="k">do</span>
-      <span onmouseout="hideTip(event, 'fs44', 102)" onmouseover="showTip(event, 'fs44', 102)" class="i">z</span> <span class="o">&lt;-</span> <span onmouseout="hideTip(event, 'fs40', 103)" onmouseover="showTip(event, 'fs40', 103)" class="i">iteratePoint</span> <span onmouseout="hideTip(event, 'fs42', 104)" onmouseover="showTip(event, 'fs42', 104)" class="i">p</span> <span onmouseout="hideTip(event, 'fs44', 105)" onmouseover="showTip(event, 'fs44', 105)" class="i">z</span>
-      <span onmouseout="hideTip(event, 'fs45', 106)" onmouseover="showTip(event, 'fs45', 106)" class="i">i</span> <span class="o">&lt;-</span> <span onmouseout="hideTip(event, 'fs45', 107)" onmouseover="showTip(event, 'fs45', 107)" class="i">i</span> <span class="o">+</span> <span class="n">1</span>
-    <span onmouseout="hideTip(event, 'fs45', 108)" onmouseover="showTip(event, 'fs45', 108)" class="i">i</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs24', 49)" onmouseover="showTip(event, 'fs24', 49)" class="i">getIterationCount</span> (<span onmouseout="hideTip(event, 'fs23', 50)" onmouseover="showTip(event, 'fs23', 50)" class="i">p</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs4', 51)" onmouseover="showTip(event, 'fs4', 51)" class="i">Complex</span>) <span class="o">=</span>
+    <span class="k">let</span> <span class="k">mutable</span> <span onmouseout="hideTip(event, 'fs25', 52)" onmouseover="showTip(event, 'fs25', 52)" class="i">z</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs23', 53)" onmouseover="showTip(event, 'fs23', 53)" class="i">p</span>
+    <span class="k">let</span> <span class="k">mutable</span> <span onmouseout="hideTip(event, 'fs26', 54)" onmouseover="showTip(event, 'fs26', 54)" class="i">i</span> <span class="o">=</span> <span class="n">0</span>
+    <span class="k">while</span> <span onmouseout="hideTip(event, 'fs26', 55)" onmouseover="showTip(event, 'fs26', 55)" class="i">i</span> <span class="o">&lt;</span> <span onmouseout="hideTip(event, 'fs14', 56)" onmouseover="showTip(event, 'fs14', 56)" class="i">maxIter</span> <span class="o">&amp;&amp;</span> (<span onmouseout="hideTip(event, 'fs25', 57)" onmouseover="showTip(event, 'fs25', 57)" class="i">z</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 58)" onmouseover="showTip(event, 'fs5', 58)" class="i">r</span><span class="o">*</span><span onmouseout="hideTip(event, 'fs25', 59)" onmouseover="showTip(event, 'fs25', 59)" class="i">z</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 60)" onmouseover="showTip(event, 'fs5', 60)" class="i">r</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs25', 61)" onmouseover="showTip(event, 'fs25', 61)" class="i">z</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 62)" onmouseover="showTip(event, 'fs7', 62)" class="i">i</span><span class="o">*</span><span onmouseout="hideTip(event, 'fs25', 63)" onmouseover="showTip(event, 'fs25', 63)" class="i">z</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 64)" onmouseover="showTip(event, 'fs7', 64)" class="i">i</span> <span class="o">&lt;</span> <span class="n">4.0</span>) <span class="k">do</span>
+      <span onmouseout="hideTip(event, 'fs25', 65)" onmouseover="showTip(event, 'fs25', 65)" class="i">z</span> <span class="o">&lt;-</span> <span onmouseout="hideTip(event, 'fs21', 66)" onmouseover="showTip(event, 'fs21', 66)" class="i">iteratePoint</span> <span onmouseout="hideTip(event, 'fs23', 67)" onmouseover="showTip(event, 'fs23', 67)" class="i">p</span> <span onmouseout="hideTip(event, 'fs25', 68)" onmouseover="showTip(event, 'fs25', 68)" class="i">z</span>
+      <span onmouseout="hideTip(event, 'fs26', 69)" onmouseover="showTip(event, 'fs26', 69)" class="i">i</span> <span class="o">&lt;-</span> <span onmouseout="hideTip(event, 'fs26', 70)" onmouseover="showTip(event, 'fs26', 70)" class="i">i</span> <span class="o">+</span> <span class="n">1</span>
+    <span onmouseout="hideTip(event, 'fs26', 71)" onmouseover="showTip(event, 'fs26', 71)" class="i">i</span>
     
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs46', 109)" onmouseover="showTip(event, 'fs46', 109)" class="i">iterCountToColor</span> (<span onmouseout="hideTip(event, 'fs47', 110)" onmouseover="showTip(event, 'fs47', 110)" class="i">i</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs10', 111)" onmouseover="showTip(event, 'fs10', 111)" class="i">int</span>) <span class="o">:</span> <span onmouseout="hideTip(event, 'fs8', 112)" onmouseover="showTip(event, 'fs8', 112)" class="i">Color</span> <span class="o">=</span>
-    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs47', 113)" onmouseover="showTip(event, 'fs47', 113)" class="i">i</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs33', 114)" onmouseover="showTip(event, 'fs33', 114)" class="i">maxIter</span> <span class="o">-</span> <span onmouseout="hideTip(event, 'fs47', 115)" onmouseover="showTip(event, 'fs47', 115)" class="i">i</span>
-    { <span onmouseout="hideTip(event, 'fs9', 116)" onmouseover="showTip(event, 'fs9', 116)" class="i">r</span> <span class="o">=</span> <span class="n">0</span>; <span onmouseout="hideTip(event, 'fs11', 117)" onmouseover="showTip(event, 'fs11', 117)" class="i">g</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs47', 118)" onmouseover="showTip(event, 'fs47', 118)" class="i">i</span> <span class="o">%</span> <span class="n">256</span>; <span onmouseout="hideTip(event, 'fs12', 119)" onmouseover="showTip(event, 'fs12', 119)" class="i">b</span> <span class="o">=</span> <span class="n">100</span> <span class="o">*</span> (<span onmouseout="hideTip(event, 'fs47', 120)" onmouseover="showTip(event, 'fs47', 120)" class="i">i</span> <span class="o">/</span> <span class="n">256</span>); <span onmouseout="hideTip(event, 'fs13', 121)" onmouseover="showTip(event, 'fs13', 121)" class="i">a</span> <span class="o">=</span> <span class="n">255</span> }
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs27', 72)" onmouseover="showTip(event, 'fs27', 72)" class="i">iterCountToColor</span> (<span onmouseout="hideTip(event, 'fs28', 73)" onmouseover="showTip(event, 'fs28', 73)" class="i">i</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs10', 74)" onmouseover="showTip(event, 'fs10', 74)" class="i">int</span>) <span class="o">:</span> <span onmouseout="hideTip(event, 'fs8', 75)" onmouseover="showTip(event, 'fs8', 75)" class="i">Color</span> <span class="o">=</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs28', 76)" onmouseover="showTip(event, 'fs28', 76)" class="i">i</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs14', 77)" onmouseover="showTip(event, 'fs14', 77)" class="i">maxIter</span> <span class="o">-</span> <span onmouseout="hideTip(event, 'fs28', 78)" onmouseover="showTip(event, 'fs28', 78)" class="i">i</span>
+    { <span onmouseout="hideTip(event, 'fs9', 79)" onmouseover="showTip(event, 'fs9', 79)" class="i">r</span> <span class="o">=</span> <span class="n">0</span>; <span onmouseout="hideTip(event, 'fs11', 80)" onmouseover="showTip(event, 'fs11', 80)" class="i">g</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs28', 81)" onmouseover="showTip(event, 'fs28', 81)" class="i">i</span> <span class="o">%</span> <span class="n">256</span>; <span onmouseout="hideTip(event, 'fs12', 82)" onmouseover="showTip(event, 'fs12', 82)" class="i">b</span> <span class="o">=</span> <span class="n">100</span> <span class="o">*</span> (<span onmouseout="hideTip(event, 'fs28', 83)" onmouseover="showTip(event, 'fs28', 83)" class="i">i</span> <span class="o">/</span> <span class="n">256</span>); <span onmouseout="hideTip(event, 'fs13', 84)" onmouseover="showTip(event, 'fs13', 84)" class="i">a</span> <span class="o">=</span> <span class="n">255</span> }
 
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs48', 122)" onmouseover="showTip(event, 'fs48', 122)" class="i">getCoordColor</span> (<span onmouseout="hideTip(event, 'fs49', 123)" onmouseover="showTip(event, 'fs49', 123)" class="i">x</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs10', 124)" onmouseover="showTip(event, 'fs10', 124)" class="i">int</span>, <span onmouseout="hideTip(event, 'fs50', 125)" onmouseover="showTip(event, 'fs50', 125)" class="i">y</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs10', 126)" onmouseover="showTip(event, 'fs10', 126)" class="i">int</span>) <span class="o">:</span> <span onmouseout="hideTip(event, 'fs8', 127)" onmouseover="showTip(event, 'fs8', 127)" class="i">Color</span> <span class="o">=</span>
-    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs42', 128)" onmouseover="showTip(event, 'fs42', 128)" class="i">p</span> <span class="o">=</span> { <span onmouseout="hideTip(event, 'fs5', 129)" onmouseover="showTip(event, 'fs5', 129)" class="i">r</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs51', 130)" onmouseover="showTip(event, 'fs51', 130)" class="i">float</span> <span onmouseout="hideTip(event, 'fs49', 131)" onmouseover="showTip(event, 'fs49', 131)" class="i">x</span> <span class="o">*</span> (<span onmouseout="hideTip(event, 'fs37', 132)" onmouseover="showTip(event, 'fs37', 132)" class="i">maxX</span> <span class="o">-</span> <span onmouseout="hideTip(event, 'fs36', 133)" onmouseover="showTip(event, 'fs36', 133)" class="i">minX</span>) <span class="o">/</span> <span onmouseout="hideTip(event, 'fs51', 134)" onmouseover="showTip(event, 'fs51', 134)" class="i">float</span> <span onmouseout="hideTip(event, 'fs35', 135)" onmouseover="showTip(event, 'fs35', 135)" class="i">width</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs36', 136)" onmouseover="showTip(event, 'fs36', 136)" class="i">minX</span>
-            ; <span onmouseout="hideTip(event, 'fs7', 137)" onmouseover="showTip(event, 'fs7', 137)" class="i">i</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs51', 138)" onmouseover="showTip(event, 'fs51', 138)" class="i">float</span> <span onmouseout="hideTip(event, 'fs50', 139)" onmouseover="showTip(event, 'fs50', 139)" class="i">y</span> <span class="o">*</span> (<span onmouseout="hideTip(event, 'fs39', 140)" onmouseover="showTip(event, 'fs39', 140)" class="i">maxY</span> <span class="o">-</span> <span onmouseout="hideTip(event, 'fs38', 141)" onmouseover="showTip(event, 'fs38', 141)" class="i">minY</span>) <span class="o">/</span> <span onmouseout="hideTip(event, 'fs51', 142)" onmouseover="showTip(event, 'fs51', 142)" class="i">float</span> <span onmouseout="hideTip(event, 'fs34', 143)" onmouseover="showTip(event, 'fs34', 143)" class="i">height</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs38', 144)" onmouseover="showTip(event, 'fs38', 144)" class="i">minY</span> }
-    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs47', 145)" onmouseover="showTip(event, 'fs47', 145)" class="i">i</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs43', 146)" onmouseover="showTip(event, 'fs43', 146)" class="i">getIterationCount</span> <span onmouseout="hideTip(event, 'fs42', 147)" onmouseover="showTip(event, 'fs42', 147)" class="i">p</span>
-    <span onmouseout="hideTip(event, 'fs46', 148)" onmouseover="showTip(event, 'fs46', 148)" class="i">iterCountToColor</span> <span onmouseout="hideTip(event, 'fs47', 149)" onmouseover="showTip(event, 'fs47', 149)" class="i">i</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs29', 85)" onmouseover="showTip(event, 'fs29', 85)" class="i">getCoordColor</span> (<span onmouseout="hideTip(event, 'fs30', 86)" onmouseover="showTip(event, 'fs30', 86)" class="i">x</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs10', 87)" onmouseover="showTip(event, 'fs10', 87)" class="i">int</span>, <span onmouseout="hideTip(event, 'fs31', 88)" onmouseover="showTip(event, 'fs31', 88)" class="i">y</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs10', 89)" onmouseover="showTip(event, 'fs10', 89)" class="i">int</span>) <span class="o">:</span> <span onmouseout="hideTip(event, 'fs8', 90)" onmouseover="showTip(event, 'fs8', 90)" class="i">Color</span> <span class="o">=</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs23', 91)" onmouseover="showTip(event, 'fs23', 91)" class="i">p</span> <span class="o">=</span> { <span onmouseout="hideTip(event, 'fs5', 92)" onmouseover="showTip(event, 'fs5', 92)" class="i">r</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs32', 93)" onmouseover="showTip(event, 'fs32', 93)" class="i">float</span> <span onmouseout="hideTip(event, 'fs30', 94)" onmouseover="showTip(event, 'fs30', 94)" class="i">x</span> <span class="o">*</span> (<span onmouseout="hideTip(event, 'fs18', 95)" onmouseover="showTip(event, 'fs18', 95)" class="i">maxX</span> <span class="o">-</span> <span onmouseout="hideTip(event, 'fs17', 96)" onmouseover="showTip(event, 'fs17', 96)" class="i">minX</span>) <span class="o">/</span> <span onmouseout="hideTip(event, 'fs32', 97)" onmouseover="showTip(event, 'fs32', 97)" class="i">float</span> <span onmouseout="hideTip(event, 'fs16', 98)" onmouseover="showTip(event, 'fs16', 98)" class="i">width</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs17', 99)" onmouseover="showTip(event, 'fs17', 99)" class="i">minX</span>
+            ; <span onmouseout="hideTip(event, 'fs7', 100)" onmouseover="showTip(event, 'fs7', 100)" class="i">i</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs32', 101)" onmouseover="showTip(event, 'fs32', 101)" class="i">float</span> <span onmouseout="hideTip(event, 'fs31', 102)" onmouseover="showTip(event, 'fs31', 102)" class="i">y</span> <span class="o">*</span> (<span onmouseout="hideTip(event, 'fs20', 103)" onmouseover="showTip(event, 'fs20', 103)" class="i">maxY</span> <span class="o">-</span> <span onmouseout="hideTip(event, 'fs19', 104)" onmouseover="showTip(event, 'fs19', 104)" class="i">minY</span>) <span class="o">/</span> <span onmouseout="hideTip(event, 'fs32', 105)" onmouseover="showTip(event, 'fs32', 105)" class="i">float</span> <span onmouseout="hideTip(event, 'fs15', 106)" onmouseover="showTip(event, 'fs15', 106)" class="i">height</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs19', 107)" onmouseover="showTip(event, 'fs19', 107)" class="i">minY</span> }
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs28', 108)" onmouseover="showTip(event, 'fs28', 108)" class="i">i</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs24', 109)" onmouseover="showTip(event, 'fs24', 109)" class="i">getIterationCount</span> <span onmouseout="hideTip(event, 'fs23', 110)" onmouseover="showTip(event, 'fs23', 110)" class="i">p</span>
+    <span onmouseout="hideTip(event, 'fs27', 111)" onmouseover="showTip(event, 'fs27', 111)" class="i">iterCountToColor</span> <span onmouseout="hideTip(event, 'fs28', 112)" onmouseover="showTip(event, 'fs28', 112)" class="i">i</span>
 
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs52', 150)" onmouseover="showTip(event, 'fs52', 150)" class="i">showSet</span>() <span class="o">=</span>
-    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs23', 151)" onmouseover="showTip(event, 'fs23', 151)" class="i">ctx</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs15', 152)" onmouseover="showTip(event, 'fs15', 152)" class="i">getElement</span>(<span class="s">&quot;</span><span class="s">canvas</span><span class="s">&quot;</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs19', 153)" onmouseover="showTip(event, 'fs19', 153)" class="i">getContext</span>
-    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs30', 154)" onmouseover="showTip(event, 'fs30', 154)" class="i">img</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs22', 155)" onmouseover="showTip(event, 'fs22', 155)" class="i">createImageData</span>(<span onmouseout="hideTip(event, 'fs23', 156)" onmouseover="showTip(event, 'fs23', 156)" class="i">ctx</span>, <span onmouseout="hideTip(event, 'fs35', 157)" onmouseover="showTip(event, 'fs35', 157)" class="i">width</span>, <span onmouseout="hideTip(event, 'fs34', 158)" onmouseover="showTip(event, 'fs34', 158)" class="i">height</span>)
-    <span class="k">for</span> <span onmouseout="hideTip(event, 'fs50', 159)" onmouseover="showTip(event, 'fs50', 159)" class="i">y</span> <span class="o">=</span> <span class="n">0</span> <span class="k">to</span> <span onmouseout="hideTip(event, 'fs34', 160)" onmouseover="showTip(event, 'fs34', 160)" class="i">height</span><span class="o">-</span><span class="n">1</span> <span class="k">do</span>
-        <span class="k">for</span> <span onmouseout="hideTip(event, 'fs49', 161)" onmouseover="showTip(event, 'fs49', 161)" class="i">x</span> <span class="o">=</span> <span class="n">0</span> <span class="k">to</span> <span onmouseout="hideTip(event, 'fs35', 162)" onmouseover="showTip(event, 'fs35', 162)" class="i">width</span><span class="o">-</span><span class="n">1</span> <span class="k">do</span>
-            <span class="k">let</span> <span onmouseout="hideTip(event, 'fs31', 163)" onmouseover="showTip(event, 'fs31', 163)" class="i">index</span> <span class="o">=</span> (<span onmouseout="hideTip(event, 'fs49', 164)" onmouseover="showTip(event, 'fs49', 164)" class="i">x</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs50', 165)" onmouseover="showTip(event, 'fs50', 165)" class="i">y</span> <span class="o">*</span> <span onmouseout="hideTip(event, 'fs35', 166)" onmouseover="showTip(event, 'fs35', 166)" class="i">width</span>) <span class="o">*</span> <span class="n">4</span>
-            <span class="k">let</span> <span onmouseout="hideTip(event, 'fs53', 167)" onmouseover="showTip(event, 'fs53', 167)" class="i">color</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs48', 168)" onmouseover="showTip(event, 'fs48', 168)" class="i">getCoordColor</span> (<span onmouseout="hideTip(event, 'fs49', 169)" onmouseover="showTip(event, 'fs49', 169)" class="i">x</span>, <span onmouseout="hideTip(event, 'fs50', 170)" onmouseover="showTip(event, 'fs50', 170)" class="i">y</span>)
-            <span onmouseout="hideTip(event, 'fs29', 171)" onmouseover="showTip(event, 'fs29', 171)" class="i">setPixel</span>(<span onmouseout="hideTip(event, 'fs30', 172)" onmouseover="showTip(event, 'fs30', 172)" class="i">img</span>, <span onmouseout="hideTip(event, 'fs31', 173)" onmouseover="showTip(event, 'fs31', 173)" class="i">index</span><span class="o">+</span><span class="n">0</span>, <span onmouseout="hideTip(event, 'fs53', 174)" onmouseover="showTip(event, 'fs53', 174)" class="i">color</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs9', 175)" onmouseover="showTip(event, 'fs9', 175)" class="i">r</span>)
-            <span onmouseout="hideTip(event, 'fs29', 176)" onmouseover="showTip(event, 'fs29', 176)" class="i">setPixel</span>(<span onmouseout="hideTip(event, 'fs30', 177)" onmouseover="showTip(event, 'fs30', 177)" class="i">img</span>, <span onmouseout="hideTip(event, 'fs31', 178)" onmouseover="showTip(event, 'fs31', 178)" class="i">index</span><span class="o">+</span><span class="n">1</span>, <span onmouseout="hideTip(event, 'fs53', 179)" onmouseover="showTip(event, 'fs53', 179)" class="i">color</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 180)" onmouseover="showTip(event, 'fs11', 180)" class="i">g</span>)
-            <span onmouseout="hideTip(event, 'fs29', 181)" onmouseover="showTip(event, 'fs29', 181)" class="i">setPixel</span>(<span onmouseout="hideTip(event, 'fs30', 182)" onmouseover="showTip(event, 'fs30', 182)" class="i">img</span>, <span onmouseout="hideTip(event, 'fs31', 183)" onmouseover="showTip(event, 'fs31', 183)" class="i">index</span><span class="o">+</span><span class="n">2</span>, <span onmouseout="hideTip(event, 'fs53', 184)" onmouseover="showTip(event, 'fs53', 184)" class="i">color</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 185)" onmouseover="showTip(event, 'fs12', 185)" class="i">b</span>)
-            <span onmouseout="hideTip(event, 'fs29', 186)" onmouseover="showTip(event, 'fs29', 186)" class="i">setPixel</span>(<span onmouseout="hideTip(event, 'fs30', 187)" onmouseover="showTip(event, 'fs30', 187)" class="i">img</span>, <span onmouseout="hideTip(event, 'fs31', 188)" onmouseover="showTip(event, 'fs31', 188)" class="i">index</span><span class="o">+</span><span class="n">3</span>, <span onmouseout="hideTip(event, 'fs53', 189)" onmouseover="showTip(event, 'fs53', 189)" class="i">color</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs13', 190)" onmouseover="showTip(event, 'fs13', 190)" class="i">a</span>)
-    <span onmouseout="hideTip(event, 'fs26', 191)" onmouseover="showTip(event, 'fs26', 191)" class="i">putImageData</span>(<span onmouseout="hideTip(event, 'fs23', 192)" onmouseover="showTip(event, 'fs23', 192)" class="i">ctx</span>, <span onmouseout="hideTip(event, 'fs30', 193)" onmouseover="showTip(event, 'fs30', 193)" class="i">img</span>)
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs33', 113)" onmouseover="showTip(event, 'fs33', 113)" class="i">showSet</span>() <span class="o">=</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs34', 114)" onmouseover="showTip(event, 'fs34', 114)" class="i">ctx</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs35', 115)" onmouseover="showTip(event, 'fs35', 115)" class="i">Globals</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs36', 116)" onmouseover="showTip(event, 'fs36', 116)" class="i">document</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs37', 117)" onmouseover="showTip(event, 'fs37', 117)" class="i">getElementsByTagName_canvas</span>()<span class="o">.</span>[<span class="n">0</span>]<span class="o">.</span><span class="i">getContext_2d</span>()
+    
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs38', 118)" onmouseover="showTip(event, 'fs38', 118)" class="i">img</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs34', 119)" onmouseover="showTip(event, 'fs34', 119)" class="i">ctx</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs39', 120)" onmouseover="showTip(event, 'fs39', 120)" class="i">createImageData</span>(<span onmouseout="hideTip(event, 'fs32', 121)" onmouseover="showTip(event, 'fs32', 121)" class="i">float</span> <span onmouseout="hideTip(event, 'fs16', 122)" onmouseover="showTip(event, 'fs16', 122)" class="i">width</span>, <span onmouseout="hideTip(event, 'fs32', 123)" onmouseover="showTip(event, 'fs32', 123)" class="i">float</span> <span onmouseout="hideTip(event, 'fs15', 124)" onmouseover="showTip(event, 'fs15', 124)" class="i">height</span>)
+    <span class="k">for</span> <span onmouseout="hideTip(event, 'fs31', 125)" onmouseover="showTip(event, 'fs31', 125)" class="i">y</span> <span class="o">=</span> <span class="n">0</span> <span class="k">to</span> <span onmouseout="hideTip(event, 'fs15', 126)" onmouseover="showTip(event, 'fs15', 126)" class="i">height</span><span class="o">-</span><span class="n">1</span> <span class="k">do</span>
+        <span class="k">for</span> <span onmouseout="hideTip(event, 'fs30', 127)" onmouseover="showTip(event, 'fs30', 127)" class="i">x</span> <span class="o">=</span> <span class="n">0</span> <span class="k">to</span> <span onmouseout="hideTip(event, 'fs16', 128)" onmouseover="showTip(event, 'fs16', 128)" class="i">width</span><span class="o">-</span><span class="n">1</span> <span class="k">do</span>
+            <span class="k">let</span> <span onmouseout="hideTip(event, 'fs40', 129)" onmouseover="showTip(event, 'fs40', 129)" class="i">index</span> <span class="o">=</span> (<span onmouseout="hideTip(event, 'fs30', 130)" onmouseover="showTip(event, 'fs30', 130)" class="i">x</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs31', 131)" onmouseover="showTip(event, 'fs31', 131)" class="i">y</span> <span class="o">*</span> <span onmouseout="hideTip(event, 'fs16', 132)" onmouseover="showTip(event, 'fs16', 132)" class="i">width</span>) <span class="o">*</span> <span class="n">4</span>
+            <span class="k">let</span> <span onmouseout="hideTip(event, 'fs41', 133)" onmouseover="showTip(event, 'fs41', 133)" class="i">color</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs29', 134)" onmouseover="showTip(event, 'fs29', 134)" class="i">getCoordColor</span> (<span onmouseout="hideTip(event, 'fs30', 135)" onmouseover="showTip(event, 'fs30', 135)" class="i">x</span>, <span onmouseout="hideTip(event, 'fs31', 136)" onmouseover="showTip(event, 'fs31', 136)" class="i">y</span>)
+            <span onmouseout="hideTip(event, 'fs38', 137)" onmouseover="showTip(event, 'fs38', 137)" class="i">img</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs42', 138)" onmouseover="showTip(event, 'fs42', 138)" class="i">data</span><span class="o">.</span>[<span onmouseout="hideTip(event, 'fs40', 139)" onmouseover="showTip(event, 'fs40', 139)" class="i">index</span><span class="o">+</span><span class="n">0</span>] <span class="o">&lt;-</span> <span onmouseout="hideTip(event, 'fs32', 140)" onmouseover="showTip(event, 'fs32', 140)" class="i">float</span> <span onmouseout="hideTip(event, 'fs41', 141)" onmouseover="showTip(event, 'fs41', 141)" class="i">color</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs9', 142)" onmouseover="showTip(event, 'fs9', 142)" class="i">r</span>
+            <span onmouseout="hideTip(event, 'fs38', 143)" onmouseover="showTip(event, 'fs38', 143)" class="i">img</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs42', 144)" onmouseover="showTip(event, 'fs42', 144)" class="i">data</span><span class="o">.</span>[<span onmouseout="hideTip(event, 'fs40', 145)" onmouseover="showTip(event, 'fs40', 145)" class="i">index</span><span class="o">+</span><span class="n">1</span>] <span class="o">&lt;-</span> <span onmouseout="hideTip(event, 'fs32', 146)" onmouseover="showTip(event, 'fs32', 146)" class="i">float</span> <span onmouseout="hideTip(event, 'fs41', 147)" onmouseover="showTip(event, 'fs41', 147)" class="i">color</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 148)" onmouseover="showTip(event, 'fs11', 148)" class="i">g</span>
+            <span onmouseout="hideTip(event, 'fs38', 149)" onmouseover="showTip(event, 'fs38', 149)" class="i">img</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs42', 150)" onmouseover="showTip(event, 'fs42', 150)" class="i">data</span><span class="o">.</span>[<span onmouseout="hideTip(event, 'fs40', 151)" onmouseover="showTip(event, 'fs40', 151)" class="i">index</span><span class="o">+</span><span class="n">2</span>] <span class="o">&lt;-</span> <span onmouseout="hideTip(event, 'fs32', 152)" onmouseover="showTip(event, 'fs32', 152)" class="i">float</span> <span onmouseout="hideTip(event, 'fs41', 153)" onmouseover="showTip(event, 'fs41', 153)" class="i">color</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 154)" onmouseover="showTip(event, 'fs12', 154)" class="i">b</span>
+            <span onmouseout="hideTip(event, 'fs38', 155)" onmouseover="showTip(event, 'fs38', 155)" class="i">img</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs42', 156)" onmouseover="showTip(event, 'fs42', 156)" class="i">data</span><span class="o">.</span>[<span onmouseout="hideTip(event, 'fs40', 157)" onmouseover="showTip(event, 'fs40', 157)" class="i">index</span><span class="o">+</span><span class="n">3</span>] <span class="o">&lt;-</span> <span onmouseout="hideTip(event, 'fs32', 158)" onmouseover="showTip(event, 'fs32', 158)" class="i">float</span> <span onmouseout="hideTip(event, 'fs41', 159)" onmouseover="showTip(event, 'fs41', 159)" class="i">color</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs13', 160)" onmouseover="showTip(event, 'fs13', 160)" class="i">a</span>
+    <span onmouseout="hideTip(event, 'fs34', 161)" onmouseover="showTip(event, 'fs34', 161)" class="i">ctx</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs43', 162)" onmouseover="showTip(event, 'fs43', 162)" class="i">putImageData</span>(<span onmouseout="hideTip(event, 'fs38', 163)" onmouseover="showTip(event, 'fs38', 163)" class="i">img</span>, <span class="n">0.</span>, <span class="n">0.</span>)
 
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs54', 194)" onmouseover="showTip(event, 'fs54', 194)" class="i">main</span>() <span class="o">=</span>
-    <span onmouseout="hideTip(event, 'fs52', 195)" onmouseover="showTip(event, 'fs52', 195)" class="i">showSet</span>()
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs44', 164)" onmouseover="showTip(event, 'fs44', 164)" class="i">main</span>() <span class="o">=</span>
+    <span onmouseout="hideTip(event, 'fs33', 165)" onmouseover="showTip(event, 'fs33', 165)" class="i">showSet</span>()
     
 <span class="k">do</span> <span class="i">Runtime</span><span class="o">.</span><span class="i">Run</span>(<span class="i">directory</span><span class="o">=</span><span class="s">&quot;</span><span class="s">Web</span><span class="s">&quot;</span>)</pre>
 </td>
@@ -267,47 +207,37 @@
 <div class="tip" id="fs11">Color.g: int</div>
 <div class="tip" id="fs12">Color.b: int</div>
 <div class="tip" id="fs13">Color.a: int</div>
-<div class="tip" id="fs14">Multiple items<br />type JSEmitAttribute =<br />&#160;&#160;inherit Attribute<br />&#160;&#160;new : emit:string -&gt; JSEmitAttribute<br />&#160;&#160;member Emit : string<br /><br />Full name: FunScript.JSEmitAttribute<br /><br />--------------------<br />new : emit:string -&gt; JSEmitAttribute</div>
-<div class="tip" id="fs15">val getElement : x:string -&gt; &#39;a<br /><br />Full name: Program.getElement</div>
-<div class="tip" id="fs16">val x : string</div>
-<div class="tip" id="fs17">Multiple items<br />val string : value:&#39;T -&gt; string<br /><br />Full name: Microsoft.FSharp.Core.Operators.string<br /><br />--------------------<br />type string = System.String<br /><br />Full name: Microsoft.FSharp.Core.string</div>
-<div class="tip" id="fs18">val failwith : message:string -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Core.Operators.failwith</div>
-<div class="tip" id="fs19">val getContext : o:obj -&gt; &#39;a<br /><br />Full name: Program.getContext</div>
-<div class="tip" id="fs20">val o : obj</div>
-<div class="tip" id="fs21">type obj = System.Object<br /><br />Full name: Microsoft.FSharp.Core.obj</div>
-<div class="tip" id="fs22">val createImageData : ctx:obj * width:int * height:int -&gt; &#39;a<br /><br />Full name: Program.createImageData</div>
-<div class="tip" id="fs23">val ctx : obj</div>
-<div class="tip" id="fs24">val width : int</div>
-<div class="tip" id="fs25">val height : int</div>
-<div class="tip" id="fs26">val putImageData : ctx:obj * data:obj -&gt; unit<br /><br />Full name: Program.putImageData</div>
-<div class="tip" id="fs27">val data : obj</div>
-<div class="tip" id="fs28">type unit = Unit<br /><br />Full name: Microsoft.FSharp.Core.unit</div>
-<div class="tip" id="fs29">val setPixel : img:obj * index:int * value:int -&gt; unit<br /><br />Full name: Program.setPixel</div>
-<div class="tip" id="fs30">val img : obj</div>
-<div class="tip" id="fs31">val index : int</div>
-<div class="tip" id="fs32">val value : int</div>
-<div class="tip" id="fs33">val mutable maxIter : int<br /><br />Full name: Program.maxIter</div>
-<div class="tip" id="fs34">val height : int<br /><br />Full name: Program.height</div>
-<div class="tip" id="fs35">val width : int<br /><br />Full name: Program.width</div>
-<div class="tip" id="fs36">val minX : float<br /><br />Full name: Program.minX</div>
-<div class="tip" id="fs37">val maxX : float<br /><br />Full name: Program.maxX</div>
-<div class="tip" id="fs38">val minY : float<br /><br />Full name: Program.minY</div>
-<div class="tip" id="fs39">val maxY : float<br /><br />Full name: Program.maxY</div>
-<div class="tip" id="fs40">val iteratePoint : s:Complex -&gt; p:Complex -&gt; Complex<br /><br />Full name: Program.iteratePoint</div>
-<div class="tip" id="fs41">val s : Complex</div>
-<div class="tip" id="fs42">val p : Complex</div>
-<div class="tip" id="fs43">val getIterationCount : p:Complex -&gt; int<br /><br />Full name: Program.getIterationCount</div>
-<div class="tip" id="fs44">val mutable z : Complex</div>
-<div class="tip" id="fs45">val mutable i : int</div>
-<div class="tip" id="fs46">val iterCountToColor : i:int -&gt; Color<br /><br />Full name: Program.iterCountToColor</div>
-<div class="tip" id="fs47">val i : int</div>
-<div class="tip" id="fs48">val getCoordColor : x:int * y:int -&gt; Color<br /><br />Full name: Program.getCoordColor</div>
-<div class="tip" id="fs49">val x : int</div>
-<div class="tip" id="fs50">val y : int</div>
-<div class="tip" id="fs51">Multiple items<br />val float : value:&#39;T -&gt; float (requires member op_Explicit)<br /><br />Full name: Microsoft.FSharp.Core.Operators.float<br /><br />--------------------<br />type float = System.Double<br /><br />Full name: Microsoft.FSharp.Core.float<br /><br />--------------------<br />type float&lt;&#39;Measure&gt; = float<br /><br />Full name: Microsoft.FSharp.Core.float&lt;_&gt;</div>
-<div class="tip" id="fs52">val showSet : unit -&gt; unit<br /><br />Full name: Program.showSet</div>
-<div class="tip" id="fs53">val color : Color</div>
-<div class="tip" id="fs54">val main : unit -&gt; unit<br /><br />Full name: Program.main</div>
+<div class="tip" id="fs14">val maxIter : int<br /><br />Full name: Program.maxIter</div>
+<div class="tip" id="fs15">val height : int<br /><br />Full name: Program.height</div>
+<div class="tip" id="fs16">val width : int<br /><br />Full name: Program.width</div>
+<div class="tip" id="fs17">val minX : float<br /><br />Full name: Program.minX</div>
+<div class="tip" id="fs18">val maxX : float<br /><br />Full name: Program.maxX</div>
+<div class="tip" id="fs19">val minY : float<br /><br />Full name: Program.minY</div>
+<div class="tip" id="fs20">val maxY : float<br /><br />Full name: Program.maxY</div>
+<div class="tip" id="fs21">val iteratePoint : s:Complex -&gt; p:Complex -&gt; Complex<br /><br />Full name: Program.iteratePoint</div>
+<div class="tip" id="fs22">val s : Complex</div>
+<div class="tip" id="fs23">val p : Complex</div>
+<div class="tip" id="fs24">val getIterationCount : p:Complex -&gt; int<br /><br />Full name: Program.getIterationCount</div>
+<div class="tip" id="fs25">val mutable z : Complex</div>
+<div class="tip" id="fs26">val mutable i : int</div>
+<div class="tip" id="fs27">val iterCountToColor : i:int -&gt; Color<br /><br />Full name: Program.iterCountToColor</div>
+<div class="tip" id="fs28">val i : int</div>
+<div class="tip" id="fs29">val getCoordColor : x:int * y:int -&gt; Color<br /><br />Full name: Program.getCoordColor</div>
+<div class="tip" id="fs30">val x : int</div>
+<div class="tip" id="fs31">val y : int</div>
+<div class="tip" id="fs32">Multiple items<br />val float : value:&#39;T -&gt; float (requires member op_Explicit)<br /><br />Full name: Microsoft.FSharp.Core.Operators.float<br /><br />--------------------<br />type float = System.Double<br /><br />Full name: Microsoft.FSharp.Core.float<br /><br />--------------------<br />type float&lt;&#39;Measure&gt; = float<br /><br />Full name: Microsoft.FSharp.Core.float&lt;_&gt;</div>
+<div class="tip" id="fs33">val showSet : unit -&gt; unit<br /><br />Full name: Program.showSet</div>
+<div class="tip" id="fs34">val ctx : CanvasRenderingContext2D</div>
+<div class="tip" id="fs35">type Globals<br /><br />Full name: Globals</div>
+<div class="tip" id="fs36">property Globals.document: Document</div>
+<div class="tip" id="fs37">member Document.getElementsByTagName_canvas : unit -&gt; NodeListOf&lt;HTMLCanvasElement&gt;</div>
+<div class="tip" id="fs38">val img : ImageData</div>
+<div class="tip" id="fs39">member CanvasRenderingContext2D.createImageData : imageDataOrSw:obj * ?sh:float -&gt; ImageData</div>
+<div class="tip" id="fs40">val index : int</div>
+<div class="tip" id="fs41">val color : Color</div>
+<div class="tip" id="fs42">property ImageData.data: float array</div>
+<div class="tip" id="fs43">member CanvasRenderingContext2D.putImageData : imagedata:ImageData * dx:float * dy:float * ?dirtyX:float * ?dirtyY:float * ?dirtyWidth:float * ?dirtyHeight:float -&gt; unit</div>
+<div class="tip" id="fs44">val main : unit -&gt; unit<br /><br />Full name: Program.main</div>
 
     </div>
     <div class="large-3 columns">
@@ -365,7 +295,7 @@
   <!-- JavaScript code from the sample goes here... -->
   <script type="text/javascript">
     $(document).ready(function () {
-var Program__width, Program__showSet$, Program__setPixel$, Program__putImageData$, Program__minY, Program__minX, Program__maxY, Program__maxX, Program__maxIter, Program__main$, Program__iteratePoint$, Program__iterCountToColor$, Program__height, Program__get_width$, Program__get_minY$, Program__get_minX$, Program__get_maxY$, Program__get_maxX$, Program__get_maxIter$, Program__get_height$, Program__getIterationCount$, Program__getElement$Object_Object_, Program__getCoordColor$, Program__getContext$Object_Object_, Program__createImageData$Object_Object_, Complex___ctor$, Color___ctor$;
+var Program__width, Program__showSet$, Program__minY, Program__minX, Program__maxY, Program__maxX, Program__maxIter, Program__main$, Program__iteratePoint$, Program__iterCountToColor$, Program__height, Program__get_width$, Program__get_minY$, Program__get_minX$, Program__get_maxY$, Program__get_maxX$, Program__get_maxIter$, Program__get_height$, Program__getIterationCount$, Program__getCoordColor$, Complex___ctor$, Color___ctor$;
   Color___ctor$ = (function (r, g, b, a)
   {
     this.r = r;
@@ -448,23 +378,11 @@ var Program__width, Program__showSet$, Program__setPixel$, Program__putImageData
       };
     };
   });
-  Program__createImageData$Object_Object_ = (function (ctx, width, height)
-  {
-    return ctx.createImageData(width,height);
-  });
-  Program__getContext$Object_Object_ = (function (o)
-  {
-    return o.getContext("2d");
-  });
   Program__getCoordColor$ = (function (x, y)
   {
     var p = (new Complex___ctor$((((x * (Program__maxX - Program__minX)) / Program__width) + Program__minX), (((y * (Program__maxY - Program__minY)) / Program__height) + Program__minY)));
     var i = Program__getIterationCount$(p);
     return Program__iterCountToColor$(i);
-  });
-  Program__getElement$Object_Object_ = (function (x)
-  {
-    return document.getElementById(x);
   });
   Program__getIterationCount$ = (function (p)
   {
@@ -520,22 +438,11 @@ var Program__width, Program__showSet$, Program__setPixel$, Program__putImageData
   {
     return Program__showSet$();
   });
-  Program__putImageData$ = (function (ctx, data)
-  {
-    ctx.putImageData(data,0,0);
-  });
-  Program__setPixel$ = (function (img, index, value)
-  {
-    img.data[index]=value;
-  });
   Program__showSet$ = (function (unitVar0)
   {
-    var ctx = (function (o)
-    {
-      return Program__getContext$Object_Object_(o);
-    })(Program__getElement$Object_Object_("canvas"));
-    var img = Program__createImageData$Object_Object_(ctx, Program__width, Program__height);
-    for (var _154 = 0; _154 <= (Program__height - 1); _154++)
+    var ctx = window.document.getElementsByTagName("canvas")[0].getContext("2d");
+    var img = ctx.createImageData(Program__width, Program__height);
+    for (var _164 = 0; _164 <= (Program__height - 1); _164++)
     {
       (function (y)
       {
@@ -543,14 +450,18 @@ var Program__width, Program__showSet$, Program__setPixel$, Program__putImageData
         {
           var index = ((x + (y * Program__width)) * 4);
           var color = Program__getCoordColor$(x, y);
-          Program__setPixel$(img, (index + 0), color.r);
-          Program__setPixel$(img, (index + 1), color.g);
-          Program__setPixel$(img, (index + 2), color.b);
-          Program__setPixel$(img, (index + 3), color.a);
+          img.data[(index + 0)] = color.r;
+          null;
+          img.data[(index + 1)] = color.g;
+          null;
+          img.data[(index + 2)] = color.b;
+          null;
+          img.data[(index + 3)] = color.a;
+          null;
         };
-      })(_154);
+      })(_164);
     };
-    return Program__putImageData$(ctx, img);
+    return ctx.putImageData(img, 0.000000, 0.000000);
   });
   Program__width = Program__get_width$();
   Program__height = Program__get_height$();

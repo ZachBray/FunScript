@@ -67,8 +67,8 @@
     <h2>Playing Mario with HTML5 Canvas</h2>
     
   <div>
-    <canvas align="center" id="canvas" width="512" height="384"></canvas>
-    <img id="image" style="position:absolute" />
+    <canvas id="canvas" width="512" height="384" style="position:absolute;"></canvas>
+    <img id="image" src="#" style="position:absolute;" >
   </div>
   
     <a class="close-reveal-modal">&#215;</a>
@@ -207,10 +207,10 @@ function that calculates a new game state using <code>step</code> and renders it
   <span class="k">let</span> <span class="k">rec</span> <span onmouseout="hideTip(event, 'fs32', 97)" onmouseover="showTip(event, 'fs32', 97)" class="i">update</span> <span onmouseout="hideTip(event, 'fs19', 98)" onmouseover="showTip(event, 'fs19', 98)" class="i">mario</span> () <span class="o">=</span>
       <span class="k">let</span> <span onmouseout="hideTip(event, 'fs19', 99)" onmouseover="showTip(event, 'fs19', 99)" class="i">mario</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs19', 100)" onmouseover="showTip(event, 'fs19', 100)" class="i">mario</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs17', 101)" onmouseover="showTip(event, 'fs17', 101)" class="i">step</span> (<span onmouseout="hideTip(event, 'fs29', 102)" onmouseover="showTip(event, 'fs29', 102)" class="i">Keyboard</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs33', 103)" onmouseover="showTip(event, 'fs33', 103)" class="i">arrows</span>())
       <span onmouseout="hideTip(event, 'fs20', 104)" onmouseover="showTip(event, 'fs20', 104)" class="i">render</span> (<span onmouseout="hideTip(event, 'fs21', 105)" onmouseover="showTip(event, 'fs21', 105)" class="i">w</span>,<span onmouseout="hideTip(event, 'fs22', 106)" onmouseover="showTip(event, 'fs22', 106)" class="i">h</span>) <span onmouseout="hideTip(event, 'fs19', 107)" onmouseover="showTip(event, 'fs19', 107)" class="i">mario</span>      
-      <span onmouseout="hideTip(event, 'fs34', 108)" onmouseover="showTip(event, 'fs34', 108)" class="i">ts</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs35', 109)" onmouseover="showTip(event, 'fs35', 109)" class="i">setTimeout</span>(<span onmouseout="hideTip(event, 'fs32', 110)" onmouseover="showTip(event, 'fs32', 110)" class="i">update</span> <span onmouseout="hideTip(event, 'fs19', 111)" onmouseover="showTip(event, 'fs19', 111)" class="i">mario</span>, <span class="n">1000.</span> <span class="o">/</span> <span class="n">60.</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs36', 112)" onmouseover="showTip(event, 'fs36', 112)" class="i">ignore</span>
+      <span onmouseout="hideTip(event, 'fs34', 108)" onmouseover="showTip(event, 'fs34', 108)" class="i">Globals</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs35', 109)" onmouseover="showTip(event, 'fs35', 109)" class="i">setTimeout</span>(<span onmouseout="hideTip(event, 'fs32', 110)" onmouseover="showTip(event, 'fs32', 110)" class="i">update</span> <span onmouseout="hideTip(event, 'fs19', 111)" onmouseover="showTip(event, 'fs19', 111)" class="i">mario</span>, <span class="n">1000.</span> <span class="o">/</span> <span class="n">60.</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs36', 112)" onmouseover="showTip(event, 'fs36', 112)" class="i">ignore</span>
   <span class="c">// Start the game with Mario in the center</span>
   <span class="k">let</span> <span onmouseout="hideTip(event, 'fs19', 113)" onmouseover="showTip(event, 'fs19', 113)" class="i">mario</span> <span class="o">=</span> { <span onmouseout="hideTip(event, 'fs2', 114)" onmouseover="showTip(event, 'fs2', 114)" class="i">x</span><span class="o">=</span><span class="n">0.</span>; <span onmouseout="hideTip(event, 'fs4', 115)" onmouseover="showTip(event, 'fs4', 115)" class="i">y</span><span class="o">=</span><span class="n">0.</span>; <span class="i">vx</span><span class="o">=</span><span class="n">0.</span>; <span class="i">vy</span><span class="o">=</span><span class="n">0.</span>; <span class="i">dir</span><span class="o">=</span><span class="s">&quot;</span><span class="s">right</span><span class="s">&quot;</span> }
-  <span onmouseout="hideTip(event, 'fs32', 116)" onmouseover="showTip(event, 'fs32', 116)" class="i">update</span> <span onmouseout="hideTip(event, 'fs19', 117)" onmouseover="showTip(event, 'fs19', 117)" class="i">mario</span>
+  <span onmouseout="hideTip(event, 'fs32', 116)" onmouseover="showTip(event, 'fs32', 116)" class="i">update</span> <span onmouseout="hideTip(event, 'fs19', 117)" onmouseover="showTip(event, 'fs19', 117)" class="i">mario</span> ()
    </pre>
 </td>
 </tr>
@@ -237,19 +237,19 @@ function that calculates a new game state using <code>step</code> and renders it
 <div class="tip" id="fs20">val render : w:float * h:float -&gt; mario:Mario -&gt; unit<br /><br />Full name: Program.render<br /><em><br /><br />&#160;Render mario on canvas </em></div>
 <div class="tip" id="fs21">val w : float</div>
 <div class="tip" id="fs22">val h : float</div>
-<div class="tip" id="fs23">val filled : color:&#39;a -&gt; float * float * float * float -&gt; Unit<br /><br />Full name: Program.Window.filled</div>
+<div class="tip" id="fs23">val filled : color:&#39;a -&gt; float * float * float * float -&gt; unit<br /><br />Full name: Program.Window.filled</div>
 <div class="tip" id="fs24">val rgb : r:&#39;a -&gt; g:&#39;b -&gt; b:&#39;c -&gt; string<br /><br />Full name: Program.Window.rgb</div>
 <div class="tip" id="fs25">val verb : string</div>
-<div class="tip" id="fs26">val image : src:string -&gt; Api&lt;...&gt;.HTMLImageElement<br /><br />Full name: Program.Window.image</div>
-<div class="tip" id="fs27">val position : x:float * y:float -&gt; img:&#39;a -&gt; unit<br /><br />Full name: Program.Window.position</div>
-<div class="tip" id="fs28">val main : unit -&gt; (unit -&gt; unit)<br /><br />Full name: Program.main</div>
+<div class="tip" id="fs26">val image : src:string -&gt; HTMLImageElement<br /><br />Full name: Program.Window.image</div>
+<div class="tip" id="fs27">val position : x:&#39;a * y:float -&gt; img:HTMLImageElement -&gt; unit<br /><br />Full name: Program.Window.position</div>
+<div class="tip" id="fs28">val main : unit -&gt; unit<br /><br />Full name: Program.main</div>
 <div class="tip" id="fs29">module Keyboard<br /><br />from Program<br /><em><br /><br />&#160;Handles keydown and keyup events of the window and exposes them<br />&#160;using the &#39;arrows&#39; property (which is a tuple int*int with -1 if the<br />&#160;left/up key is pressed, 1 if right/down key is pressed and 0 otherwise)</em></div>
-<div class="tip" id="fs30">val init : unit -&gt; Unit<br /><br />Full name: Program.Keyboard.init</div>
+<div class="tip" id="fs30">val init : unit -&gt; unit<br /><br />Full name: Program.Keyboard.init</div>
 <div class="tip" id="fs31">val dimensions : unit -&gt; float * float<br /><br />Full name: Program.Window.dimensions</div>
 <div class="tip" id="fs32">val update : (Mario -&gt; unit -&gt; unit)</div>
 <div class="tip" id="fs33">val arrows : unit -&gt; int * int<br /><br />Full name: Program.Keyboard.arrows</div>
-<div class="tip" id="fs34">type ts = Api&lt;...&gt;<br /><br />Full name: Program.ts<br /><em><br /><br />&#160;Use the type script type provider to import core JavaScript libraries</em></div>
-<div class="tip" id="fs35">Api&lt;...&gt;.setTimeout(expression: obj) : float<br />Api&lt;...&gt;.setTimeout(expression: obj, language: obj) : float<br />Api&lt;...&gt;.setTimeout(expression: obj, msec: float) : float<br />Api&lt;...&gt;.setTimeout(expression: obj, msec: float, language: obj) : float</div>
+<div class="tip" id="fs34">type Globals<br /><br />Full name: Globals</div>
+<div class="tip" id="fs35">static member Globals.setTimeout : handler:obj * ?timeout:obj -&gt; float<br />static member Globals.setTimeout : handler:obj * timeout:obj * params args:obj array -&gt; float</div>
 <div class="tip" id="fs36">val ignore : value:&#39;T -&gt; unit<br /><br />Full name: Microsoft.FSharp.Core.Operators.ignore</div>
 
     </div>
@@ -308,7 +308,7 @@ function that calculates a new game state using <code>step</code> and renders it
   <!-- JavaScript code from the sample goes here... -->
   <script type="text/javascript">
     $(document).ready(function () {
-var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Object_Object_, Window__op_Dollar$String_String, Window__op_Dollar$Int32_Int32, Window__image$, Window__filled$String_String, Window__dimensions$, Window__context$, Window__canvas$, TupleSetTree_1_Int32__SetTree_1_Int32_, TupleInt32_SetTree_1_Int32_, TupleInt32_Int32, TupleDouble_Double_Double_Double, TupleDouble_Double, String_1_IndexOf$, Set__Remove$Int32_Int32, Set__Empty$Int32_Int32, Set__Add$Int32_Int32, Set_1_Int32__get_Tree$Int32, Set_1_Int32__get_Empty$Int32, Set_1_Int32__get_Comparer$Int32, Set_1_Int32___ctor$Int32, Set_1_Int32__Remove$Int32, Set_1_Int32__Add$Int32, Set_1_IComparable__get_Tree$IComparable_, Set_1_IComparable__get_Comparer$IComparable_, Set_1_IComparable__Contains$IComparable_, SetTree_1_Int32__SetOneInt32, SetTree_1_Int32__SetNodeInt32, SetTree_1_Int32__SetEmptyInt32, SetTreeModule__tolerance, SetTreeModule__spliceOutSuccessor$Int32_Int32, SetTreeModule__remove$Int32_Int32, SetTreeModule__rebalance$Int32_Int32, SetTreeModule__mk$Int32_Int32, SetTreeModule__mem$IComparable_IComparable_, SetTreeModule__height$Int32_Int32, SetTreeModule__get_tolerance$, SetTreeModule__add$Int32_Int32, SetTreeModule__SetOne$Int32_Int32, SetTreeModule__SetNode$Int32_Int32, Program__walk$Int32_Int32, Program__step$, Program__render$, Program__physics$, Program__main$, Program__jump$Int32_Int32, Program__gravity$, Mario___ctor$, Keyboard__update$Object_Object_, Keyboard__keysPressed, Keyboard__init$, Keyboard__get_keysPressed$, Keyboard__code$, Keyboard__arrows$, GenericComparer_1_Int32___ctor$Int32;
+var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Double_Double, Window__op_Dollar$String_String, Window__op_Dollar$Int32_Int32, Window__image$, Window__get_context$, Window__get_canvas$, Window__filled$String_String, Window__dimensions$, Window__context, Window__canvas, TupleSetTree_1_Int32__SetTree_1_Int32_, TupleInt32_SetTree_1_Int32_, TupleInt32_Int32, TupleDouble_Double_Double_Double, TupleDouble_Double, String_1_IndexOf$, Set__Remove$Int32_Int32, Set__Empty$Int32_Int32, Set__Add$Int32_Int32, Set_1_Int32__get_Tree$Int32, Set_1_Int32__get_Empty$Int32, Set_1_Int32__get_Comparer$Int32, Set_1_Int32___ctor$Int32, Set_1_Int32__Remove$Int32, Set_1_Int32__Add$Int32, Set_1_IComparable__get_Tree$IComparable_, Set_1_IComparable__get_Comparer$IComparable_, Set_1_IComparable__Contains$IComparable_, SetTree_1_Int32__SetOneInt32, SetTree_1_Int32__SetNodeInt32, SetTree_1_Int32__SetEmptyInt32, SetTreeModule__tolerance, SetTreeModule__spliceOutSuccessor$Int32_Int32, SetTreeModule__remove$Int32_Int32, SetTreeModule__rebalance$Int32_Int32, SetTreeModule__mk$Int32_Int32, SetTreeModule__mem$IComparable_IComparable_, SetTreeModule__height$Int32_Int32, SetTreeModule__get_tolerance$, SetTreeModule__add$Int32_Int32, SetTreeModule__SetOne$Int32_Int32, SetTreeModule__SetNode$Int32_Int32, Program__walk$Int32_Int32, Program__step$, Program__render$, Program__physics$, Program__main$, Program__jump$Int32_Int32, Program__gravity$, Mario___ctor$, Lazy_1_Object__get_Value$Object_, Lazy_1_Object___ctor$Object_, Lazy_1_Object__Create$Object_, Keyboard__update$, Keyboard__keysPressed, Keyboard__init$, Keyboard__get_keysPressed$, Keyboard__code$, Keyboard__arrows$, GenericComparer_1_Int32___ctor$Int32;
   GenericComparer_1_Int32___ctor$Int32 = (function (unitVar0)
   {
     ;
@@ -334,23 +334,24 @@ var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Object_O
   });
   Keyboard__init$ = (function (unitVar0)
   {
-    addEventListener("keydown", (function (e)
+    window.addEventListener("keydown", (function (e)
     {
-      return Keyboard__update$Object_Object_(e, true);
+      Keyboard__update$(e, true);
+      return null;
     }));
-    return addEventListener("keyup", (function (e)
+    return window.addEventListener("keyup", (function (e)
     {
-      return Keyboard__update$Object_Object_(e, false);
+      Keyboard__update$(e, false);
+      return null;
     }));
   });
-  Keyboard__update$Object_Object_ = (function (e, pressed)
+  Keyboard__update$ = (function (e, pressed)
   {
-    var _e = e;
-    var keyCode = _e.keyCode;
-    var _11;
+    var keyCode = e.keyCode;
+    var _7;
     if (pressed) 
     {
-      _11 = (function (value)
+      _7 = (function (value)
       {
         return (function (set)
         {
@@ -360,7 +361,7 @@ var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Object_O
     }
     else
     {
-      _11 = (function (value)
+      _7 = (function (value)
       {
         return (function (set)
         {
@@ -368,8 +369,34 @@ var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Object_O
         });
       });
     };
-    var op = _11;
+    var op = _7;
     Keyboard__keysPressed = op(keyCode)(Keyboard__keysPressed);
+  });
+  Lazy_1_Object__Create$Object_ = (function (f)
+  {
+    return (new Lazy_1_Object___ctor$Object_(null, f));
+  });
+  Lazy_1_Object___ctor$Object_ = (function (value, factory)
+  {
+    this.factory = factory;
+    this.isCreated = false;
+    this.value_25 = value;
+  });
+  Lazy_1_Object__get_Value$Object_ = (function (x, unitVar1)
+  {
+    if ((!x.isCreated)) 
+    {
+      var _391;
+      var _394;
+      _391 = x.factory(_394);
+      x.value_25 = _391;
+      x.isCreated = true;
+    }
+    else
+    {
+      ;
+    };
+    return x.value_25;
   });
   Mario___ctor$ = (function (x, y, vx, vy, dir)
   {
@@ -469,45 +496,46 @@ var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Object_O
     {
       return (function (unitVar1)
       {
-        var _396;
-        var _397;
+        var _417;
+        var _418;
         var tupledArg = Keyboard__arrows$();
         var arg00_ = tupledArg.Items[0.000000];
         var arg01_ = tupledArg.Items[1.000000];
-        _397 = (function (_mario)
+        _418 = (function (_mario)
         {
           return Program__step$(arg00_, arg01_, _mario);
         });
-        _396 = _397(mario);
-        var _mario = _396;
+        _417 = _418(mario);
+        var _mario = _417;
         Program__render$(w, h, _mario);
         return (function (value)
         {
           var ignored0 = value;
-        })(setTimeout(update(_mario), (1000.000000 / 60.000000)));
+        })(window.setTimeout(update(_mario), (1000.000000 / 60.000000)));
       });
     });
     var mario = (new Mario___ctor$(0.000000, 0.000000, 0.000000, 0.000000, "right"));
-    return update(mario);
+    var _415;
+    return update(mario)(_415);
   });
   Program__physics$ = (function (m)
   {
-    var _565;
+    var _586;
     if (((m.y + m.vy) > 0.000000)) 
     {
-      _565 = (m.y + m.vy);
+      _586 = (m.y + m.vy);
     }
     else
     {
-      _565 = 0.000000;
+      _586 = 0.000000;
     };
-    return (new Mario___ctor$((m.x + m.vx), _565, m.vx, m.vy, m.dir));
+    return (new Mario___ctor$((m.x + m.vx), _586, m.vx, m.vy, m.dir));
   });
   Program__render$ = (function (w, h, mario)
   {
-    var _595;
+    var _616;
     var color = Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32(174, 238, 238);
-    _595 = (function (tupledArg)
+    _616 = (function (tupledArg)
     {
       var arg10_ = tupledArg.Items[0.000000];
       var arg11_ = tupledArg.Items[1.000000];
@@ -515,10 +543,10 @@ var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Object_O
       var arg13_ = tupledArg.Items[3.000000];
       return Window__filled$String_String(color, arg10_, arg11_, arg12_, arg13_);
     });
-    _595((new TupleDouble_Double_Double_Double(0.000000, 0.000000, w, h)));
-    var _661;
+    _616((new TupleDouble_Double_Double_Double(0.000000, 0.000000, w, h)));
+    var _688;
     var _color = Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32(74, 163, 41);
-    _661 = (function (tupledArg)
+    _688 = (function (tupledArg)
     {
       var arg10_ = tupledArg.Items[0.000000];
       var arg11_ = tupledArg.Items[1.000000];
@@ -526,33 +554,33 @@ var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Object_O
       var arg13_ = tupledArg.Items[3.000000];
       return Window__filled$String_String(_color, arg10_, arg11_, arg12_, arg13_);
     });
-    _661((new TupleDouble_Double_Double_Double(0.000000, (h - 50.000000), w, 50.000000)));
-    var _686;
+    _688((new TupleDouble_Double_Double_Double(0.000000, (h - 50.000000), w, 50.000000)));
+    var _713;
     if ((mario.y > 0.000000)) 
     {
-      _686 = "jump";
+      _713 = "jump";
     }
     else
     {
       if ((mario.vx != 0.000000)) 
       {
-        _686 = "walk";
+        _713 = "walk";
       }
       else
       {
-        _686 = "stand";
+        _713 = "stand";
       };
     };
-    var verb = _686;
-    var _697;
+    var verb = _713;
+    var _724;
     var tupledArg = (new TupleDouble_Double((((w / 2.000000) - 16.000000) + mario.x), (((h - 50.000000) - 31.000000) - mario.y)));
     var x = tupledArg.Items[0.000000];
     var y = tupledArg.Items[1.000000];
-    _697 = (function (img)
+    _724 = (function (img)
     {
-      return Window__position$Object_Object_(x, y, img);
+      return Window__position$Double_Double(x, y, img);
     });
-    return _697((function (src)
+    return _724((function (src)
     {
       return Window__image$(src);
     })(((("mario" + verb) + mario.dir) + ".gif")));
@@ -560,52 +588,52 @@ var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Object_O
   Program__step$ = (function (dir_0, dir_1, mario)
   {
     var dir = (new TupleInt32_Int32(dir_0, dir_1));
-    var _468;
+    var _489;
     var arg00_ = dir.Items[0.000000];
     var y = dir.Items[1.000000];
-    _468 = (function (m)
+    _489 = (function (m)
     {
       return Program__jump$Int32_Int32(arg00_, y, m);
     });
-    var _498;
-    var _524;
-    var _525;
+    var _519;
+    var _545;
+    var _546;
     var x = dir.Items[0.000000];
     var arg01_ = dir.Items[1.000000];
-    _525 = (function (m)
+    _546 = (function (m)
     {
       return Program__walk$Int32_Int32(x, arg01_, m);
     });
-    _524 = _525((function (m)
+    _545 = _546((function (m)
     {
       return Program__physics$(m);
     })(mario));
-    _498 = (function (m)
+    _519 = (function (m)
     {
       return Program__gravity$(m);
-    })(_524);
-    return _468(_498);
+    })(_545);
+    return _489(_519);
   });
   Program__walk$Int32_Int32 = (function (x, _arg1, m)
   {
     var vx = x;
-    var _535;
+    var _556;
     if ((x < 0)) 
     {
-      _535 = "left";
+      _556 = "left";
     }
     else
     {
       if ((x > 0)) 
       {
-        _535 = "right";
+        _556 = "right";
       }
       else
       {
-        _535 = m.dir;
+        _556 = m.dir;
       };
     };
-    var dir = _535;
+    var dir = _556;
     return (new Mario___ctor$(m.x, m.y, vx, m.vy, dir));
   });
   SetTreeModule__SetNode$Int32_Int32 = (function (x, l, r, h)
@@ -734,16 +762,16 @@ var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Object_O
       {
         var hl = SetTreeModule__height$Int32_Int32(l);
         var hr = SetTreeModule__height$Int32_Int32(r);
-        var _144;
+        var _140;
         if ((hl < hr)) 
         {
-          _144 = hr;
+          _140 = hr;
         }
         else
         {
-          _144 = hl;
+          _140 = hl;
         };
-        var m = _144;
+        var m = _140;
         return SetTreeModule__SetNode$Int32_Int32(k, l, r, (m + 1));
       };
     }
@@ -751,16 +779,16 @@ var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Object_O
     {
       var _hl = SetTreeModule__height$Int32_Int32(l);
       var _hr = SetTreeModule__height$Int32_Int32(r);
-      var _158;
+      var _154;
       if ((_hl < _hr)) 
       {
-        _158 = _hr;
+        _154 = _hr;
       }
       else
       {
-        _158 = _hl;
+        _154 = _hl;
       };
-      var _m = _158;
+      var _m = _154;
       return SetTreeModule__SetNode$Int32_Int32(k, l, r, (_m + 1));
     };
   });
@@ -1086,10 +1114,10 @@ var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Object_O
   Set_1_Int32__get_Empty$Int32 = (function (unitVar0)
   {
     var comparer = (new GenericComparer_1_Int32___ctor$Int32());
-    var _366;
+    var _362;
     var impl;
     impl = comparer;
-    _366 = {Compare: (function (x, y)
+    _362 = {Compare: (function (x, y)
     {
       return (function (__, x, y)
       {
@@ -1098,7 +1126,7 @@ var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Object_O
         return diff;
       })(impl, x, y);
     })};
-    return (new Set_1_Int32___ctor$Int32(_366, (new SetTree_1_Int32__SetEmptyInt32())));
+    return (new Set_1_Int32___ctor$Int32(_362, (new SetTree_1_Int32__SetEmptyInt32())));
   });
   Set_1_Int32__get_Tree$Int32 = (function (set, unitVar1)
   {
@@ -1118,7 +1146,7 @@ var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Object_O
   });
   String_1_IndexOf$ = (function (s, search)
   {
-    return s.indexOf(search);
+    return s.indexOf(search);;
   });
   TupleDouble_Double = (function (Item0, Item1)
   {
@@ -1292,22 +1320,14 @@ var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Object_O
       };
     };
   });
-  Window__canvas$ = (function (unitVar0)
-  {
-    return document.getElementById("canvas");
-  });
-  Window__context$ = (function (unitVar0)
-  {
-    return Window__canvas$().getContext("2d");
-  });
   Window__dimensions$ = (function (unitVar0)
   {
-    return (new TupleDouble_Double(Window__canvas$().width, Window__canvas$().height));
+    return (new TupleDouble_Double(Lazy_1_Object__get_Value$Object_(Window__canvas).width, Lazy_1_Object__get_Value$Object_(Window__canvas).height));
   });
   Window__filled$String_String = (function (color, rect_0, rect_1, rect_2, rect_3)
   {
     var rect = (new TupleDouble_Double_Double_Double(rect_0, rect_1, rect_2, rect_3));
-    var ctx = Window__context$();
+    var ctx = Lazy_1_Object__get_Value$Object_(Window__context);
     ctx.fillStyle = color;
     null;
     return (function (tupledArg)
@@ -1319,9 +1339,23 @@ var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Object_O
       return ctx.fillRect(arg00, arg01, arg02, arg03);
     })(rect);
   });
+  Window__get_canvas$ = (function ()
+  {
+    return Lazy_1_Object__Create$Object_((function (unitVar)
+    {
+      return window.document.getElementsByTagName("canvas")[0];
+    }));
+  });
+  Window__get_context$ = (function ()
+  {
+    return Lazy_1_Object__Create$Object_((function (unitVar)
+    {
+      return Lazy_1_Object__get_Value$Object_(Window__canvas).getContext("2d");
+    }));
+  });
   Window__image$ = (function (src)
   {
-    var image = document.getElementById("image");
+    var image = window.document.getElementsByTagName("img")[0];
     if ((String_1_IndexOf$(image.src, src) == -1)) 
     {
       image.src = src;
@@ -1341,12 +1375,21 @@ var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Object_O
   {
     return (s + n.toString());
   });
-  Window__position$Object_Object_ = (function (x, y, img)
+  Window__position$Double_Double = (function (x, y, img)
   {
-    var _img = img;
-    _img.style.posLeft = x;
+    img.style.left = (x.toString() + "px");
     null;
-    _img.style.posTop = (Window__canvas$().offsetTop + y);
+    var _761;
+    var _762;
+    var copyOfStruct = (Lazy_1_Object__get_Value$Object_(Window__canvas).offsetTop + y);
+    _762 = copyOfStruct.toString();
+    _761 = (_762 + "px");
+    var _773;
+    var _774;
+    var copyOfStruct = (Lazy_1_Object__get_Value$Object_(Window__canvas).offsetTop + y);
+    _774 = copyOfStruct.toString();
+    _773 = (_774 + "px");
+    img.style.top = _761;
     return null;
   });
   Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32 = (function (r, g, b)
@@ -1355,6 +1398,8 @@ var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Object_O
   });
   SetTreeModule__tolerance = SetTreeModule__get_tolerance$();
   Keyboard__keysPressed = Keyboard__get_keysPressed$();
+  Window__canvas = Window__get_canvas$();
+  Window__context = Window__get_context$();
   return Program__main$()
 });
   </script>
