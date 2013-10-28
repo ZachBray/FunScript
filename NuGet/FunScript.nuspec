@@ -3,11 +3,14 @@
   <metadata>
     <id>FunScript</id>
     <authors>Zach Bray, Tomas Petricek, Phillip Trelford, James Feiwirth, Robert Pickering</authors>
-    <version>1.0.0.1</version>
+    <version>1.1.0.0</version>
     <projectUrl>http://www.funscript.info</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>F# to JavaScript compiler with JQuery etc. mappings through a TypeScript type provider</description>
+    <description>(BETA version) F# to JavaScript compiler with JQuery etc. mappings through a TypeScript type provider</description>
     <copyright>Copyright 2013</copyright>
     <tags>F# JavaScript TypeProvider</tags>
+    <dependencies>
+        <dependency id="FSharp.Data" version="[1.1.5.0]" />
+    </dependencies>
   </metadata>
 </package>
