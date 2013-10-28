@@ -38,6 +38,15 @@ let ``the := operator works``() =
          !x
       @@>
 
+[<Test>]
+let ``the <'a ref>.Value property works``() =
+   check  
+      <@@ 
+         let x = ref 10.
+         x := 11.
+         x.Value
+      @@>
+
 
 [<Test>]
 let ``the |> operator works``() =

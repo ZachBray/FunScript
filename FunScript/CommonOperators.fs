@@ -130,6 +130,7 @@ let components =
          // Refs
          ExpressionReplacer.create <@ ref @> <@ Replacements.ref @>
          ExpressionReplacer.create <@ (!) @> <@ Replacements.op_Bang @>
+         ExpressionReplacer.create <@ fun (x : _ Ref) -> x.Value @> <@ Replacements.op_Bang @>
          ExpressionReplacer.create <@ (:=) @> <@ Replacements.assign @>
    
          // Piping
