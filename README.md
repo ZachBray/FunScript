@@ -15,4 +15,4 @@ Please help test the compiler libary and type provider by building samples and r
 
 ## More information
 
-Please see the (FunScript website)[http://www.funscript.info].
+Please see the [FunScript website](http://www.funscript.info).
