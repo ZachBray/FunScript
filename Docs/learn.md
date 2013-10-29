@@ -21,6 +21,6 @@ and take a look at our tutorials and samples:
  - [Calling The Movie Database](samples/moviedatabase/index.html)
  - [Using HTML5 canvas](samples/canvas/index.html)
  - [Drawing a Mandelbrot with HTML5 canvas](samples/mandelbrot/index.html)
- - [Asynchornous computations](samples/simpleasync/index.html)
+ - [Asynchronous computations](samples/simpleasync/index.html)
 
 </div>
