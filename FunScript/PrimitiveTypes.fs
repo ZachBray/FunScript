@@ -23,7 +23,13 @@ let private primitiveValues =
       // TODO: our own decimal type?
       | Patterns.Value(null, _) -> [ yield returnStategy.Return <| Null ]
       | Patterns.Value(x, t) ->
-            if t.IsEnum then [ yield returnStategy.Return <| Integer(unbox x) ]
+            if t.IsEnum then 
+                // TODO: Remove this hack. Replace with Attribute.
+                if t.Assembly.GetName().Name.StartsWith("FunScript.TypeScript.Binding.") then
+                    // TODO: Add attribute for this too. It could be sanitized by this point!
+                    let name = System.Enum.GetName(t, x)
+                    [ yield returnStategy.Return <| JSExpr.EmitExpr(fun (_, _) -> t.FullName + "." + name) ] 
+                else [ yield returnStategy.Return <| Integer(unbox x) ]
             else []
       | _ -> []
 

@@ -93,9 +93,15 @@ module private Domain =
         | Index of ParameterType * ReturnType
         | Property of ReturnType
 
+    type FFIPropertyName =
+        | Invoker
+        | Indexer
+        | Constructor
+        | Name of PropertyName
+
     type FFIElement =
         | Enum of TypeRef * (PropertyName * int option) list
-        | Member of ParentType * PropertyName option * Staticness * FFIMemberElement
+        | Member of ParentType * FFIPropertyName * Staticness * FFIMemberElement
         | Interface of TypeRef * GenericConstraint list * SuperType list
         | Delegate of TypeRef * ParameterType list * ReturnType
         | Import of IsExport * Destination * Source
@@ -228,7 +234,7 @@ module private FFIMapping =
             match zs with
             | None -> fst x
             | Some _ -> typeAnnotationOptionToTypeRef k x zs
-        fromSignature k x None y xs ys returnType
+        fromSignature k x Constructor y xs ys returnType
 
     and fromIndexSignature k x y =
         let n, z, r =
@@ -236,17 +242,17 @@ module private FFIMapping =
             | IndexSignatureNumber(n, TypeAnnotation z) -> n, z, TypeRef(["int"], [])
             | IndexSignatureString(n, TypeAnnotation z) -> n, z, predefinedTypeToTypeRef String
         let returnType = typeToTypeRef k x z
-        Member(fst x, None, NonStatic, Index(r, returnType)) |> k
+        Member(fst x, Indexer, NonStatic, Index(r, returnType)) |> k
 
     and fromMethodSignature k x s (MethodSignature(y, _, z)) =
-        fromCallSignature k x (Some y) s z
+        fromCallSignature k x (Name y) s z
 
     and fromPropertySignature k x s (PropertySignature(y, _, z)) =
         let returnType = typeAnnotationOptionToTypeRef k x z
-        Member(fst x, Some y, s, Property returnType) |> k
+        Member(fst x, Name y, s, Property returnType) |> k
 
     and fromTypeMember k x = function
-        | MemberCallSignature y -> fromCallSignature k x None NonStatic y
+        | MemberCallSignature y -> fromCallSignature k x Invoker NonStatic y
         | MemberConstructSignature y -> fromConstructSignature k x NonStatic y
         | MemberIndexSignature y -> fromIndexSignature k x y
         | MemberMethodSignature y -> fromMethodSignature k x NonStatic y
@@ -291,7 +297,7 @@ module private FFIMapping =
 
     and fromFunctionDeclaration k ns n x =
         let t = TypeRef(ns, [])
-        let y = Some(NameIdentifier n)
+        let y = Name(NameIdentifier n)
         fromCallSignature k (t, (false, [])) y Static x
 
     and fromVariableDeclaration k ns n x =
@@ -832,16 +838,19 @@ type %s ="""        (extractNamespaceCode t) localSignature
                     let fixAndResolve = 
                         fixGenericTypeParameters >> resolveTypeRef true typeImports typesByKey t fixedGpsSet
                     let fixedT = fixGenericTypeParameters t
-                    let name, accessCode = 
-                        match pn, el with
-                        | None, Index _ -> "Item", ""
-                        | None, _ -> "Invoke", ""
-                        | Some pn, _ -> Identifier.fromPropertyName pn
+                    let name, accessCode, prelude = 
+                        match pn with
+                        | Indexer -> "Item", "", ""
+                        | Invoker -> "Invoke", "", ""
+                        | Constructor -> "Create", "", "new "
+                        | Name pn -> 
+                            let n, a = Identifier.fromPropertyName pn
+                            n, a, ""
                     let baseAccess, seedI =
                         match s with
                         | Static -> javaScriptTypeCode t, 0
                         | NonStatic -> "{0}", 1
-                    let fullAccess = baseAccess + accessCode
+                    let fullAccess = prelude + baseAccess + accessCode
                     let callCode =
                         match el with
                         | Property _ -> fullAccess
@@ -925,11 +934,11 @@ type %s ="""        (extractNamespaceCode t) localSignature
                             | Static -> "static member "
                             | NonStatic -> "member __."
                         sprintf """
-            [<FunScript.JSEmitInline("%s"); CompiledName("%s")>]
+            [<FunScript.JSEmitInline("(%s)"); CompiledName("%s")>]
             %s%s"""                 callCode compiledName root memberSignature
                         |> Option.foldBack (fun (auxSignature, auxCallCode) acc  ->
                             sprintf """%s
-            [<FunScript.JSEmitInline("%s"); CompiledName("%sAux")>]
+            [<FunScript.JSEmitInline("(%s)"); CompiledName("%sAux")>]
             %s%s"""                 acc auxCallCode compiledName root auxSignature)
                             auxMemberSignature
                         |> Some
@@ -1025,8 +1034,8 @@ module Compiler =
     let private findAndConvertDelegates hasPriorDefinition elementsByNameKey =
         elementsByNameKey |> Seq.collect (fun (k, els) ->
             match els with
-            | [Interface(_, [], []); Member(TypeRef(_,gps) as t, None, NonStatic, Method([], [], ps, r))]
-            | [Member(TypeRef(_,gps) as t, None, NonStatic, Method([], [], ps, r)); Interface(_, [], [])]
+            | [Interface(_, [], []); Member(TypeRef(_,gps) as t, Invoker, NonStatic, Method([], [], ps, r))]
+            | [Member(TypeRef(_,gps) as t, Invoker, NonStatic, Method([], [], ps, r)); Interface(_, [], [])]
                 when ps |> List.forall (function Variable _ -> true | _ -> false) &&
                         not (hasPriorDefinition  k) ->
                 let args = ps |> List.map (function Variable(_, t, _) -> t | _ -> failwith "never")

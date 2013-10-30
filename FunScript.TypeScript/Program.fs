@@ -78,7 +78,7 @@ let generateAssembliesLazily tempDir inputs =
         let contents, dependencies = outputMappings.[name]
         let moduleLocation = assemblyLocation name
         if File.Exists moduleLocation then
-            Some(moduleLocation, dependencies)
+            Some moduleLocation
         else
             printfn "Generating assembly for %s..." name
             let hasDependencies =
@@ -91,10 +91,10 @@ let generateAssembliesLazily tempDir inputs =
                     moduleLocation
                     dependencyLocations
                     contents
-            if wasSuccessful then Some(moduleLocation, dependencies)
+            if wasSuccessful then Some moduleLocation
             else None
     outputFiles |> List.map (fun (name, _, _) ->
-        name, lazy forceCreation name)
+        name, lazy forceCreation name, snd outputMappings.[name])
     
 let loadDefaultLib() =
     let ass = typeof<AST.AmbientClassBodyElement>.Assembly
@@ -156,6 +156,9 @@ let uploadPackage tempDir key version moduleName assLoc deps =
             sprintf "push FunScript.TypeScript.Binding.%s.%s.nupkg %s" moduleName version key)
     pushProcess.WaitForExit()
 
+open System.Threading
+open System.Collections.Concurrent
+
 [<EntryPoint>]
 let main args =
     try
@@ -168,16 +171,33 @@ let main args =
             | [| zipUri |] -> None, Some zipUri
             | _ -> None, None
         let zipUri = defaultArg zipUri "https://github.com/borisyankov/DefinitelyTyped/archive/master.zip"
+        let gate = new AutoResetEvent(false) 
+        let processed = ConcurrentDictionary()
         downloadTypesZip tempDir zipUri
         |> generateAssembliesLazily outDir
-        |> Seq.iter (fun (moduleName, locations) -> 
-            match nugetKey with
-            | None -> ()
-            | Some(version, key) -> 
-                match locations.Value with
-                | None -> ()
-                | Some (assLoc, deps) ->
-                    uploadPackage outDir key version moduleName assLoc deps)
+        |> Seq.toArray
+        |> Array.map (fun (moduleName, location, dependencies) -> 
+            let rec attempt() =
+                async {
+                    let hasDependencies = dependencies |> List.forall processed.ContainsKey
+                    if hasDependencies then
+                        match nugetKey with
+                        | None -> ()
+                        | Some(version, key) ->
+                            processed.[moduleName] <- location.Value
+                            gate.Set() |> ignore
+                            match location.Value with
+                            | None -> ()
+                            | Some assLoc ->
+                                uploadPackage outDir key version moduleName assLoc dependencies
+                    else
+                        let! _ = Async.AwaitWaitHandle(gate, 1000)
+                        return! attempt()
+                }
+            attempt())
+        |> Async.Parallel
+        |> Async.RunSynchronously
+        |> ignore
         0
     with ex -> 
         printfn "[ERROR] %s" (ex.ToString())
