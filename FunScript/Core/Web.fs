@@ -30,7 +30,13 @@ module Literals =
 
     [<Literal>]
     let sendRequestJS = """
-    var _method = {0}, _url = {1}, _headerKeys = {2}, _headerValues = {3}, _onSuccess = {4}, _onError = {5};
+    var _method = {0}, 
+        _url = {1}, 
+        _headerKeys = {2}, 
+        _headerValues = {3},
+        _body = {4}, 
+        _onSuccess = {5}, 
+        _onError = {6};
 
     if (window.XDomainRequest) {
         var req = new XDomainRequest();
@@ -39,7 +45,11 @@ module Literals =
         req.ontimeout = _onError;
         req.timeout = 10000;
         req.open(_method, _url);
-        req.send();
+        if(_body) {
+            req.send(_body);
+        } else {
+            req.send();
+        }
     }
     else {
         var req;
@@ -65,13 +75,17 @@ module Literals =
             var value = _headerValues[i];
             req.setRequestHeader(key, value);
         }
-        req.send();
+        if(_body) {
+            req.send(_body);
+        } else {
+            req.send();
+        }
     }"""
 
 
 /// Note: XDomainRequest doesn't support headers!
 [<JS; JSEmit(Literals.sendRequestJS)>]
-let sendRequest(meth : string, url : string, headerKeys : string[], headerValues : string[], onSuccess : string -> unit, onError : unit -> unit) =
+let sendRequest(meth : string, url : string, headerKeys : string[], headerValues : string[], body : string, onSuccess : string -> unit, onError : unit -> unit) =
     failwith "never"
 
 [<JS>]
@@ -138,7 +152,12 @@ type WebRequest(url : string) =
                 let bytes = Text.Encoding.UTF8.GetBytes data
                 onSuccess(new WebResponse(bytes))
             let onErrorReceived() = onError null
-            sendRequest(req.Method, url, req.Headers.Keys, req.Headers.Values, onReceived, onErrorReceived)
+            let body =
+                if req.Method = "GET" then null
+                else Text.Encoding.UTF8.GetString(requestStream.Contents)
+            sendRequest(
+                req.Method, url, req.Headers.Keys, req.Headers.Values, 
+                body, onReceived, onErrorReceived)
         )
         
     static member Create(uri : string) = WebRequest(uri)
