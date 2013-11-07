@@ -3,6 +3,7 @@ module internal FunScript.OtherMappings
 open AST
 open Microsoft.FSharp.Quotations
 open System.IO
+open System.IO.Compression
 open System.Collections.Concurrent
 
 [<FunScript.JS>]
@@ -53,6 +54,14 @@ let components =
          ExpressionReplacer.createUnsafe 
             <@ fun (stream : Stream, buffer, offset, count) -> stream.AsyncWrite(buffer, offset, count) @> 
             <@ fun (stream : Core.Web.Stream, buffer, offset, count) -> stream.AsyncWrite(buffer, offset, count) @> 
+
+         ExpressionReplacer.createUnsafe 
+            <@ fun () -> new MemoryStream() @> 
+            <@ fun () -> Core.Web.Stream.Create() @>
+
+         ExpressionReplacer.createUnsafe 
+            <@ fun x y z -> new GZipStream(x, y, z) @> 
+            <@ fun x y z -> Core.Web.GZipStream.Create(x, y, z) @>
       ]
 
       ExpressionReplacer.createTypeMethodMappings 
@@ -69,6 +78,10 @@ let components =
 
       ExpressionReplacer.createTypeMethodMappings
          typeof<System.IO.Stream>
+         typeof<Core.Web.Stream>
+         
+      ExpressionReplacer.createTypeMethodMappings
+         typeof<System.IO.MemoryStream>
          typeof<Core.Web.Stream>
 
       ExpressionReplacer.createTypeMethodMappings

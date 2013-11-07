@@ -10,6 +10,9 @@ let private replaceSingle(s:string, search:string, replace:string) : string = fa
 [<FunScript.JSEmit("return {0}.indexOf({1});")>]
 let IndexOf(s:string, search:string) : int = failwith "never"
 
+let StartsWith(s, search) =
+    IndexOf(s, search) = 0
+
 [<FunScript.JSEmit("return {0}.toLowerCase();")>]
 let ToLowerCase(s:string) : string = failwith "never"
 

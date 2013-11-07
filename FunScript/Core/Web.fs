@@ -101,39 +101,61 @@ type UTF8Encoding() =
 type WebHeaderCollection() =
     let mutable headers = []
 
-    member __.Add(key, value) = headers <- (key, value)::headers
+    member __.Add(key : string, value) = 
+        // Browsers deal with this:
+        if not(key.StartsWith "Accept") then
+            headers <- (key, value)::headers
     member __.Keys = headers |> List.map fst |> List.toArray
     member __.Values = headers |> List.map snd |> List.toArray
 
 [<JS>]
-type Stream(initalContents : byte[]) =
+type Stream(initalContents : byte[], flush) =
     let mutable contents = initalContents
     let mutable nextIndex = 0
 
-    member __.Contents = contents
+    member __.Contents 
+        with get() = contents
+        and set v = contents <- v
+
+    member __.Write(buffer:byte[], offset:int, count:int) =
+        let extra = Array.sub buffer offset count
+        contents <- Array.append contents extra
 
     member __.AsyncWrite(buffer:byte[], ?offset:int, ?count:int) =
         async {
             //TODO: Perf... could be more efficient!
             let offset = defaultArg offset 0
             let count  = defaultArg count buffer.Length
-            let extra = Array.sub buffer offset count
-            contents <- Array.append contents extra
+            __.Write(buffer, offset, count)
         }
+
     member stream.AsyncRead(count) =
         async { 
             let start = nextIndex
             nextIndex <- nextIndex + count
             return Array.sub contents start count
         }
+
+    member __.Flush() = flush contents
+    member __.Close() = flush contents
         
     member __.Dispose() = ()
+
+    member __.ToArray() = contents
+
     interface IDisposable with
         member __.Dispose() = ()
 
+    static member Create() = new Stream([||], ignore)
+
+[<JS>] // GZip is handled by the browser!
+type GZipStream() = 
+    static member Create(stream : Stream, mode : System.IO.Compression.CompressionMode, shouldKeepOpen : bool) = 
+        new Stream([||], fun xs -> stream.Contents <- xs)
+
 [<JS>]
 type WebResponse(contents) =
-    member __.GetResponseStream() = new Stream(contents)
+    member __.GetResponseStream() = new Stream(contents, ignore)
     member __.ContentLength = int64 contents.Length
 
     member __.Dispose() = ()
@@ -142,7 +164,7 @@ type WebResponse(contents) =
 
 [<JS>]
 type WebRequest(url : string) =
-    let requestStream = new Stream([||])
+    let requestStream = new Stream([||], ignore)
     member val Headers = WebHeaderCollection()
     member val Method = "GET" with get, set
     member __.GetRequestStream() = requestStream
