@@ -46,6 +46,45 @@ let ``infinite seq expressions work``() =
       @@>
 
 [<Test>]
+let ``multiple yields in seq expressions work``() =
+   check  
+      <@@ 
+        let upTo n = seq {
+            for i = 1 to n do
+                yield n
+        }
+        let numbers () = seq { 
+            yield 8
+            yield! upTo 5 
+            yield 4
+            yield! upTo 3
+            yield 2
+         }
+        numbers() |> Seq.sumBy float
+      @@>
+
+type 'a Tree =
+    | Leaf
+    | Node of 'a Tree * 'a * 'a Tree
+
+[<Test>]
+let ``recursive seq expressions work``() =
+   check  
+      <@@ 
+        let rec traverse t = seq { 
+            match t with
+            | Leaf -> ()
+            | Node(xs, y, zs) ->
+                yield y
+                yield! traverse xs
+                yield! traverse zs |> Seq.map ((*) 2.)
+         }
+        let t =
+            Node(Node(Leaf, 1., Leaf), 2., Node(Leaf, 3., Leaf))
+        traverse t |> Seq.sumBy float
+      @@>
+
+[<Test>]
 let ``combine in seq expressions works``() =
    check  
       <@@ 

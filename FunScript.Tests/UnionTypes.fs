@@ -86,3 +86,17 @@ let ``Union cases matches with many arguments can be generated``() =
          | Case3(a, b, c) -> a + b + c
          | _ -> ""
       @@>
+
+type TestUnion2 =
+    | Tag of string
+    | NewTag of string
+
+[<Test>]
+let ``Union cases called Tag still work (bug due to Tag field)``() =
+   check 
+      <@@ 
+         let x = Tag "abc"
+         match x with
+         | Tag x -> x
+         | _ -> ""
+      @@>

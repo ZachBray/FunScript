@@ -33,18 +33,30 @@ module PatternsExt =
          else None
       | _ -> None
 
+let (|TryFind|_|) f xs =
+    xs |> Array.tryPick f
+
+let ofType<'a> x =
+    match x : obj with 
+    | :? 'a as caseType -> Some caseType
+    | _ -> None
+
 let getCaseMethodInfo (uci:UnionCaseInfo) =
    let unionType = uci.DeclaringType
-   match unionType.GetMember(uci.Name, flags) with
-   | [| :? System.Type as caseType |] -> 
+   let members = unionType.GetMember(uci.Name, flags)
+   let ofTypeType = ofType<System.Type>
+   let ofTypeMethodInfo = ofType<MethodInfo>
+   let ofTypePropertyInfo = ofType<PropertyInfo>
+   match members with
+   | TryFind ofTypeType caseType -> 
       caseType.GetConstructors(flags).[0]
       :> MethodBase, caseType
-   | [| :? MethodInfo as mi |] -> mi :> MethodBase, unionType
-   | [| :? PropertyInfo as pi |] -> pi.GetGetMethod(true) :> MethodBase, unionType
+   | TryFind ofTypeMethodInfo mi -> mi :> MethodBase, unionType
+   | TryFind ofTypePropertyInfo pi -> pi.GetGetMethod(true) :> MethodBase, unionType
    | _ ->
       match unionType.GetMember("New" + uci.Name, flags) with
-      | [| :? MethodInfo as mi |] -> mi :> MethodBase, unionType
-      | [| :? PropertyInfo as pi |] -> pi.GetGetMethod(true) :> MethodBase, unionType
+      | TryFind ofTypeMethodInfo mi -> mi :> MethodBase, unionType
+      | TryFind ofTypePropertyInfo pi -> pi.GetGetMethod(true) :> MethodBase, unionType
       | _ -> failwith "never"
 
 let specialOp (mb:MethodBase) =
