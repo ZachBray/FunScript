@@ -66,6 +66,16 @@ let ``System.Net.WebUtility.UrlDecode works``() =
          System.Net.WebUtility.UrlDecode "%3cabc%3efoo+%3c%2fabc%3e"
       @@>
 
+
+
+//TODO: Move to another file.
+[<Test>]
+let ``UrlEncode >> UrlDecode works``() =
+   check 
+      <@@ 
+         System.Net.WebUtility.UrlDecode(System.Net.WebUtility.UrlEncode " a + b + c <br> ")
+      @@>
+
 [<Test>]
 let ``String.Replace works``() =
    check 

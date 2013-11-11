@@ -148,3 +148,29 @@ let ``Option.toList works``() =
          let xs = Some 1. |> Option.toList
          xs.Head
       @@>
+
+open System
+
+[<Test>]
+let ``Empty Nullable construction works``() =
+   check  
+      <@@ 
+         let x = Nullable<int>()
+         x.HasValue
+      @@>
+
+[<Test>]
+let ``Filled Nullable construction works``() =
+   check  
+      <@@ 
+         let x = Nullable(12)
+         x.HasValue
+      @@>
+
+[<Test>]
+let ``Filled Nullable Value access works``() =
+   check  
+      <@@ 
+         let x = Nullable(12.)
+         x.Value
+      @@>

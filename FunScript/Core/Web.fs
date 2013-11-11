@@ -186,7 +186,7 @@ type WebRequest(url : string) =
 
 [<JS>]
 type WebUtility() =
-    [<JSEmitInline("""encodeURIComponent({0}.replace("+", "%2B")).replace("%20", "+")""")>]
+    [<JSEmitInline("""encodeURIComponent({0}.replace(/\+/g, "%2B")).replace(/%20/g, "+")""")>]
     static member UrlEncode(url : string) : string = failwith "never"
-    [<JSEmitInline("decodeURIComponent({0})")>]
+    [<JSEmitInline("""decodeURIComponent({0}.replace(/\+/g, "%20")).replace(/%2B/g, "+")""")>]
     static member UrlDecode(url : string) : string = failwith "never"

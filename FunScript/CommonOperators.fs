@@ -42,6 +42,7 @@ module private Replacements =
 
    let exn(msg : string) = System.Exception(msg)
 
+// TODO: Specialize for ints/floats etc. to give 0. as in .NET
 let private defaultValue =
    CompilerComponent.create <| fun (|Split|) _ returnStategy ->
       function

@@ -3,7 +3,7 @@
   <metadata>
     <id>FunScript</id>
     <authors>Zach Bray, Tomas Petricek, Phillip Trelford, James Feiwirth, Robert Pickering</authors>
-    <version>1.1.0.21</version>
+    <version>1.1.0.22</version>
     <projectUrl>http://www.funscript.info</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>(BETA version) F# to JavaScript compiler with JQuery etc. mappings through a TypeScript type provider</description>
