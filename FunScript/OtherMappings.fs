@@ -60,7 +60,7 @@ let components =
             <@ fun () -> Core.Web.Stream.Create() @>
 
          ExpressionReplacer.createUnsafe 
-            <@ fun x y z -> new GZipStream(x, y, z) @> 
+            <@ fun x (y : CompressionMode) z -> new GZipStream(x, y, z) @> 
             <@ fun x y z -> Core.Web.GZipStream.Create(x, y, z) @>
       ]
 
@@ -101,5 +101,9 @@ let components =
       ExpressionReplacer.createTypeMethodMappings
          typeof<System.Text.Encoding>
          typeof<Core.Web.UTF8Encoding>
+
+      ExpressionReplacer.createTypeMethodMappings
+         typeof<System.Net.WebUtility>
+         typeof<Core.Web.WebUtility>
 
    ] |> List.concat

@@ -11,6 +11,8 @@
     <AssemblyName>funsc</AssemblyName>
     <Name>FunScript.Compiler</Name>
     <ProductVersion>12.0.0</ProductVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

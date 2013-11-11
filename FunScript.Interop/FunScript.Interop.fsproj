@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>FunScript.Interop</RootNamespace>
     <AssemblyName>FunScript.Interop</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Name>FunScript.Interop</Name>
     <TargetFrameworkProfile />
   </PropertyGroup>

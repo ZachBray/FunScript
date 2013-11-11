@@ -92,7 +92,20 @@ type Compiler(components, shouldFlattenGenericsForReflection) as this =
          let paramKey = parameterKey mi
          let r =
             match rs.TryFind paramKey with
-            | None -> (rs |> Seq.head).Value
+            | None -> 
+                // Try to pick overload with same number of parameters.
+                // Favour those with most like params.
+                let rec ordering i (ks : _[]) acc =
+                    if i = paramKey.Length && i = ks.Length then
+                        acc
+                    elif i = paramKey.Length || i = ks.Length then
+                        Int32.MaxValue
+                    elif paramKey.[i] = ks.[i] then
+                        ordering (i+1) ks (acc-1)
+                    else ordering (i+1) ks acc
+                rs |> Map.toArray 
+                |> Array.minBy (fun (ks, _) -> ordering 0 ks 0)
+                |> snd
             | Some r -> r
          let typeArgs = getTypeArgs mi
          r.TryReplace this returnStrategy (obj, typeArgs, exprs)

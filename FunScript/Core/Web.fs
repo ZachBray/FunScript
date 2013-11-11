@@ -183,3 +183,10 @@ type WebRequest(url : string) =
         )
         
     static member Create(uri : string) = WebRequest(uri)
+
+[<JS>]
+type WebUtility() =
+    [<JSEmitInline("""encodeURIComponent({0}.replace("+", "%2B")).replace("%20", "+")""")>]
+    static member UrlEncode(url : string) : string = failwith "never"
+    [<JSEmitInline("decodeURIComponent({0})")>]
+    static member UrlDecode(url : string) : string = failwith "never"

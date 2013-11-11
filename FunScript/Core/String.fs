@@ -1,53 +1,65 @@
 ﻿[<FunScript.JS>]
 module FunScript.Core.String
 
-[<FunScript.JSEmit("return {0}.split({1});")>]
+[<FunScript.JSEmitInline("{0}.split({1})")>]
 let private splitSingle(s:string, delimiter:string) : string[] = failwith "never"
 
-[<FunScript.JSEmit("return {0}.replace({1}, {2});")>]
+[<FunScript.JSEmitInline("{0}.replace({1}, {2})")>]
 let private replaceSingle(s:string, search:string, replace:string) : string = failwith "never"
 
-[<FunScript.JSEmit("return {0}.indexOf({1});")>]
-let IndexOf(s:string, search:string) : int = failwith "never"
+[<FunScript.JSEmitInline("{0}.indexOf({1})")>]
+let IndexOfWithoutOffset(s:string, search:string) : int = failwith "never"
+
+[<FunScript.JSEmitInline("{0}.indexOf({1}, {2})")>]
+let IndexOfWithOffset(s:string, search:string, offset:int) : int = failwith "never"
 
 let StartsWith(s, search) =
-    IndexOf(s, search) = 0
+    IndexOfWithoutOffset(s, search) = 0
 
-[<FunScript.JSEmit("return {0}.toLowerCase();")>]
+[<FunScript.JSEmitInline("{0}.toLowerCase()")>]
 let ToLowerCase(s:string) : string = failwith "never"
 
-[<FunScript.JSEmit("return {0}.toUpperCase();")>]
+[<FunScript.JSEmitInline("{0}.toUpperCase()")>]
 let ToUpperCase(s:string) : string = failwith "never"
 
-[<FunScript.JSEmit("return ({0}==null)||({0}==\"\");")>]
+[<FunScript.JSEmitInline("({0}==null)||({0}==\"\")")>]
 let IsNullOrEmpty(s:string) : bool = failwith "never"
 
-[<FunScript.JSEmit("return {0}.length;")>]
+[<FunScript.JSEmitInline("{0}.length")>]
 let Length(s:string) : int = failwith "never"
 
-[<FunScript.JSEmit("return {0}.charAt({1});")>]
+[<FunScript.JSEmitInline("{0}.charAt({1})")>]
 let CharAt(s:string, length:int) : char = failwith "never"
 
-[<FunScript.JSEmit("return {0}.substring({1}, {1} + {2});")>]
-let Substring(s:string, offset:int, length:int) : char = failwith "never"
+[<FunScript.JSEmitInline("{0}.substring({1}, {1} + {2})")>]
+let SubstringWithLength(s:string, offset:int, length:int) : char = failwith "never"
 
-[<FunScript.JSEmit("return String.fromCharCode({0});")>]
-let inline FromCharCode x = char x
+[<FunScript.JSEmitInline("{0}.substring({1})")>]
+let SubstringWithoutLength(s:string, offset:int) : char = failwith "never"
 
-let Split(s:string, delimiters:string[]) : string[] = 
-   delimiters |> Array.fold (fun inputs delimiter ->
-      inputs |> Array.map (fun inp -> splitSingle(inp, delimiter))
-             |> Array.concat) [| s |]
+[<FunScript.JSEmitInline("String.fromCharCode({0})")>]
+let FromCharCode x = char x
+
+let SplitWithoutOptions(s:string, delimiters:string[]) : string[] = 
+    delimiters |> Array.fold (fun inputs delimiter ->
+        inputs |> Array.map (fun inp -> splitSingle(inp, delimiter))
+                |> Array.concat) [| s |]
   
+let SplitWithOptions(s, delimiters, opts) =
+    let parts = SplitWithoutOptions(s, delimiters)
+    match opts with
+    | System.StringSplitOptions.RemoveEmptyEntries -> 
+        parts |> Array.filter ((<>) "")
+    | _ -> parts
 
-[<FunScript.JSEmit("return {1}.join({0});")>]
+[<FunScript.JSEmitInline("{1}.join({0})")>]
 let Join(separator:string, s:string[]) : string = failwith "never"
 
 let Replace(s:string, search:string, replace:string) : string = 
     let splits = splitSingle(s, search)
     Join(replace,splits)
 
-[<FunScript.JSEmit("return {0};")>]
+[<FunScript.JSEmitInline("{0}")>]
 let ToCharArray(str:string) : char[] = failwith "never"
 
 // Re-implementation of functions from Microsoft.FSharp.Core.StringModule

@@ -5,6 +5,7 @@ open FunScript.Tests.Common
 [<NUnit.Framework.TestFixture>] 
 module FunScript.Tests.Strings
 
+open System
 open NUnit.Framework
 
 
@@ -34,6 +35,38 @@ let ``String.Split works``() =
       @@>
 
 [<Test>]
+let ``String.Split with remove empties works``() =
+   check 
+      <@@ 
+         let array = ";,a;b,c".Split([|','; ';'|], StringSplitOptions.RemoveEmptyEntries)
+         "abc" = array.[0] + array.[1] + array.[2]
+      @@>
+
+[<Test>]
+let ``String.Split with strings & remove empties works``() =
+   check 
+      <@@ 
+         let array = ";,a;b,c".Split([|","; ";"|], StringSplitOptions.RemoveEmptyEntries)
+         "abc" = array.[0] + array.[1] + array.[2]
+      @@>
+
+//TODO: Move to another file.
+[<Test>]
+let ``System.Net.WebUtility.UrlEncode works``() =
+   check 
+      <@@ 
+         System.Net.WebUtility.UrlEncode "<abc>foo </abc>"
+      @@>
+
+//TODO: Move to another file.
+[<Test>]
+let ``System.Net.WebUtility.UrlDecode works``() =
+   check 
+      <@@ 
+         System.Net.WebUtility.UrlDecode "%3cabc%3efoo+%3c%2fabc%3e"
+      @@>
+
+[<Test>]
 let ``String.Replace works``() =
    check 
       <@@ 
@@ -53,6 +86,27 @@ let ``String.IndexOf works``() =
    check 
       <@@ 
          "abcd".IndexOf("bc") * 100 + "abcd".IndexOf("bd") |> float
+      @@>
+
+[<Test>] 
+let ``String.IndexOf works with offset``() =
+   check 
+      <@@ 
+         "abcdbc".IndexOf("bc", 3) |> float
+      @@>
+
+[<Test>]
+let ``String.Substring works``() =
+   check 
+      <@@ 
+         "abcdefg".Substring(2)
+      @@>
+
+[<Test>]
+let ``String.Substring works with length``() =
+   check 
+      <@@ 
+         "abcdefg".Substring(2, 2)
       @@>
 
 [<Test>]
