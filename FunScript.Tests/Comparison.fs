@@ -9,6 +9,33 @@ let ``Infix equality works``() =
    check <@@ 2. = 3. @@>
 
 [<Test>]
+let ``obj.ReferenceEquals works with null``() =
+   check 
+       <@@ 
+           let x : obj = null
+           let y : obj = null
+           obj.ReferenceEquals(x, y)
+       @@>
+
+[<Test>]
+let ``obj.ReferenceEquals works with objs``() =
+   check 
+       <@@ 
+           let x = Some 1
+           let y = x
+           obj.ReferenceEquals(x, y)
+       @@>
+
+[<Test>]
+let ``obj.ReferenceEquals works with objs & null``() =
+   check 
+       <@@ 
+           let x = Some 1
+           let y : obj = null
+           obj.ReferenceEquals(x, y)
+       @@>
+
+[<Test>]
 let ``Infix inequality works``() =
    check <@@ 2. <> 3. @@>
 

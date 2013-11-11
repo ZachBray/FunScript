@@ -11,6 +11,10 @@ module Replacements =
 
    let max x y = if y > x then y else x
 
+[<JS>]
+module EmittedReplacements =
+   [<JSEmitInline("({0} == {1})")>]
+   let referenceEquals(x : obj, y : obj) : bool = failwith "never"
 
 type private TypeKind =
    | Primitive
@@ -106,6 +110,7 @@ let components = [
    CompilerComponent.binaryTyped <@ (<=) @> (primitiveInfix "<=")
    CompilerComponent.binaryTyped <@ compare @> (fun _ -> compareCall)
    CompilerComponent.binaryTyped <@ Unchecked.compare @> (fun _ -> compareCall)
+   ExpressionReplacer.create <@ obj.ReferenceEquals @> <@ EmittedReplacements.referenceEquals @>
    ExpressionReplacer.create <@ min @> <@ Replacements.min @>
    ExpressionReplacer.create <@ max @> <@ Replacements.max @>
 ]
