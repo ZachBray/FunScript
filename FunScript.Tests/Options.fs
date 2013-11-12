@@ -149,6 +149,33 @@ let ``Option.toList works``() =
          xs.Head
       @@>
 
+[<Test>]
+let ``Some unit works``() =
+   check  
+      <@@ 
+         let xs = Some()
+         match xs with
+         | None -> 0.0
+         | Some() -> 1.0
+      @@>
+      
+open Microsoft.FSharp.Reflection
+open Microsoft.FSharp.Quotations
+
+[<Test>] // Note: this is for some HashBang functionality.
+let ``Some unit via reflection works``() =
+   let genericOption = typedefof<_ option>
+   let unitOption = genericOption.MakeGenericType [| typeof<unit> |]
+   let someMethod = unitOption.GetMethod("Some")
+   let someUnit = Expr.Call(someMethod, [Expr.Value(())])
+   check  
+      <@@ 
+         let xs = %%someUnit
+         match xs with
+         | None -> 0.0
+         | Some() -> 1.0
+      @@>
+
 open System
 
 [<Test>]

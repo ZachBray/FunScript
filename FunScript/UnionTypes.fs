@@ -113,20 +113,36 @@ let private creation =
       | _ -> []
 
 let private matching =
-   CompilerComponent.create <| fun (|Split|) _ returnStategy ->
-      function
-      | Patterns.UnionCaseTest(Split(objDecl, objRef), uci) ->
-         [ yield! objDecl
-           yield returnStategy.Return <| BinaryOp(PropertyGet(objRef, "Tag"), "==", Number(float uci.Tag))
-         ]
-      | Patterns.Call(None, mi, [Split(objDecl, objRef)]) when 
-        FSharpType.IsUnion mi.DeclaringType && 
-        mi.Name = "GetTag" && 
-        mi.ReturnType = typeof<int> ->
+   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+    function
+    | Patterns.UnionCaseTest(Split(objDecl, objRef), uci) ->
+        [ yield! objDecl
+          yield returnStategy.Return <| BinaryOp(PropertyGet(objRef, "Tag"), "==", Number(float uci.Tag))
+        ]
+    | Patterns.Call(None, mi, [Split(objDecl, objRef)]) when 
+            FSharpType.IsUnion mi.DeclaringType && 
+            mi.Name = "GetTag" && 
+            mi.ReturnType = typeof<int> ->
         [ yield! objDecl
           yield returnStategy.Return <| PropertyGet(objRef, "Tag")
         ]
-      | _ -> []
+    | Patterns.Call(None, mi, [arg]) as e when 
+            mi.DeclaringType.Name.Contains "FSharpOption" ->
+        let cases = FSharpType.GetUnionCases e.Type
+        let noneCase, someCase = cases.[0], cases.[1]
+        match mi.Name with
+        | "Some" ->
+            compiler.Compile returnStategy (Expr.NewUnionCase(someCase, [arg]))
+        | "get_None" ->
+            compiler.Compile returnStategy (Expr.NewUnionCase(noneCase, []))
+        | _ -> []
+    | Patterns.PropertyGet(None, pi, []) as e when 
+        pi.DeclaringType.Name.Contains "FSharpOption" &&
+        pi.Name = "None" ->
+        let cases = FSharpType.GetUnionCases e.Type
+        let noneCase = cases.[0]
+        compiler.Compile returnStategy (Expr.NewUnionCase(noneCase, []))
+    | _ -> []
 
 let components = [ 
    creation
