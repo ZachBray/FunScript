@@ -40,7 +40,7 @@ module internal Replacements =
         | None -> failwith ("Not a valid boolean value: " + x)
         | Some y -> y
 
-[<AutoOpen>]
+[<JS; AutoOpen>]
 module JSConversionExtensions =
 
     // TODO: Nullable might make more sense for these _value types_...

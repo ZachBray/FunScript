@@ -127,15 +127,17 @@ let private matching =
           yield returnStategy.Return <| PropertyGet(objRef, "Tag")
         ]
     | Patterns.Call(None, mi, [arg]) as e when 
-            mi.DeclaringType.Name.Contains "FSharpOption" ->
+            mi.DeclaringType.Name.Contains "FSharpOption" &&
+            mi.Name = "Some" ->
         let cases = FSharpType.GetUnionCases e.Type
-        let noneCase, someCase = cases.[0], cases.[1]
-        match mi.Name with
-        | "Some" ->
-            compiler.Compile returnStategy (Expr.NewUnionCase(someCase, [arg]))
-        | "get_None" ->
-            compiler.Compile returnStategy (Expr.NewUnionCase(noneCase, []))
-        | _ -> []
+        let someCase = cases.[1]
+        compiler.Compile returnStategy (Expr.NewUnionCase(someCase, [arg]))
+    | Patterns.Call(None, mi, []) as e when 
+            mi.DeclaringType.Name.Contains "FSharpOption" &&
+            mi.Name = "get_None" ->
+        let cases = FSharpType.GetUnionCases e.Type
+        let noneCase = cases.[0]
+        compiler.Compile returnStategy (Expr.NewUnionCase(noneCase, []))
     | Patterns.PropertyGet(None, pi, []) as e when 
         pi.DeclaringType.Name.Contains "FSharpOption" &&
         pi.Name = "None" ->
