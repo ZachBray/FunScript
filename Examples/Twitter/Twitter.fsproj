@@ -11,6 +11,8 @@
     <AssemblyName>FunScript.Example</AssemblyName>
     <Name>FunScript.Example</Name>
     <ProductVersion>10.0.0</ProductVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,6 +43,9 @@
     </Reference>
     <Reference Include="FunScript.Interop">
       <HintPath>..\..\FunScript\bin\Debug\FunScript.Interop.dll</HintPath>
+    </Reference>
+    <Reference Include="FunScript.TypeScript.Binding.google_maps">
+      <HintPath>..\Typings\FunScript.TypeScript.Binding.google_maps.dll</HintPath>
     </Reference>
     <Reference Include="FunScript.TypeScript.Binding.jquery">
       <HintPath>..\Typings\FunScript.TypeScript.Binding.jquery.dll</HintPath>
