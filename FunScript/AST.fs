@@ -169,8 +169,7 @@ and JSStatement =
    | IfThenElse of JSExpr * JSBlock * JSBlock
    | WhileLoop of JSExpr * JSBlock
    | ForLoop of Var * JSExpr * JSExpr * JSBlock
-   | TryCatch of JSBlock * JSRef * JSBlock
-   | TryCatchFinally of JSBlock * JSRef * JSBlock * JSBlock
+   | TryCatch of JSBlock * Var * JSBlock
    | TryFinally of JSBlock * JSBlock
    | Scope of JSBlock
    | Return of JSExpr
@@ -212,22 +211,14 @@ and JSStatement =
          + newL
          + block.Print(padding, scope)
       | TryCatch(tryExpr, var, catchExpr) ->
+         let name, newScope = (!scope).ObtainNameScope var FromDeclaration
+         scope := newScope
          sprintf "try"
          + newL
          + tryExpr.Print(padding, scope)
          + newL
-         + sprintf "catch(%s)" var
+         + sprintf "catch(%s)" name
          + catchExpr.Print(padding, scope)
-      | TryCatchFinally(tryExpr, var, catchExpr, finallyExpr) ->
-         sprintf "try"
-         + newL
-         + tryExpr.Print(padding, scope)
-         + newL
-         + sprintf "catch(%s)" var
-         + catchExpr.Print(padding, scope)
-         + newL
-         + "finally"
-         + finallyExpr.Print(padding, scope)
       | TryFinally(tryExpr, finallyExpr) ->
          sprintf "try"
          + newL

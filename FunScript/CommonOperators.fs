@@ -40,7 +40,7 @@ module private Replacements =
                         [arg2]),
                         [arg3])
 
-   let exn(msg : string) = System.Exception(msg)
+   let exn(msg : string) = Core.LanguagePrimitives.Exception(msg)
 
 // TODO: Specialize for ints/floats etc. to give 0. as in .NET
 let private defaultValue =
@@ -108,15 +108,6 @@ let private coerce =
          // else []
       | _ -> []
 
-let private tryCatch =
-   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
-   function
-   | Patterns.TryFinally(tryExpr, finallyExpr) ->
-      let tryStmts = compiler.Compile returnStategy tryExpr
-      let finallyStmts = compiler.Compile ReturnStrategies.inplace finallyExpr
-      [ TryFinally(Block tryStmts, Block finallyStmts) ]
-   | _ -> []
- 
 // TODO: Implement this properly. Through type property?
 let private typeTest =
    CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
@@ -181,12 +172,11 @@ let components =
          CompilerComponent.unary <@ InternalCompiler.Helpers.Cast @> id
 
          // Exns 
-         ExpressionReplacer.create <@ fun str -> exn str @> <@ Replacements.exn @>
+         ExpressionReplacer.createUnsafe <@ fun str -> exn str @> <@ Replacements.exn @>
          CompilerComponent.unaryStatement <@ raise @> Throw
          CompilerComponent.unaryStatement <@ invalidOp @> Throw
          CompilerComponent.unaryStatement <@ failwith @> Throw
          CompilerComponent.binaryStatement <@ invalidArg @> (fun field msg -> Throw msg)
-         tryCatch
 
          // Default values
          CompilerComponent.nullary <@ Unchecked.defaultof<_> @> Null

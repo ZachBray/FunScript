@@ -57,10 +57,22 @@ let ``Lambdas inside for loops create closures``() =
 
 [<Test>]
 let ``Matching when the matched variable name is re-used in the case works``() =
-   check 
+   check
       <@@
          let xs = [1.; 2.; 3.]
          match xs with
          | x::xs -> x
          | _ -> failwith "never"
+      @@>
+
+[<Test>]
+let ``Catching any exception works``() =
+   checkAreEqual 100.
+      <@@ 
+         let f x =
+            try
+                if x then  raise (exn())
+                else 1.0
+            with _ -> 99.0
+         f true + f false
       @@>
