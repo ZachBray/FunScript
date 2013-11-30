@@ -108,7 +108,7 @@ let private creation =
                ]                    
             )
          [ yield! decls |> Seq.concat 
-           yield returnStategy.Return <| New(cons.Name, refs)
+           yield returnStategy.Return <| New(cons, refs)
          ]
       | _ -> []
 

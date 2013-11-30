@@ -20,7 +20,7 @@ let GetSubArray (xs:'a[]) (offset:int) (length:int): 'a[] =
 let Copy (xs:'a[]): 'a[] =
    failwith "never"
 
-[<JSEmit("{1}.sort(function(a,b) { return {0}(a)(b); });")>]
+[<JSEmit("{1}.sort(function($a,$b) { return {0}($a)($b); });")>]
 let SortInPlaceWith (f:'a -> 'a -> int) (xs:'a[]): unit =
    failwith "never"
 

@@ -10,7 +10,7 @@ open Microsoft.FSharp.Linq.QuotationEvaluation
 let log (msg : obj) : unit = failwith "never"
 
 let checkAreEqualWithComponents components expectedResult quote =
-   let code = Compiler.Compiler.Compile(quote, components = components)
+   let code = Compiler.Compiler.Compile(quote, components = components, shouldCompress = true)
    try
       let engine = JintEngine().SetFunction("test_log", System.Action<string>(printfn "//[LOG] %s"))
       let result = engine.Run(code + "\nreturn null;")

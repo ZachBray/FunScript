@@ -1,5 +1,6 @@
 ﻿module (*internal*) FunScript.AST
 
+open System.Text
 open Microsoft.FSharp.Quotations
 
 let indent n = String.init n (fun _ -> "  ")
@@ -12,11 +13,47 @@ type Site =
    | FromDeclaration
    | FromReference
 
+let alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
+
 type VariableScope =
    {  ByName : Map<string, Var>
-      ByVar : Map<Var, string> }
+      ByVar : Map<Var, string>
+      ShouldCompressNames : bool }
+
       static member Empty =
-         { ByName = Map.empty; ByVar = Map.empty }
+         { ByName = Map.empty; ByVar = Map.empty; ShouldCompressNames = false }
+
+      static member EmptyCompressing =
+         { VariableScope.Empty with ShouldCompressNames = true }
+
+      member scope.ObtainFreeCompressedName(var : Var) =
+         if var.Name.StartsWith "Tag" || var.Name.StartsWith "Item" then
+             scope.ObtainFreeName var
+         else
+             let rec buildName (acc : StringBuilder) i =
+                let letterCode = i % alphabet.Length
+                acc.Append alphabet.[letterCode] |> ignore
+                let nextI = (i - letterCode) / alphabet.Length
+                if nextI <> 0 then
+                    buildName acc nextI
+                else acc.ToString()
+             let proposedName = buildName (StringBuilder()) scope.ByVar.Count
+             if proposedName.StartsWith "Tag" || 
+                proposedName.StartsWith "Item" ||
+                JavaScriptNameMapper.unsafeWords.Contains proposedName then
+                "$$" + proposedName
+             else proposedName
+
+      member scope.ObtainFreeName(var : Var) =
+         let baseName =
+             match var.Name with
+             | "this" -> "_this"
+             | name -> JavaScriptNameMapper.sanitizeAux name
+         let rec obtainFreeName name =
+             match scope.ByName.TryFind name with
+             | None -> name
+             | Some _ -> obtainFreeName ("_" + name)
+         obtainFreeName baseName
 
       member scope.ObtainNameScope var site =
          match scope.ByVar.TryFind var with
@@ -28,18 +65,15 @@ type VariableScope =
                | "this" -> "this", scope
                | _ -> failwithf "Variable '%A' is not within scope." var
             | FromDeclaration ->
-               let baseName =
-                  match var.Name with
-                  | "this" -> "_this"
-                  | name -> JavaScriptNameMapper.sanitizeAux name
-               let rec obtainFreeName name =
-                  match scope.ByName.TryFind name with
-                  | None -> name
-                  | Some _ -> obtainFreeName ("_" + name)
-               let finalName = obtainFreeName baseName
+               let finalName = 
+                   if scope.ShouldCompressNames then
+                      scope.ObtainFreeCompressedName var
+                   else scope.ObtainFreeName var
+                   
                let newScope =
                   {  ByName = scope.ByName |> Map.add finalName var
-                     ByVar = scope.ByVar |> Map.add var finalName    }
+                     ByVar = scope.ByVar |> Map.add var finalName
+                     ShouldCompressNames = scope.ShouldCompressNames }
                finalName, newScope
 
 type JSRef = string
@@ -51,14 +85,13 @@ type JSExpr =
    | Integer of int
    | String of string
    | Reference of Var
-   | UnsafeReference of JSRef
    | This
    | Object of (JSRef * JSExpr) list
    | PropertyGet of JSExpr * JSRef
    | IndexGet of JSExpr * JSExpr
    | Array of JSExpr list
    | Apply of JSExpr * JSExpr list
-   | New of JSRef * JSExpr list
+   | New of Var * JSExpr list
    | Lambda of Var list * JSBlock
    | UnaryOp of string * JSExpr
    | BinaryOp of JSExpr * string * JSExpr
@@ -72,7 +105,6 @@ type JSExpr =
       | Number f -> sprintf "%f" f
       | String str -> sprintf @"""%s""" (System.Web.HttpUtility.JavaScriptStringEncode(str))
       | Reference ref -> (!scope).ObtainNameScope ref FromReference |> fst
-      | UnsafeReference ref -> ref
       | This -> "this"
       | Object propExprs ->
          let filling =
@@ -96,12 +128,12 @@ type JSExpr =
                argExpr.Print(padding, scope))
             |> String.concat ", "
          sprintf "%s(%s)" (lambdaExpr.Print(padding, scope)) filling
-      | New(objName, argExprs) ->
+      | New(ref, argExprs) ->
          let filling =
             argExprs |> List.map (fun argExpr -> 
                argExpr.Print(padding, scope))
             |> String.concat ", "
-         sprintf "(new %s(%s))" objName filling
+         sprintf "(new %s(%s))" ((!scope).ObtainNameScope ref FromReference |> fst) filling
       | Lambda(vars, block) ->
          let oldScope = !scope
          let newScope, names = 
@@ -228,3 +260,7 @@ and JSBlock =
 
    member block.Print() =
       block.Print(0, ref VariableScope.Empty)
+
+   member block.PrintCompressed() =
+      block.Print(0, ref VariableScope.EmptyCompressing)
+      
