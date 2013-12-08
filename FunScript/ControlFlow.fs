@@ -52,6 +52,25 @@ let private ifThenElse =
          ]
       | _ -> []
 
+let private tryFinally =
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
+   function
+   | Patterns.TryFinally(tryExpr, finallyExpr) ->
+      let tryStmts = compiler.Compile returnStrategy tryExpr
+      let finallyStmts = compiler.Compile ReturnStrategies.inplace finallyExpr
+      [ TryFinally(Block tryStmts, Block finallyStmts) ]
+   | _ -> []
+
+let private tryWith =
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
+      function
+      // TODO: Type testing...
+      | Patterns.TryWith(body, _, _, catchVar, catchBody) ->
+         let bodyBlock = compiler.Compile returnStrategy body
+         let catchBlock = compiler.Compile returnStrategy catchBody
+         [TryCatch(Block bodyBlock, catchVar, Block catchBlock)]
+      | _ -> []
+
 let private sequential =
    CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
       let (|Return|) = compiler.Compile
@@ -67,4 +86,6 @@ let components = [
    whileLoop
    ifThenElse
    sequential
+   tryFinally
+   tryWith
 ]

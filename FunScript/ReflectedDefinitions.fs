@@ -22,13 +22,13 @@ let private (|ReflectedDefinition|_|) (mi:MethodBase) =
 let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list) bodyExpr var (compiler:InternalCompiler.ICompiler) =
    match replacementMi.GetCustomAttribute<JSEmitAttribute>() with
    | meth when meth <> Unchecked.defaultof<_> ->
-      let code =
+      let code padding (scope : VariableScope ref) =
          vars 
          |> List.mapi (fun i v -> i,v)
          |> List.fold (fun (acc:string) (i,v) ->
-            acc.Replace(sprintf "{%i}" i, v.Name)
+            acc.Replace(sprintf "{%i}" i, (Reference v).Print(padding, scope))
             ) meth.Emit
-      [ Assign(Reference var, Lambda(vars, Block[EmitStatement(fun _ -> code)])) ]
+      [ Assign(Reference var, Lambda(vars, Block[EmitStatement(fun (padding, scope) -> code padding scope)])) ]
    | _ when mb.IsConstructor ->
       [  
          yield Assign(Reference var, Lambda(vars, Block(compiler.Compile ReturnStrategies.inplace bodyExpr)))
@@ -66,7 +66,7 @@ let private createConstruction
       //TODO: Generic types will have typeArgs we need to deal with here.
       let consRef = createGlobalMethod name compiler ci Quote.ConstructorCall
       [ yield! decls |> List.concat
-        yield returnStategy.Return <| New(consRef.Name, refs) ]
+        yield returnStategy.Return <| New(consRef, refs) ]
    | _ -> []
 
 
