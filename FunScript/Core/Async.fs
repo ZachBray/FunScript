@@ -16,7 +16,7 @@ type CancellationTokenSource() =
 
 type AsyncParamsAux =
    { StackCounter : int ref 
-     ExceptionCont : string -> unit
+     ExceptionCont : exn -> unit
      CancelledCont : string -> unit 
      CancellationToken : CancellationToken }
 
@@ -26,7 +26,7 @@ type AsyncParams<'T> =
 
 type Async<'T> = Cont of (AsyncParams<'T> -> unit)
 
-[<FunScript.JSEmit("return setTimeout({0}, {1});")>]
+[<FunScript.JSEmitInlineAttribute("window.setTimeout({0}, {1})")>]
 let setTimeout (handler:unit -> unit, milliseconds:float) = failwith "never"
   
 let private protectedCont f = Cont (fun args ->
@@ -34,8 +34,12 @@ let private protectedCont f = Cont (fun args ->
    incr args.Aux.StackCounter
    if !args.Aux.StackCounter > 1000 then // TODO: Make this a parameter (this is pretty arbitrary)
       args.Aux.StackCounter := 0
-      setTimeout((fun () -> f args), 1.0)
-   else f args )
+      setTimeout((fun () -> 
+        try f args
+        with ex -> args.Aux.ExceptionCont ex), 1.0)
+   else
+      try f args
+      with ex -> args.Aux.ExceptionCont ex)
 
 //let private incrStack  
 let private invokeCont k value = 
@@ -46,7 +50,7 @@ type AsyncBuilder() =
       let cont (a:'T) =
          let (Cont r) = f a 
          r k
-      v { Cont = cont; Aux = k.Aux }
+      v { Cont = cont; Aux = k.Aux;  }
 
    member x.Using<'T, 'R when 'T :> System.IDisposable>(a:'T, f:'T -> Async<'R>) : Async<'R> = protectedCont <| fun k -> 
       let (Cont v) = f a
@@ -67,23 +71,33 @@ type AsyncBuilder() =
    member x.Return(v) : Async<'T> = protectedCont <| fun k -> 
       invokeCont k v
 
-   member x.While(cond, body) = 
-      let x = x
-      let rec loop() = 
-         if cond() then x.Bind(body, loop)
-         else x.Zero()
-      loop()
+   member x.While(cond, body) =
+      if cond() then 
+         x.Bind(body, fun () -> x.While(cond, body)) 
+      else 
+         x.Return()
+
+   member x.TryWith(Cont v : Async<'T>, catchFunction) =
+      protectedCont <| fun k ->
+         k.Aux.CancellationToken.ThrowIfCancellationRequested()
+         v {
+            k with
+               Aux = 
+               {
+                  k.Aux with
+                     ExceptionCont = catchFunction
+               }
+         }
 
    member x.Combine(work1, work2) = 
       x.Bind(work1, fun () -> work2)
 
    member x.For(seq:seq<_>, body) = 
-      let en = seq.GetEnumerator()
-      let x = x
-      let rec loop() = 
-         if en.MoveNext() then x.Bind(body en.Current, loop)
-         else x.Zero()
-      loop()
+      let enumerator = seq.GetEnumerator()
+      x.While(
+        (fun () -> enumerator.MoveNext()),
+        x.Delay(fun () ->
+            body enumerator.Current))
 
 let async = AsyncBuilder()
 
