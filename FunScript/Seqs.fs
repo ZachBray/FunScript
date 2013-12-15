@@ -33,4 +33,8 @@ let components =
       ExpressionReplacer.createModuleMapping 
          "FSharp.Core" "Microsoft.FSharp.Collections.SeqModule"
          "FunScript" "FunScript.Core.Seq"
+
+      ExpressionReplacer.createModuleMapping 
+         "FSharp.Core" "Microsoft.FSharp.Core.CompilerServices.RuntimeHelpers"
+         "FunScript" "FunScript.Core.Seq.RuntimeHelpers"
    ] |> List.concat

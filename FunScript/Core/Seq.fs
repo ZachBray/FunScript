@@ -8,22 +8,30 @@ open System.Collections.Generic
 let Enumerator (xs:_ seq) =   
    xs.GetEnumerator()
 
-let rec FoldIndexedAux f i acc (xs:_ IEnumerator) =
-   if xs.MoveNext() then FoldIndexedAux f (i+1) (f i acc xs.Current) xs
-   else acc
+let FoldIndexedAux f acc (xs:_ IEnumerator) =
+   let i = ref 0
+   let acc = ref acc
+   while xs.MoveNext() do
+      acc := f !i !acc xs.Current
+      i := !i + 1
+   !acc
 
 let FoldIndexed<'a,'acc> f (seed:'acc) (xs: 'a seq) = 
-   FoldIndexedAux f 0 seed (Enumerator xs)
+   FoldIndexedAux f seed (Enumerator xs)
 
 let Fold<'a,'acc> f (seed:'acc) (xs: 'a seq) = 
    FoldIndexed (fun _ acc x -> f acc x) seed xs
 
-let rec FoldIndexed2Aux f i acc (xs:_ IEnumerator) (ys:_ IEnumerator) =
-   if xs.MoveNext() && ys.MoveNext() then FoldIndexed2Aux f (i+1) (f i acc xs.Current ys.Current) xs ys
-   else acc
+let FoldIndexed2Aux f acc (xs:_ IEnumerator) (ys:_ IEnumerator) =
+   let i = ref 0
+   let acc = ref acc
+   while xs.MoveNext() && ys.MoveNext() do
+      acc := f !i !acc xs.Current ys.Current
+      i := !i + 1
+   !acc
 
 let FoldIndexed2<'a, 'b, 'acc> f (seed:'acc) (xs: 'a seq) (ys: 'b seq) = 
-   FoldIndexed2Aux f 0 seed (Enumerator xs) (Enumerator ys)
+   FoldIndexed2Aux f seed (Enumerator xs) (Enumerator ys)
 
 let Fold2<'a, 'b, 'acc> f (seed:'acc) (xs: 'a seq) (ys: 'b seq) = 
    FoldIndexed2 (fun _ acc x y -> f acc x y) seed xs ys
@@ -440,7 +448,60 @@ let CountBy f xs =
    |> Map (fun (k, vs) -> k, Length vs)
 
 let Concat xs =
-   Fold Append Empty<_> xs
+    Delay <| fun () ->
+        let enum = Enumerator xs
+        let tryGetNext innerEnum =
+            let innerEnum = ref innerEnum
+            let output = ref None
+            let hasFinished = ref false
+            while not !hasFinished do
+                match !innerEnum with
+                | None -> 
+                    if enum.MoveNext() then
+                        innerEnum := Some(Enumerator enum.Current)
+                    else hasFinished := true
+                | Some currentEnum ->
+                    if currentEnum.MoveNext() then
+                        output := Some currentEnum.Current
+                        hasFinished := true
+                    else innerEnum := None
+            match !innerEnum, !output with
+            | Some e, Some x -> Some(x, Some e)
+            | _ -> None
+        Unfold (fun x -> tryGetNext x) None
+
+
+   //Fold Append Empty<_> xs
 
 let Collect f xs =
    Map f xs |> Concat
+
+
+module RuntimeHelpers =
+    let EnumerateWhile (g : unit -> bool) (b: seq<'T>) : seq<'T> =
+        Unfold(fun () ->
+            if g() then Some(b, ())
+            else None) ()
+        |> Concat
+
+    let EnumerateThenFinally (rest : seq<'T>) (compensation : unit -> unit)  =
+        Delay <| fun () ->
+          let enum = 
+             try Enumerator rest
+             finally compensation()
+          enum
+          |> Unfold (fun enum ->
+             try
+                if enum.MoveNext() then Some(enum.Current, enum)
+                else None
+             finally compensation())
+
+    let EnumerateUsing (resource : 'T :> System.IDisposable) (rest: 'T -> #seq<'U>) =
+        let isDisposed = ref false
+        let disposable = resource :> IDisposable
+        let disposeOnce() =
+            if not !isDisposed then
+                isDisposed := true
+                disposable.Dispose()
+        try EnumerateThenFinally (rest resource) disposeOnce
+        finally disposeOnce()

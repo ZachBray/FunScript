@@ -104,6 +104,52 @@ let ``for in seq expressions works``() =
       @@>
 
 [<Test>]
+let ``while in seq expressions works``() =
+   check  
+      <@@
+         let n = ref 0.0
+         seq {
+            while !n < 10.0 do
+                n := !n + 1.0
+                yield !n
+         } |> Seq.sum
+      @@>
+
+[<Test>]
+let ``try...finally in seq expressions works``() =
+   check  
+      <@@
+         let n = ref 0.0
+         try
+             seq { 
+                try 
+                    raise (exn "My message")
+                finally 
+                    n := !n + 1.0
+             } |> Seq.iter ignore
+         with _ -> ()
+         !n
+      @@>
+
+open System
+type DisposableAction(f) =
+    interface IDisposable with
+        member __.Dispose() = f()
+
+[<Test>]
+let ``use in seq expressions works``() =
+   check  
+      <@@
+         let n = ref 0.0
+         seq { 
+            use x = new DisposableAction(fun () ->
+                n := !n + 1.0)
+            ignore x
+         } |> Seq.iter ignore
+         !n
+      @@>
+
+[<Test>]
 let ``array expressions work``() =
    check  
       <@@ 
