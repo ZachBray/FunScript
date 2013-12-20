@@ -35,6 +35,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Mario", "Mario\Mario.fsproj
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "PacMan", "Pacman\PacMan.fsproj", "{1CD63889-D724-46FA-B055-7BDCFEDC1541}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Hokusai", "Hokusai\Hokusai.fsproj", "{C63D4CBA-1907-4775-B694-8E35FAE8D5D5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +82,10 @@ Global
 		{1CD63889-D724-46FA-B055-7BDCFEDC1541}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CD63889-D724-46FA-B055-7BDCFEDC1541}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1CD63889-D724-46FA-B055-7BDCFEDC1541}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C63D4CBA-1907-4775-B694-8E35FAE8D5D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C63D4CBA-1907-4775-B694-8E35FAE8D5D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C63D4CBA-1907-4775-B694-8E35FAE8D5D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C63D4CBA-1907-4775-B694-8E35FAE8D5D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
