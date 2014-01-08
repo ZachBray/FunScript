@@ -14,7 +14,8 @@ let checkAreEqualWithComponents components expectedResult quote =
    try
       let engine = JintEngine().SetFunction("test_log", System.Action<string>(printfn "//[LOG] %s"))
       let result = engine.Run(code + "\nreturn null;")
-      Assert.That((result = expectedResult))
+      let message (ex: 'a) (re: 'b) = sprintf "%sExpected: %A%sBut was: %A" System.Environment.NewLine ex System.Environment.NewLine re
+      Assert.That((result = expectedResult), (message expectedResult result))
    // Wrap xUnit exceptions to stop pauses.
    with ex ->
       //printfn "// Code:\n%s" code
