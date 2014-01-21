@@ -53,6 +53,7 @@ let ``String.Split with strings & remove empties works``() =
 //TODO: Move to another file.
 [<Test>]
 let ``System.Net.WebUtility.UrlEncode works``() =
+   if typeof<System.Type>.GetType().Name = "MonoType" then Assert.Ignore("Mono/MS.NET compatibility bug") else
    check 
       <@@ 
          System.Net.WebUtility.UrlEncode "<abc>foo </abc>"

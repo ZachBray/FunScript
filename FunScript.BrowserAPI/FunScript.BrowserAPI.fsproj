@@ -34,9 +34,6 @@
     <DocumentationFile>bin\Release\FunScript.BrowserAPI.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FunScript.Interop">
-      <HintPath>..\FunScript\bin\Debug\FunScript.Interop.dll</HintPath>
-    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="System" />
@@ -50,6 +47,10 @@
     <ProjectReference Include="..\FunScript\FunScript.fsproj">
       <Name>FunScript</Name>
       <Project>e0916e67-d3b0-4c3a-ad18-4146882fcedd</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\FunScript.Interop\FunScript.Interop.fsproj">
+      <Project>1397ECEF-2A65-49CE-AFA1-B9884671BBB9</Project>
+      <Name>FunScript.Interop</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
