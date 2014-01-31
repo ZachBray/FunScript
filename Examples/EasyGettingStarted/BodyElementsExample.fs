@@ -1,4 +1,4 @@
-(*
+﻿(*
     Modifying the HtmlCanvasExample to represent TS which populates the whole HTML page body part.
     The Project.fs then creates an index file with the HTML contents and opens it using the default brower.
 *)

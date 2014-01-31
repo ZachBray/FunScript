@@ -1,4 +1,4 @@
-(*
+﻿(*
     Modifying the BodyElementsExample to work with the JQueryMobile library.
     The Project.fs then creates an index file with the HTML contents and opens it using the default brower.
 *)

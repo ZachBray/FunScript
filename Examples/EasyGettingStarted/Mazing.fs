@@ -1,4 +1,4 @@
-(*
+﻿(*
     Mazing: a simple maze mobile application based on jquerymobile and Cordova/phonegap (TBD).
     The Project.fs creates the index file with the HTML contents and opens it using the default brower.
     Wrapping externally with Cordova (once I get to the Cordova API).

@@ -1,4 +1,4 @@
-(*
+﻿(*
     Based on Zach Bary's "Canavas" example (see GitHub examples).
     The TS draws 2 rectangles and we inject the compiled JS code into an HTML page.
     The Project.fs then creates an index file with the HTML contents and opens it using the default brower.

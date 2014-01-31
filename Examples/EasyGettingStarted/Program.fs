@@ -1,4 +1,4 @@
-(*
+﻿(*
 Main module. 
 ============
 Intended as a reference project for beginners who aim to get up and running and learn the basics.
