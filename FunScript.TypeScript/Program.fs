@@ -40,7 +40,7 @@ let compile outputAssembly references source =
     let parameters = CompilerParameters(OutputAssembly = outputAssembly)
     let msCorLib = typeof<int>.Assembly.Location
     parameters.ReferencedAssemblies.Add msCorLib |> ignore<int>
-    let fsCorLib = @"C:\Program Files (x86)\Reference Assemblies\Microsoft\FSharp\3.0\Runtime\v4.0\FSharp.Core.dll"
+    let fsCorLib = @"C:\Program Files (x86)\Reference Assemblies\Microsoft\FSharp\.NETFramework\v4.0\4.3.1.0\FSharp.Core.dll"
     parameters.ReferencedAssemblies.Add fsCorLib |> ignore<int>
     let funScriptInterop = typeof<FunScript.JSEmitInlineAttribute>.Assembly.Location
     parameters.ReferencedAssemblies.Add funScriptInterop |> ignore<int>
@@ -49,7 +49,7 @@ let compile outputAssembly references source =
     File.WriteAllText(sourceFile, source)
     /// This is to get the code dom to work!
     if System.Environment.GetEnvironmentVariable("FSHARP_BIN") = null then
-        let defaultFSharpBin = @"C:\Program Files (x86)\Microsoft SDKs\F#\3.0\Framework\v4.0"
+        let defaultFSharpBin = @"C:\Program Files (x86)\Microsoft SDKs\F#\3.1\Framework\v4.0"
         if Directory.Exists defaultFSharpBin then
             Environment.SetEnvironmentVariable("FSHARP_BIN", defaultFSharpBin)
         else failwith "Expected FSHARP_BIN environment variable to be set."
@@ -65,7 +65,7 @@ let generateAssembliesLazily tempDir inputs =
         Directory.CreateDirectory tempDir |> ignore
     let outputFiles =
         inputs
-        |> Seq.map (fun (name, contents) -> name, Parser.parseDeclarationsFile contents)
+        |> Seq.map (fun (path, name, contents) -> path, name, Parser.parseDeclarationsFile contents)
         |> Seq.toList
         |> TypeGenerator.Compiler.generateTypes
     let assemblyLocation moduleName =
@@ -100,7 +100,20 @@ let loadDefaultLib() =
     let ass = typeof<AST.AmbientClassBodyElement>.Assembly
     use stream = ass.GetManifestResourceStream("lib.d.ts")
     use reader = new StreamReader(stream)
-    "lib", reader.ReadToEnd()
+    "lib.d.ts", "lib", reader.ReadToEnd()
+
+let blacklist = 
+    set [
+        "text-buffer"
+        "atom"
+        "lib"
+        "joi"
+    ]
+
+let whitelist =
+    set [
+        "yui-test"
+    ]
 
 // DefaultUri = "https://github.com/borisyankov/DefinitelyTyped/archive/master.zip"
 let downloadTypesZip tempDir zipUri =
@@ -115,17 +128,18 @@ let downloadTypesZip tempDir zipUri =
     let moduleContents =
         zip.Entries 
         |> Seq.filter (fun entry ->
-            entry.FileName.EndsWith ".d.ts" && not (entry.FileName.Contains "test"))
+            entry.FileName.EndsWith ".d.ts")
         |> Seq.map (fun entry -> 
             use stream = entry.OpenReader()
             use reader = new StreamReader(stream)
             let filename = Path.GetFileName entry.FileName
             let moduleName = filename.Substring(0, filename.Length - ".d.ts".Length)
-            moduleName, reader.ReadToEnd())
+            sprintf "I:\\%s" (entry.FileName.Replace('/','\\')), moduleName, reader.ReadToEnd())
+        |> Seq.filter (fun ((path,moduleName,_) as x) ->
+            whitelist.Contains moduleName
+            || not (path.Contains "test" || blacklist.Contains moduleName))
         |> Seq.toList
-    let hasLib = moduleContents |> Seq.exists (fst >> ((=) "lib"))
-    if hasLib then moduleContents
-    else loadDefaultLib() :: moduleContents
+    loadDefaultLib() :: moduleContents
 
 let template =
     lazy
@@ -171,34 +185,21 @@ let main args =
             | [| zipUri |] -> None, Some zipUri
             | _ -> None, None
         let zipUri = defaultArg zipUri "https://github.com/borisyankov/DefinitelyTyped/archive/master.zip"
-        let gate = new AutoResetEvent(false) 
-        let processed = ConcurrentDictionary()
+
         downloadTypesZip tempDir zipUri
         |> generateAssembliesLazily outDir
-        |> Seq.toArray
-        |> Array.map (fun (moduleName, location, dependencies) -> 
-            let rec attempt() =
-                async {
-                    let hasDependencies = dependencies |> List.forall processed.ContainsKey
-                    if hasDependencies then
-                        match nugetKey with
-                        | None -> ()
-                        | Some(version, key) ->
-                            processed.[moduleName] <- location.Value
-                            gate.Set() |> ignore
-                            match location.Value with
-                            | None -> ()
-                            | Some assLoc ->
-                                uploadPackage outDir key version moduleName assLoc dependencies
-                    else
-                        let! _ = Async.AwaitWaitHandle(gate, 1000)
-                        return! attempt()
-                }
-            attempt())
-        |> Async.Parallel
-        |> Async.RunSynchronously
+        |> Seq.iter (fun (moduleName, location, dependencies) -> 
+            match location.Value with
+            | None -> ()
+            | Some assLoc ->
+                match nugetKey with
+                | None -> ()
+                | Some(version, key) ->
+                    uploadPackage outDir key version moduleName assLoc dependencies
+        )
         |> ignore
         0
     with ex -> 
         printfn "[ERROR] %s" (ex.ToString())
+        Console.ReadLine() |> ignore
         1

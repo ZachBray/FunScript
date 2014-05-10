@@ -37,8 +37,8 @@ and TypeParameter =
     /// TypeParameterList: TypeParameter | TypeParameterList , TypeParameter
     /// TypeParameter: Identifier Constraint[opt]
     /// Constraint: extends TypeReference
-    /// Note: The specification seems to be incorrect here! 
-    ///       The '*.d.ts' files use Type and not TypeReference
+    /// ***** NOTE: THE SPEC SEEMS TO BE INCORRECT HERE
+    ///             THE '*.d.ts' FILES USE Type AND NOT TypeReference
     | TypeParameter of Identifier * Type option
 
 /// PropertyName: IdentifierName | StringLiteral | NumericLiteral
@@ -79,6 +79,9 @@ and OptionalParameter =
     | OptionalParameter of PublicOrPrivate option * Identifier * TypeAnnotation option
     /// | PublicOrPrivate[opt] Identifier TypeAnnotation[opt] Initialiser
     | DefaultParameter of PublicOrPrivate option * Identifier * TypeAnnotation option * LiteralValue
+    /// ***** NOTE: NOT DECLARED IN SPEC BUT USED AND ACCEPTED BY COMPILER
+    /// | PublicOrPrivate[opt] Identifier ? : StringLiteral
+    
 
 and ParameterList =
     /// ParameterList: 
@@ -168,6 +171,9 @@ type ClassHeritage =
 /// AmbientMemberDeclaration: 
 /// | PublicOrPrivate[opt] static[opt] PropertyName TypeAnnotation[opt] ; 
 /// | PublicOrPrivate[opt] static[opt] PropertyName CallSignature ;
+/// ***** NOTE: THIS IS NOT CONTAINED IN THE SPEC BUT ALSO SEEMS TO BE VALID
+///             WHERE static IS THE IDENTIFIER RATHER THAN A KEYWORD
+/// | PublicOrPrivate[opt] static CallSignature ;
 type AmbientMemberDeclaration =
     | AmbientPropertyDeclaration of PublicOrPrivate option * IsStatic * PropertyName * TypeAnnotation option
     | AmbientMethodDeclaration of PublicOrPrivate option * IsStatic * PropertyName * CallSignature

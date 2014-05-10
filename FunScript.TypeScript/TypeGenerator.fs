@@ -487,11 +487,13 @@ module private Generate =
             let sanitise =
                 if predefinedNs.Contains ns then id
                 else Identifier.sanitise
-            ns |> List.rev |> List.map sanitise |> String.concat "." |> Some
+            let subTypeSpace = ns |> List.rev |> List.map sanitise |> String.concat "." 
+            let fullTypeSpace = sprintf "FunScript.TypeScript.%s" subTypeSpace
+            Some subTypeSpace
 
     let namespaceCode ns =
         match nameCode ns with
-        | None -> "global"
+        | None -> "FunScript.TypeScript"
         | Some namespaceCode -> namespaceCode
 
     let extractNamespaceCode = function
@@ -977,15 +979,14 @@ type %s ="""        (extractNamespaceCode t) localSignature
 
 
     let typeExtensions moduleName typeImports isMemberDefined signaturesByKey moduleElements =
-        let precursor = sprintf """
-namespace global
+        // TODO: Perhaps choose namespace based on type extensions. However, this may reduce discoverability.
+        let precursor i = sprintf """
+namespace FunScript.TypeScript
 
 [<AutoOpen>]
-module TypeExtensions_%s =
+module TypeExtensions_%s_%i =
 
-    do ()
-
-"""                         moduleName
+"""                         moduleName i
         let signaturesByKeyTest =
             signaturesByKey |> List.map (fun (x : Map<_,_>) -> x.ContainsKey)
         moduleElements |> Map.toSeq |> Seq.choose (fun ((ns, _) as typeKey, els) ->
@@ -1001,35 +1002,32 @@ module TypeExtensions_%s =
                 | None -> typeExtensionCode typeImports isMemberDefined signaturesByKeyTest ns None [] members
                 | Some(signature, fixedGps) -> typeExtensionCode typeImports isMemberDefined signaturesByKeyTest ns (Some signature) fixedGps members
             )
-        |> Seq.fold (fun (acc : StringBuilder) code -> acc.Append code) (StringBuilder().Append precursor)
+        |> Seq.mapi (fun i x -> i, x)
+        |> Seq.fold (fun (acc : StringBuilder) (i, code) -> acc.Append(precursor i).Append(code)) (StringBuilder())
         |> fun sb -> sb.ToString()
 
 module Compiler =
 
-    let convertPathToModuleName modulePath =
-        let moduleName = System.IO.Path.GetFileName modulePath
-        let moduleName =
-            if moduleName.EndsWith ".d.ts" then 
-                moduleName.Substring(0, moduleName.Length - ".d.ts".Length)
-            else moduleName
-        let saneName = Identifier.sanitise(moduleName).ToLower()
-        saneName
-
-    let findModuleDependencies (moduleName, DeclarationsFile decls) =
+    let findModuleDependencies (moduleName, modulePath, DeclarationsFile decls) =
+        let moduleDir = System.IO.Path.GetDirectoryName modulePath
         let isLib =
             decls |> List.exists (function
                 | RootReference(NoDefaultLib true) -> true
                 | _ -> false)
         let rest =
             decls |> List.choose (function
-                | RootReference(File path) -> Some(convertPathToModuleName path)
+                | RootReference(File path) -> 
+                    let refPath = path.Replace('/', '\\')
+                    let partRelativePath = System.IO.Path.Combine(moduleDir, refPath)
+                    let absolutePath = System.IO.Path.GetFullPath partRelativePath
+                    Some absolutePath
                 | _ -> None)
         if isLib then rest
-        else "lib" :: rest
+        else "lib.d.ts" :: rest
                 
     let orderByCompilationDependencies declarationModules =
         declarationModules |> List.topologicalSortBy 
-            fst findModuleDependencies
+            (fun (name, path, decls) -> path) findModuleDependencies
 
     let private findAndConvertDelegates hasPriorDefinition elementsByNameKey =
         elementsByNameKey |> Seq.collect (fun (k, els) ->
@@ -1049,38 +1047,73 @@ module Compiler =
             | _ -> [k, els]
         )
 
+    let generateUniqueNames declarationFiles=
+        declarationFiles |> List.fold (fun namesToDecls (path : string, _, decls) ->
+            let nameParts = path.Substring(0, path.Length - ".d.ts".Length).Split('/','\\')
+            nameParts |> Array.rev |> Array.map (fun str -> str.ToLowerInvariant())
+            |> Array.scan (fun acc namePart -> 
+                match acc with
+                | None -> Some namePart
+                | Some prevPart -> Some(sprintf "%s.%s" namePart prevPart)) None
+            |> Seq.choose (Option.map Identifier.sanitise)
+            |> Seq.tryPick (fun chosenName ->
+                match namesToDecls |> Map.tryFind chosenName with
+                | None -> Some(namesToDecls |> Map.add chosenName (path, decls))
+                | Some _ -> None)
+            |> function
+                | Some acc -> acc
+                | None -> 
+                    // TODO: Could just append numbers here
+                    failwithf "No unique name found for: %s" path) Map.empty
+        |> Map.toList
+        |> List.map (fun (name, (path, decls)) -> name, path, decls)
+
     let generateTypes declarationFiles =
 
-        let modules =
-            declarationFiles |> List.map (fun (name, decls) ->
-                let moduleName = (Identifier.sanitise name).ToLower()
-                moduleName, decls)
-
+        let modules = generateUniqueNames declarationFiles
+            
         printfn "Ordering modules..."
+
+        let lines = modules |> List.toArray |> Array.map (fun (moduleName, _,_) -> moduleName)
+        System.IO.File.WriteAllLines("uniqueModuleNames.txt", lines)
 
         let modulesInCompilationOrder =
             orderByCompilationDependencies modules
             |> Seq.toList
+
+        let lines = 
+            modulesInCompilationOrder 
+            |> List.map (fun (_, modulePath, _) -> modulePath)
+            |> List.toArray
+        System.IO.File.WriteAllLines("compilationOrder.txt", lines)
+
+        let modulePathToName =
+            modules |> List.map (fun (moduleName, modulePath, _) -> 
+                modulePath, moduleName)
+            |> Map.ofList
 
         let dependencyMap =
             modulesInCompilationOrder 
             |> Seq.map (fun (_, x, xs) -> x, xs)
             |> Map.ofSeq
 
-        let findAllDependencies moduleName =
+        let lines = dependencyMap |> Map.toArray |> Array.map (sprintf "%A")
+        System.IO.File.WriteAllLines("dependencyMap.txt", lines)
+
+        let findAllDependencies modulePath =
             let rec findAll acc names =
                 match names with
                 | [] -> acc
                 | _ -> 
                     let nextNames = names |> Seq.choose dependencyMap.TryFind |> Seq.concat |> Seq.toList
                     findAll (names @ acc) nextNames
-            findAll [] (dependencyMap.TryFind moduleName |> Option.toList |> List.concat)
+            findAll [] (dependencyMap.TryFind modulePath |> Option.toList |> List.concat)
             |> Seq.distinct |> Seq.toList
 
         let codeByModule =
             modulesInCompilationOrder
-            |> List.fold (fun (codeOut, moduleTypes, typeImports, membersDefined) ((_, DeclarationsFile decls), moduleName, _) ->
-                let moduleDependencies = findAllDependencies moduleName
+            |> List.fold (fun (codeOut, moduleTypes, typeImports, membersDefined) ((moduleName, _, DeclarationsFile decls), modulePath, _) ->
+                let moduleDependencies = findAllDependencies modulePath
                 let xs = ResizeArray()
                 decls |> List.iter (FFIMapping.fromDeclarationElement xs.Add)
                 // TODO: This doesn't protect against same signatures in the same module.
@@ -1127,11 +1160,11 @@ module Compiler =
                     Generate.typeExtensions moduleName allTypeImports isMemberDefined (sigs :: dependencySigs) elementsByNameKey
                 let code = declarationCode + System.Environment.NewLine + extensionCode
                 codeOut |> Map.add moduleName code, 
-                moduleTypes |> Map.add moduleName sigs,
-                typeImports |> Map.add moduleName exportedTypeImports,
-                membersDefined |> Map.add moduleName !localMembersDefined
+                moduleTypes |> Map.add modulePath sigs,
+                typeImports |> Map.add modulePath exportedTypeImports,
+                membersDefined |> Map.add modulePath !localMembersDefined
             ) (Map.empty, Map.empty, Map.empty, Map.empty)
             |> fun (x, _, _, _) -> x
 
-        modulesInCompilationOrder |> List.map (fun (_, name, _) ->
-            name, codeByModule |> Map.find name, findAllDependencies name)
+        modulesInCompilationOrder |> List.map (fun ((name,_,_), path, _) ->
+            name, codeByModule |> Map.find name, findAllDependencies path |> List.choose modulePathToName.TryFind)

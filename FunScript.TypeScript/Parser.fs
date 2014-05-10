@@ -220,6 +220,11 @@ let optionalParameter =
         opt publicOrPrivate .>>. identifier .>> str_ws "?"
         .>>. opt typeAnnotation
         |>> (fun ((pp, id), t) -> OptionalParameter(pp, id, t))
+        
+        /// ***** NOTE: NOT DECLARED IN SPEC BUT USED AND ACCEPTED BY COMPILER
+        opt publicOrPrivate .>>. identifier .>> str_ws "?" .>> str_ws ":"
+        .>>. stringLiteral
+        |>> (fun ((pp, id), _) -> OptionalParameter(pp, id, Some(TypeAnnotation(Predefined String))))
 
         opt publicOrPrivate .>>. identifier
         .>>. opt typeAnnotation
@@ -399,6 +404,9 @@ let ambientMemberDeclaration =
 
         opt publicOrPrivate .>>. staticness .>>. propertyName .>>. opt typeAnnotation
         |>> (fun (((pp, s), n), t) -> AmbientPropertyDeclaration(pp, s, n, t))
+
+        opt publicOrPrivate .>> stringReturn_ws "static" true .>>. callSignature
+        |>> (fun (pp, c) -> AmbientMethodDeclaration(pp, false, NameIdentifier "static", c))
     ]
 
 let ambientClassBodyElement =
@@ -497,7 +505,7 @@ let rootReference =
 
 let declarationElement =
     choice_attempt [
-        exportAssignment |>> RootExportAssignment
+        exportAssignment .>> str_ws ";" |>> RootExportAssignment
         exportedness .>>. interfaceDeclaration |>> RootInterfaceDeclaration
         exportedness .>>. importDeclaration |>> RootImportDeclaration
         exportedness .>>. externalImportDeclaration |>> RootExternalImportDeclaration
@@ -528,3 +536,18 @@ let parseDeclarationsFile str =
 //let lib = System.IO.File.ReadAllText(__SOURCE_DIRECTORY__ + @"\..\Examples\Typings\d3.d.ts")
 //let lib = System.IO.File.ReadAllText(__SOURCE_DIRECTORY__ + @"\..\Examples\Typings\ember.d.ts")
 //do  test declarationsFile lib
+
+let tryOut() =
+    test declarationsFile """
+// Type definitions for When 2.4.0
+// Project: https://github.com/cujojs/when
+// Definitions by: Derek Cicerone <https://github.com/derekcicerone>
+// Definitions: https://github.com/borisyankov/DefinitelyTyped
+
+declare module When {
+    function all<T>(promisesOrValues: any[]): Promise<T>;
+}
+
+export = When;
+
+    """
