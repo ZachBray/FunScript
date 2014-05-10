@@ -7,7 +7,7 @@
 module Program
 
 open FunScript
-open FSharp.Data
+open ApiaryProvider
 
 // ------------------------------------------------------------------
 // Initializataion
@@ -35,14 +35,14 @@ let main() =
     jQuery?dialogTitle.text(movie.Title) |> ignore
     jQuery?dialogImage.attr("src", root + movie.PosterPath) |> ignore
   
-    let! casts = movie.AsyncCasts()
-    let sorted = casts.Cast |> Array.sortBy (fun c -> c.Order)    
+    let! credits = movie.AsyncCredits()
+    let sorted = credits.Cast |> Array.sortBy (fun c -> c.Order)    
     let sorted = 
       if sorted.Length <= 10 then sorted |> Seq.ofArray 
       else sorted |> Seq.ofArray |> Seq.take 10
 
     jQuery?dialogCast.html("") |> ignore
-    for cast in casts.Cast do 
+    for cast in credits.Cast do 
       let html = "<strong>" + cast.Name + "</strong> (" + cast.Character + ")"
       let li = jQuery("<li>")
       li.html(html) |> ignore
@@ -66,7 +66,7 @@ let main() =
 
         let details = jQuery("<ul>")
         let date = 
-          match item.ReleaseDate.DateTime with
+          match item.ReleaseDate with
           | None -> "(not known)"
           | Some dt -> dt.ToString()
         jQuery("<li>").html("<strong>Released:</strong> " + date).
@@ -78,7 +78,7 @@ let main() =
 
         let body = jQuery("<div>").addClass("searchResult")
         jQuery("<h3>").append([| box link |]).appendTo(body) |> ignore
-        jQuery("<img>").attr("src", root + item.PosterPath).appendTo(body) |> ignore
+        jQuery("<img>").attr("src", root + (defaultArg item.PosterPath "")).appendTo(body) |> ignore
         details.appendTo(body) |> ignore
         jQuery("<div>").addClass("clearer").appendTo(body) |> ignore
         body.appendTo(jQuery?results) |> ignore )}

@@ -4,10 +4,10 @@
 
 module private FunScript.Data.JsonProvider
 
+open System
 open FunScript
-open FSharp.Data.Json
-open ProviderImplementation
-open FSharp.Data.RuntimeImplementation
+open FSharp.Data
+open FSharp.Data.Runtime
 
 // --------------------------------------------------------------------------------------
 // Low level JS helpers for getting types & reflection
@@ -26,6 +26,8 @@ module JsHelpers =
 // --------------------------------------------------------------------------------------
 // Reimplementation of the Json Type Provider runtime 
 
+#nowarn "10001"
+
 [<JS>]
 type JsRuntime = 
   // Document is parsed into JS object using nasty 'eval'
@@ -37,68 +39,75 @@ type JsRuntime =
   [<JSEmit("var it = {0}; return (typeof(it)==\"string\") ? eval(\"(function(a){return a;})(\" + it + \")\") : it;")>]
   static member Parse(source:string, culture:obj) : JsonValue = failwith "never"
 
-  [<JSEmit("return {0};")>]
-  static member CreateDocument(json:JsonValue) : JsonDocument = failwith "never"
-
   [<JSEmit("return {0}[{1}];")>]
-  static member GetProperty(json:JsonValue, name:string) : JsonValue = failwith "never"
+  static member GetProperty(json:IJsonDocument, name:string) : IJsonDocument = failwith "never"
 
+  [<JSEmit("""return "";""")>]
+  static member EmptyString(arg:obj) : obj = failwith "never"
+  
   [<JSEmit("return {0};")>]
   static member Identity(arg:obj) : obj = failwith "never"
+
   [<JSEmit("return {0};")>]
-  static member Identity2(arg:obj, culture:obj) : obj = failwith "never"
+  static member Identity1Of2(arg:obj, arg2:obj) : obj = failwith "never"
+  [<JSEmit("return {1};")>]
+  static member Identity2Of2(arg:obj, arg2:obj) : obj = failwith "never"
+  
+  [<JSEmit("return {0};")>]
+  static member Identity1Of3(arg:obj, arg2:obj, arg3:obj) : obj = failwith "never"
+  [<JSEmit("return {1};")>]
+  static member Identity2Of3(arg:obj, arg2:obj, arg3:obj) : obj = failwith "never"
+  [<JSEmit("return {2};")>]
+  static member Identity3Of3(arg:obj, arg2:obj, arg3:obj) : obj = failwith "never"
 
   // The `GetArrayChildrenByTypeTag` is a JS reimplementation of the
   // equivalent in the JSON type provider. The following functions
   // are derived (copied from JSON provider code)
-  static member GetArrayChildrenByTypeTag<'P, 'R>
-    (doc:JsonValue, tag:string, pack:JsonValue -> 'P, f:'P -> 'R) : 'R[] =
+  static member GetArrayChildrenByTypeTag<'T>
+    (doc:IJsonDocument, cultureStr:string, tagCode:string, mapping:Func<IJsonDocument, 'T>) : 'T[] =
     let matchTag (value:obj) : option<obj> = 
       if isNull value then None
-      elif jstypeof(value) = "boolean" && tag = "Boolean" then Some(unbox value)
-      elif jstypeof(value) = "number" && tag = "Number" then Some(unbox value)
-      elif jstypeof(value) = "string" && tag = "Number" then Some(unbox (1 * unbox value))
-      elif jstypeof(value) = "string" && tag = "String" then Some(unbox value)
-      elif isArray(value) && tag = "Array"then Some(unbox value)
-      elif jstypeof(value) = "object" && tag = "Record" then Some(unbox value)
+      elif jstypeof(value) = "boolean" && tagCode = "Boolean" then Some(unbox value)
+      elif jstypeof(value) = "number" && tagCode = "Number" then Some(unbox value)
+      elif jstypeof(value) = "string" && tagCode = "Number" then Some(unbox (1 * unbox value))
+      elif jstypeof(value) = "string" && tagCode = "String" then Some(unbox value)
+      elif isArray(value) && tagCode = "Array"then Some(unbox value)
+      elif jstypeof(value) = "object" && tagCode = "Record" then Some(unbox value)
       else None // ??? maybe sometimes fail
     if isArray doc then
       doc |> unbox 
           |> Array.choose matchTag
-          |> Array.map (unbox >> pack >> f)
+          |> Array.map (unbox >> mapping.Invoke)
     else failwith "JSON mismatch: Expected Array node"
 
   static member GetArrayChildByTypeTag
-    (value:JsonValue, tag:string) : JsonValue = 
-    let arr = JsRuntime.GetArrayChildrenByTypeTag(value, tag, id, id) 
+    (value:IJsonDocument, cultureStr:string, tagCode:string) : IJsonDocument = 
+    let arr = JsRuntime.GetArrayChildrenByTypeTag(value, cultureStr, tagCode, Func<_,_>(id)) 
     if arr.Length = 1 then arr.[0] 
     else failwith "JSON mismatch: Expected single value, but found multiple."
 
-  static member TryGetArrayChildByTypeTag<'P, 'R>
-    (doc:JsonValue, tag:string, pack:JsonValue-> 'P, f:'P -> 'R) : 'R option = 
-    let arr = JsRuntime.GetArrayChildrenByTypeTag(doc, tag, pack, f) 
+  static member TryGetArrayChildByTypeTag<'T>
+    (doc:IJsonDocument, cultureStr:string, tagCode:string, mapping:Func<IJsonDocument, 'T>) : 'T option = 
+    let arr = JsRuntime.GetArrayChildrenByTypeTag(doc, cultureStr, tagCode, mapping) 
     if arr.Length = 1 then Some arr.[0]
     elif arr.Length = 0 then None
     else failwith "JSON mismatch: Expected Array with single or no elements."
 
-  static member TryGetValueByTypeTag<'P, 'R>
-    (value:JsonValue, tag:string, pack:JsonValue -> 'P, f:'P -> 'R) : 'R option =
-    let arrayValue = [|value|]
-    JsonOperations.TryGetArrayChildByTypeTag(unbox arrayValue, tag, unbox pack, unbox f) 
+  static member TryGetValueByTypeTag<'T>(value:IJsonDocument, cultureStr:string, tagCode:string, mapping:Func<IJsonDocument,'T>) : 'T option =
+    JsonRuntime.TryGetArrayChildByTypeTag(value, cultureStr, tagCode, mapping) 
 
-  static member ConvertOptionalProperty<'P, 'R>
-    (doc:JsonValue, name:string, packer:JsonValue -> 'P, f:'P -> 'R) : 'R option = 
-    if hasProperty(doc, name) then Some (f (packer (JsRuntime.GetProperty(doc, name))))
+  static member ConvertOptionalProperty<'T>(doc:IJsonDocument, name:string, mapping:Func<IJsonDocument, 'T>) : 'T option = 
+    if hasProperty(doc, name) then Some (mapping.Invoke (JsRuntime.GetProperty(doc, name)))
     else None
 
   // In the dynamic world, this does not do anything at all :-)  
   [<JSEmit("return {0};")>]
-  static member ConvertArray<'P, 'R>
-    (value:JsonValue, packer:JsonValue -> 'P, f:'P -> 'R) : 'R[] = failwith "never"
+  static member ConvertArray<'T>(value:IJsonDocument, mapping:Func<IJsonDocument, 'T>) : 'T[] = failwith "never"
 
 // --------------------------------------------------------------------------------------
 // Define the mappings
 
+open System.IO
 open FunScript.Data.Utils
 open Microsoft.FSharp.Quotations
 
@@ -106,9 +115,12 @@ let components =
   [ // Document is parsed into JS object
     ExpressionReplacer.createUnsafe <@ JsonValue.Parse @> <@ JsRuntime.Parse @>
     ExpressionReplacer.createUnsafe <@ fun (d:JsonDocument) -> d.JsonValue @> <@ JsRuntime.Identity @>
+    ExpressionReplacer.createUnsafe <@ fun (d:JsonValueOptionAndPath) -> d.JsonOpt @> <@ JsRuntime.Identity @>
+    ExpressionReplacer.createUnsafe <@ fun (d:JsonValueOptionAndPath) -> d.Path @> <@ JsRuntime.EmptyString @>
+    ExpressionReplacer.createUnsafe <@ fun s -> new StringReader(s) @> <@ JsRuntime.Identity @>
 
     // Turn 'new JsonDocument(...)' to just 'return {0}'
-    ExpressionReplacer.createUnsafe <@ JsonDocument.Create @> <@ JsRuntime.Identity @>
+    ExpressionReplacer.createUnsafe <@ JsonDocument.Create:JsonValue*string->IJsonDocument @> <@ JsRuntime.Identity1Of2 @>
 
     CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
       function
@@ -116,25 +128,31 @@ let components =
          [ yield returnStategy.Return <| FunScript.AST.Null ] /// TODO!!!!!
       | _ -> []
 
-    ExpressionReplacer.createUnsafe <@ Operations.GetCulture @> <@ JsRuntime.GetCulture @>
+    ExpressionReplacer.createUnsafe <@ TextRuntime.GetCulture @> <@ JsRuntime.GetCulture @>
 
     // Get property using indexer
-    ExpressionReplacer.createUnsafe <@ JsonOperations.GetProperty @> <@ JsRuntime.GetProperty @>
+    ExpressionReplacer.createUnsafe <@ JsonRuntime.GetPropertyPacked @> <@ JsRuntime.GetProperty @>
+    ExpressionReplacer.createUnsafe <@ JsonRuntime.GetPropertyPackedOrNull @> <@ JsRuntime.GetProperty @>
+    ExpressionReplacer.createUnsafe <@ JsonRuntime.TryGetPropertyPacked @> <@ JsRuntime.GetProperty @>
+    ExpressionReplacer.createUnsafe <@ JsonRuntime.TryGetPropertyUnpacked @> <@ JsRuntime.GetProperty @>
+    ExpressionReplacer.createUnsafe <@ JsonRuntime.TryGetPropertyUnpackedWithPath @> <@ JsRuntime.GetProperty @>
 
     // Conversion becomes just identity
-    ExpressionReplacer.createUnsafe <@ JsonOperations.GetString @> <@ JsRuntime.Identity @>
-    ExpressionReplacer.createUnsafe <@ JsonOperations.GetBoolean @> <@ JsRuntime.Identity @>
-    ExpressionReplacer.createUnsafe <@ JsonOperations.GetFloat @> <@ JsRuntime.Identity2 @>
-    ExpressionReplacer.createUnsafe <@ JsonOperations.GetDecimal @> <@ JsRuntime.Identity2 @>
-    ExpressionReplacer.createUnsafe <@ JsonOperations.GetInteger @> <@ JsRuntime.Identity2 @>
-    ExpressionReplacer.createUnsafe <@ JsonOperations.GetInteger64 @> <@ JsRuntime.Identity2 @>
-    ExpressionReplacer.createUnsafe <@ JsonOperations.GetDateTime @> <@ JsRuntime.Identity2 @>
+    ExpressionReplacer.createUnsafe <@ JsonRuntime.ConvertString @> <@ JsRuntime.Identity2Of2 @>
+    ExpressionReplacer.createUnsafe <@ JsonRuntime.ConvertBoolean @> <@ JsRuntime.Identity2Of2 @>
+    ExpressionReplacer.createUnsafe <@ JsonRuntime.ConvertFloat @> <@ JsRuntime.Identity3Of3 @>
+    ExpressionReplacer.createUnsafe <@ JsonRuntime.ConvertDecimal @> <@ JsRuntime.Identity2Of2 @>
+    ExpressionReplacer.createUnsafe <@ JsonRuntime.ConvertInteger @> <@ JsRuntime.Identity2Of2 @>
+    ExpressionReplacer.createUnsafe <@ JsonRuntime.ConvertInteger64 @> <@ JsRuntime.Identity2Of2 @>
+    ExpressionReplacer.createUnsafe <@ JsonRuntime.ConvertDateTime @> <@ JsRuntime.Identity2Of2 @>
+    ExpressionReplacer.createUnsafe <@ JsonRuntime.ConvertGuid @> <@ JsRuntime.Identity @>
+    ExpressionReplacer.createUnsafe <@ JsonRuntime.GetNonOptionalValue @> <@ JsRuntime.Identity2Of3 @>
 
     // Functions that do something tricky are reimplemented
-    ExpressionReplacer.createUnsafe <@ JsonOperations.GetArrayChildrenByTypeTag @> <@ JsRuntime.GetArrayChildrenByTypeTag @>
-    ExpressionReplacer.createUnsafe <@ JsonOperations.ConvertArray @> <@ JsRuntime.ConvertArray @>
-    ExpressionReplacer.createUnsafe <@ JsonOperations.ConvertOptionalProperty @> <@ JsRuntime.ConvertOptionalProperty @>
-    ExpressionReplacer.createUnsafe <@ JsonOperations.TryGetArrayChildByTypeTag @> <@ JsRuntime.TryGetArrayChildByTypeTag @>
-    ExpressionReplacer.createUnsafe <@ JsonOperations.GetArrayChildByTypeTag @> <@ JsRuntime.GetArrayChildByTypeTag @>
-    ExpressionReplacer.createUnsafe <@ JsonOperations.TryGetValueByTypeTag @> <@ JsRuntime.TryGetValueByTypeTag @>
+    ExpressionReplacer.createUnsafe <@ JsonRuntime.GetArrayChildrenByTypeTag @> <@ JsRuntime.GetArrayChildrenByTypeTag @>
+    ExpressionReplacer.createUnsafe <@ JsonRuntime.ConvertArray @> <@ JsRuntime.ConvertArray @>
+    ExpressionReplacer.createUnsafe <@ JsonRuntime.ConvertOptionalProperty @> <@ JsRuntime.ConvertOptionalProperty @>
+    ExpressionReplacer.createUnsafe <@ JsonRuntime.TryGetArrayChildByTypeTag @> <@ JsRuntime.TryGetArrayChildByTypeTag @>
+    ExpressionReplacer.createUnsafe <@ JsonRuntime.GetArrayChildByTypeTag @> <@ JsRuntime.GetArrayChildByTypeTag @>
+    ExpressionReplacer.createUnsafe <@ JsonRuntime.TryGetValueByTypeTag @> <@ JsRuntime.TryGetValueByTypeTag @>
   ]

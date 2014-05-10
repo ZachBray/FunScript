@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "WorldBank", "WorldBank\WorldBank.fsproj", "{A4799ED1-4228-4B1D-8ACB-61293F90B07E}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "SimpleAsync", "SimpleAsync\SimpleAsync.fsproj", "{E1D45250-A24A-4D26-BFBF-BF93AB5F45E5}"
-EndProject
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30324.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Typings", "Typings", "{F86C43BE-698F-46D5-9A7F-78AACDA19478}"
 	ProjectSection(SolutionItems) = preProject
 		Typings\google.maps.d.ts = Typings\google.maps.d.ts
@@ -18,6 +16,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{DEA69E61-D
 	ProjectSection(SolutionItems) = preProject
 		..\Docs\build.fsx = ..\Docs\build.fsx
 	EndProjectSection
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "WorldBank", "WorldBank\WorldBank.fsproj", "{A4799ED1-4228-4B1D-8ACB-61293F90B07E}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "SimpleAsync", "SimpleAsync\SimpleAsync.fsproj", "{E1D45250-A24A-4D26-BFBF-BF93AB5F45E5}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Tutorial", "Tutorial\Tutorial.fsproj", "{64D64D70-C665-4A7B-BF83-9635485578E0}"
 EndProject
