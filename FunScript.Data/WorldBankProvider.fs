@@ -57,12 +57,11 @@ module Runtime =
           let res =
             data.Array |> Seq.ofArray |> Seq.choose (fun v ->
               if JsonProvider.JsHelpers.isNull v.Value then None
-              else Some(int v.Date, float v.Value.Number.Value))
+              else Some(int v.Date, float v.Value.Value))
           cont res ))
 
 open Runtime
-open ProviderImplementation
-open FSharp.Data.RuntimeImplementation.WorldBank
+open FSharp.Data.Runtime.WorldBank
 
 let private newWorldBankData = <@@ new WorldBankData(undef(), undef()) @@>
 let private worldbank =
