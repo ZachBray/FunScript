@@ -108,6 +108,7 @@ let blacklist =
         "atom"
         "lib"
         "joi"
+        "status-bar"
     ]
 
 let whitelist =

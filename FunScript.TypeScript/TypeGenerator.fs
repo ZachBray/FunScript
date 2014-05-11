@@ -848,6 +848,7 @@ type %s ="""        (extractNamespaceCode t) localSignature
                         | Name pn -> 
                             let n, a = Identifier.fromPropertyName pn
                             n, a, ""
+                    let compiledName = compiledName name 0
                     let baseAccess, seedI =
                         match s with
                         | Static -> javaScriptTypeCode t, 0
@@ -867,13 +868,31 @@ type %s ="""        (extractNamespaceCode t) localSignature
                             sprintf "%s(%s)" fullAccess parameterCode
                         | Index _ ->
                             sprintf "%s[{%i}]" fullAccess seedI
-                    let memberSignature, key, auxMemberSignature =
+                    let getOverloadName specializedName memberElement =
+                        let memberElementKey =
+                            match memberElement with
+                            | Property _ | Index _ -> memberElement
+                            | Method(gps, gcs, ps, r) ->
+                                let requiredParameters =
+                                    ps |> List.choose (function
+                                        | Fixed _ | InlineArray _ -> None
+                                        | Variable(_,pt,optionality) -> 
+                                            match optionality with
+                                            | Optional -> None
+                                            | Required -> Some(Variable("", pt, Required)))
+                                Method(gps, gcs, requiredParameters, r)
+                        Seq.initInfinite id |> Seq.map (function
+                            | 0 -> specializedName
+                            | n -> sprintf "%sOverload%i" specializedName (n+1))
+                        |> Seq.find (fun name ->
+                            not (isMemberDefined (signature, name, s, memberElementKey)))
+                    let memberSignature, auxMemberSignature =
                         match el with
                         | Property r -> 
                             let fixedR = fixAndResolve r
                             let rCode = typeReferenceCode fixedR
+                            let name = getOverloadName name (Property fixedR)
                             sprintf "%s with get() : %s = failwith \"never\" and set (v : %s) : unit = failwith \"never\"" name rCode rCode,
-                            ("", Property fixedR), 
                             None
                         | Method(methodGps, methodGcs, ps, r) ->
                             let partiallyFixedMethodGps, _, fixGenericNames = fixGenericParameters methodGps
@@ -891,12 +910,8 @@ type %s ="""        (extractNamespaceCode t) localSignature
                                 specs |> String.concat "", pCodes |> List.choose id |> String.concat ", "
                             let fixedR = combinedFix r
                             let genericDef = defaultArg (constrainedGenericParameterCode fixedMethodGps fixedGcs) ""
-                            let keyPs =
-                                fixedPs |> List.map (function
-                                    | Fixed x -> Fixed x
-                                    | Variable(_, t, _) -> Variable("", t, Required)
-                                    | InlineArray(_, t) -> Variable("", t, Required))
                             let specializedName = name + specialization
+                            let specializedName = getOverloadName specializedName (Method(fixedMethodGps, fixedGcs, fixedPs, fixedR))
                             let canHaveSetter = 
                                 let hasSpecialArgs =
                                     fixedPs |> List.exists (function
@@ -918,32 +933,28 @@ type %s ="""        (extractNamespaceCode t) localSignature
                                 else None
                             sprintf "%s%s(%s) : %s = failwith \"never\"" 
                                 specializedName genericDef parametersCode (typeReferenceCode fixedR),
-                            (specialization, Method(fixedMethodGps, fixedGcs, keyPs, fixedR)),
                             auxMethod
                         | Index(p, r) ->
                             let fixedP = fixAndResolve p
                             let fixedR = fixAndResolve r
                             let pCode = typeReferenceCode fixedP
                             let rCode = typeReferenceCode fixedR
+                            let name = getOverloadName name (Index(fixedP, fixedR))
                             sprintf "%s with get(i : %s) : %s = failwith \"never\" and set (i : %s) (v : %s) : unit = failwith \"never\"" name pCode rCode pCode rCode,
-                            ("", Index(fixedP, fixedR)),
                             None
-                    if isMemberDefined (signature, pn, s, key) then None
-                    else
-                        let compiledName = compiledName name 0
-                        let root =
-                            match s with
-                            | Static -> "static member "
-                            | NonStatic -> "member __."
-                        sprintf """
+                    let root =
+                        match s with
+                        | Static -> "static member "
+                        | NonStatic -> "member __."
+                    sprintf """
             [<FunScript.JSEmitInline("(%s)"); CompiledName("%s")>]
             %s%s"""                 callCode compiledName root memberSignature
-                        |> Option.foldBack (fun (auxSignature, auxCallCode) acc  ->
-                            sprintf """%s
+                    |> Option.foldBack (fun (auxSignature, auxCallCode) acc  ->
+                        sprintf """%s
             [<FunScript.JSEmitInline("(%s)"); CompiledName("%sAux")>]
             %s%s"""                 acc auxCallCode compiledName root auxSignature)
-                            auxMemberSignature
-                        |> Some
+                        auxMemberSignature
+                    |> Some
                 with ex ->
                     printfn "[ERROR] %s" ex.Message
                     None
@@ -1126,8 +1137,6 @@ module Compiler =
                         !localMembersDefined |> Set.contains memberKey
                     if not isDefined then
                         localMembersDefined := !localMembersDefined |> Set.add memberKey
-                    if isDefined then
-                        printfn "[WARN] Ignoring a duplicate member table entry: %A." memberKey
                     isDefined
                 let dependencySigs =
                     moduleDependencies |> List.map (fun n -> moduleTypes |> Map.find n)
