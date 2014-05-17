@@ -10,7 +10,7 @@ install:
   - mono --runtime=v4.0 ./NuGet/NuGet.exe install NUnit.Runners -Version 2.6.3 -OutputDirectory packages -ExcludeVersion
 
 script: 
-  - xbuild FunScript.sln /p:Configuration=Release
-  - xbuild FunScript.Libraries.sln /p:Configuration=Release
-  - mono --runtime=v4.0 packages/NUnit.Runners/tools/nunit-console.exe ./FunScript.Tests/bin/Release/FunScript.Tests.dll
+  - xbuild src/FunScript.sln /p:Configuration=Release
+  - xbuild src/FunScript.Libraries.sln /p:Configuration=Release
+  - mono --runtime=v4.0 packages/NUnit.Runners/tools/nunit-console.exe ./src/tests/FunScript.Tests/bin/Release/FunScript.Tests.dll
 

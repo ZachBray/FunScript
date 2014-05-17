@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>e0916e67-d3b0-4c3a-ad18-4146882fcedd</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>FunScript</RootNamespace>
+    <AssemblyName>FunScript</AssemblyName>
+    <Name>FunScript</Name>
+    <ProductVersion>10.0.0</ProductVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+    <TargetFSharpCoreVersion>4.3.1.0</TargetFSharpCoreVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <Tailcalls>false</Tailcalls>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <WarningLevel>3</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DocumentationFile>bin\Debug\FunScript.XML</DocumentationFile>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <Tailcalls>true</Tailcalls>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <WarningLevel>3</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DocumentationFile>bin\Release\FunScript.XML</DocumentationFile>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Web" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="AttributeHelpers.fs" />
+    <Compile Include="ExprExtensions.fs" />
+    <Compile Include="Core\LanguagePrimitives.fs" />
+    <Compile Include="Core\GenericConstants.fs" />
+    <Compile Include="Core\Array.fs" />
+    <Compile Include="Core\list.fs" />
+    <Compile Include="Core\Option.fs" />
+    <Compile Include="Core\Seq.fs" />
+    <Compile Include="Core\Range.fs" />
+    <Compile Include="Core\Set.fs" />
+    <Compile Include="Core\Map.fs" />
+    <Compile Include="Core\String.fs" />
+    <Compile Include="Core\Events.fs" />
+    <Compile Include="Core\Async.fs" />
+    <Compile Include="Core\Type.fs" />
+    <Compile Include="Core\StringWriter.fs" />
+    <Compile Include="Core\Dictionaries.fs" />
+    <Compile Include="Core\Web.fs" />
+    <Compile Include="JavaScriptNameMapper.fs" />
+    <Compile Include="AST.fs" />
+    <Compile Include="QuoteExtensions.fs" />
+    <Compile Include="InternalCompiler.fs" />
+    <Compile Include="ReturnStrategies.fs" />
+    <Compile Include="CompilerComponent.fs" />
+    <Compile Include="ExpressionReplacer.fs" />
+    <Compile Include="Reflection.fs" />
+    <Compile Include="PrimitiveTypes.fs" />
+    <Compile Include="Comparison.fs" />
+    <Compile Include="Arithmetic.fs" />
+    <Compile Include="Logic.fs" />
+    <Compile Include="LetBindings.fs" />
+    <Compile Include="LambdaApplication.fs" />
+    <Compile Include="ControlFlow.fs" />
+    <Compile Include="Arrays.fs" />
+    <Compile Include="Lists.fs" />
+    <Compile Include="Seqs.fs" />
+    <Compile Include="Options.fs" />
+    <Compile Include="Sets.fs" />
+    <Compile Include="Maps.fs" />
+    <Compile Include="Objects.fs" />
+    <Compile Include="CommonOperators.fs" />
+    <Compile Include="Strings.fs" />
+    <Compile Include="TypeConversion.fs" />
+    <Compile Include="OtherMappings.fs" />
+    <Compile Include="Asyncs.fs" />
+    <Compile Include="UnionTypes.fs" />
+    <Compile Include="RecordTypes.fs" />
+    <Compile Include="Tuples.fs" />
+    <Compile Include="ReflectedDefinitions.fs" />
+    <Compile Include="Compiler.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FunScript.Interop\FunScript.Interop.fsproj">
+      <Name>FunScript.Interop</Name>
+      <Project>{1397ecef-2a65-49ce-afa1-b9884671bbb9}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <PropertyGroup>
+    <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
+  </PropertyGroup>
+  <Choose>
+    <When Condition="'$(VisualStudioVersion)' == '11.0'">
+      <PropertyGroup>
+        <FSharpTargetsPath>$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets</FSharpTargetsPath>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <FSharpTargetsPath>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets</FSharpTargetsPath>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+  <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
