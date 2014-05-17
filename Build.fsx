@@ -51,6 +51,10 @@ Target "Build-Main" (fun () ->
 )
 
 Target "Create-Package-Main" (fun () ->
+    let hasNugetKey = hasBuildParam "nuget_key"
+
+    tracefn "Publish-Package-Main: %b" hasNugetKey
+
     NuGet(fun p ->
         {p with
             Authors = ["Zach Bray"; "Tomas Petricek"]
@@ -62,7 +66,7 @@ Target "Create-Package-Main" (fun () ->
             OutputPath = packageDir
             Version = versionNumber
             AccessKey = getBuildParamOrDefault "nuget_key" ""
-            Publish = hasBuildParam "nuget_key"
+            Publish = hasNugetKey
         }) "build/template.nuspec"
 )
 
