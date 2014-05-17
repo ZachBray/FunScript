@@ -9,6 +9,8 @@ let mainPackageDir = "./build/main/deploy/"
 let dataBuildDir = "./build/data/bin/"
 let dataPackageDir = "./build/data/deploy/"
 
+let testBuildDir = "./build/data/bin/"
+
 let versionNumber =
     match buildServer with
     | TeamCity -> buildVersion
@@ -20,6 +22,10 @@ Target "Clean-Main" (fun _ ->
 
 Target "Clean-Data" (fun _ ->
     CleanDirs [dataBuildDir; dataPackageDir]
+)
+
+Target "Clean-Test" (fun _ ->
+    CleanDirs [testBuildDir]
 )
 
 let baseAttributes = [
@@ -74,6 +80,27 @@ Target "Build-Data" (fun () ->
     |> Log "Build-Data-Output: "
 )
 
+Target "Build-Test" (fun () ->
+
+    let projectFiles = !! "src/tests/**/*.fsproj"
+    
+    Log "Build-Test-Projects: " projectFiles
+
+    MSBuildRelease testBuildDir "Build" projectFiles
+    |> Log "Build-Test-Output: "
+)
+
+Target "Run-Test" (fun () ->
+    let targetDlls = !! (testBuildDir + "/*.Tests.dll")
+    
+    targetDlls |> NUnit (fun p -> 
+        { p with 
+            DisableShadowCopy = true 
+            OutputFile = "TestResult.xml"
+            ToolPath = "lib/NUnit"
+        })
+)
+
 Target "Create-Package-Main" (fun () ->
     let hasNugetKey = hasBuildParam "nuget_key"
     tracefn "Publish-Package-Main: %b" hasNugetKey
@@ -123,5 +150,7 @@ Target "Release" DoNothing
 "Clean-Main" ==> "Build-Main" ==> "Create-Package-Main" ==> "Release"
 "Build-Main" ==> "Build-Data"
 "Clean-Data" ==> "Build-Data" ==> "Create-Package-Data" ==> "Release"
+"Clean-Test" ==> "Build-Test" ==> "Run-Test"
+"Run-Test" ==> "Create-Package-Main"
 
 RunTargetOrDefault "Release"
