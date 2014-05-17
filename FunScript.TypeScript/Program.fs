@@ -35,32 +35,38 @@ let openFileOrUri resolutionFolder (fileName:string) =
             else fileName
         new StreamReader(file)
 
-let compile outputAssembly references source =
-    use provider = new Microsoft.FSharp.Compiler.CodeDom.FSharpCodeProvider()
-    let parameters = CompilerParameters(OutputAssembly = outputAssembly)
-    let msCorLib = typeof<int>.Assembly.Location
-    parameters.ReferencedAssemblies.Add msCorLib |> ignore<int>
-    let fsCorLib = @"C:\Program Files (x86)\Reference Assemblies\Microsoft\FSharp\.NETFramework\v4.0\4.3.1.0\FSharp.Core.dll"
-    parameters.ReferencedAssemblies.Add fsCorLib |> ignore<int>
-    let funScriptInterop = typeof<FunScript.JSEmitInlineAttribute>.Assembly.Location
-    parameters.ReferencedAssemblies.Add funScriptInterop |> ignore<int>
-    parameters.ReferencedAssemblies.AddRange references
-    let sourceFile = outputAssembly + ".fs"
-    File.WriteAllText(sourceFile, source)
-    /// This is to get the code dom to work!
-    if System.Environment.GetEnvironmentVariable("FSHARP_BIN") = null then
-        let defaultFSharpBin = @"C:\Program Files (x86)\Microsoft SDKs\F#\3.1\Framework\v4.0"
-        if Directory.Exists defaultFSharpBin then
-            Environment.SetEnvironmentVariable("FSHARP_BIN", defaultFSharpBin)
-        else failwith "Expected FSHARP_BIN environment variable to be set."
-    let results = provider.CompileAssemblyFromFile(parameters, [|sourceFile|])
-    match [| for err in results.Errors -> err |] with
-    | [||] -> true
-    | errors ->
-        printf "Failed to compile. \n%A" (errors |> Array.map (fun err -> err.ErrorText))
-        false
+let compile outputAssembly references (source : string) =
+    let source = 
+        if source.Trim() = "" then "namespace FunScript.TypeScript" 
+        else source
+    if File.Exists outputAssembly then
+        true
+    else
+        use provider = new Microsoft.FSharp.Compiler.CodeDom.FSharpCodeProvider()
+        let parameters = CompilerParameters(OutputAssembly = outputAssembly)
+        let msCorLib = typeof<int>.Assembly.Location
+        parameters.ReferencedAssemblies.Add msCorLib |> ignore<int>
+        let fsCorLib = @"C:\Program Files (x86)\Reference Assemblies\Microsoft\FSharp\.NETFramework\v4.0\4.3.1.0\FSharp.Core.dll"
+        parameters.ReferencedAssemblies.Add fsCorLib |> ignore<int>
+        let funScriptInterop = typeof<FunScript.JSEmitInlineAttribute>.Assembly.Location
+        parameters.ReferencedAssemblies.Add funScriptInterop |> ignore<int>
+        parameters.ReferencedAssemblies.AddRange references
+        let sourceFile = outputAssembly + ".fs"
+        File.WriteAllText(sourceFile, source)
+        /// This is to get the code dom to work!
+        if System.Environment.GetEnvironmentVariable("FSHARP_BIN") = null then
+            let defaultFSharpBin = @"C:\Program Files (x86)\Microsoft SDKs\F#\3.1\Framework\v4.0"
+            if Directory.Exists defaultFSharpBin then
+                Environment.SetEnvironmentVariable("FSHARP_BIN", defaultFSharpBin)
+            else failwith "Expected FSHARP_BIN environment variable to be set."
+        let results = provider.CompileAssemblyFromFile(parameters, [|sourceFile|])
+        match [| for err in results.Errors -> err |] with
+        | [||] -> true
+        | errors ->
+            printf "Failed to compile. \n%A" (errors |> Array.map (fun err -> err.ErrorText))
+            false
 
-let generateAssembliesLazily tempDir inputs =
+let generateAssemblies tempDir postBuildStep inputs  =
     if not(Directory.Exists tempDir) then
         Directory.CreateDirectory tempDir |> ignore
     let outputFiles =
@@ -74,27 +80,75 @@ let generateAssembliesLazily tempDir inputs =
         outputFiles |> Seq.map (fun (name, contents, dependencies) ->
             name, (contents, dependencies))
         |> Map.ofSeq
-    let rec forceCreation name =
-        let contents, dependencies = outputMappings.[name]
-        let moduleLocation = assemblyLocation name
-        if File.Exists moduleLocation then
-            Some moduleLocation
-        else
+    let tryCreate name =
+        try
+            let contents, dependencies = outputMappings.[name]
+            let moduleLocation = assemblyLocation name
             printfn "Generating assembly for %s..." name
-            let hasDependencies =
-                dependencies |> List.forall (forceCreation >> Option.isSome)
             let dependencyLocations =
                 dependencies |> List.toArray |> Array.map assemblyLocation
             let wasSuccessful =
-                hasDependencies &&
                 compile 
                     moduleLocation
                     dependencyLocations
                     contents
+                && postBuildStep name moduleLocation dependencies
             if wasSuccessful then Some moduleLocation
             else None
+        with ex ->
+            printfn "[ERROR] %s" ex.Message
+            None
+
+    let generateAssembly generateAssembly name =
+        let hasDependencies() =
+            async {
+                let dependencies = snd outputMappings.[name]
+                let! results =
+                    dependencies |> Seq.map generateAssembly
+                    |> Async.Parallel
+                return results |> Array.forall (snd >> Option.isSome)
+            }
+            
+        async {
+            let! hasDependencies = hasDependencies()
+            if hasDependencies then return name, tryCreate name
+            else return name, None
+        }
+
+    let eventually f =
+        let started, notStarted = 1, 0
+        let state = ref notStarted
+        let finishedEvent = new Threading.ManualResetEvent(false)
+        let result = ref Unchecked.defaultof<_>
+        async {
+            let isFirst = System.Threading.Interlocked.Exchange(state, started) = notStarted
+            if isFirst then
+                try
+                    let! x = f()
+                    result := x
+                finally
+                    finishedEvent.Set() |> ignore
+            let! _ = Async.AwaitWaitHandle finishedEvent
+            return !result
+        }
+
+    let memoize f =
+        let cache = System.Collections.Concurrent.ConcurrentDictionary()
+        let rec find x =
+            match cache.TryGetValue x with
+            | false, _ ->
+                cache.TryAdd(x, eventually (fun () -> f find x)) |> ignore
+                cache.[x]
+            | true, v -> v
+        find
+
+    let generateAssembly = memoize generateAssembly
+
     outputFiles |> List.map (fun (name, _, _) ->
-        name, lazy forceCreation name, snd outputMappings.[name])
+        generateAssembly name)
+    |> List.map Async.RunSynchronously
+//    |> Async.Parallel
+//    |> Async.RunSynchronously
     
 let loadDefaultLib() =
     let ass = typeof<AST.AmbientClassBodyElement>.Assembly
@@ -136,9 +190,11 @@ let downloadTypesZip tempDir zipUri =
             let filename = Path.GetFileName entry.FileName
             let moduleName = filename.Substring(0, filename.Length - ".d.ts".Length)
             sprintf "I:\\%s" (entry.FileName.Replace('/','\\')), moduleName, reader.ReadToEnd())
-        |> Seq.filter (fun ((path,moduleName,_) as x) ->
+        |> Seq.filter (fun (path,moduleName,_) ->
             whitelist.Contains moduleName
             || not (path.Contains "test" || blacklist.Contains moduleName))
+//        |> Seq.filter (fun (path,moduleName,_) -> 
+//            (moduleName = "jquery" || moduleName.Contains "rx") && not(moduleName.Contains "knockout")) 
         |> Seq.toList
     loadDefaultLib() :: moduleContents
 
@@ -165,11 +221,13 @@ let uploadPackage tempDir key version moduleName assLoc deps =
     File.WriteAllText(nuspecFile, nuspec moduleName version deps)
     let packProcess = Process.Start("nuget.exe", sprintf "pack %s" nuspecFile)
     packProcess.WaitForExit()
-    let pushProcess = 
-        Process.Start(
-            "nuget.exe", 
-            sprintf "push FunScript.TypeScript.Binding.%s.%s.nupkg %s" moduleName version key)
-    pushProcess.WaitForExit()
+    packProcess.ExitCode = 0 && (
+        let pushProcess = 
+            Process.Start(
+                "nuget.exe", 
+                sprintf "push FunScript.TypeScript.Binding.%s.%s.nupkg %s" moduleName version key)
+        pushProcess.WaitForExit()
+        pushProcess.ExitCode = 0)
 
 open System.Threading
 open System.Collections.Concurrent
@@ -188,16 +246,15 @@ let main args =
         let zipUri = defaultArg zipUri "https://github.com/borisyankov/DefinitelyTyped/archive/master.zip"
 
         downloadTypesZip tempDir zipUri
-        |> generateAssembliesLazily outDir
-        |> Seq.iter (fun (moduleName, location, dependencies) -> 
-            match location.Value with
-            | None -> ()
-            | Some assLoc ->
-                match nugetKey with
-                | None -> ()
-                | Some(version, key) ->
-                    uploadPackage outDir key version moduleName assLoc dependencies
-        )
+        |> generateAssemblies outDir (fun moduleName location dependencies -> 
+            match nugetKey with
+            | None -> true
+            | Some(version, key) ->
+                uploadPackage outDir key version moduleName location dependencies)
+        |> Seq.filter (snd >> Option.isNone)
+        |> Seq.map fst
+        |> Seq.toArray
+        |> fun xs -> File.WriteAllLines("failed-modules.txt", xs)
         |> ignore
         0
     with ex -> 

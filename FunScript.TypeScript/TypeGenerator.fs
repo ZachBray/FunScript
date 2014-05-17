@@ -471,25 +471,31 @@ module private Generate =
             Void
         ]
 
-    let predefinedNs =
-        set (predefinedTypeRefs |> List.map (fun (TypeRef(ns, _)) -> ns))
-
     let predefinedTypeKeys =
         set (predefinedTypeRefs |> List.map typeRefToTypeKey)
         |> Set.add (["IList"; "Generic"; "Collections"; "System"], 1)
         |> Set.add (["Array"], 1)
+        |> List.foldBack Set.add (List.init 15 (fun i -> (["Func"; "System"], i+1)))
+
+    let predefinedNs =
+        predefinedTypeKeys |> Set.map fst
 
     let nameCode ns =
         match ns with
         | [] -> None
         | ["Array"] -> Some "array"
+        | [genericParam] when genericParam.StartsWith("'") ->
+            Some(Identifier.sanitise genericParam)
         | _ -> 
+            let isPredefined = predefinedNs.Contains ns
             let sanitise =
-                if predefinedNs.Contains ns then id
+                if isPredefined then id
                 else Identifier.sanitise
             let subTypeSpace = ns |> List.rev |> List.map sanitise |> String.concat "." 
-            let fullTypeSpace = sprintf "FunScript.TypeScript.%s" subTypeSpace
-            Some subTypeSpace
+            if isPredefined then Some subTypeSpace
+            else
+                let fullTypeSpace = sprintf "FunScript.TypeScript.%s" subTypeSpace
+                Some fullTypeSpace
 
     let namespaceCode ns =
         match nameCode ns with
@@ -752,8 +758,7 @@ type %s ="""        (extractNamespaceCode t) localSignature
             (fun (_, xs, _, _) -> 
                 xs |> Set.toList |> List.filter (fun x -> 
                     typesByKey |> List.exists (fun f -> f x) |> not &&
-                    predefinedTypeKeys |> Set.contains x |> not &&
-                    fst x <> ["Func"; "System"]))
+                    predefinedTypeKeys |> Set.contains x |> not))
         |> Seq.map (fun (x, _, _) -> x)
         |> Seq.fold (fun (allCode : StringBuilder, typeSigs) (codeFragment, _, typeKey, typeSignature) ->
             allCode.Append codeFragment, 
