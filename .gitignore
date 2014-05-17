@@ -14,7 +14,7 @@ _ReSharper*/
 *.*~
 :
 nugetpackage/lib
-build
+build/deploy
 packages
 
 # Generated documentation
