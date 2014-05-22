@@ -13,29 +13,29 @@
   <meta name="author" content="Zach Bray">
 
   <!-- Reference Foundation -->
-  <link rel="stylesheet" href="http://www.funscript.info/css/foundation.css" />
-  <script src="http://www.funscript.info/js/vendor/custom.modernizr.js"></script>
+  <link rel="stylesheet" href="http://funscript.info/css/foundation.css" />
+  <script src="http://funscript.info/js/vendor/custom.modernizr.js"></script>
 
   <!-- Reference custom CSS and tooltips -->
-  <link type="text/css" rel="stylesheet" href="http://www.funscript.info/custom/style.css" />
-  <script src="http://www.funscript.info/custom/tooltips.js" type="text/javascript"></script>
-  <link type="text/css" rel="stylesheet" href="http://www.funscript.info/custom/tooltips.css" />
+  <link type="text/css" rel="stylesheet" href="http://funscript.info/custom/style.css" />
+  <script src="http://funscript.info/custom/tooltips.js" type="text/javascript"></script>
+  <link type="text/css" rel="stylesheet" href="http://funscript.info/custom/tooltips.css" />
 </head>
 <body>
 
   <!-- Header bar with name and navigation links -->
   <nav class="top-bar">
     <ul class="title-area">
-      <li class="name"><h1><a href="http://www.funscript.info">FunScript</a></h1></li>
+      <li class="name"><h1><a href="http://funscript.info">FunScript</a></h1></li>
       <li class="toggle-topbar"><a href="#"><span>Menu</span></a></li>
     </ul>
 
     <section class="top-bar-section">
       <ul class="left">
-        <li><a href="http://www.funscript.info/index.html">home</a></li>
-        <li><a href="http://www.funscript.info/learn.html">learn more</a></li>
-        <li><a href="http://www.funscript.info/get.html">get started</a></li>
-        <li><a href="http://www.funscript.info/contribute.html">contribute</a></li>
+        <li><a href="http://funscript.info/index.html">home</a></li>
+        <li><a href="http://funscript.info/learn.html">learn more</a></li>
+        <li><a href="http://funscript.info/get.html">get started</a></li>
+        <li><a href="http://funscript.info/contribute.html">contribute</a></li>
       </ul>
     </section>
   </nav>
@@ -50,9 +50,9 @@
   </header>
 
   <!-- Some more Foundation references (always load jQuery, because samples use it) -->
-  <script src="http://www.funscript.info/js/vendor/jquery.js"></script>
-  <script src="http://www.funscript.info/js/foundation.min.js"></script>  
-  <script src="http://www.funscript.info/js/foundation/foundation.reveal.js"></script>
+  <script src="http://funscript.info/js/vendor/jquery.js"></script>
+  <script src="http://funscript.info/js/foundation.min.js"></script>  
+  <script src="http://funscript.info/js/foundation/foundation.reveal.js"></script>
   <script>
     $(document).foundation();
   </script>
@@ -99,13 +99,15 @@ attribute (an alias for <code>ReflectedDefinition</code>):</p>
 <span class="l">2: </span>
 <span class="l">3: </span>
 <span class="l">4: </span>
+<span class="l">5: </span>
 </pre>
 </td>
 <td class="snippet"><pre class="fssnip">
 [&lt;<span onmouseout="hideTip(event, 'fs1', 1)" onmouseover="showTip(event, 'fs1', 1)" class="i">FunScript</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs2', 2)" onmouseover="showTip(event, 'fs2', 2)" class="i">JS</span>&gt;]
 <span class="k">module</span> <span onmouseout="hideTip(event, 'fs3', 3)" onmouseover="showTip(event, 'fs3', 3)" class="i">Page</span>
 
-<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 4)" onmouseover="showTip(event, 'fs1', 4)" class="i">FunScript</span></pre>
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 4)" onmouseover="showTip(event, 'fs1', 4)" class="i">FunScript</span>
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 5)" onmouseover="showTip(event, 'fs1', 5)" class="i">FunScript</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs4', 6)" onmouseover="showTip(event, 'fs4', 6)" class="i">TypeScript</span></pre>
 </td>
 </tr>
 </table><p>The <code>FunScript.TypeScript</code> namespace contains the TypeScript provider, which is 
@@ -131,8 +133,8 @@ suggestion including the <code>alert</code> function:</p>
 </pre>
 </td>
 <td class="snippet"><pre class="fssnip">
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs4', 5)" onmouseover="showTip(event, 'fs4', 5)" class="i">hello</span> () <span class="o">=</span>
-  <span onmouseout="hideTip(event, 'fs5', 6)" onmouseover="showTip(event, 'fs5', 6)" class="i">Globals</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs6', 7)" onmouseover="showTip(event, 'fs6', 7)" class="i">window</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 8)" onmouseover="showTip(event, 'fs7', 8)" class="i">alert</span>(<span class="s">&quot;</span><span class="s">Hello</span><span class="s"> </span><span class="s">world</span><span class="s">!</span><span class="s">&quot;</span>)</pre>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs5', 7)" onmouseover="showTip(event, 'fs5', 7)" class="i">hello</span> () <span class="o">=</span>
+  <span onmouseout="hideTip(event, 'fs6', 8)" onmouseover="showTip(event, 'fs6', 8)" class="i">Globals</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 9)" onmouseover="showTip(event, 'fs7', 9)" class="i">window</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs8', 10)" onmouseover="showTip(event, 'fs8', 10)" class="i">alert</span>(<span class="s">&quot;</span><span class="s">Hello</span><span class="s"> </span><span class="s">world</span><span class="s">!</span><span class="s">&quot;</span>)</pre>
 </td>
 </tr>
 </table><p>This snippet defines a function <code>hello</code> that can be translated to JavaScript 
@@ -156,8 +158,8 @@ following snippet gives the necessary definitions:</p>
 </td>
 <td class="snippet"><pre class="fssnip">
 <span class="c">// Allows writing jq?name for element access</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs8', 9)" onmouseover="showTip(event, 'fs8', 9)" class="i">jq</span>(<span onmouseout="hideTip(event, 'fs9', 10)" onmouseover="showTip(event, 'fs9', 10)" class="i">selector</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs10', 11)" onmouseover="showTip(event, 'fs10', 11)" class="i">string</span>) <span class="o">=</span> <span onmouseout="hideTip(event, 'fs5', 12)" onmouseover="showTip(event, 'fs5', 12)" class="i">Globals</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 13)" onmouseover="showTip(event, 'fs11', 13)" class="i">Dollar</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 14)" onmouseover="showTip(event, 'fs12', 14)" class="i">Invoke</span> <span onmouseout="hideTip(event, 'fs9', 15)" onmouseover="showTip(event, 'fs9', 15)" class="i">selector</span>
-<span class="k">let</span> (<span class="o">?</span>) <span onmouseout="hideTip(event, 'fs13', 16)" onmouseover="showTip(event, 'fs13', 16)" class="i">jq</span> <span onmouseout="hideTip(event, 'fs14', 17)" onmouseover="showTip(event, 'fs14', 17)" class="i">name</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs13', 18)" onmouseover="showTip(event, 'fs13', 18)" class="i">jq</span>(<span class="s">&quot;</span><span class="s">#</span><span class="s">&quot;</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs14', 19)" onmouseover="showTip(event, 'fs14', 19)" class="i">name</span>)</pre>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs9', 11)" onmouseover="showTip(event, 'fs9', 11)" class="i">jq</span>(<span onmouseout="hideTip(event, 'fs10', 12)" onmouseover="showTip(event, 'fs10', 12)" class="i">selector</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs11', 13)" onmouseover="showTip(event, 'fs11', 13)" class="i">string</span>) <span class="o">=</span> <span onmouseout="hideTip(event, 'fs6', 14)" onmouseover="showTip(event, 'fs6', 14)" class="i">Globals</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 15)" onmouseover="showTip(event, 'fs12', 15)" class="i">Dollar</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs13', 16)" onmouseover="showTip(event, 'fs13', 16)" class="i">Invoke</span> <span onmouseout="hideTip(event, 'fs10', 17)" onmouseover="showTip(event, 'fs10', 17)" class="i">selector</span>
+<span class="k">let</span> (<span class="o">?</span>) <span onmouseout="hideTip(event, 'fs14', 18)" onmouseover="showTip(event, 'fs14', 18)" class="i">jq</span> <span onmouseout="hideTip(event, 'fs15', 19)" onmouseover="showTip(event, 'fs15', 19)" class="i">name</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs14', 20)" onmouseover="showTip(event, 'fs14', 20)" class="i">jq</span>(<span class="s">&quot;</span><span class="s">#</span><span class="s">&quot;</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs15', 21)" onmouseover="showTip(event, 'fs15', 21)" class="i">name</span>)</pre>
 </td>
 </tr>
 </table><p>The <code>?</code> operator takes a parameter of type <code>j.JQueryStatic</code> which is a (generated)
@@ -169,8 +171,8 @@ important - the important fact is that we can now easily access DOM elements:</p
 </pre>
 </td>
 <td class="snippet"><pre class="fssnip">
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs15', 20)" onmouseover="showTip(event, 'fs15', 20)" class="i">main</span>() <span class="o">=</span> 
-  <span onmouseout="hideTip(event, 'fs8', 21)" onmouseover="showTip(event, 'fs8', 21)" class="i">jq</span><span class="o">?</span><span class="i">helloWorld</span><span class="o">.</span><span class="i">click</span>(<span onmouseout="hideTip(event, 'fs4', 22)" onmouseover="showTip(event, 'fs4', 22)" class="i">hello</span>)</pre>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs16', 22)" onmouseover="showTip(event, 'fs16', 22)" class="i">main</span>() <span class="o">=</span> 
+  <span onmouseout="hideTip(event, 'fs9', 23)" onmouseover="showTip(event, 'fs9', 23)" class="i">jq</span><span class="o">?</span><span class="i">helloWorld</span><span class="o">.</span><span class="i">click</span>(<span class="k">fun</span> _ <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs5', 24)" onmouseover="showTip(event, 'fs5', 24)" class="i">hello</span>() <span class="o">:&gt;</span> <span onmouseout="hideTip(event, 'fs17', 25)" onmouseover="showTip(event, 'fs17', 25)" class="i">obj</span>)</pre>
 </td>
 </tr>
 </table><p>The <code>mainHello</code> function will be later called when the web page is loaded. It
@@ -196,18 +198,20 @@ file ends with the following line:</p>
       <div class="tip" id="fs1">namespace FunScript</div>
 <div class="tip" id="fs2">type JS = ReflectedDefinitionAttribute<br /><br />Full name: FunScript.JS</div>
 <div class="tip" id="fs3">module Page</div>
-<div class="tip" id="fs4">val hello : unit -&gt; unit<br /><br />Full name: Page.hello</div>
-<div class="tip" id="fs5">type Globals<br /><br />Full name: Globals</div>
-<div class="tip" id="fs6">property Globals.window: Window</div>
-<div class="tip" id="fs7">member Window.alert : ?message:string -&gt; unit</div>
-<div class="tip" id="fs8">val jq : selector:string -&gt; JQuery<br /><br />Full name: Page.jq</div>
-<div class="tip" id="fs9">val selector : string</div>
-<div class="tip" id="fs10">Multiple items<br />val string : value:&#39;T -&gt; string<br /><br />Full name: Microsoft.FSharp.Core.Operators.string<br /><br />--------------------<br />type string = System.String<br /><br />Full name: Microsoft.FSharp.Core.string</div>
-<div class="tip" id="fs11">property Globals.Dollar: JQueryStatic</div>
-<div class="tip" id="fs12">member JQueryStatic.Invoke : unit -&gt; JQuery<br />member JQueryStatic.Invoke : element:Element -&gt; JQuery<br />member JQueryStatic.Invoke : _object:AnonymousType814 -&gt; JQuery<br />member JQueryStatic.Invoke : elementArray:Element array -&gt; JQuery<br />member JQueryStatic.Invoke : _object:JQuery -&gt; JQuery<br />member JQueryStatic.Invoke : func:Function -&gt; JQuery<br />member JQueryStatic.Invoke : array:obj array -&gt; JQuery<br />member JQueryStatic.Invoke : selector:string * ?context:obj -&gt; JQuery</div>
-<div class="tip" id="fs13">val jq : (string -&gt; &#39;a)</div>
-<div class="tip" id="fs14">val name : string</div>
-<div class="tip" id="fs15">val main : unit -&gt; JQuery<br /><br />Full name: Page.main</div>
+<div class="tip" id="fs4">namespace FunScript.TypeScript</div>
+<div class="tip" id="fs5">val hello : unit -&gt; unit<br /><br />Full name: Page.hello</div>
+<div class="tip" id="fs6">type Globals<br /><br />Full name: FunScript.TypeScript.Globals</div>
+<div class="tip" id="fs7">property Globals.window: Window</div>
+<div class="tip" id="fs8">member Window.alert : ?message:string -&gt; unit</div>
+<div class="tip" id="fs9">val jq : selector:string -&gt; JQuery<br /><br />Full name: Page.jq</div>
+<div class="tip" id="fs10">val selector : string</div>
+<div class="tip" id="fs11">Multiple items<br />val string : value:&#39;T -&gt; string<br /><br />Full name: Microsoft.FSharp.Core.Operators.string<br /><br />--------------------<br />type string = System.String<br /><br />Full name: Microsoft.FSharp.Core.string</div>
+<div class="tip" id="fs12">property Globals.Dollar: JQueryStatic</div>
+<div class="tip" id="fs13">member JQueryStatic.Invoke : unit -&gt; JQuery<br />member JQueryStatic.Invoke : element:Element -&gt; JQuery<br />member JQueryStatic.Invoke : elementArray:Element array -&gt; JQuery<br />member JQueryStatic.Invoke : _object:AnonymousType436 -&gt; JQuery<br />member JQueryStatic.Invoke : _object:JQuery -&gt; JQuery<br />member JQueryStatic.Invoke : callback:Function -&gt; JQuery<br />member JQueryStatic.Invoke : selector:string * ?context:Element -&gt; JQuery<br />member JQueryStatic.Invoke : html:string * attributes:Object -&gt; JQuery</div>
+<div class="tip" id="fs14">val jq : (string -&gt; &#39;a)</div>
+<div class="tip" id="fs15">val name : string</div>
+<div class="tip" id="fs16">val main : unit -&gt; JQuery<br /><br />Full name: Page.main</div>
+<div class="tip" id="fs17">type obj = System.Object<br /><br />Full name: Microsoft.FSharp.Core.obj</div>
 
     </div>
     <div class="large-3 columns">
@@ -268,21 +272,21 @@ file ends with the following line:</p>
 var Page__op_Dynamic$JQuery_JQuery_, Page__main$, Page__jq$, Page__hello$;
   Page__hello$ = (function (unitVar0)
   {
-    return window.window.alert("Hello world!");
+    return ((window.window).alert("Hello world!"));
   });
   Page__jq$ = (function (selector)
   {
-    return window.$(selector);
+    return ((window.$)(selector));
   });
   Page__main$ = (function (unitVar0)
   {
-    return Page__op_Dynamic$JQuery_JQuery_((function (selector)
+    return (Page__op_Dynamic$JQuery_JQuery_((function (selector)
     {
       return Page__jq$(selector);
-    }), "helloWorld").click((function (arg00_)
+    }), "helloWorld").click((function (_arg1)
     {
       return Page__hello$();
-    }));
+    })));
   });
   Page__op_Dynamic$JQuery_JQuery_ = (function (jq, name)
   {

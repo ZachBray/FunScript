@@ -13,29 +13,29 @@
   <meta name="author" content="Zach Bray">
 
   <!-- Reference Foundation -->
-  <link rel="stylesheet" href="http://www.funscript.info/css/foundation.css" />
-  <script src="http://www.funscript.info/js/vendor/custom.modernizr.js"></script>
+  <link rel="stylesheet" href="http://funscript.info/css/foundation.css" />
+  <script src="http://funscript.info/js/vendor/custom.modernizr.js"></script>
 
   <!-- Reference custom CSS and tooltips -->
-  <link type="text/css" rel="stylesheet" href="http://www.funscript.info/custom/style.css" />
-  <script src="http://www.funscript.info/custom/tooltips.js" type="text/javascript"></script>
-  <link type="text/css" rel="stylesheet" href="http://www.funscript.info/custom/tooltips.css" />
+  <link type="text/css" rel="stylesheet" href="http://funscript.info/custom/style.css" />
+  <script src="http://funscript.info/custom/tooltips.js" type="text/javascript"></script>
+  <link type="text/css" rel="stylesheet" href="http://funscript.info/custom/tooltips.css" />
 </head>
 <body>
 
   <!-- Header bar with name and navigation links -->
   <nav class="top-bar">
     <ul class="title-area">
-      <li class="name"><h1><a href="http://www.funscript.info">FunScript</a></h1></li>
+      <li class="name"><h1><a href="http://funscript.info">FunScript</a></h1></li>
       <li class="toggle-topbar"><a href="#"><span>Menu</span></a></li>
     </ul>
 
     <section class="top-bar-section">
       <ul class="left">
-        <li><a href="http://www.funscript.info/index.html">home</a></li>
-        <li><a href="http://www.funscript.info/learn.html">learn more</a></li>
-        <li><a href="http://www.funscript.info/get.html">get started</a></li>
-        <li><a href="http://www.funscript.info/contribute.html">contribute</a></li>
+        <li><a href="http://funscript.info/index.html">home</a></li>
+        <li><a href="http://funscript.info/learn.html">learn more</a></li>
+        <li><a href="http://funscript.info/get.html">get started</a></li>
+        <li><a href="http://funscript.info/contribute.html">contribute</a></li>
       </ul>
     </section>
   </nav>
@@ -57,51 +57,51 @@
 
 <span class="k">open</span> <span onmouseout="hideTip(event, 'fs3', 3)" onmouseover="showTip(event, 'fs3', 3)" class="i">FSharp</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs4', 4)" onmouseover="showTip(event, 'fs4', 4)" class="i">Data</span>
 <span class="k">open</span> <span onmouseout="hideTip(event, 'fs5', 5)" onmouseover="showTip(event, 'fs5', 5)" class="i">FunScript</span>
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs5', 6)" onmouseover="showTip(event, 'fs5', 6)" class="i">FunScript</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs6', 7)" onmouseover="showTip(event, 'fs6', 7)" class="i">TypeScript</span>
 
 <span class="c">// Access standard JavaScript libraries in a type-safe way.</span>
 <span class="c">// Generate strongly-typed interfaces from TypeScript 0.9.x </span>
 <span class="c">// definitions files or use any of the 280+ pre-built library</span>
 <span class="c">// mappings (hosted on NuGet).</span>
-<span class="prep">#I</span> <span class="s">&quot;</span><span class="s">.</span><span class="s">.</span><span class="s">/</span><span class="s">Examples</span><span class="s">/</span><span class="s">Typings</span><span class="s">/</span><span class="s">&quot;</span>
 <span class="prep">#r</span> <span class="s">&quot;</span><span class="s">FunScript</span><span class="s">.</span><span class="s">TypeScript</span><span class="s">.</span><span class="s">Binding</span><span class="s">.</span><span class="s">lib</span><span class="s">.</span><span class="s">dll</span><span class="s">&quot;</span>
 <span class="prep">#r</span> <span class="s">&quot;</span><span class="s">FunScript</span><span class="s">.</span><span class="s">TypeScript</span><span class="s">.</span><span class="s">Binding</span><span class="s">.</span><span class="s">jquery</span><span class="s">.</span><span class="s">dll</span><span class="s">&quot;</span>
 <span class="prep">#r</span> <span class="s">&quot;</span><span class="s">FunScript</span><span class="s">.</span><span class="s">TypeScript</span><span class="s">.</span><span class="s">Binding</span><span class="s">.</span><span class="s">highcharts</span><span class="s">.</span><span class="s">dll</span><span class="s">&quot;</span>
 
 <span class="c">// Integrate REST APIs with F# 3.0 type providers</span>
-<span class="k">type</span> <span onmouseout="hideTip(event, 'fs6', 6)" onmouseover="showTip(event, 'fs6', 6)" class="i">WorldBank</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs7', 7)" onmouseover="showTip(event, 'fs7', 7)" class="i">WorldBankDataProvider</span><span class="o">&lt;</span><span class="i">Asynchronous</span><span class="o">=</span><span class="k">true</span><span class="o">&gt;</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs8', 8)" onmouseover="showTip(event, 'fs8', 8)" class="i">data</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs6', 9)" onmouseover="showTip(event, 'fs6', 9)" class="i">WorldBank</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs9', 10)" onmouseover="showTip(event, 'fs9', 10)" class="i">GetDataContext</span>()
+<span class="k">type</span> <span onmouseout="hideTip(event, 'fs7', 8)" onmouseover="showTip(event, 'fs7', 8)" class="i">WorldBank</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 9)" onmouseover="showTip(event, 'fs8', 9)" class="i">WorldBankDataProvider</span><span class="o">&lt;</span><span class="i">Asynchronous</span><span class="o">=</span><span class="k">true</span><span class="o">&gt;</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs9', 10)" onmouseover="showTip(event, 'fs9', 10)" class="i">data</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs7', 11)" onmouseover="showTip(event, 'fs7', 11)" class="i">WorldBank</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs10', 12)" onmouseover="showTip(event, 'fs10', 12)" class="i">GetDataContext</span>()
 
 <span class="c">// Get full type checking for external data sources!</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs10', 11)" onmouseover="showTip(event, 'fs10', 11)" class="i">countries</span> <span class="o">=</span> 
-  [ <span onmouseout="hideTip(event, 'fs8', 12)" onmouseover="showTip(event, 'fs8', 12)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 13)" onmouseover="showTip(event, 'fs11', 13)" class="i">Countries</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 14)" onmouseover="showTip(event, 'fs12', 14)" class="i">Denmark</span>
-    <span onmouseout="hideTip(event, 'fs8', 15)" onmouseover="showTip(event, 'fs8', 15)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 16)" onmouseover="showTip(event, 'fs11', 16)" class="i">Countries</span><span class="o">.</span><span class="i">``Czech Republic``</span>
-    <span onmouseout="hideTip(event, 'fs8', 17)" onmouseover="showTip(event, 'fs8', 17)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 18)" onmouseover="showTip(event, 'fs11', 18)" class="i">Countries</span><span class="o">.</span><span class="i">``United Kingdom``</span>
-    <span onmouseout="hideTip(event, 'fs8', 19)" onmouseover="showTip(event, 'fs8', 19)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 20)" onmouseover="showTip(event, 'fs11', 20)" class="i">Countries</span><span class="o">.</span><span class="i">``United States``</span> ]
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs11', 13)" onmouseover="showTip(event, 'fs11', 13)" class="i">countries</span> <span class="o">=</span> 
+  [ <span onmouseout="hideTip(event, 'fs9', 14)" onmouseover="showTip(event, 'fs9', 14)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 15)" onmouseover="showTip(event, 'fs12', 15)" class="i">Countries</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs13', 16)" onmouseover="showTip(event, 'fs13', 16)" class="i">Denmark</span>
+    <span onmouseout="hideTip(event, 'fs9', 17)" onmouseover="showTip(event, 'fs9', 17)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 18)" onmouseover="showTip(event, 'fs12', 18)" class="i">Countries</span><span class="o">.</span><span class="i">``Czech Republic``</span>
+    <span onmouseout="hideTip(event, 'fs9', 19)" onmouseover="showTip(event, 'fs9', 19)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 20)" onmouseover="showTip(event, 'fs12', 20)" class="i">Countries</span><span class="o">.</span><span class="i">``United Kingdom``</span>
+    <span onmouseout="hideTip(event, 'fs9', 21)" onmouseover="showTip(event, 'fs9', 21)" class="i">data</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 22)" onmouseover="showTip(event, 'fs12', 22)" class="i">Countries</span><span class="o">.</span><span class="i">``United States``</span> ]
 
 <span class="c">// Easily define strongly-typed Foreign Function Interfaces</span>
 <span class="c">// (FFIs) to access unmapped functions</span>
-[&lt;<span onmouseout="hideTip(event, 'fs13', 21)" onmouseover="showTip(event, 'fs13', 21)" class="i">JSEmitInlineAttribute</span>(<span class="s">&quot;</span><span class="s">(</span><span class="s">{</span><span class="s">0</span><span class="s">}</span><span class="s"> </span><span class="s">*</span><span class="s"> </span><span class="s">1</span><span class="s">.</span><span class="s">0</span><span class="s">)</span><span class="s">&quot;</span>)&gt;]
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs14', 22)" onmouseover="showTip(event, 'fs14', 22)" class="i">number</span>(<span onmouseout="hideTip(event, 'fs15', 23)" onmouseover="showTip(event, 'fs15', 23)" class="i">x</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs16', 24)" onmouseover="showTip(event, 'fs16', 24)" class="i">int</span>) <span class="o">:</span> <span onmouseout="hideTip(event, 'fs17', 25)" onmouseover="showTip(event, 'fs17', 25)" class="i">float</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs18', 26)" onmouseover="showTip(event, 'fs18', 26)" class="i">failwith</span> <span class="s">&quot;</span><span class="s">never</span><span class="s">&quot;</span>
+[&lt;<span onmouseout="hideTip(event, 'fs14', 23)" onmouseover="showTip(event, 'fs14', 23)" class="i">JSEmitInlineAttribute</span>(<span class="s">&quot;</span><span class="s">(</span><span class="s">{</span><span class="s">0</span><span class="s">}</span><span class="s"> </span><span class="s">*</span><span class="s"> </span><span class="s">1</span><span class="s">.</span><span class="s">0</span><span class="s">)</span><span class="s">&quot;</span>)&gt;]
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs15', 24)" onmouseover="showTip(event, 'fs15', 24)" class="i">number</span>(<span onmouseout="hideTip(event, 'fs16', 25)" onmouseover="showTip(event, 'fs16', 25)" class="i">x</span> <span class="o">:</span> <span onmouseout="hideTip(event, 'fs17', 26)" onmouseover="showTip(event, 'fs17', 26)" class="i">int</span>) <span class="o">:</span> <span onmouseout="hideTip(event, 'fs18', 27)" onmouseover="showTip(event, 'fs18', 27)" class="i">float</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs19', 28)" onmouseover="showTip(event, 'fs19', 28)" class="i">failwith</span> <span class="s">&quot;</span><span class="s">never</span><span class="s">&quot;</span>
 
 <span class="c">// Write asynchronous computations without callbacks</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs19', 27)" onmouseover="showTip(event, 'fs19', 27)" class="i">render</span> () <span class="o">=</span> <span onmouseout="hideTip(event, 'fs20', 28)" onmouseover="showTip(event, 'fs20', 28)" class="i">async</span> {
-  <span class="k">let</span> <span onmouseout="hideTip(event, 'fs21', 29)" onmouseover="showTip(event, 'fs21', 29)" class="i">chart</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs22', 30)" onmouseover="showTip(event, 'fs22', 30)" class="i">createEmpty</span><span class="o">&lt;</span><span onmouseout="hideTip(event, 'fs23', 31)" onmouseover="showTip(event, 'fs23', 31)" class="i">HighchartsOptions</span><span class="o">&gt;</span>()
-  <span onmouseout="hideTip(event, 'fs21', 32)" onmouseover="showTip(event, 'fs21', 32)" class="i">chart</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs24', 33)" onmouseover="showTip(event, 'fs24', 33)" class="i">series</span> <span class="o">&lt;-</span> [| |]
-  <span class="k">for</span> <span onmouseout="hideTip(event, 'fs25', 34)" onmouseover="showTip(event, 'fs25', 34)" class="i">country</span> <span class="k">in</span> <span onmouseout="hideTip(event, 'fs10', 35)" onmouseover="showTip(event, 'fs10', 35)" class="i">countries</span> <span class="k">do</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs20', 29)" onmouseover="showTip(event, 'fs20', 29)" class="i">render</span> () <span class="o">=</span> <span onmouseout="hideTip(event, 'fs21', 30)" onmouseover="showTip(event, 'fs21', 30)" class="i">async</span> {
+  <span class="k">let</span> <span onmouseout="hideTip(event, 'fs22', 31)" onmouseover="showTip(event, 'fs22', 31)" class="i">chart</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs23', 32)" onmouseover="showTip(event, 'fs23', 32)" class="i">createEmpty</span><span class="o">&lt;</span><span onmouseout="hideTip(event, 'fs24', 33)" onmouseover="showTip(event, 'fs24', 33)" class="i">HighchartsOptions</span><span class="o">&gt;</span>()
+  <span onmouseout="hideTip(event, 'fs22', 34)" onmouseover="showTip(event, 'fs22', 34)" class="i">chart</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs25', 35)" onmouseover="showTip(event, 'fs25', 35)" class="i">series</span> <span class="o">&lt;-</span> [| |]
+  <span class="k">for</span> <span onmouseout="hideTip(event, 'fs26', 36)" onmouseover="showTip(event, 'fs26', 36)" class="i">country</span> <span class="k">in</span> <span onmouseout="hideTip(event, 'fs11', 37)" onmouseover="showTip(event, 'fs11', 37)" class="i">countries</span> <span class="k">do</span>
 
     <span class="c">// Access data sets in a statically typed way</span>
-    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs26', 36)" onmouseover="showTip(event, 'fs26', 36)" class="i">data</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs25', 37)" onmouseover="showTip(event, 'fs25', 37)" class="i">country</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs27', 38)" onmouseover="showTip(event, 'fs27', 38)" class="i">Indicators</span>
-    <span class="k">let!</span> <span onmouseout="hideTip(event, 'fs28', 39)" onmouseover="showTip(event, 'fs28', 39)" class="i">l</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs26', 40)" onmouseover="showTip(event, 'fs26', 40)" class="i">data</span><span class="o">.</span><span class="i">``School enrollment, tertiary (% gross)``</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs27', 38)" onmouseover="showTip(event, 'fs27', 38)" class="i">data</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs26', 39)" onmouseover="showTip(event, 'fs26', 39)" class="i">country</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs28', 40)" onmouseover="showTip(event, 'fs28', 40)" class="i">Indicators</span>
+    <span class="k">let!</span> <span onmouseout="hideTip(event, 'fs29', 41)" onmouseover="showTip(event, 'fs29', 41)" class="i">l</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs27', 42)" onmouseover="showTip(event, 'fs27', 42)" class="i">data</span><span class="o">.</span><span class="i">``School enrollment, tertiary (% gross)``</span>
 
     <span class="c">// Add line series to the chart</span>
-    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs29', 41)" onmouseover="showTip(event, 'fs29', 41)" class="i">seriesOpts</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs22', 42)" onmouseover="showTip(event, 'fs22', 42)" class="i">createEmpty</span><span class="o">&lt;</span><span onmouseout="hideTip(event, 'fs30', 43)" onmouseover="showTip(event, 'fs30', 43)" class="i">HighchartsSeriesOptions</span><span class="o">&gt;</span>()
-    <span onmouseout="hideTip(event, 'fs29', 44)" onmouseover="showTip(event, 'fs29', 44)" class="i">seriesOpts</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs31', 45)" onmouseover="showTip(event, 'fs31', 45)" class="i">name</span> <span class="o">&lt;-</span> <span onmouseout="hideTip(event, 'fs25', 46)" onmouseover="showTip(event, 'fs25', 46)" class="i">country</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs32', 47)" onmouseover="showTip(event, 'fs32', 47)" class="i">Name</span>
-    <span onmouseout="hideTip(event, 'fs29', 48)" onmouseover="showTip(event, 'fs29', 48)" class="i">seriesOpts</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs33', 49)" onmouseover="showTip(event, 'fs33', 49)" class="i">data</span> <span class="o">&lt;-</span> 
-        [| <span class="k">for</span> <span onmouseout="hideTip(event, 'fs34', 50)" onmouseover="showTip(event, 'fs34', 50)" class="i">t</span>, <span onmouseout="hideTip(event, 'fs35', 51)" onmouseover="showTip(event, 'fs35', 51)" class="i">y</span> <span class="k">in</span> <span onmouseout="hideTip(event, 'fs28', 52)" onmouseover="showTip(event, 'fs28', 52)" class="i">l</span> <span class="k">-&gt;</span> [| <span onmouseout="hideTip(event, 'fs14', 53)" onmouseover="showTip(event, 'fs14', 53)" class="i">number</span> <span onmouseout="hideTip(event, 'fs34', 54)" onmouseover="showTip(event, 'fs34', 54)" class="i">t</span>; <span onmouseout="hideTip(event, 'fs35', 55)" onmouseover="showTip(event, 'fs35', 55)" class="i">y</span> |] <span class="o">:&gt;</span> <span onmouseout="hideTip(event, 'fs36', 56)" onmouseover="showTip(event, 'fs36', 56)" class="i">obj</span> |]
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs30', 43)" onmouseover="showTip(event, 'fs30', 43)" class="i">seriesOpts</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs23', 44)" onmouseover="showTip(event, 'fs23', 44)" class="i">createEmpty</span><span class="o">&lt;</span><span onmouseout="hideTip(event, 'fs31', 45)" onmouseover="showTip(event, 'fs31', 45)" class="i">HighchartsSeriesOptions</span><span class="o">&gt;</span>()
+    <span onmouseout="hideTip(event, 'fs30', 46)" onmouseover="showTip(event, 'fs30', 46)" class="i">seriesOpts</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs32', 47)" onmouseover="showTip(event, 'fs32', 47)" class="i">name</span> <span class="o">&lt;-</span> <span onmouseout="hideTip(event, 'fs26', 48)" onmouseover="showTip(event, 'fs26', 48)" class="i">country</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs33', 49)" onmouseover="showTip(event, 'fs33', 49)" class="i">Name</span>
+    <span onmouseout="hideTip(event, 'fs30', 50)" onmouseover="showTip(event, 'fs30', 50)" class="i">seriesOpts</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs34', 51)" onmouseover="showTip(event, 'fs34', 51)" class="i">data</span> <span class="o">&lt;-</span> 
+        [| <span class="k">for</span> <span onmouseout="hideTip(event, 'fs35', 52)" onmouseover="showTip(event, 'fs35', 52)" class="i">t</span>, <span onmouseout="hideTip(event, 'fs36', 53)" onmouseover="showTip(event, 'fs36', 53)" class="i">y</span> <span class="k">in</span> <span onmouseout="hideTip(event, 'fs29', 54)" onmouseover="showTip(event, 'fs29', 54)" class="i">l</span> <span class="k">-&gt;</span> [| <span onmouseout="hideTip(event, 'fs15', 55)" onmouseover="showTip(event, 'fs15', 55)" class="i">number</span> <span onmouseout="hideTip(event, 'fs35', 56)" onmouseover="showTip(event, 'fs35', 56)" class="i">t</span>; <span onmouseout="hideTip(event, 'fs36', 57)" onmouseover="showTip(event, 'fs36', 57)" class="i">y</span> |] <span class="o">:&gt;</span> <span onmouseout="hideTip(event, 'fs37', 58)" onmouseover="showTip(event, 'fs37', 58)" class="i">obj</span> |]
 
     <span class="c">// Use a standard library function </span>
     <span class="c">// through ...Binding.lib.dll</span>
-    <span onmouseout="hideTip(event, 'fs21', 57)" onmouseover="showTip(event, 'fs21', 57)" class="i">chart</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs24', 58)" onmouseover="showTip(event, 'fs24', 58)" class="i">series</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs37', 59)" onmouseover="showTip(event, 'fs37', 59)" class="i">push</span> <span onmouseout="hideTip(event, 'fs29', 60)" onmouseover="showTip(event, 'fs29', 60)" class="i">seriesOpts</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs38', 61)" onmouseover="showTip(event, 'fs38', 61)" class="i">ignore</span> 
+    <span onmouseout="hideTip(event, 'fs22', 59)" onmouseover="showTip(event, 'fs22', 59)" class="i">chart</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs25', 60)" onmouseover="showTip(event, 'fs25', 60)" class="i">series</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs38', 61)" onmouseover="showTip(event, 'fs38', 61)" class="i">pushOverload2</span> <span onmouseout="hideTip(event, 'fs30', 62)" onmouseover="showTip(event, 'fs30', 62)" class="i">seriesOpts</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs39', 63)" onmouseover="showTip(event, 'fs39', 63)" class="i">ignore</span> 
 }</pre>
 <p><div class="row"><div class="large-6 columns"></p>
 
@@ -131,7 +131,7 @@ and take a look at our tutorials and samples:</p>
 <li><a href="samples/worldbank/index.html">Visualizing World Bank data</a></li>
 <li><a href="samples/moviedatabase/index.html">Calling The Movie Database</a></li>
 <li><a href="samples/mandelbrot/index.html">Mandelbrot with HTML5 canvas</a></li>
-<li><a href="samples/simpleasync/index.html">Asynchronous computations</a></li>
+<li><a href="samples/simpleasync/index.html">Asynchornous computations</a></li>
 </ul>
 
 </div></div>
@@ -176,39 +176,42 @@ and connect to <a href="http://www.themoviedb.org/">The Movie Database</a>.</p>
 <div class="tip" id="fs3">namespace FSharp</div>
 <div class="tip" id="fs4">namespace FSharp.Data</div>
 <div class="tip" id="fs5">namespace FunScript</div>
-<div class="tip" id="fs6">type WorldBank = WorldBankDataProvider&lt;...&gt;<br /><br />Full name: Sample.WorldBank</div>
-<div class="tip" id="fs7">type WorldBankDataProvider<br /><br />Full name: FSharp.Data.WorldBankDataProvider<br /><em><br /><br />&lt;summary&gt;Typed representation of WorldBank data with additional configuration parameters&lt;/summary&gt;<br />&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&lt;param name=&#39;Sources&#39;&gt;The World Bank data sources to include, separated by semicolons. Defaults to &quot;World Development Indicators;Global Financial Development&quot;. If an empty string is specified, includes all data sources.&lt;/param&gt;<br />&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&lt;param name=&#39;Asynchronous&#39;&gt;Generate asynchronous calls. Defaults to false&lt;/param&gt;</em></div>
-<div class="tip" id="fs8">val data : WorldBankDataProvider&lt;...&gt;.ServiceTypes.WorldBankDataService<br /><br />Full name: Sample.data</div>
-<div class="tip" id="fs9">WorldBankDataProvider&lt;...&gt;.GetDataContext() : WorldBankDataProvider&lt;...&gt;.ServiceTypes.WorldBankDataService</div>
-<div class="tip" id="fs10">val countries : WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country list<br /><br />Full name: Sample.countries</div>
-<div class="tip" id="fs11">property WorldBankDataProvider&lt;...&gt;.ServiceTypes.WorldBankDataService.Countries: WorldBankDataProvider&lt;...&gt;.ServiceTypes.Countries</div>
-<div class="tip" id="fs12">property WorldBankDataProvider&lt;...&gt;.ServiceTypes.Countries.Denmark: WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country<br /><em><br /><br />The data for country &#39;Denmark&#39;</em></div>
-<div class="tip" id="fs13">Multiple items<br />type JSEmitInlineAttribute =<br />&#160;&#160;inherit Attribute<br />&#160;&#160;new : emit:string -&gt; JSEmitInlineAttribute<br />&#160;&#160;member Emit : string<br /><br />Full name: FunScript.JSEmitInlineAttribute<br /><br />--------------------<br />new : emit:string -&gt; JSEmitInlineAttribute</div>
-<div class="tip" id="fs14">val number : x:int -&gt; float<br /><br />Full name: Sample.number</div>
-<div class="tip" id="fs15">val x : int</div>
-<div class="tip" id="fs16">Multiple items<br />val int : value:&#39;T -&gt; int (requires member op_Explicit)<br /><br />Full name: Microsoft.FSharp.Core.Operators.int<br /><br />--------------------<br />type int = int32<br /><br />Full name: Microsoft.FSharp.Core.int<br /><br />--------------------<br />type int&lt;&#39;Measure&gt; = int<br /><br />Full name: Microsoft.FSharp.Core.int&lt;_&gt;</div>
-<div class="tip" id="fs17">Multiple items<br />val float : value:&#39;T -&gt; float (requires member op_Explicit)<br /><br />Full name: Microsoft.FSharp.Core.Operators.float<br /><br />--------------------<br />type float = System.Double<br /><br />Full name: Microsoft.FSharp.Core.float<br /><br />--------------------<br />type float&lt;&#39;Measure&gt; = float<br /><br />Full name: Microsoft.FSharp.Core.float&lt;_&gt;</div>
-<div class="tip" id="fs18">val failwith : message:string -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Core.Operators.failwith</div>
-<div class="tip" id="fs19">val render : unit -&gt; Async&lt;unit&gt;<br /><br />Full name: Sample.render</div>
-<div class="tip" id="fs20">val async : AsyncBuilder<br /><br />Full name: Microsoft.FSharp.Core.ExtraTopLevelOperators.async</div>
-<div class="tip" id="fs21">val chart : HighchartsOptions</div>
-<div class="tip" id="fs22">val createEmpty : unit -&gt; &#39;a<br /><br />Full name: TypeExtensions.createEmpty</div>
-<div class="tip" id="fs23">type HighchartsOptions<br /><br />Full name: HighchartsOptions</div>
-<div class="tip" id="fs24">property HighchartsOptions.series: HighchartsSeriesOptions array</div>
-<div class="tip" id="fs25">val country : WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country</div>
-<div class="tip" id="fs26">val data : WorldBankDataProvider&lt;...&gt;.ServiceTypes.Indicators</div>
-<div class="tip" id="fs27">property WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country.Indicators: WorldBankDataProvider&lt;...&gt;.ServiceTypes.Indicators<br /><em><br /><br />&lt;summary&gt;The indicators for the country&lt;/summary&gt;</em></div>
-<div class="tip" id="fs28">val l : RuntimeImplementation.WorldBank.Indicator</div>
-<div class="tip" id="fs29">val seriesOpts : HighchartsSeriesOptions</div>
-<div class="tip" id="fs30">type HighchartsSeriesOptions<br /><br />Full name: HighchartsSeriesOptions</div>
-<div class="tip" id="fs31">property HighchartsSeriesOptions.name: string</div>
-<div class="tip" id="fs32">property RuntimeImplementation.WorldBank.Country.Name: string</div>
-<div class="tip" id="fs33">property HighchartsSeriesOptions.data: obj array</div>
-<div class="tip" id="fs34">val t : int</div>
-<div class="tip" id="fs35">val y : float</div>
-<div class="tip" id="fs36">type obj = System.Object<br /><br />Full name: Microsoft.FSharp.Core.obj</div>
-<div class="tip" id="fs37">member System.Collections.Generic.IList.push : unit -&gt; float<br />member System.Collections.Generic.IList.push : params items:&#39;T array -&gt; float</div>
-<div class="tip" id="fs38">val ignore : value:&#39;T -&gt; unit<br /><br />Full name: Microsoft.FSharp.Core.Operators.ignore</div>
+<div class="tip" id="fs6">namespace FunScript.TypeScript</div>
+<div class="tip" id="fs7">type WorldBank = WorldBankDataProvider&lt;...&gt;<br /><br />Full name: Sample.WorldBank</div>
+<div class="tip" id="fs8">type WorldBankDataProvider<br /><br />Full name: FSharp.Data.WorldBankDataProvider<br /><em><br /><br />&lt;summary&gt;Typed representation of WorldBank data with additional configuration parameters&lt;/summary&gt;
+<br />&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&lt;param name=&#39;Sources&#39;&gt;The World Bank data sources to include, separated by semicolons. Defaults to &quot;World Development Indicators;Global Financial Development&quot;. If an empty string is specified, includes all data sources.&lt;/param&gt;
+<br />&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&lt;param name=&#39;Asynchronous&#39;&gt;Generate asynchronous calls. Defaults to false&lt;/param&gt;</em></div>
+<div class="tip" id="fs9">val data : WorldBankDataProvider&lt;...&gt;.ServiceTypes.WorldBankDataService<br /><br />Full name: Sample.data</div>
+<div class="tip" id="fs10">WorldBankDataProvider&lt;...&gt;.GetDataContext() : WorldBankDataProvider&lt;...&gt;.ServiceTypes.WorldBankDataService</div>
+<div class="tip" id="fs11">val countries : WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country list<br /><br />Full name: Sample.countries</div>
+<div class="tip" id="fs12">property WorldBankDataProvider&lt;...&gt;.ServiceTypes.WorldBankDataService.Countries: WorldBankDataProvider&lt;...&gt;.ServiceTypes.Countries</div>
+<div class="tip" id="fs13">property WorldBankDataProvider&lt;...&gt;.ServiceTypes.Countries.Denmark: WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country<br /><em><br /><br />The data for country &#39;Denmark&#39;</em></div>
+<div class="tip" id="fs14">Multiple items<br />type JSEmitInlineAttribute =<br />&#160;&#160;inherit Attribute<br />&#160;&#160;new : emit:string -&gt; JSEmitInlineAttribute<br />&#160;&#160;member Emit : string<br /><br />Full name: FunScript.JSEmitInlineAttribute<br /><br />--------------------<br />new : emit:string -&gt; JSEmitInlineAttribute</div>
+<div class="tip" id="fs15">val number : x:int -&gt; float<br /><br />Full name: Sample.number</div>
+<div class="tip" id="fs16">val x : int</div>
+<div class="tip" id="fs17">Multiple items<br />val int : value:&#39;T -&gt; int (requires member op_Explicit)<br /><br />Full name: Microsoft.FSharp.Core.Operators.int<br /><br />--------------------<br />type int = int32<br /><br />Full name: Microsoft.FSharp.Core.int<br /><br />--------------------<br />type int&lt;&#39;Measure&gt; = int<br /><br />Full name: Microsoft.FSharp.Core.int&lt;_&gt;</div>
+<div class="tip" id="fs18">Multiple items<br />val float : value:&#39;T -&gt; float (requires member op_Explicit)<br /><br />Full name: Microsoft.FSharp.Core.Operators.float<br /><br />--------------------<br />type float = System.Double<br /><br />Full name: Microsoft.FSharp.Core.float<br /><br />--------------------<br />type float&lt;&#39;Measure&gt; = float<br /><br />Full name: Microsoft.FSharp.Core.float&lt;_&gt;</div>
+<div class="tip" id="fs19">val failwith : message:string -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Core.Operators.failwith</div>
+<div class="tip" id="fs20">val render : unit -&gt; Async&lt;unit&gt;<br /><br />Full name: Sample.render</div>
+<div class="tip" id="fs21">val async : AsyncBuilder<br /><br />Full name: Microsoft.FSharp.Core.ExtraTopLevelOperators.async</div>
+<div class="tip" id="fs22">val chart : HighchartsOptions</div>
+<div class="tip" id="fs23">val createEmpty : unit -&gt; &#39;a<br /><br />Full name: TypeExtensions.createEmpty</div>
+<div class="tip" id="fs24">type HighchartsOptions<br /><br />Full name: FunScript.TypeScript.HighchartsOptions</div>
+<div class="tip" id="fs25">property HighchartsOptions.series: HighchartsSeriesOptions array</div>
+<div class="tip" id="fs26">val country : WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country</div>
+<div class="tip" id="fs27">val data : WorldBankDataProvider&lt;...&gt;.ServiceTypes.Indicators</div>
+<div class="tip" id="fs28">property WorldBankDataProvider&lt;...&gt;.ServiceTypes.Country.Indicators: WorldBankDataProvider&lt;...&gt;.ServiceTypes.Indicators<br /><em><br /><br />&lt;summary&gt;The indicators for the country&lt;/summary&gt;</em></div>
+<div class="tip" id="fs29">val l : RuntimeImplementation.WorldBank.Indicator</div>
+<div class="tip" id="fs30">val seriesOpts : HighchartsSeriesOptions</div>
+<div class="tip" id="fs31">type HighchartsSeriesOptions<br /><br />Full name: FunScript.TypeScript.HighchartsSeriesOptions</div>
+<div class="tip" id="fs32">property HighchartsSeriesOptions.name: string</div>
+<div class="tip" id="fs33">property RuntimeImplementation.WorldBank.Country.Name: string</div>
+<div class="tip" id="fs34">property HighchartsSeriesOptions.data: obj array</div>
+<div class="tip" id="fs35">val t : int</div>
+<div class="tip" id="fs36">val y : float</div>
+<div class="tip" id="fs37">type obj = System.Object<br /><br />Full name: Microsoft.FSharp.Core.obj</div>
+<div class="tip" id="fs38">member System.Collections.Generic.IList.pushOverload2 : params items:&#39;T array -&gt; float</div>
+<div class="tip" id="fs39">val ignore : value:&#39;T -&gt; unit<br /><br />Full name: Microsoft.FSharp.Core.Operators.ignore</div>
 
 
   <div class="row"><div class="large-12 columns" id="footer">

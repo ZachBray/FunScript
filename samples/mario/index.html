@@ -13,29 +13,29 @@
   <meta name="author" content="Zach Bray">
 
   <!-- Reference Foundation -->
-  <link rel="stylesheet" href="http://www.funscript.info/css/foundation.css" />
-  <script src="http://www.funscript.info/js/vendor/custom.modernizr.js"></script>
+  <link rel="stylesheet" href="http://funscript.info/css/foundation.css" />
+  <script src="http://funscript.info/js/vendor/custom.modernizr.js"></script>
 
   <!-- Reference custom CSS and tooltips -->
-  <link type="text/css" rel="stylesheet" href="http://www.funscript.info/custom/style.css" />
-  <script src="http://www.funscript.info/custom/tooltips.js" type="text/javascript"></script>
-  <link type="text/css" rel="stylesheet" href="http://www.funscript.info/custom/tooltips.css" />
+  <link type="text/css" rel="stylesheet" href="http://funscript.info/custom/style.css" />
+  <script src="http://funscript.info/custom/tooltips.js" type="text/javascript"></script>
+  <link type="text/css" rel="stylesheet" href="http://funscript.info/custom/tooltips.css" />
 </head>
 <body>
 
   <!-- Header bar with name and navigation links -->
   <nav class="top-bar">
     <ul class="title-area">
-      <li class="name"><h1><a href="http://www.funscript.info">FunScript</a></h1></li>
+      <li class="name"><h1><a href="http://funscript.info">FunScript</a></h1></li>
       <li class="toggle-topbar"><a href="#"><span>Menu</span></a></li>
     </ul>
 
     <section class="top-bar-section">
       <ul class="left">
-        <li><a href="http://www.funscript.info/index.html">home</a></li>
-        <li><a href="http://www.funscript.info/learn.html">learn more</a></li>
-        <li><a href="http://www.funscript.info/get.html">get started</a></li>
-        <li><a href="http://www.funscript.info/contribute.html">contribute</a></li>
+        <li><a href="http://funscript.info/index.html">home</a></li>
+        <li><a href="http://funscript.info/learn.html">learn more</a></li>
+        <li><a href="http://funscript.info/get.html">get started</a></li>
+        <li><a href="http://funscript.info/contribute.html">contribute</a></li>
       </ul>
     </section>
   </nav>
@@ -50,9 +50,9 @@
   </header>
 
   <!-- Some more Foundation references (always load jQuery, because samples use it) -->
-  <script src="http://www.funscript.info/js/vendor/jquery.js"></script>
-  <script src="http://www.funscript.info/js/foundation.min.js"></script>  
-  <script src="http://www.funscript.info/js/foundation/foundation.reveal.js"></script>
+  <script src="http://funscript.info/js/vendor/jquery.js"></script>
+  <script src="http://funscript.info/js/foundation.min.js"></script>  
+  <script src="http://funscript.info/js/foundation/foundation.reveal.js"></script>
   <script>
     $(document).foundation();
   </script>
@@ -248,7 +248,7 @@ function that calculates a new game state using <code>step</code> and renders it
 <div class="tip" id="fs31">val dimensions : unit -&gt; float * float<br /><br />Full name: Program.Window.dimensions</div>
 <div class="tip" id="fs32">val update : (Mario -&gt; unit -&gt; unit)</div>
 <div class="tip" id="fs33">val arrows : unit -&gt; int * int<br /><br />Full name: Program.Keyboard.arrows</div>
-<div class="tip" id="fs34">type Globals<br /><br />Full name: Globals</div>
+<div class="tip" id="fs34">type Globals<br /><br />Full name: FunScript.TypeScript.Globals</div>
 <div class="tip" id="fs35">static member Globals.setTimeout : handler:obj * ?timeout:obj -&gt; float<br />static member Globals.setTimeout : handler:obj * timeout:obj * params args:obj array -&gt; float</div>
 <div class="tip" id="fs36">val ignore : value:&#39;T -&gt; unit<br /><br />Full name: Microsoft.FSharp.Core.Operators.ignore</div>
 
@@ -308,7 +308,7 @@ function that calculates a new game state using <code>step</code> and renders it
   <!-- JavaScript code from the sample goes here... -->
   <script type="text/javascript">
     $(document).ready(function () {
-var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Double_Double, Window__op_Dollar$String_String, Window__op_Dollar$Int32_Int32, Window__image$, Window__get_context$, Window__get_canvas$, Window__filled$String_String, Window__dimensions$, Window__context, Window__canvas, TupleSetTree_1_Int32__SetTree_1_Int32_, TupleInt32_SetTree_1_Int32_, TupleInt32_Int32, TupleDouble_Double_Double_Double, TupleDouble_Double, String_1_IndexOf$, Set__Remove$Int32_Int32, Set__Empty$Int32_Int32, Set__Add$Int32_Int32, Set_1_Int32__get_Tree$Int32, Set_1_Int32__get_Empty$Int32, Set_1_Int32__get_Comparer$Int32, Set_1_Int32___ctor$Int32, Set_1_Int32__Remove$Int32, Set_1_Int32__Add$Int32, Set_1_IComparable__get_Tree$IComparable_, Set_1_IComparable__get_Comparer$IComparable_, Set_1_IComparable__Contains$IComparable_, SetTree_1_Int32__SetOneInt32, SetTree_1_Int32__SetNodeInt32, SetTree_1_Int32__SetEmptyInt32, SetTreeModule__tolerance, SetTreeModule__spliceOutSuccessor$Int32_Int32, SetTreeModule__remove$Int32_Int32, SetTreeModule__rebalance$Int32_Int32, SetTreeModule__mk$Int32_Int32, SetTreeModule__mem$IComparable_IComparable_, SetTreeModule__height$Int32_Int32, SetTreeModule__get_tolerance$, SetTreeModule__add$Int32_Int32, SetTreeModule__SetOne$Int32_Int32, SetTreeModule__SetNode$Int32_Int32, Program__walk$Int32_Int32, Program__step$, Program__render$, Program__physics$, Program__main$, Program__jump$Int32_Int32, Program__gravity$, Mario___ctor$, Lazy_1_Object__get_Value$Object_, Lazy_1_Object___ctor$Object_, Lazy_1_Object__Create$Object_, Keyboard__update$, Keyboard__keysPressed, Keyboard__init$, Keyboard__get_keysPressed$, Keyboard__code$, Keyboard__arrows$, GenericComparer_1_Int32___ctor$Int32;
+var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Double_Double, Window__op_Dollar$String_String, Window__op_Dollar$Int32_Int32, Window__image$, Window__get_context$, Window__get_canvas$, Window__filled$String_String, Window__dimensions$, Window__context, Window__canvas, TupleSetTree_1_Int32__SetTree_1_Int32_, TupleInt32_SetTree_1_Int32_, TupleInt32_Int32, TupleDouble_Double_Double_Double, TupleDouble_Double, Set__Remove$Int32_Int32, Set__Empty$Int32_Int32, Set__Add$Int32_Int32, Set_1_Int32__get_Tree$Int32, Set_1_Int32__get_Empty$Int32, Set_1_Int32__get_Comparer$Int32, Set_1_Int32___ctor$Int32, Set_1_Int32__Remove$Int32, Set_1_Int32__Add$Int32, Set_1_IComparable__get_Tree$IComparable_, Set_1_IComparable__get_Comparer$IComparable_, Set_1_IComparable__Contains$IComparable_, SetTree_1_Int32__SetOneInt32, SetTree_1_Int32__SetNodeInt32, SetTree_1_Int32__SetEmptyInt32, SetTreeModule__tolerance, SetTreeModule__spliceOutSuccessor$Int32_Int32, SetTreeModule__remove$Int32_Int32, SetTreeModule__rebalance$Int32_Int32, SetTreeModule__mk$Int32_Int32, SetTreeModule__mem$IComparable_IComparable_, SetTreeModule__height$Int32_Int32, SetTreeModule__get_tolerance$, SetTreeModule__add$Int32_Int32, SetTreeModule__SetOne$Int32_Int32, SetTreeModule__SetNode$Int32_Int32, Program__walk$Int32_Int32, Program__step$, Program__render$, Program__physics$, Program__main$, Program__jump$Int32_Int32, Program__gravity$, Mario___ctor$, Lazy_1_Object__get_Value$Object_, Lazy_1_Object___ctor$Object_, Lazy_1_Object__Create$Object_, Keyboard__update$, Keyboard__keysPressed, Keyboard__init$, Keyboard__get_keysPressed$, Keyboard__code$, Keyboard__arrows$, GenericComparer_1_Int32___ctor$Int32;
   GenericComparer_1_Int32___ctor$Int32 = (function (unitVar0)
   {
     ;
@@ -334,20 +334,20 @@ var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Double_D
   });
   Keyboard__init$ = (function (unitVar0)
   {
-    window.addEventListener("keydown", (function (e)
+    (window.addEventListener("keydown", (function (e)
     {
       Keyboard__update$(e, true);
       return null;
-    }));
-    return window.addEventListener("keyup", (function (e)
+    })));
+    return (window.addEventListener("keyup", (function (e)
     {
       Keyboard__update$(e, false);
       return null;
-    }));
+    })));
   });
   Keyboard__update$ = (function (e, pressed)
   {
-    var keyCode = e.keyCode;
+    var keyCode = (e.keyCode);
     var _7;
     if (pressed) 
     {
@@ -511,7 +511,7 @@ var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Double_D
         return (function (value)
         {
           var ignored0 = value;
-        })(window.setTimeout(update(_mario), (1000.000000 / 60.000000)));
+        })((window.setTimeout(update(_mario), (1000.000000 / 60.000000))));
       });
     });
     var mario = (new Mario___ctor$(0.000000, 0.000000, 0.000000, 0.000000, "right"));
@@ -1144,10 +1144,6 @@ var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Double_D
   {
     return Set_1_Int32__Remove$Int32(s, x);
   });
-  String_1_IndexOf$ = (function (s, search)
-  {
-    return s.indexOf(search);;
-  });
   TupleDouble_Double = (function (Item0, Item1)
   {
     this.Items = [Item0, Item1];
@@ -1322,13 +1318,13 @@ var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Double_D
   });
   Window__dimensions$ = (function (unitVar0)
   {
-    return (new TupleDouble_Double(Lazy_1_Object__get_Value$Object_(Window__canvas).width, Lazy_1_Object__get_Value$Object_(Window__canvas).height));
+    return (new TupleDouble_Double((Lazy_1_Object__get_Value$Object_(Window__canvas).width), (Lazy_1_Object__get_Value$Object_(Window__canvas).height)));
   });
   Window__filled$String_String = (function (color, rect_0, rect_1, rect_2, rect_3)
   {
     var rect = (new TupleDouble_Double_Double_Double(rect_0, rect_1, rect_2, rect_3));
     var ctx = Lazy_1_Object__get_Value$Object_(Window__context);
-    ctx.fillStyle = color;
+    (ctx.fillStyle) = color;
     null;
     return (function (tupledArg)
     {
@@ -1336,29 +1332,29 @@ var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Double_D
       var arg01 = tupledArg.Items[1.000000];
       var arg02 = tupledArg.Items[2.000000];
       var arg03 = tupledArg.Items[3.000000];
-      return ctx.fillRect(arg00, arg01, arg02, arg03);
+      return (ctx.fillRect(arg00, arg01, arg02, arg03));
     })(rect);
   });
   Window__get_canvas$ = (function ()
   {
     return Lazy_1_Object__Create$Object_((function (unitVar)
     {
-      return window.document.getElementsByTagName("canvas")[0];
+      return (((window.document).getElementsByTagName("canvas"))[0]);
     }));
   });
   Window__get_context$ = (function ()
   {
     return Lazy_1_Object__Create$Object_((function (unitVar)
     {
-      return Lazy_1_Object__get_Value$Object_(Window__canvas).getContext("2d");
+      return (Lazy_1_Object__get_Value$Object_(Window__canvas).getContext("2d"));
     }));
   });
   Window__image$ = (function (src)
   {
-    var image = window.document.getElementsByTagName("img")[0];
-    if ((String_1_IndexOf$(image.src, src) == -1)) 
+    var image = (((window.document).getElementsByTagName("img"))[0]);
+    if (((image.src).indexOf(src) == -1)) 
     {
-      image.src = src;
+      (image.src) = src;
       null;
     }
     else
@@ -1377,19 +1373,19 @@ var Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32, Window__position$Double_D
   });
   Window__position$Double_Double = (function (x, y, img)
   {
-    img.style.left = (x.toString() + "px");
+    ((img.style).left) = (x.toString() + "px");
     null;
     var _761;
     var _762;
-    var copyOfStruct = (Lazy_1_Object__get_Value$Object_(Window__canvas).offsetTop + y);
+    var copyOfStruct = ((Lazy_1_Object__get_Value$Object_(Window__canvas).offsetTop) + y);
     _762 = copyOfStruct.toString();
     _761 = (_762 + "px");
     var _773;
     var _774;
-    var copyOfStruct = (Lazy_1_Object__get_Value$Object_(Window__canvas).offsetTop + y);
+    var copyOfStruct = ((Lazy_1_Object__get_Value$Object_(Window__canvas).offsetTop) + y);
     _774 = copyOfStruct.toString();
     _773 = (_774 + "px");
-    img.style.top = _761;
+    ((img.style).top) = _761;
     return null;
   });
   Window__rgb$Int32__Int32__Int32_Int32_Int32_Int32 = (function (r, g, b)
