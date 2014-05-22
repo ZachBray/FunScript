@@ -52,7 +52,7 @@ module Runtime =
         let wb = country.Context
         let countryCode = country.Code
         let url = worldBankUrl wb [ "countries"; countryCode; "indicators"; indicator ] [ "date", "1900:2050"; "format", "jsonp" ]
-        getJSON(url + "&prefix=?", fun json ->
+        getJSONPrefix(url, fun json ->
           let data = WorldBankResponse.Parse(json)
           let res =
             data.Array |> Seq.ofArray |> Seq.choose (fun v ->

@@ -61,5 +61,18 @@ let newXMLHttpRequest() : XMLHttpRequest = failwith "never"
 [<JS; JSEmit("return encodeURIComponent({0});")>]
 let encodeURIComponent(s:string) : string = failwith "never"
 
-[<JS; JSEmit("return $.getJSON({0}, {1});")>]
-let getJSON (url:string, callback : string -> unit) : unit = failwith "never"
+[<JS; JSEmit("""
+  $.ajax({
+    url: {0},
+    dataType: 'jsonp',
+    jsonp: 'prefix',
+    jsonpCallback: 'prefix',
+    error: function(jqXHR, textStatus, errorThrown){
+        console.log(textStatus + errorThrown);
+    },
+    success: function(data){
+        {1}(data);
+    }
+  });
+""")>]
+let getJSONPrefix (url:string, callback : string -> unit) : unit = failwith "never"
