@@ -2,6 +2,7 @@
 module Program
 
 open FunScript
+open FunScript.TypeScript
 
 type Tweet =
  { from_user: string
@@ -18,7 +19,7 @@ type Program() =
 
    let map = 
       let mapElement = jq?map
-      google.maps.Map.Invoke(unbox mapElement)
+      google.maps.Map.Create(mapElement.[0])
 
    let mutable markers = List.empty
 
@@ -47,12 +48,12 @@ type Program() =
 
    member __.Setup() =
       //Doesn't work under localhost... might work when hosted?
-      map.setCenter(google.maps.LatLng.Invoke(51.5171,0.1026))
+      map.setCenter(google.maps.LatLng.Create(51.5171,0.1026))
    
       let initialQuery = "%23fsharp"
       let t = jq?searchText._val initialQuery |> ignore
       let searchButton = jq?searchButton
-      let result = searchButton.click (fun _ -> updateTweets map)
+      let result = searchButton.click (fun _ -> updateTweets map |> ignore; null)
       ignore result
       updateTweets map
 

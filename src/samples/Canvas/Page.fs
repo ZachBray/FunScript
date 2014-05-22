@@ -7,6 +7,7 @@
 module Program
 
 open FunScript
+open FunScript.TypeScript
 
 let main() =
    let canvas = Globals.document.getElementsByTagName_canvas().[0]

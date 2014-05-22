@@ -28,6 +28,7 @@ attribute (an alias for `ReflectedDefinition`):
 module Page
 
 open FunScript
+open FunScript.TypeScript
 
 (**
 The `FunScript.TypeScript` namespace contains the TypeScript provider, which is 
@@ -82,7 +83,7 @@ important - the important fact is that we can now easily access DOM elements:
 *)
 
 let main() = 
-  jq?helloWorld.click(hello)
+  jq?helloWorld.click(fun _ -> hello() :> obj)
 
 (** 
 The `mainHello` function will be later called when the web page is loaded. It

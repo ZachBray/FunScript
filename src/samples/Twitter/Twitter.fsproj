@@ -13,7 +13,7 @@
     <ProductVersion>10.0.0</ProductVersion>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
-    <TargetFSharpCoreVersion>4.3.0.0</TargetFSharpCoreVersion>
+    <TargetFSharpCoreVersion>4.3.1.0</TargetFSharpCoreVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -49,13 +49,16 @@
       <HintPath>..\..\main\FunScript\bin\Debug\FunScript.Interop.dll</HintPath>
     </Reference>
     <Reference Include="FunScript.TypeScript.Binding.google_maps">
-      <HintPath>..\Typings\FunScript.TypeScript.Binding.google_maps.dll</HintPath>
+      <HintPath>..\packages\FunScript.TypeScript.Binding.google_maps.1.1.0.37\lib\net40\FunScript.TypeScript.Binding.google_maps.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="FunScript.TypeScript.Binding.jquery">
-      <HintPath>..\Typings\FunScript.TypeScript.Binding.jquery.dll</HintPath>
+      <HintPath>..\packages\FunScript.TypeScript.Binding.jquery.1.1.0.37\lib\net40\FunScript.TypeScript.Binding.jquery.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="FunScript.TypeScript.Binding.lib">
-      <HintPath>..\Typings\FunScript.TypeScript.Binding.lib.dll</HintPath>
+      <HintPath>..\packages\FunScript.TypeScript.Binding.lib.1.1.0.37\lib\net40\FunScript.TypeScript.Binding.lib.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
@@ -74,6 +77,7 @@
     <None Include="bootstrap.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>

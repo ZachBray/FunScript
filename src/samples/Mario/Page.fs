@@ -14,6 +14,7 @@
 module Program
 
 open FunScript
+open FunScript.TypeScript
 
 /// Handles keydown and keyup events of the window and exposes them
 /// using the 'arrows' property (which is a tuple int*int with -1 if the

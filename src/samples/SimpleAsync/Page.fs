@@ -7,6 +7,7 @@
 module Program
 
 open FunScript
+open FunScript.TypeScript
 open System.Threading
 
 // ----------------------------------------------------------------------------
@@ -40,7 +41,7 @@ let increment(n) =
 
 let rec worker(n) = 
   async { 
-    let! v = Async.AwaitJQueryEvent(fun f -> j?next.click(f))
+    let! v = Async.AwaitJQueryEvent(fun f -> j?next.click(fun x -> f x))
     let! n = increment(n)
     do log ("Count: " + n.ToString())
     return! worker(n)
@@ -48,7 +49,7 @@ let rec worker(n) =
 
 let main() = 
   async {
-    let! x = Async.AwaitJQueryEvent(fun o -> j?document.ready o)
+    let! x = Async.AwaitJQueryEvent(fun o -> j?document.ready(unbox<Function> o))
     let cts = new CancellationTokenSource()
     Async.StartImmediate(worker 0, cts.Token)
     j?stop.click(fun _ -> box <| cts.Cancel()) |> ignore

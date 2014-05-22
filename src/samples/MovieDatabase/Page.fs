@@ -7,6 +7,7 @@
 module Program
 
 open FunScript
+open FunScript.TypeScript
 open FSharp.Data
 
 // ------------------------------------------------------------------

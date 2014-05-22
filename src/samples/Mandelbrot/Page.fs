@@ -7,6 +7,7 @@
 module Program
 
 open FunScript
+open FunScript.TypeScript
 
 type Complex = { r : double; i : double }
 type Color = { r : int; g : int; b : int; a : int }

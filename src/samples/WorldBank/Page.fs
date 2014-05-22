@@ -8,6 +8,7 @@
 module Program
 
 open FunScript
+open FunScript.TypeScript
 open FSharp.Data
 
 (**
@@ -144,7 +145,7 @@ let main() =
         series.name <- country.Name
         series._type <- "line"
         
-        opts.series.push(series) |> ignore
+        opts.series.pushOverload2(series) |> ignore
     // Invoke constructor on a chart prototype
     let chartElement = jq?chart
     chartElement.highcharts(opts) |> ignore

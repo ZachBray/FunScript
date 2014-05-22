@@ -7,6 +7,7 @@ module Program
 
 open System
 open FunScript
+open FunScript.TypeScript
 
 (**
 Complex numbers

@@ -2,6 +2,7 @@
 module Program
 
 open FunScript
+open FunScript.TypeScript
 
 // loop through the provided array of tasks and create a div for each
 let addTasksToElement (elementSelector:string) tasks =
@@ -33,7 +34,7 @@ let initDragAndDrop () =
     let dropSettings = createEmpty<JQueryUI.Droppable>()
     dropSettings.hoverClass <- "ui-state-active"
     dropSettings.accept <- ".draggable"
-    dropSettings.drop <- fun e ui -> ui.draggable.appendTo(e.target) |> ignore
+    dropSettings.drop <- fun e ui -> ui.draggable.appendTo(e.target :?> Element) |> ignore
     // The Drop related settings are now tied to the element(s) that have a class named "droppable". 
     Globals.Dollar.Invoke(".droppable").droppable(dropSettings) |> ignore
 

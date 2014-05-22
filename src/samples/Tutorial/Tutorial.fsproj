@@ -11,7 +11,7 @@
     <AssemblyName>Tutorial</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Name>MovieDatabase</Name>
-    <TargetFSharpCoreVersion>4.3.0.0</TargetFSharpCoreVersion>
+    <TargetFSharpCoreVersion>4.3.1.0</TargetFSharpCoreVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -60,6 +60,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Compile Include="Page.fs" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -72,10 +73,12 @@
       <HintPath>..\..\main\FunScript\bin\Debug\FunScript.Interop.dll</HintPath>
     </Reference>
     <Reference Include="FunScript.TypeScript.Binding.jquery">
-      <HintPath>..\Typings\FunScript.TypeScript.Binding.jquery.dll</HintPath>
+      <HintPath>..\packages\FunScript.TypeScript.Binding.jquery.1.1.0.37\lib\net40\FunScript.TypeScript.Binding.jquery.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="FunScript.TypeScript.Binding.lib">
-      <HintPath>..\Typings\FunScript.TypeScript.Binding.lib.dll</HintPath>
+      <HintPath>..\packages\FunScript.TypeScript.Binding.lib.1.1.0.37\lib\net40\FunScript.TypeScript.Binding.lib.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
