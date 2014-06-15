@@ -2,8 +2,8 @@
 
 open FunScript.Data
 
-let DataProviders =
-  ApiaryProvider.components @
-  JsonProvider.components @
-  WorldBank.components
+let getDataProviders() =
+  ApiaryProvider.getComponents() @
+  JsonProvider.getComponents() @
+  WorldBank.getComponents()
 

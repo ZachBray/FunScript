@@ -8,14 +8,15 @@ module Program
 
 open FunScript
 open FunScript.TypeScript
-open FSharp.Data
+open ApiaryProvider
 
 // ------------------------------------------------------------------
 // Initializataion
 
 type MovieDb = ApiaryProvider<"themoviedb">
 
-let jQuery(selector : string) = Globals.Dollar.Invoke selector
+// Allows writing jq?name for element access
+let jq(selector : string) = Globals.Dollar.Invoke selector
 let (?) jq name = jq("#" + name)
 
 // ------------------------------------------------------------------
@@ -32,66 +33,66 @@ let main() =
 
   let showDetails (id:int) = async {
     let! movie = db.Movie.AsyncGetMovie(id.ToString())
-    jQuery?dialogOverview.text(movie.Overview) |> ignore 
-    jQuery?dialogTitle.text(movie.Title) |> ignore
-    jQuery?dialogImage.attr("src", root + movie.PosterPath) |> ignore
+    jq?dialogOverview.text(movie.Overview) |> ignore 
+    jq?dialogTitle.text(movie.Title) |> ignore
+    jq?dialogImage.attr("src", root + movie.PosterPath) |> ignore
   
-    let! casts = movie.AsyncCasts()
-    let sorted = casts.Cast |> Array.sortBy (fun c -> c.Order)    
+    let! credits = movie.AsyncCredits()
+    let sorted = credits.Cast |> Array.sortBy (fun c -> c.Order)    
     let sorted = 
       if sorted.Length <= 10 then sorted |> Seq.ofArray 
       else sorted |> Seq.ofArray |> Seq.take 10
 
-    jQuery?dialogCast.html("") |> ignore
-    for cast in casts.Cast do 
+    jq?dialogCast.html("") |> ignore
+    for cast in credits.Cast do 
       let html = "<strong>" + cast.Name + "</strong> (" + cast.Character + ")"
-      let li = jQuery("<li>")
+      let li = jq("<li>")
       li.html(html) |> ignore
-      li.appendTo(jQuery?dialogCast) |> ignore }
+      li.appendTo(jq?dialogCast) |> ignore }
 
   // ----------------------------------------------------------------
   // Movie search
 
   let search term = async {
     let! res = db.Search.AsyncMovie(query=["query", term])
-    jQuery?results.html("") |> ignore
+    jq?results.html("") |> ignore
 
     res.Results 
     |> Seq.ofArray
     |> Seq.iteri (fun index item ->
         
         let link = 
-          jQuery("<a>").attr("data-toggle", "modal").
+          jq("<a>").attr("data-toggle", "modal").
             attr("href", "#detailsDialog").text(item.Title).
             click(fun e -> showDetails item.Id |> Async.StartImmediate; null)
 
-        let details = jQuery("<ul>")
+        let details = jq("<ul>")
         let date = 
-          match item.ReleaseDate.DateTime with
+          match item.ReleaseDate with
           | None -> "(not known)"
           | Some dt -> dt.ToString()
-        jQuery("<li>").html("<strong>Released:</strong> " + date).
+        jq("<li>").html("<strong>Released:</strong> " + date).
           appendTo(details) |> ignore
-        jQuery("<li>").html("<strong>Average vote:</strong> " + item.VoteAverage.ToString()).
+        jq("<li>").html("<strong>Average vote:</strong> " + item.VoteAverage.ToString()).
           appendTo(details) |> ignore
-        jQuery("<li>").html("<strong>Popularity:</strong> " + item.Popularity.ToString()).
+        jq("<li>").html("<strong>Popularity:</strong> " + item.Popularity.ToString()).
           appendTo(details) |> ignore
 
-        let body = jQuery("<div>").addClass("searchResult")
-        jQuery("<h3>").append([| box link |]).appendTo(body) |> ignore
-        jQuery("<img>").attr("src", root + item.PosterPath).appendTo(body) |> ignore
+        let body = jq("<div>").addClass("searchResult")
+        jq("<h3>").append([| box link |]).appendTo(body) |> ignore
+        jq("<img>").attr("src", root + (defaultArg item.PosterPath "")).appendTo(body) |> ignore
         details.appendTo(body) |> ignore
-        jQuery("<div>").addClass("clearer").appendTo(body) |> ignore
-        body.appendTo(jQuery?results) |> ignore )}
+        jq("<div>").addClass("clearer").appendTo(body) |> ignore
+        body.appendTo(jq?results) |> ignore )}
 
   // ----------------------------------------------------------------
   // Movie search
 
-  jQuery?searchButton.click(fun () ->
-    let id = jQuery?searchInput._val() :?> string
-    search id |> Async.StartImmediate )
+  jq?searchButton.click(fun _ ->
+    let id = jq?searchInput._val() :?> string
+    search id |> Async.StartImmediate |> box)
 
 // ------------------------------------------------------------------
 let components =
-  FunScript.Data.Components.DataProviders  
+  FunScript.Data.Components.getDataProviders()  
 do Runtime.Run(components=components, directory="Web")

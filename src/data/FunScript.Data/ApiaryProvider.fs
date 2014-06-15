@@ -6,19 +6,21 @@ module private FunScript.Data.ApiaryProvider
 
 open System
 open System.Reflection
-open FSharp.Data.Json
-open FSharp.Data.RuntimeImplementation
-open FSharp.Data.RuntimeImplementation.Apiary
+open FSharp.Data
+open FSharp.Data.Runtime
+open ApiaryProvider
+open ApiaryProvider.Runtime
 open FunScript
 open FunScript.AST
 open FunScript.Data.Utils
-open ProviderImplementation
 open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.DerivedPatterns
 open Microsoft.FSharp.Reflection
 
 // --------------------------------------------------------------------------------------
-// Reimplemntation of the Apiary provider runtime
+// Reimplementation of the Apiary provider runtime
+
+#nowarn "10001"
 
 [<JS>]
 module Runtime = 
@@ -90,7 +92,7 @@ module Runtime =
           xhr.onreadystatechange <- (fun () ->
             if xhr.readyState = 4.0 then
               let source = xhr.responseText
-              let doc = JsonDocument.Create(JsonValue.Parse(source))
+              let doc = JsonDocument.Create(JsonValue.Parse(source), "")
               setContext(doc, { x with GlobalArguments = allArguments } )
               cont doc
             )
@@ -106,11 +108,11 @@ open Runtime
 
 // Deserialize the quotation for performance reasons
 let private newApiaryCtx = <@@ new ApiaryContext(undef()) @@>
-let private newApiaryDoc = <@@ new ApiaryDocument(undef()) @@>
+let private newApiaryDoc = <@@ new ApiaryDocument(undef(), "") @@>
 
-let components = 
+let getComponents() = 
   [ // ApiaryDocument behaves just like JsonDocument
-    ExpressionReplacer.createUnsafe <@ fun (d:ApiaryDocument) -> d.JsonValue @> <@ JsonProvider.JsRuntime.Identity @>
+    ExpressionReplacer.createUnsafe <@ fun (d:ApiaryDocument) -> (d :> IJsonDocument).JsonValue @> <@ JsonProvider.JsRuntime.Identity @>
     ExpressionReplacer.createUnsafe <@ fun (d:ApiaryDocument) -> d.Context @> <@ getContext @>
 
     // Apiary runtime is reimplemented by ApiaryJsRuntime
@@ -118,7 +120,7 @@ let components =
     ExpressionReplacer.createUnsafe <@ fun (a:ApiaryContext) -> a.AddHeader @> <@ ApiaryJsRuntime.AddHeader @> 
     ExpressionReplacer.createUnsafe <@ fun (a:ApiaryContext) -> a.AddQueryParam @> <@ ApiaryJsRuntime.AddQueryParam @> 
     ExpressionReplacer.createUnsafe <@ fun (a:ApiaryOperations) -> a.AsyncInvokeOperation @> <@ ApiaryJsRuntime.AsyncInvokeOperation @> 
-    ExpressionReplacer.createUnsafe <@ ApiaryGenerationHelper.AsyncMap @> <@ ApiaryJsRuntime.AsyncMap @> 
+    ExpressionReplacer.createUnsafe <@ TextRuntime.AsyncMap @> <@ ApiaryJsRuntime.AsyncMap @> 
 
     // Turn 'new ApiaryDocument(...)' to just 'return {0}'
     CompilerComponent.create <| fun (|Split|) compiler returnStategy ->

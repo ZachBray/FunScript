@@ -15,8 +15,8 @@
     <tags>FSharp F# FunScript TypeScript JavaScript Compiler</tags>
     <dependencies>
 <dependency id="FunScript" version="[0.0.0]" />
-<dependency id="FSharp.Data" version="[1.1.5.0]" />
-<dependency id="FSharp.Data.Experimental" version="[1.1.5.0]" />
+<dependency id="FSharp.Data" version="[2.0.9]" />
+<dependency id="ApiaryProvier" version="[1.0.2]" />
 </dependencies>
   </metadata>
   <files>

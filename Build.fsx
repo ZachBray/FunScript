@@ -139,8 +139,8 @@ Target "Create-Package-Data" (fun () ->
             Dependencies = 
             [
                 "FunScript", sprintf "[%s]" versionNumber
-                "FSharp.Data", "[1.1.5.0]"
-                "FSharp.Data.Experimental", "[1.1.5.0]"
+                "FSharp.Data", "[2.0.9]"
+                "ApiaryProvier", "[1.0.2]"
             ]
         }) "build/template.nuspec"
 )

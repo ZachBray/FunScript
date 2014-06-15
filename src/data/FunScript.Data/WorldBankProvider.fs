@@ -55,14 +55,13 @@ module Runtime =
         getJSONPrefix(url, fun json ->
           let data = WorldBankResponse.Parse(json)
           let res =
-            data.Array |> Seq.ofArray |> Seq.choose (fun v ->
+            data.Array |> Seq.choose (fun v ->
               if JsonProvider.JsHelpers.isNull v.Value then None
-              else Some(int v.Date, float v.Value.Number.Value))
+              else Some(int v.Date, float v.Value.Value))
           cont res ))
 
 open Runtime
-open ProviderImplementation
-open FSharp.Data.RuntimeImplementation.WorldBank
+open FSharp.Data.Runtime.WorldBank
 
 let private newWorldBankData = <@@ new WorldBankData(undef(), undef()) @@>
 let private worldbank =
@@ -85,7 +84,7 @@ let private worldbank =
          ]
       | _ -> []
 
-let components = 
+let getComponents() = 
   [ ExpressionReplacer.createUnsafe <@ fun (w:IWorldBankData) -> w.GetCountries @> <@ WorldBankRuntime.GetCountries @> 
     ExpressionReplacer.createUnsafe <@ fun (w:ICountry) -> w.GetIndicators @> <@ WorldBankRuntime.GetIndicators @> 
     ExpressionReplacer.createUnsafe <@ fun (w:ICountryCollection) -> w.GetCountry @> <@ WorldBankRuntime.GetCountry @> 
