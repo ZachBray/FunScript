@@ -65,7 +65,7 @@ let countries () =
 ## Building user interface
 
 As a first step, we need to iterate over all the countries and generate check box
-for for each country. This can be done using the `jQuery` function defined earlier
+for for each country. This can be done using the `jq` function defined earlier
 (which builds the HTML element) and then using standard jQuery methods like 
 `attr` and `append` which are exposed automatically using TypeScript type provider:
 
@@ -133,10 +133,11 @@ let main() =
         let! vals = country.Indicators.``School enrollment, tertiary (% gross)``
         // Convert data to format required by HighCharts
         let data = 
-            vals |> Seq.map (fun (k, v) ->
+            vals
+            |> Seq.map (fun (k, v) ->
                 let p = createEmpty<HighchartsDataPoint>() 
                 p.x <- number k
-                p.y <- v
+                p.y <- number v
                 p)
             |> Seq.toArray
         // Create new data series and add it to the chart
@@ -180,5 +181,5 @@ runner as usual:
 *)
 
 let components = 
-  FunScript.Data.Components.DataProviders
+  FunScript.Data.Components.getDataProviders()
 do Runtime.Run(components=components, directory="Web")

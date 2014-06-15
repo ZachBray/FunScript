@@ -57,32 +57,31 @@
     <Compile Include="ApiaryProvider.fs" />
     <Compile Include="WorldBankProvider.fs" />
     <Compile Include="Components.fs" />
+    <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
+  <ItemGroup>
+    <Reference Include="ApiaryProvider">
+      <HintPath>..\..\packages\ApiaryProvider.1.0.2\lib\net40\ApiaryProvider.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="FunScript">
       <HintPath>..\..\main\FunScript\bin\Debug\FunScript.dll</HintPath>
     </Reference>
     <Reference Include="FunScript.Interop">
       <HintPath>..\..\main\FunScript\bin\Debug\FunScript.Interop.dll</HintPath>
     </Reference>
-  </ItemGroup>
-  <ItemGroup Condition=" '$(Configuration)' == 'Release' ">
     <Reference Include="FunScript">
       <HintPath>..\..\..\build\main\bin\FunScript.dll</HintPath>
     </Reference>
     <Reference Include="FunScript.Interop">
       <HintPath>..\..\..\build\main\bin\FunScript.Interop.dll</HintPath>
     </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <Private>True</Private>
     </Reference>
     <Reference Include="FSharp.Data">
-      <HintPath>..\..\..\lib\FSharp.Data.dll</HintPath>
-    </Reference>
-    <Reference Include="FSharp.Data.Experimental">
-      <HintPath>..\..\..\lib\FSharp.Data.Experimental.dll</HintPath>
+      <HintPath>..\..\packages\FSharp.Data.2.0.9\lib\net40\FSharp.Data.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
