@@ -11,6 +11,8 @@ let dataPackageDir = "./build/data/deploy/"
 
 let testBuildDir = "./build/data/bin/"
 
+let dependenciesDir = "./src/packages/"
+
 let versionNumber =
     match buildServer with
     | TeamCity -> buildVersion
@@ -64,6 +66,9 @@ Target "Build-Main" (fun () ->
 
 Target "Build-Data" (fun () ->
     
+    RestorePackages()
+    CopyDir dependenciesDir "./packages/" (fun _ -> true)
+
     CreateFSharpAssemblyInfo "src/data/FunScript.Data/AssemblyInfo.fs" 
         [
             yield Attribute.Title "TypeInferred.FunScript.Data"
