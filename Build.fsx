@@ -145,7 +145,7 @@ Target "Create-Package-Data" (fun () ->
             [
                 "FunScript", sprintf "[%s]" versionNumber
                 "FSharp.Data", "[2.0.9]"
-                "ApiaryProvier", "[1.0.2]"
+                "ApiaryProvider", "[1.0.2]"
             ]
         }) "build/template.nuspec"
 )
