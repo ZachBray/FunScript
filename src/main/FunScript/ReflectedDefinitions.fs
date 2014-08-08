@@ -31,7 +31,8 @@ let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list)
       [ Assign(Reference var, Lambda(vars, Block[EmitStatement(fun (padding, scope) -> code padding scope)])) ]
    | _ when mb.IsConstructor ->
       [  
-         yield Assign(Reference var, Lambda(vars, Block(compiler.Compile ReturnStrategies.inplace bodyExpr)))
+         let returnStrategy = match bodyExpr with Patterns.NewObject _ -> ReturnStrategies.returnFrom | _ -> ReturnStrategies.inplace
+         yield Assign(Reference var, Lambda(vars, Block(compiler.Compile returnStrategy bodyExpr)))
       ]
    | _ -> 
       [ Assign(
