@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>FunScript.Data</id>
@@ -16,7 +16,7 @@
     <dependencies>
 <dependency id="FunScript" version="[0.0.0]" />
 <dependency id="FSharp.Data" version="[2.0.9]" />
-<dependency id="ApiaryProvier" version="[1.0.2]" />
+<dependency id="ApiaryProvider" version="[1.0.2]" />
 </dependencies>
   </metadata>
   <files>
