@@ -310,3 +310,21 @@ let ``generic methods on records work``() =
       <@@ 
          let calc = { y = 10. }
          calc.genericIdentity 11. @@>
+
+module ValueWrapperCompanion =
+    let mutable secondaryCount = 0.
+
+type ValueWrapper(x) =
+    member __.Value = x 
+    new () = 
+        ValueWrapperCompanion.secondaryCount <- ValueWrapperCompanion.secondaryCount + 1.
+        let y = 1.
+        ValueWrapper(y * 2.)
+
+[<Test>]
+let ``multiple constructors work``() =
+   check  
+      <@@ 
+         let a = ValueWrapper()
+         let b = ValueWrapper(10.)
+         a.Value + b.Value + ValueWrapperCompanion.secondaryCount @@>

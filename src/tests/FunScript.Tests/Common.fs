@@ -10,15 +10,15 @@ open Microsoft.FSharp.Linq.QuotationEvaluation
 let log (msg : obj) : unit = failwith "never"
 
 let checkAreEqualWithComponents components expectedResult quote =
-   let code = Compiler.Compiler.Compile(quote, components = components(*, shouldCompress = true*))
+   let code = Compiler.Compiler.Compile(quote, components = components, noReturn = true(*, shouldCompress = true*))
    try
-      let engine = JintEngine().SetFunction("test_log", System.Action<string>(printfn "//[LOG] %s"))
-      let result = engine.Run(code + "\nreturn null;")
+      let engine = Engine().SetValue("test_log", System.Action<string>(printfn "//[LOG] %s"))
+      let result = engine.Execute(code).GetCompletionValue().ToObject()
       let message (ex: 'a) (re: 'b) = sprintf "%sExpected: %A%sBut was: %A" System.Environment.NewLine ex System.Environment.NewLine re
       Assert.That((result = expectedResult), (message expectedResult result))
    // Wrap xUnit exceptions to stop pauses.
    with ex ->
-      //printfn "// Code:\n%s" code
+      printfn "// Code:\n%s" code
       if ex.GetType().Namespace.StartsWith "FunScript" then raise ex
       else failwithf "Message: %s\n" ex.Message
 

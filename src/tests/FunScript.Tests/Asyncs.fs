@@ -50,7 +50,7 @@ let ``Async exceptions are handled correctly``() =
          let f shouldThrow =
              async { 
                 try
-                    if shouldThrow then raise(exn())
+                    if shouldThrow then failwith "boom!"
                     else result := 12.0
                 with _ -> result := 10.0
              } |> Async.StartImmediate

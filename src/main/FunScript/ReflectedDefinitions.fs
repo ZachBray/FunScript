@@ -30,8 +30,8 @@ let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list)
             ) meth.Emit
       [ Assign(Reference var, Lambda(vars, Block[EmitStatement(fun (padding, scope) -> code padding scope)])) ]
    | _ when mb.IsConstructor ->
-      [  
-         yield Assign(Reference var, Lambda(vars, Block(compiler.Compile ReturnStrategies.inplace bodyExpr)))
+      [
+         yield Assign(Reference var, Lambda(vars, Block(compiler.Compile ReturnStrategies.returnFrom bodyExpr)))
       ]
    | _ -> 
       [ Assign(
