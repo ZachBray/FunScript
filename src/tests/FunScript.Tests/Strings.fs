@@ -107,6 +107,41 @@ let ``String.IndexOf works with offset``() =
       @@>
 
 [<Test>]
+let ``String.LastIndexOf works``() =
+   check 
+      <@@ 
+         "abcdbc".LastIndexOf("bc") * 100 + "abcd".LastIndexOf("bd") |> float
+      @@>
+
+[<Test>] 
+let ``String.LastIndexOf works with offset``() =
+   check 
+      <@@ 
+         "abcdbcebc".LastIndexOf("bc", 3) |> float
+      @@>
+
+[<TestCase("ab"); TestCase("cd"); TestCase("abcdx")>]
+let ``String.StartsWith works``(str:string) =
+   check  
+      <@@ 
+         "abcd".StartsWith(str)
+      @@>
+
+[<TestCase("ab"); TestCase("cd"); TestCase("abcdx")>]
+let ``String.EndsWith works``(str:string) =
+   check  
+      <@@ 
+         "abcd".EndsWith(str)
+      @@>
+
+[<Test>]
+let ``String.Trim works``() =
+   check 
+      <@@ 
+         "   abc   ".Trim()
+      @@>
+
+[<Test>]
 let ``String.Substring works``() =
    check 
       <@@ 
