@@ -106,4 +106,8 @@ let components =
          typeof<System.Net.WebUtility>
          typeof<Core.Web.WebUtility>
 
+      ExpressionReplacer.createModuleMapping 
+         "FSharp.Core" "Microsoft.FSharp.Control.ObservableModule"
+         "FunScript" "FunScript.Core.Events.Observable"
+
    ] |> List.concat
