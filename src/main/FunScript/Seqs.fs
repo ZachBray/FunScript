@@ -21,6 +21,10 @@ let private toSeq =
             let mi, _ = Quote.toMethodInfoFromLambdas <@@ Core.Seq.OfList @@>
             let specificMi = mi.MakeGenericMethod(expr.Type.GetGenericArguments())
             compiler.Compile returnStrategy (Expr.Call(specificMi, [expr]))
+         | expr when expr.Type.Name = typeof<ResizeArray<obj>>.Name ->
+            let mi, _ = Quote.toMethodInfoFromLambdas <@@ Core.Seq.OfResizeArray @@>
+            let specificMi = mi.MakeGenericMethod(expr.Type.GetGenericArguments())
+            compiler.Compile returnStrategy (Expr.Call(specificMi, [expr]))
          | _ -> []         
       | _ -> []
 
