@@ -62,6 +62,9 @@ and Event<'T>() =
 
    member this.Publish = PublishedEvent<'T>(delegates) :> IEvent<'T>
 
+
+// NOTE: Quotations don't allow object expressions, so this is just a reimplementation of the Observable module
+// in the FSharp.Core library with actual types
 module Observable =
 
     let inline protect f succeed fail =

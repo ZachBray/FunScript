@@ -74,6 +74,7 @@
     <Compile Include="Sets.fs" />
     <Compile Include="Maps.fs" />
     <Compile Include="Strings.fs" />
+    <Compile Include="Regexs.fs" />
     <Compile Include="Asyncs.fs" />
     <Compile Include="Reflection.fs" />
     <Compile Include="StringWriter.fs" />
