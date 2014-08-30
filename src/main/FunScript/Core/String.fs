@@ -30,6 +30,12 @@ let EndsWith(s: string, search: string) =
     let index = IndexOfWithOffset(s, search, offset)
     index <> -1 && index = offset
 
+// Simple formatting from http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
+[<FunScript.JSEmit("""return {0}.replace(/{(\d+)}/g, function(match, number) {
+        return typeof {1}[number] !== undefined ? {1}[number] : match
+})""")>]
+let Format(s: string, [<System.ParamArray>] args: obj[]): string = failwith "never"
+
 [<FunScript.JSEmitInline("{0}.toLowerCase()")>]
 let ToLowerCase(s:string) : string = failwith "never"
 

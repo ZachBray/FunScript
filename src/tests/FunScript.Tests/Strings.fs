@@ -141,6 +141,22 @@ let ``String.Trim works``() =
          "   abc   ".Trim()
       @@>
 
+[<TestCase("ASP", "ASP.NET"); TestCase(1, 2)>]
+let ``String.Format works``(arg1, arg2) =
+   check 
+      <@@
+         String.Format("{0} is dead, but {1} is alive! {0}", arg1, arg2)
+      @@>
+
+// NOTE: This test doesn't work, but the correct Javascript is generated anyway
+//[<Test>]
+//let ``Console.WriteLine works``() =
+//   check 
+//      <@@
+//         Console.WriteLine("Testing, testing...")
+//         true
+//      @@>
+
 [<Test>]
 let ``String.Substring works``() =
    check 

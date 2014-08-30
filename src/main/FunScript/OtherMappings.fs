@@ -10,6 +10,11 @@ open System.Collections.Concurrent
 module Replacements =
     let utf8Encoding() = Core.Web.UTF8Encoding()
 
+[<FunScript.JS>]
+module Extensions =
+    [<FunScript.JSEmitInline("console.log({0})")>]
+    let log(o: obj): unit = failwith "never"
+
 let components = 
    [
       [
@@ -62,6 +67,10 @@ let components =
          ExpressionReplacer.createUnsafe 
             <@ fun x (y : CompressionMode) z -> new GZipStream(x, y, z) @> 
             <@ fun x y z -> Core.Web.GZipStream.Create(x, y, z) @>
+
+         ExpressionReplacer.createUnsafe
+            <@ fun (o: obj) -> System.Console.WriteLine(o) @>
+            <@ Extensions.log @>
       ]
 
       ExpressionReplacer.createTypeMethodMappings 
