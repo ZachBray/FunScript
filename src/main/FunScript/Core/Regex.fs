@@ -4,6 +4,7 @@ module FunScript.Core.Regex
 open FunScript
 open System.Text.RegularExpressions
 
+// TODO: Check for null in properties other than Success?
 module Match =
     [<JSEmitInline("{0}")>]
     let Groups(m: Match): GroupCollection = failwith "never"
@@ -61,55 +62,79 @@ let private translateOptions(options: RegexOptions) =
     | false, true -> "m"
     | _ -> ""
 
-[<JSEmitInline("(new RegExp({1},{2})).test({0})")>]
-let private isMatch(input: string, pattern: string, options: string): bool = failwith "never"
+[<JSEmitInline("(new RegExp({0}, 'g' + {1}))")>]
+let private createUnsafe(pattern: string, options: string): Regex = failwith "neve"
 
-let IsMatch(input: string, pattern: string) =
-    isMatch(input, pattern, "")
+let Create(pattern: string) =
+    createUnsafe(pattern, "")
 
-let IsMatchWithOptions(input: string, pattern: string, options: RegexOptions) =
+let CreateWithOptions(pattern: string, options: RegexOptions) =
     let options' = translateOptions options
-    isMatch(input, pattern, options')
+    createUnsafe(pattern, options')   
 
-[<JSEmitInline("{0}.match(new RegExp({1},{2}))")>]
-let private matchFirst(input: string, pattern: string, options: string): Match = failwith "never"
+[<JSEmit("{0}.lastIndex = {2}; return {0}.test({1})")>]
+let IsMatchWithOffset(regex: Regex, input: string, offset: int): bool = failwith "never"
 
-let MatchFirst(input: string, pattern: string) =
-    matchFirst(input, pattern, "")
+let IsMatch(regex: Regex, input: string) =
+    IsMatchWithOffset(regex, input, 0)
 
-let MatchFirstWithOptions(input: string, pattern: string, options: RegexOptions) =
-    let options' = translateOptions options
-    matchFirst(input, pattern, options')
+let IsMatchStatic(input: string, pattern: string) =
+    let regex = Create(pattern)
+    IsMatch(regex, input)
 
-[<JSEmit("var r = new RegExp({1},{2}); var ms = []; var m; while ((m = r.exec({0})) !== null) { ms.push(m) } return ms")>]
-let private matches(input: string, pattern: string, options: string): MatchCollection = failwith "never"
+let IsMatchStaticWithOptions(input: string, pattern: string, options: RegexOptions) =
+    let regex = CreateWithOptions(pattern, options)
+    IsMatch(regex, input)
 
-let Matches(input: string, pattern: string) =
-    matches(input, pattern, "g")
+[<JSEmit("{0}.lastIndex = {2}; return {0}.exec({1})")>]
+let MatchFirstWithOffset(regex: Regex, input: string, offset: int): Match = failwith "never"
 
-let MatchesWithOptions(input: string, pattern: string, options: RegexOptions) =
-    let options' = "g" + translateOptions options
-    matches(input, pattern, options')
+let MatchFirst(regex: Regex, input: string) =
+    MatchFirstWithOffset(regex, input, 0)
 
-[<JSEmitInline("{0}.split(new RegExp({1},{2}))")>]
-let private split(input: string, pattern: string, options: string): string[] = failwith "never"
+let MatchFirstStatic(input: string, pattern: string) =
+    let regex = Create(pattern)
+    MatchFirst(regex, input)
 
-let Split(input: string, pattern: string) =
-    split(input, pattern, "g")
+let MatchFirstStaticWithOptions(input: string, pattern: string, options: RegexOptions) =
+    let regex = CreateWithOptions(pattern, options)
+    MatchFirst(regex, input)
 
-let SplitWithOptions(input: string, pattern: string, options: RegexOptions) =
-    let options' = "g" + translateOptions options
-    split(input, pattern, options')
+[<JSEmit("{0}.lastIndex = {2}; var matches = []; var m; while ((m = {0}.exec({1})) !== null) { matches.push(m) } return matches")>]
+let MatchesWithOffset(regex: Regex, input: string, offset: int): MatchCollection = failwith "never"
 
-[<JSEmitInline("{0}.replace(new RegExp({1},{3}), {2})")>]
-let private replace(input: string, pattern: string, replacement: string, options: string): string = failwith "never"
+let Matches(regex: Regex, input: string) =
+    MatchesWithOffset(regex, input, 0)
 
-let Replace(input: string, pattern: string, replacement: string) =
-    replace(input, pattern, replacement, "g")
+let MatchesStatic(input: string, pattern: string) =
+    let regex = Create(pattern)
+    Matches(regex, input)
 
-let ReplaceWithOptions(input: string, pattern: string, replacement: string, options: RegexOptions) =
-    let options' = "g" + translateOptions options
-    replace(input, pattern, replacement, options')
+let MatchesStaticWithOptions(input: string, pattern: string, options: RegexOptions) =
+    let regex = CreateWithOptions(pattern, options)
+    Matches(regex, input)
+
+[<JSEmitInline("{1}.split({0})")>]
+let Split(regex: Regex, input: string): string[] = failwith "never"
+
+let SplitStatic(input: string, pattern: string) =
+    let regex = Create(pattern)
+    Split(regex, input)
+
+let SplitStaticWithOptions(input: string, pattern: string, options: RegexOptions) =
+    let regex = CreateWithOptions(pattern, options)
+    Split(regex, input)
+
+[<JSEmitInline("{1}.replace({0}, {2})")>]
+let Replace(regex: Regex, input: string, replacement: string): string = failwith "never"
+
+let ReplaceStatic(input: string, pattern: string, replacement: string) =
+    let regex = Create(pattern)
+    Replace(regex, input, replacement)
+
+let ReplaceStaticWithOptions(input: string, pattern: string, replacement: string, options: RegexOptions) =
+    let regex = CreateWithOptions(pattern, options)
+    Replace(regex, input, replacement)
 
 
 
