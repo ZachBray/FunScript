@@ -82,10 +82,12 @@ let buildCall (mi:MethodInfo) exprs =
       | true -> let normalParamInfos = paramInfos |> Seq.take (paramInfos.Length - 1) |> Seq.toList
                 let normalArgExprs =   argExprs   |> Seq.take (paramInfos.Length - 1) |> Seq.toList
                 let arrayArgExpr  =    argExprs   |> Seq.skip (paramInfos.Length - 1) |> Seq.toList
-                let arrayArgExpr' = Expr.NewArray(paramInfos.[paramInfos.Length-1].ParameterType.GetElementType(), arrayArgExpr)
+                let arrayArgExpr = match arrayArgExpr with
+                                   | [Patterns.NewArray _ ] -> List.head arrayArgExpr
+                                   | _ -> Expr.NewArray(paramInfos.[paramInfos.Length-1].ParameterType.GetElementType(), arrayArgExpr)
                 [
                     normalParamInfos |> List.map2 castExpr normalArgExprs
-                    [ paramInfos.[paramInfos.Length - 1] |> castExpr arrayArgExpr' ]
+                    [ paramInfos.[paramInfos.Length - 1] |> castExpr arrayArgExpr ]
                 ] |> List.concat
 
    match obj with

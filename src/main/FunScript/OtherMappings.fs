@@ -22,7 +22,24 @@ module Extensions =
     else {
 	    console.log({0})
     }""")>]
-    let logFormat(str: string, [<System.ParamArray>] args: obj[]): string = failwith "never"
+    let logFormat(str: string, [<System.ParamArray>] args: obj[]): unit = failwith "never"
+
+    [<FunScript.JSEmit("if ({0}) { console.log({1}) }")>]
+    let logIf(condition: bool, o: obj): unit = failwith "never"
+
+// NOTE: A call replacer with System.Diagnostics.Debug will fail if FunScript is compiled in Release mode, so use this function instead
+let private debugComponents =
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
+      function
+      | Patterns.Call(None,mi,args) when mi.DeclaringType.Name = "Debug" ->
+        let compile = fun quote -> let mi, _ = Quote.toMethodInfoFromLambdas quote
+                                   compiler.Compile returnStrategy (ExpressionReplacer.buildCall mi args)
+        match mi.Name with
+        | "WriteLine" -> compile <@ Extensions.logFormat @>
+        | "WriteLineIf" -> compile <@ Extensions.logIf @>
+        | _ -> []
+      | _ -> []
+
 
 let components = 
    [
@@ -80,6 +97,12 @@ let components =
          ExpressionReplacer.createUnsafe
             <@ fun (str: string, args: obj[]) -> System.Console.WriteLine(format=str, arg=args) @>
             <@ Extensions.logFormat @>
+
+         ExpressionReplacer.createUnsafe
+            <@ fun (str: string, args: obj[]) -> System.Console.WriteLine(format=str, arg=args) @>
+            <@ Extensions.logFormat @>
+
+         debugComponents
       ]
 
       ExpressionReplacer.createTypeMethodMappings 
