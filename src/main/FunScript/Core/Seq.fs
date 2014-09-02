@@ -347,16 +347,6 @@ let OfArray (xs:_ []) =
       if i < xs.Length then Some(xs.[i], i+1)
       else None)
 
-let ToResizeArray xs =
-   let ys = FunScript.Core.ResizeArray.ZeroCreate()
-   xs |> Iterate (fun x -> ys.Add(x))
-   ys
-
-let OfResizeArray (xs: ResizeArray<_>) =
-   0 |> Unfold (fun i ->
-      if i < xs.Count then Some(xs.[i], i+1)
-      else None)
-
 let Initialize n f =
    0 |> Unfold (fun i ->
       if i < n then Some(f i, i+1)

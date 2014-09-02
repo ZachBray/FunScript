@@ -4,51 +4,40 @@ module FunScript.Core.Regex
 open FunScript
 open System.Text.RegularExpressions
 
-// TODO: Check for null in properties other than Success?
-module Match =
-    [<JSEmitInline("{0}")>]
-    let Groups(m: Match): GroupCollection = failwith "never"
-    
-    [<JSEmitInline("{0}.index")>]
-    let Index(m: Match): int = failwith "never"
+module Collection =
+    open System.Collections
 
-    // NOTE: See Group below, if I use different JSEmit strings for properties with same name
-    // in Match and Group (like Length or Value) apparently they conflict
+    [<JSEmitInline("{0}.length")>]
+    let Count (x: IEnumerable): int = failwith "never"
+
+    [<JSEmitInline("{0}[{1}]")>]
+    let Item (x: IEnumerable, index: int): Match = failwith "never"
+
+    [<JSEmitInline("{0}.GetEnumerator()")>]
+    let GetEnumerator (x: IEnumerable): IEnumerator = failwith "never"
+
+module Capture =
+    [<JSEmitInline("{0}.index")>]
+    let Index(m: Capture): int = failwith "never"
+
     [<JSEmitInline("(Array.isArray({0}) ? ({0}[0]).length : {0}.length)")>]
-    let Length(m: Match): int = failwith "never"
+    let Length(m: Capture): int = failwith "never"
     
+    [<JSEmitInline("(Array.isArray({0}) ? ({0}[0]) : {0})")>]
+    let Value(m: Capture): string = failwith "never"
+
+module Group = 
     [<JSEmitInline("({0} === null ? false : true)")>]
     let Success(m: Match): int = failwith "never"
-    
-    [<JSEmitInline("(Array.isArray({0}) ? {0}[0] : {0})")>]
-    let Value(m: Match): string = failwith "never"
 
-module MatchCollection =
-    [<JSEmitInline("{0}.length")>]
-    let Count(m: MatchCollection): int = failwith "never"
+module Match =
+    [<JSEmitInline("{0}")>]
+    let private groupsUnsafe(m: Match) = failwith "never"
 
-    [<JSEmitInline("{0}[{1}]")>]
-    let Item(m: MatchCollection, index: int): Match = failwith "never"
-
-    let GetEnumerator(m: MatchCollection) = (unbox<Match[]> m).GetEnumerator()
-
-// TODO: Try to implement Index?
-module Group =
-    [<JSEmitInline("(Array.isArray({0}) ? ({0}[0]).length : {0}.length)")>]
-    let Length(m: Group): int = failwith "never"
-
-    [<JSEmitInline("(Array.isArray({0}) ? {0}[0] : {0})")>]
-    let Value(m: Group): string = failwith "never"
-
-module GroupCollection =
-    [<JSEmitInline("{0}.length")>]
-    let Count(m: GroupCollection): int = failwith "never"
-
-    [<JSEmitInline("{0}[{1}]")>]
-    let Item(m: GroupCollection, index: int): Group = failwith "never"
-
-    let GetEnumerator(m: GroupCollection) = (unbox<Group[]> m).GetEnumerator()
-
+    let Groups(m: Match): GroupCollection =
+        let gs = groupsUnsafe(m)
+        FunScript.Core.ResizeArray.AddGetEnumerator(gs)
+        gs
 
 // TODO: Throw exception if ECMAScript is not set? But this would make Regex creation more verbose...
 let private translateOptions(options: RegexOptions) =
@@ -101,7 +90,12 @@ let MatchFirstStaticWithOptions(input: string, pattern: string, options: RegexOp
     MatchFirst(regex, input)
 
 [<JSEmit("{0}.lastIndex = {2}; var matches = []; var m; while ((m = {0}.exec({1})) !== null) { matches.push(m) } return matches")>]
-let MatchesWithOffset(regex: Regex, input: string, offset: int): MatchCollection = failwith "never"
+let matchesWithOffsetUnsafe(regex: Regex, input: string, offset: int): MatchCollection = failwith "never"
+
+let MatchesWithOffset(regex: Regex, input: string, offset: int): MatchCollection =
+    let ms = matchesWithOffsetUnsafe(regex, input, offset)
+    FunScript.Core.ResizeArray.AddGetEnumerator(ms)
+    ms
 
 let Matches(regex: Regex, input: string) =
     MatchesWithOffset(regex, input, 0)

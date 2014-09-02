@@ -1,6 +1,9 @@
 ﻿module internal FunScript.Regexs
 
+open AST
+open Microsoft.FSharp.Quotations
 open System.Text.RegularExpressions
+
 
 let components = 
     [
@@ -30,21 +33,20 @@ let components =
         ExpressionReplacer.createUnsafe <@ fun (s, r, rep) -> Regex.Replace(s, r, replacement=rep) @> <@ Core.Regex.ReplaceStatic @>
         ExpressionReplacer.createUnsafe <@ fun (s, r, rep, o) -> Regex.Replace(s, r, replacement=rep, options=o) @> <@ Core.Regex.ReplaceStaticWithOptions @>
 
+        ExpressionReplacer.createUnsafe <@ fun (m: Capture) -> m.Index @>   <@ Core.Regex.Capture.Index @>
+        ExpressionReplacer.createUnsafe <@ fun (m: Capture) -> m.Length @>  <@ Core.Regex.Capture.Length @>
+        ExpressionReplacer.createUnsafe <@ fun (m: Capture) -> m.Value @>   <@ Core.Regex.Capture.Value @>
+
+        ExpressionReplacer.createUnsafe <@ fun (m: Group) -> m.Success @> <@ Core.Regex.Group.Success @>
+
         ExpressionReplacer.createUnsafe <@ fun (m: Match) -> m.Groups @>  <@ Core.Regex.Match.Groups @>
-        ExpressionReplacer.createUnsafe <@ fun (m: Match) -> m.Index @>   <@ Core.Regex.Match.Index @>
-        ExpressionReplacer.createUnsafe <@ fun (m: Match) -> m.Length @>  <@ Core.Regex.Match.Length @>
-        ExpressionReplacer.createUnsafe <@ fun (m: Match) -> m.Success @> <@ Core.Regex.Match.Success @>
-        ExpressionReplacer.createUnsafe <@ fun (m: Match) -> m.Value @>   <@ Core.Regex.Match.Value @>
 
-        ExpressionReplacer.createUnsafe <@ fun (ms: MatchCollection) -> ms.Count @> <@ Core.Regex.MatchCollection.Count @>
-        ExpressionReplacer.createUnsafe <@ fun (ms: MatchCollection) -> ms.GetEnumerator @> <@ Core.Regex.MatchCollection.GetEnumerator @>
-        ExpressionReplacer.createUnsafe <@ fun (ms: MatchCollection, index: int) -> ms.Item(index) @> <@ Core.Regex.MatchCollection.Item @>
+        ExpressionReplacer.createUnsafe <@ fun (ms: MatchCollection) -> ms.Count @> <@ Core.Regex.Collection.Count @>
+        ExpressionReplacer.createUnsafe <@ fun (ms: MatchCollection) -> ms.GetEnumerator() @> <@ Core.Regex.Collection.GetEnumerator @>
+        ExpressionReplacer.createUnsafe <@ fun (ms: MatchCollection, index: int) -> ms.Item(index) @> <@ Core.Regex.Collection.Item @>
 
-        ExpressionReplacer.createUnsafe <@ fun (m: Group) -> m.Length @>  <@ Core.Regex.Group.Length @>
-        ExpressionReplacer.createUnsafe <@ fun (m: Group) -> m.Value @>   <@ Core.Regex.Group.Value @>
-
-        ExpressionReplacer.createUnsafe <@ fun (ms: GroupCollection) -> ms.Count @> <@ Core.Regex.GroupCollection.Count @>
-        ExpressionReplacer.createUnsafe <@ fun (ms: GroupCollection) -> ms.GetEnumerator @> <@ Core.Regex.GroupCollection.GetEnumerator @>
-        ExpressionReplacer.createUnsafe <@ fun (ms: GroupCollection, index: int) -> ms.Item(index) @> <@ Core.Regex.GroupCollection.Item @>
+        ExpressionReplacer.createUnsafe <@ fun (ms: GroupCollection) -> ms.Count @> <@ Core.Regex.Collection.Count @>
+        ExpressionReplacer.createUnsafe <@ fun (ms: GroupCollection) -> ms.GetEnumerator() @> <@ Core.Regex.Collection.GetEnumerator @>
+        ExpressionReplacer.createUnsafe <@ fun (ms: GroupCollection, index: int) -> ms.Item(index) @> <@ Core.Regex.Collection.Item @>
     ]
 

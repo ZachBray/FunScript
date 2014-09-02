@@ -28,11 +28,22 @@ let ``ResizeArray creation with seq works``() =
       @@>
 
 [<Test>]
+let ``ResizeArray iteration works``() =
+   check 
+      <@@ 
+         let li = ResizeArray<_>(seq{1. .. 5.})
+         let acc = ref 0.
+         for i in li do
+            acc := !acc + i
+         !acc
+      @@>
+
+[<Test>]
 let ``ResizeArray folding works``() =
    check 
       <@@ 
          ResizeArray<_>(seq{1. .. 5.})
-         |>Seq.fold (fun acc item -> acc + item) 0.
+         |> Seq.fold (fun acc item -> acc + item) 0.
       @@>
 
 [<Test>]

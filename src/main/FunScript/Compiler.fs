@@ -16,6 +16,7 @@ let private allComponents =
       ReflectedDefinitions.components
       Arrays.components
       ResizeArrays.components
+      Dictionaries.components
       RecordTypes.components
       UnionTypes.components
       Tuples.components

@@ -105,9 +105,9 @@ let ``Match.Groups iteration works``(pattern) =
       <@@ 
          let str = "For more information, see Chapter 3.4.5.1"
          let m = Regex.Match(str, pattern)
-         let count = ref 0.
-         for g in m.Groups do count := !count + 1.
-         !count
+         let count = ref 0
+         for g in m.Groups do count := !count + g.Value.Length
+         float !count
       @@>
 
 [<TestCase("Chapter \d+(\.\d)*")>]
@@ -161,9 +161,9 @@ let ``Regex.Matches iteration works``(pattern) =
       <@@ 
          let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
          let ms = Regex.Matches(str, pattern, RegexOptions.IgnoreCase)
-         let count = ref 0.
-         for m in ms do count := !count + 1.
-         !count
+         let count = ref 0
+         for m in ms do count := !count + m.Value.Length
+         float !count
       @@>
 
 [<TestCase("[A-E]"); TestCase("(ZZ)+")>]
