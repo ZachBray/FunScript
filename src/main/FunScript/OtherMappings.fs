@@ -12,17 +12,12 @@ module Replacements =
 
 [<FunScript.JS>]
 module Extensions =
-    // Simple formatting from http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
-    [<FunScript.JSEmit("""if (typeof {0} === 'string' && {1}.length > 0) {
-	    var formattedString = {0}.replace(/{(\d+)}/g, function(match, number) {
-				    return typeof {1}[number] !== undefined ? {1}[number] : match
-		    })
-        console.log(formattedString)
-    }
-    else {
-	    console.log({0})
-    }""")>]
-    let logFormat(str: string, [<System.ParamArray>] args: obj[]): unit = failwith "never"
+    [<FunScript.JSEmitInline("console.log({0})")>]
+    let log(o: obj): unit = failwith "never"
+
+    let logFormat(str: string, [<System.ParamArray>] args: obj[]) =
+        if args.Length > 0 then log( System.String.Format(str, args) )
+        else log(str)
 
     [<FunScript.JSEmit("if ({0}) { console.log({1}) }")>]
     let logIf(condition: bool, o: obj): unit = failwith "never"
@@ -93,10 +88,6 @@ let components =
          ExpressionReplacer.createUnsafe 
             <@ fun x (y : CompressionMode) z -> new GZipStream(x, y, z) @> 
             <@ fun x y z -> Core.Web.GZipStream.Create(x, y, z) @>
-
-         ExpressionReplacer.createUnsafe
-            <@ fun (str: string, args: obj[]) -> System.Console.WriteLine(format=str, arg=args) @>
-            <@ Extensions.logFormat @>
 
          ExpressionReplacer.createUnsafe
             <@ fun (str: string, args: obj[]) -> System.Console.WriteLine(format=str, arg=args) @>

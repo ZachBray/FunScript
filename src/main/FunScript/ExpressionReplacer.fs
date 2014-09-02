@@ -83,7 +83,8 @@ let buildCall (mi:MethodInfo) exprs =
                 let normalArgExprs =   argExprs   |> Seq.take (paramInfos.Length - 1) |> Seq.toList
                 let arrayArgExpr  =    argExprs   |> Seq.skip (paramInfos.Length - 1) |> Seq.toList
                 let arrayArgExpr = match arrayArgExpr with
-                                   | [Patterns.NewArray _ ] -> List.head arrayArgExpr
+                                   | [ Patterns.NewArray _ ] -> List.head arrayArgExpr
+                                   | [ Patterns.Var arrayVar ] when arrayVar.Type.IsArray -> List.head arrayArgExpr
                                    | _ -> Expr.NewArray(paramInfos.[paramInfos.Length-1].ParameterType.GetElementType(), arrayArgExpr)
                 [
                     normalParamInfos |> List.map2 castExpr normalArgExprs
