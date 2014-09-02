@@ -9,14 +9,14 @@ module MutableDic =
     [<JSEmit("""var dic = {}
         Object.defineProperty(dic, "$isReadOnly", {
 	        enumerable: false,
-            configurable: false,
-            writable: true,
+	        configurable: false,
+	        writable: true,
 	        value: {0}
         })
         Object.defineProperty(dic, "GetEnumerator", {
 	        enumerable: false,
-            configurable: false,
-            writable: false,
+	        configurable: false,
+	        writable: false,
 	        value: function () {
 		        var _dic = this;
 		        var keys = Object.keys(_dic);
@@ -52,7 +52,6 @@ module MutableDic =
     [<JSEmitInline("Object.keys({0}).length")>]
     let EnumCount(dic: seq<_>): int = failwith "never"
 
-    // TODO: Add IsReadOnly property to JS dictionaries?
     [<JSEmitInline("{0}.$isReadOnly")>]
     let IsReadOnly(dic: seq<_>): bool = failwith "never"
 

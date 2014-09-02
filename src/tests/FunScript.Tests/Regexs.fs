@@ -70,7 +70,6 @@ let ``Regex.IsMatch with Multiline works``(pattern) =
 
 
 // NOTE: Tests for setting both flags at the same time are failing, but it works in actual code.
-
 //[<TestCase("^ab");TestCase("^cd");TestCase("^AB");TestCase("^CD")>]
 //let ``Regex.IsMatch with IgnoreCase and Multiline works``(pattern) =
 //   check 
