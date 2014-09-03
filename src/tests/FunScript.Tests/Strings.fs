@@ -107,6 +107,57 @@ let ``String.IndexOf works with offset``() =
       @@>
 
 [<Test>]
+let ``String.LastIndexOf works``() =
+   check 
+      <@@ 
+         "abcdbc".LastIndexOf("bc") * 100 + "abcd".LastIndexOf("bd") |> float
+      @@>
+
+[<Test>] 
+let ``String.LastIndexOf works with offset``() =
+   check 
+      <@@ 
+         "abcdbcebc".LastIndexOf("bc", 3) |> float
+      @@>
+
+[<TestCase("ab"); TestCase("cd"); TestCase("abcdx")>]
+let ``String.StartsWith works``(str:string) =
+   check  
+      <@@ 
+         "abcd".StartsWith(str)
+      @@>
+
+[<TestCase("ab"); TestCase("cd"); TestCase("abcdx")>]
+let ``String.EndsWith works``(str:string) =
+   check  
+      <@@ 
+         "abcd".EndsWith(str)
+      @@>
+
+[<Test>]
+let ``String.Trim works``() =
+   check 
+      <@@ 
+         "   abc   ".Trim()
+      @@>
+
+[<TestCase("ASP", "ASP.NET"); TestCase(1, 2)>]
+let ``String.Format works``(arg1, arg2) =
+   check 
+      <@@
+         String.Format("{0} is dead, but {1} is alive! {0}", arg1, arg2)
+      @@>
+
+// NOTE: This test doesn't work, but the correct Javascript is generated anyway
+//[<Test>]
+//let ``Console.WriteLine works``() =
+//   check 
+//      <@@
+//         Console.WriteLine("Testing, testing...")
+//         true
+//      @@>
+
+[<Test>]
 let ``String.Substring works``() =
    check 
       <@@ 

@@ -10,6 +10,32 @@ open System.Collections.Concurrent
 module Replacements =
     let utf8Encoding() = Core.Web.UTF8Encoding()
 
+[<FunScript.JS>]
+module Extensions =
+    [<FunScript.JSEmitInline("console.log({0})")>]
+    let log(o: obj): unit = failwith "never"
+
+    let logFormat(str: string, [<System.ParamArray>] args: obj[]) =
+        if args.Length > 0 then log( System.String.Format(str, args) )
+        else log(str)
+
+    [<FunScript.JSEmit("if ({0}) { console.log({1}) }")>]
+    let logIf(condition: bool, o: obj): unit = failwith "never"
+
+// NOTE: A call replacer with System.Diagnostics.Debug will fail if FunScript is compiled in Release mode, so use this function instead
+let private debugComponents =
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
+      function
+      | Patterns.Call(None,mi,args) when mi.DeclaringType.Name = "Debug" ->
+        let compile = fun quote -> let mi, _ = Quote.toMethodInfoFromLambdas quote
+                                   compiler.Compile returnStrategy (ExpressionReplacer.buildCall mi args)
+        match mi.Name with
+        | "WriteLine" -> compile <@ Extensions.logFormat @>
+        | "WriteLineIf" -> compile <@ Extensions.logIf @>
+        | _ -> []
+      | _ -> []
+
+
 let components = 
    [
       [
@@ -62,6 +88,12 @@ let components =
          ExpressionReplacer.createUnsafe 
             <@ fun x (y : CompressionMode) z -> new GZipStream(x, y, z) @> 
             <@ fun x y z -> Core.Web.GZipStream.Create(x, y, z) @>
+
+         ExpressionReplacer.createUnsafe
+            <@ fun (str: string, args: obj[]) -> System.Console.WriteLine(format=str, arg=args) @>
+            <@ Extensions.logFormat @>
+
+         debugComponents
       ]
 
       ExpressionReplacer.createTypeMethodMappings 
@@ -105,5 +137,9 @@ let components =
       ExpressionReplacer.createTypeMethodMappings
          typeof<System.Net.WebUtility>
          typeof<Core.Web.WebUtility>
+
+      ExpressionReplacer.createModuleMapping 
+         "FSharp.Core" "Microsoft.FSharp.Control.ObservableModule"
+         "FunScript" "FunScript.Core.Events.Observable"
 
    ] |> List.concat

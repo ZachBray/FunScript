@@ -13,8 +13,28 @@ let IndexOfWithoutOffset(s:string, search:string) : int = failwith "never"
 [<FunScript.JSEmitInline("{0}.indexOf({1}, {2})")>]
 let IndexOfWithOffset(s:string, search:string, offset:int) : int = failwith "never"
 
+[<FunScript.JSEmitInline("{0}.lastIndexOf({1})")>]
+let LastIndexOfWithoutOffset(s: string, search: string) : int = failwith "never"
+
+[<FunScript.JSEmitInline("{0}.lastIndexOf({1}, {2})")>]
+let LastIndexOfWithOffset(s: string, search: string, offset:int) : int = failwith "never"
+
+[<FunScript.JSEmitInline("{0}.trim()")>]
+let Trim(s: string): string = failwith "never"
+
 let StartsWith(s, search) =
     IndexOfWithoutOffset(s, search) = 0
+
+let EndsWith(s: string, search: string) =
+    let offset = s.Length - search.Length
+    let index = IndexOfWithOffset(s, search, offset)
+    index <> -1 && index = offset
+
+// Simple formatting from http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
+[<FunScript.JSEmit("""return {0}.replace(/{(\d+)}/g, function(match, number) {
+        return typeof {1}[number] !== undefined ? {1}[number] : match
+})""")>]
+let Format(s: string, [<System.ParamArray>] args: obj[]): string = failwith "never"
 
 [<FunScript.JSEmitInline("{0}.toLowerCase()")>]
 let ToLowerCase(s:string) : string = failwith "never"

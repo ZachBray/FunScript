@@ -15,6 +15,11 @@ let components =
          ExpressionReplacer.createUnsafe <@ fun (s:string) -> s.Replace("", "") @> <@ Core.String.Replace @>
          ExpressionReplacer.createUnsafe <@ fun (s:string) -> s.IndexOf : string -> int @> <@ Core.String.IndexOfWithoutOffset @>
          ExpressionReplacer.createUnsafe <@ fun (s:string) -> s.IndexOf : string * int -> int @> <@ Core.String.IndexOfWithOffset @>
+         ExpressionReplacer.createUnsafe <@ fun (s:string) -> s.LastIndexOf : string -> int @> <@ Core.String.LastIndexOfWithoutOffset @>
+         ExpressionReplacer.createUnsafe <@ fun (s:string) -> s.LastIndexOf : string * int -> int @> <@ Core.String.LastIndexOfWithOffset @>
+         ExpressionReplacer.createUnsafe <@ fun (s:string) -> s.StartsWith : string -> bool @> <@ Core.String.StartsWith @>
+         ExpressionReplacer.createUnsafe <@ fun (s:string) -> s.EndsWith : string -> bool @> <@ Core.String.EndsWith @>
+         ExpressionReplacer.createUnsafe <@ fun (s:string) -> s.Trim() @> <@ Core.String.Trim @>
          ExpressionReplacer.createUnsafe <@ fun (s:string) -> s.ToLower() @> <@ Core.String.ToLowerCase @>
          ExpressionReplacer.createUnsafe <@ fun (s:string) -> s.ToUpper() @> <@ Core.String.ToUpperCase @>
          ExpressionReplacer.createUnsafe <@ fun (s:string) -> s.Length @> <@ Core.String.Length @>

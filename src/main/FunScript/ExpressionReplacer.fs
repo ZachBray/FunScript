@@ -66,12 +66,31 @@ let buildCall (mi:MethodInfo) exprs =
       | objExpr::argExprs when not mi.IsStatic ->
          Some objExpr, argExprs
       | exprs -> None, exprs
-   let castArgs = 
-      mi.GetParameters() |> Array.toList
-      |> List.map2 (fun expr p ->
-         let castArg = castMi.MakeGenericMethod p.ParameterType
-         Expr.Call(castArg, [expr])
-      ) argExprs
+
+   // NOTE: The following 20 lines have been modified to prevent the "lists had different lengths" exceptions with ParamArray arguments.
+   // As a side effect, this allows using ParamArray in modules (not only methods) like in FunScript.Core.String.Format.
+   let paramInfos = mi.GetParameters()
+   let hasParamArray =
+      paramInfos.Length > 0 && paramInfos.[paramInfos.Length-1].GetCustomAttribute(typeof<ParamArrayAttribute>, false) <> null
+     
+   let castArgs =
+      let castExpr = fun expr (p: ParameterInfo) ->
+                        let castArg = castMi.MakeGenericMethod p.ParameterType
+                        Expr.Call(castArg, [expr])
+      match hasParamArray with
+      | false -> paramInfos |> Array.toList |> List.map2 castExpr argExprs
+      | true -> let normalParamInfos = paramInfos |> Seq.take (paramInfos.Length - 1) |> Seq.toList
+                let normalArgExprs =   argExprs   |> Seq.take (paramInfos.Length - 1) |> Seq.toList
+                let arrayArgExpr  =    argExprs   |> Seq.skip (paramInfos.Length - 1) |> Seq.toList
+                let arrayArgExpr = match arrayArgExpr with
+                                   | [ Patterns.NewArray _ ] -> List.head arrayArgExpr
+                                   | [ Patterns.Var arrayVar ] when arrayVar.Type.IsArray -> List.head arrayArgExpr
+                                   | _ -> Expr.NewArray(paramInfos.[paramInfos.Length-1].ParameterType.GetElementType(), arrayArgExpr)
+                [
+                    normalParamInfos |> List.map2 castExpr normalArgExprs
+                    [ paramInfos.[paramInfos.Length - 1] |> castExpr arrayArgExpr ]
+                ] |> List.concat
+
    match obj with
    | None -> Expr.Call(mi, castArgs)
    | Some objExpr ->
