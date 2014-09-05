@@ -72,7 +72,7 @@ module Observable =
         | Choice1Of2 x -> (succeed x)
         | Choice2Of2 e -> (fail e)
 
-    type internal MapObservable<'T,'U>(f: 'T->'U, w: IObservable<'T>) =
+    type private MapObservable<'T,'U>(f: 'T->'U, w: IObservable<'T>) =
         interface IObservable<'U> with
             member x.Subscribe(observer) =
                 let newObserver =
@@ -83,7 +83,7 @@ module Observable =
                     )
                 w.Subscribe(newObserver)
 
-    type internal ChooseObservable<'T,'U>(f: 'T->'U option, w: IObservable<'T>) =
+    type private ChooseObservable<'T,'U>(f: 'T->'U option, w: IObservable<'T>) =
         interface IObservable<'U> with
             member x.Subscribe(observer) =
                 let newObserver =
@@ -94,7 +94,7 @@ module Observable =
                     )
                 w.Subscribe(newObserver)
 
-    type internal ScanObservable<'T,'U>(f: 'U->'T->'U, z: 'U, w: IObservable<'T>) =
+    type private ScanObservable<'T,'U>(f: 'U->'T->'U, z: 'U, w: IObservable<'T>) =
         interface IObservable<'U> with
             member x.Subscribe(observer) =
                 let state = ref z
@@ -106,7 +106,7 @@ module Observable =
                     )
                 w.Subscribe(newObserver)
 
-    type internal PairwiseObservable<'T>(w: IObservable<'T>) =
+    type private PairwiseObservable<'T>(w: IObservable<'T>) =
         interface IObservable<'T*'T> with
             member x.Subscribe(observer) =
                 let lastArgs = ref None
@@ -118,7 +118,7 @@ module Observable =
                     )
                 w.Subscribe(newObserver)
 
-    type internal MergeObservable<'T>(w1: IObservable<'T>, w2: IObservable<'T>) =
+    type private MergeObservable<'T>(w1: IObservable<'T>, w2: IObservable<'T>) =
         interface IObservable<'T> with
             member x.Subscribe(observer) =
                 let stopped = ref false
