@@ -49,6 +49,23 @@ let createCallerReplacer methodInfo callType replacement replace =
 open Microsoft.FSharp.Quotations
 open System.Reflection
 
+let generateMacro quote genExpr =
+    let mi, callType = Quote.toMethodBaseFromLambdas quote
+    createCallerReplacer mi callType None <| fun split compiler returnStrategy args ->
+        let exprs =
+            match args with
+            | None, _, exprs -> exprs
+            | Some expr, _, exprs -> expr::exprs
+        match genExpr split compiler returnStrategy exprs with
+        | None -> []
+        | Some fixedExpr -> compiler.Compile returnStrategy fixedExpr
+
+let generateBinaryMacro quote genExpr =
+    generateMacro quote (fun split compiler returnStrategy ->
+        function
+        | [exprA; exprB] -> genExpr split compiler returnStrategy exprA exprB
+        | _ -> None)
+
 let generateArityWithCompiler quote (|ArgMatch|_|) =
    let mi, callType = Quote.toMethodBaseFromLambdas quote
    createCallerReplacer mi callType None <| fun split compiler returnStategy ->
@@ -104,6 +121,12 @@ let binaryTyped quote genCode =
          | None -> None      
       | _ -> None)
 
+let binaryTypedExpr quote genCode =
+    generateArity quote (fun _ split ->
+      function
+      | [exprA; exprB] -> genCode split exprA exprB  
+      | _ -> None)
+
 let binary quote genCode = binaryTyped quote (fun _ _ a _ b -> Some([], genCode a b))
 
 let binaryStatement quote genCode =
@@ -112,9 +135,6 @@ let binaryStatement quote genCode =
       | [Split(declLHS, refLHS); Split(declRHS, refRHS)] ->
          Some ([declLHS; declRHS; [genCode refLHS refRHS]], Null)         
       | _ -> None)
-
-let binaryOp quote symbol =
-   binary quote (fun refLHS refRHS -> BinaryOp(refLHS, symbol, refRHS))
 
 let ternary quote genCode =
    generateArity quote (fun _ (|Split|) ->

@@ -162,7 +162,7 @@ let createTypeMethodMappings (fromType:Type) (toType:Type) =
       |> Array.toList
    availableMethods
 
-let private getModule assembly (name:string) =
+let getModule assembly (name:string) =
    let ass =
       AppDomain.CurrentDomain.GetAssemblies()
       |> Seq.find (fun ass -> ass.GetName().Name = assembly)

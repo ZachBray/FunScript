@@ -79,6 +79,8 @@
     <Compile Include="ExpressionReplacer.fs" />
     <Compile Include="Reflection.fs" />
     <Compile Include="PrimitiveTypes.fs" />
+    <Compile Include="Objects.fs" />
+    <Compile Include="ReflectedDefinitions.fs" />
     <Compile Include="Comparison.fs" />
     <Compile Include="Arithmetic.fs" />
     <Compile Include="Logic.fs" />
@@ -93,7 +95,6 @@
     <Compile Include="Options.fs" />
     <Compile Include="Sets.fs" />
     <Compile Include="Maps.fs" />
-    <Compile Include="Objects.fs" />
     <Compile Include="CommonOperators.fs" />
     <Compile Include="Strings.fs" />
     <Compile Include="Regexs.fs" />
@@ -103,7 +104,6 @@
     <Compile Include="UnionTypes.fs" />
     <Compile Include="RecordTypes.fs" />
     <Compile Include="Tuples.fs" />
-    <Compile Include="ReflectedDefinitions.fs" />
     <Compile Include="Compiler.fs" />
   </ItemGroup>
   <ItemGroup>

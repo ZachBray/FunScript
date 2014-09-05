@@ -7,35 +7,6 @@ open Microsoft.FSharp.Reflection
 let itemsPropName = "Items"
 let getItem i ref = IndexGet(PropertyGet(ref, itemsPropName), Number(float i))
 
-let genComparisonFunc ts =
-   let that = Var("that", typeof<obj>)
-   let diff = Var("diff", typeof<obj>)
-      
-   let fields =
-      ts |> List.mapi (fun i x -> i, x)
-
-   let body =
-      List.foldBack (fun (i, t) acc ->
-         let thisField = This |> getItem i
-         let thatField = Reference that |> getItem i
-         let decls, compareExpr = Comparison.compareCall t thisField t thatField |> Option.get
-         [  yield! decls
-            yield Assign(Reference diff, compareExpr)
-            yield IfThenElse(
-               BinaryOp(Reference diff, "!=", Number 0.),
-               Block [ Return <| Reference diff ],
-               Block acc)
-         ]) fields [ Return <| Number 0. ]
-      
-   Lambda(
-      [that],
-      Block <| DeclareAndAssign(diff, Number 0.) :: body
-   )
-
-let genComparisonMethods ts =
-    let func = genComparisonFunc ts
-    [ "CompareTo", func ]
-
 let getTupleVars n =
    [ 0 .. n - 1] |> List.map (fun i -> Var(sprintf "Item%i" i, typeof<obj>))
 
@@ -61,12 +32,7 @@ let private creation =
          let name = sprintf "Tuple%s" specialization
          let cons = 
             compiler.DefineGlobal name (fun var -> 
-               [  yield Assign(Reference var, Lambda <| createConstructor n compiler) 
-                  let methods = genComparisonMethods typeArgs
-                  let proto = PropertyGet(Reference var, "prototype")
-                  for name, lambda in methods do
-                     yield Assign(PropertyGet(proto, name), lambda)
-               ])
+               [Assign(Reference var, Lambda <| createConstructor n compiler)])
          [  yield! decls |> Seq.concat 
             yield returnStategy.Return <| New(cons, refs)
          ]

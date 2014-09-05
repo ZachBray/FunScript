@@ -5,36 +5,6 @@ open Quote
 open Microsoft.FSharp.Quotations
 open System.Reflection
 
-let genComparisonFunc t =
-   let fields = Objects.getFields t
-   let that = Var("that", typeof<obj>)
-   let diff = Var("diff", typeof<obj>)
-      
-   let body =
-      List.foldBack (fun (name, t) acc ->
-         let thisField = PropertyGet(This, name)
-         let thatField = PropertyGet(Reference that, name)
-         let compareDecls, compareExpr = 
-            Comparison.compareCall t thisField t thatField |> Option.get
-         [  
-            yield! compareDecls
-            yield Assign(Reference diff, compareExpr)
-            yield IfThenElse(
-               BinaryOp(Reference diff, "!=", Number 0.),
-               Block [ Return <| Reference diff ],
-               Block acc)
-         ]) fields [ Return <| Number 0. ]
-      
-   Lambda(
-      [that],
-      Block <| DeclareAndAssign(diff, Number 0.) :: body
-   )
-
-let genComparisonMethods t =
-    // TODO: What about overriden comparability
-    let func = genComparisonFunc t
-    [ "CompareTo", func ]
-
 let private getRecordVars recType =
    Objects.getFields recType
    |> Seq.map fst
@@ -68,14 +38,7 @@ let private creation =
          let name = Reflection.getRecordConstructorName compiler recType
          let cons = 
             compiler.DefineGlobal name (fun var -> 
-               [ 
-                  yield Assign(Reference var, Lambda <| createConstructor recType compiler) 
-                  let comparisonMethods = genComparisonMethods recType
-                  let proto = PropertyGet(Reference var, "prototype")
-                  for name, lambda in comparisonMethods do
-                     yield Assign(PropertyGet(proto, name), lambda)
-               ]
-            )
+               [Assign(Reference var, Lambda <| createConstructor recType compiler)])
          [ yield! decls |> Seq.concat 
            yield returnStategy.Return <| New(cons, refs)
          ]

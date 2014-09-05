@@ -200,84 +200,41 @@ let ``structural greater than or equal to works``() =
             personA >= personB
          @@>
 
+let forVariousTuplesCheck f =
+    for x in [0; 1] do
+    for y in [0; 1] do
+    for r in [0; 1] do
+    for s in [0; 1] do
+        check 
+            <@@
+                let a = x, y
+                let b = r, s
+                (%f) a b
+            @@>
 
 [<Test>]
 let ``tuple equality works``() =
-   for x in [0; 1] do
-   for y in [0; 1] do
-   for r in [0; 1] do
-   for s in [0; 1] do
-      check
-         <@@
-            let a = x, y
-            let b = r, s
-            a = b
-         @@>
+   forVariousTuplesCheck <@ (=) @>
 
 [<Test>]
 let ``tuple inequality works``() =
-   for x in [0; 1] do
-   for y in [0; 1] do
-   for r in [0; 1] do
-   for s in [0; 1] do
-      check
-         <@@
-            let a = x, y
-            let b = r, s
-            a <> b
-         @@>
+   forVariousTuplesCheck <@ (<>) @>
 
 [<Test>]
 let ``tuple greater than works``() =
-   for x in [0; 1] do
-   for y in [0; 1] do
-   for r in [0; 1] do
-   for s in [0; 1] do
-      check
-         <@@
-            let a = x, y
-            let b = r, s
-            a > b
-         @@>
+   forVariousTuplesCheck <@ (>) @>
 
 [<Test>]
 let ``tuple greater than or equal works``() =
-   for x in [0; 1] do
-   for y in [0; 1] do
-   for r in [0; 1] do
-   for s in [0; 1] do
-      check
-         <@@
-            let a = x, y
-            let b = r, s
-            a > b
-         @@>
+   forVariousTuplesCheck <@ (>=) @>
 
 [<Test>]
 let ``tuple less than works``() =
-   for x in [0; 1] do
-   for y in [0; 1] do
-   for r in [0; 1] do
-   for s in [0; 1] do
-      check
-         <@@
-            let a = x, y
-            let b = r, s
-            a < b
-         @@>
+   forVariousTuplesCheck <@ (<) @>
 
 [<Test>]
 let ``tuple less than or equal works``() =
-   for x in [0; 1] do
-   for y in [0; 1] do
-   for r in [0; 1] do
-   for s in [0; 1] do
-      check
-         <@@
-            let a = x, y
-            let b = r, s
-            a <= b
-         @@>
+   forVariousTuplesCheck <@ (<=) @>
 
 type 'a RoseTree = RoseTree of 'a * 'a RoseTree []
 
@@ -346,3 +303,214 @@ let ``recursive type less than or equal works``() =
                let b = RoseTree(1, [| RoseTree(2, [||]); RoseTree(y, [||]) |])
                a <= b
             @@>
+
+let forVariousListsCheck f =
+    for x in [0; 1] do
+    for y in [0; 1] do
+    for r in [0; 1] do
+    for s in [0; 1] do
+        check 
+            <@@
+                let a = [x; y]
+                let b = [r; s]
+                (%f) a b
+            @@>
+
+[<Test>]
+let ``list equality works``() =
+   forVariousListsCheck <@ (=) @>
+
+[<Test>]
+let ``list inequality works``() =
+   forVariousListsCheck <@ (<>) @>
+
+[<Test>]
+let ``list greater than works``() =
+   forVariousListsCheck <@ (>) @>
+
+[<Test>]
+let ``list greater than or equal works``() =
+   forVariousListsCheck <@ (>=) @>
+
+[<Test>]
+let ``list less than works``() =
+   forVariousListsCheck <@ (<) @>
+
+[<Test>]
+let ``list less than or equal works``() =
+   forVariousListsCheck <@ (<=) @>
+
+let forVariousMapsCheck f =
+    for x in [0; 1] do
+    for y in [0; 1] do
+    for r in [0; 1] do
+    for s in [0; 1] do
+        check 
+            <@@
+                let a = Map.empty |> Map.add x y
+                let b = Map.empty |> Map.add r s
+                (%f) a b
+            @@>
+
+[<Test>]
+let ``map equality works``() =
+   forVariousMapsCheck <@ (=) @>
+
+[<Test>]
+let ``map inequality works``() =
+   forVariousMapsCheck <@ (<>) @>
+
+[<Test>]
+let ``map greater than works``() =
+   forVariousMapsCheck <@ (>) @>
+
+[<Test>]
+let ``map greater than or equal works``() =
+   forVariousMapsCheck <@ (>=) @>
+
+[<Test>]
+let ``map less than works``() =
+   forVariousMapsCheck <@ (<) @>
+
+[<Test>]
+let ``map less than or equal works``() =
+   forVariousMapsCheck <@ (<=) @>
+
+let forVariousSetsCheck f =
+    for x in [0; 1] do
+    for y in [0; 1] do
+    for r in [0; 1] do
+    for s in [0; 1] do
+        check 
+            <@@
+                let a = Set.empty |> Set.add x |> Set.add y
+                let b = Set.empty |> Set.add r |> Set.add s
+                (%f) a b
+            @@>
+
+[<Test>]
+let ``set equality works``() =
+   forVariousSetsCheck <@ (=) @>
+
+[<Test>]
+let ``set inequality works``() =
+   forVariousSetsCheck <@ (<>) @>
+
+[<Test>]
+let ``set greater than works``() =
+   forVariousSetsCheck <@ (>) @>
+
+[<Test>]
+let ``set greater than or equal works``() =
+   forVariousSetsCheck <@ (>=) @>
+
+[<Test>]
+let ``set less than works``() =
+   forVariousSetsCheck <@ (<) @>
+
+[<Test>]
+let ``set less than or equal works``() =
+   forVariousSetsCheck <@ (<=) @>
+
+[<JS>]
+type CustomComparable<'a, 'b when 'a : comparison and 'b : comparison>(x:'a, y:'b) =
+    member val private X = x
+    member val private Y = y
+    override this.Equals obj = 
+        let that = obj :?> CustomComparable<'a, 'b>
+        compare this that = 0
+    override __.GetHashCode() = failwith "Not implemented"
+    interface System.IComparable with
+        member this.CompareTo(obj) =
+            let that = obj :?> CustomComparable<'a, 'b>
+            let diff = compare this.X that.X
+            if diff <> 0 then diff
+            else compare this.Y that.Y
+
+let forVariousCustomComparablesCheck f =
+    for x in [0; 1] do
+    for y in ["0"; "1"] do
+    for r in [0; 1] do
+    for s in ["0"; "1"] do
+        check 
+            <@@
+                let a = CustomComparable(x, y)
+                let b = CustomComparable(r, s)
+                (%f) a b
+            @@>
+
+[<Test>]
+let ``custom IComparable implementation equality works``() =
+   forVariousCustomComparablesCheck <@ (=) @>
+
+[<Test>]
+let ``custom IComparable implementation inequality works``() =
+   forVariousCustomComparablesCheck <@ (<>) @>
+
+[<Test>]
+let ``custom IComparable implementation greater than works``() =
+   forVariousCustomComparablesCheck <@ (>) @>
+
+[<Test>]
+let ``custom IComparable implementation greater than or equal works``() =
+   forVariousCustomComparablesCheck <@ (>=) @>
+
+[<Test>]
+let ``custom IComparable implementation less than works``() =
+   forVariousCustomComparablesCheck <@ (<) @>
+
+[<Test>]
+let ``custom IComparable implementation less than or equal works``() =
+   forVariousCustomComparablesCheck <@ (<=) @>
+
+
+[<JS; CustomComparison; CustomEquality>]
+type CustomComparableRecord<'a, 'b when 'a : comparison and 'b : comparison> = 
+    { X : 'a; Y : 'b }
+    override this.Equals obj = 
+        let that = obj :?> CustomComparableRecord<'a, 'b>
+        compare this that = 0
+    override __.GetHashCode() = failwith "Not implemented"
+    interface System.IComparable with
+        member this.CompareTo(obj) =
+            let that = obj :?> CustomComparableRecord<'a, 'b>
+            let diff = compare this.X that.X
+            if diff <> 0 then diff
+            else compare this.Y that.Y
+            
+
+let forVariousCustomRecordComparablesCheck f =
+    for x in [0; 1] do
+    for y in ["0"; "1"] do
+    for r in [0; 1] do
+    for s in ["0"; "1"] do
+        check 
+            <@@
+                let a = CustomComparable(x, y)
+                let b = CustomComparable(r, s)
+                (%f) a b
+            @@>
+
+[<Test>]
+let ``custom IComparable record implementation equality works``() =
+   forVariousCustomComparablesCheck <@ (=) @>
+
+[<Test>]
+let ``custom IComparable record implementation inequality works``() =
+   forVariousCustomRecordComparablesCheck <@ (<>) @>
+
+[<Test>]
+let ``custom IComparable record implementation greater than works``() =
+   forVariousCustomRecordComparablesCheck <@ (>) @>
+
+[<Test>]
+let ``custom IComparable record implementation greater than or equal works``() =
+   forVariousCustomRecordComparablesCheck <@ (>=) @>
+
+[<Test>]
+let ``custom IComparable record implementation less than works``() =
+   forVariousCustomRecordComparablesCheck <@ (<) @>
+
+[<Test>]
+let ``custom IComparable record implementation less than or equal works``() =
+   forVariousCustomRecordComparablesCheck <@ (<=) @>

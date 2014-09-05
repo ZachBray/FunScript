@@ -41,15 +41,21 @@ let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list)
 
 let private (|CallPattern|_|) = Objects.methodCallPattern
 
-let private createGlobalMethod name compiler mb callType =
+let tryCreateGlobalMethod name compiler mb callType =
    match Objects.replaceIfAvailable compiler mb callType with
-   | (CallPattern getVarsExpr as replacementMi) ->
+   | CallPattern getVarsExpr as replacementMi ->
       let typeArgs = Reflection.getGenericMethodArgs replacementMi
       let specialization = Reflection.getSpecializationString compiler typeArgs
-      compiler.DefineGlobal (name + specialization) (fun var ->
-         let vars, bodyExpr = getVarsExpr()
-         genMethod mb replacementMi vars bodyExpr var compiler)
-   | _ -> failwithf "No reflected definition for method: %s" mb.Name
+      Some(
+         compiler.DefineGlobal (name + specialization) (fun var ->
+            let vars, bodyExpr = getVarsExpr()
+            genMethod mb replacementMi vars bodyExpr var compiler))
+   | _ -> None
+
+let createGlobalMethod name compiler mb callType =
+    match tryCreateGlobalMethod name compiler mb callType with
+    | None -> failwithf "No reflected definition for method: %s" mb.Name
+    | Some x -> x
 
 let private createConstruction
       (|Split|) 
