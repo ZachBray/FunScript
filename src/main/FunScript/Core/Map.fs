@@ -479,15 +479,16 @@ type Map<[<EqualityConditionalOn>]'Key,[<EqualityConditionalOn;ComparisonConditi
    interface System.Collections.IEnumerable with
       member m.GetEnumerator() = (MapTree.mkIEnumerator tree :> System.Collections.IEnumerator)
 
-   interface System.IComparable with 
+   
+   interface System.IComparable with
       member m.CompareTo(obj: obj) = 
-            let m2 = obj :?> Map<'Key,'Value> 
+            let m2 = obj :?> Map<'Key,'Value>
             Seq.compareWith 
                (fun (kvp1 : FunScript.Core.LanguagePrimitives.KeyValuePair<_,_>) 
                     (kvp2 : FunScript.Core.LanguagePrimitives.KeyValuePair<_,_>)-> 
                   let c = comparer.Compare(kvp1.Key,kvp2.Key) in 
                   if c <> 0 then c else Unchecked.compare kvp1.Value kvp2.Value)
-               m m2 
+               m m2
 
 [<CompiledName("IsEmpty")>]
 let isEmpty (m:Map<_,_>) = m.IsEmpty

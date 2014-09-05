@@ -161,6 +161,24 @@ type Compiler(components, shouldFlattenGenericsForReflection) as this =
          (List.append declarations assignments)
          initialization
 
+   let tryFixDeclaringTypeGenericParameters (originalMethod:MethodBase) (replacementMethod:MethodInfo) =
+        let genericTypeDefinition = 
+            if replacementMethod.DeclaringType.IsGenericType then Some(replacementMethod.DeclaringType.GetGenericTypeDefinition())
+            elif replacementMethod.DeclaringType.IsGenericTypeDefinition then Some replacementMethod.DeclaringType
+            else None
+        match genericTypeDefinition with
+        | None -> replacementMethod
+        | Some gt ->
+            let typedDeclaringType = gt.MakeGenericType(originalMethod.DeclaringType.GetGenericArguments())
+            let flags = BindingFlags.Instance ||| BindingFlags.Static ||| BindingFlags.NonPublic ||| BindingFlags.Public
+            typedDeclaringType.GetMethods(flags)
+            |> Seq.append (
+                typedDeclaringType.GetInterfaces() 
+                |> Seq.collect (fun it -> typedDeclaringType.GetInterfaceMap(it).TargetMethods))
+            |> Seq.find (fun m -> m.Name = replacementMethod.Name 
+                                  && m.IsStatic = replacementMethod.IsStatic // TODO: We may need to make this comparison safer
+                                  && m.GetParameters().Length = replacementMethod.GetParameters().Length) 
+
    member __.Compile returnStategy expr  = 
       compile returnStategy expr
 
@@ -179,7 +197,7 @@ type Compiler(components, shouldFlattenGenericsForReflection) as this =
                match rs.TryFind paramKey with
                | None -> (rs |> Seq.head).Value
                | Some r -> r
-            r)
+            tryFixDeclaringTypeGenericParameters pi r)
 
       member __.NextTempVar() = 
          incr nextId
