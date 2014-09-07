@@ -112,9 +112,13 @@ type Async =
                   CancelledCont = ignore; CancellationToken = token }
       f { Cont = ignore; Aux = aux }
 
-   static member Sleep(milliseconds:int) = 
-      Async.FromContinuations(fun (cont, econt, ccont) ->
-         setTimeout((fun _ -> cont()), float milliseconds) |> ignore )
+   static member Sleep(milliseconds:int) = protectedCont <| fun k ->
+      setTimeout((fun _ ->
+        k.Aux.CancellationToken.ThrowIfCancellationRequested()
+        k.Cont()), float milliseconds) |> ignore
+
+   static member CancellationToken = protectedCont <| fun k ->
+      k.Cont k.Aux.CancellationToken
 
 (*
    static member AwaitJQueryEvent(f : ('T -> unit) -> j._JQuery) : Async<'T> = 
