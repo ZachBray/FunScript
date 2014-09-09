@@ -165,6 +165,7 @@ type WebResponse(contents) =
 [<JS>]
 type WebRequest(url : string) =
     let requestStream = new Stream([||], ignore)
+    member val Url = url
     member val Headers = WebHeaderCollection()
     member val Method = "GET" with get, set
     member __.GetRequestStream() = requestStream
