@@ -65,6 +65,7 @@
     <Compile Include="Core\Map.fs" />
     <Compile Include="Core\String.fs" />
     <Compile Include="Core\Regex.fs" />
+    <Compile Include="Core\DateTime.fs" />
     <Compile Include="Core\Events.fs" />
     <Compile Include="Core\Async.fs" />
     <Compile Include="Core\Type.fs" />
@@ -100,6 +101,7 @@
     <Compile Include="CommonOperators.fs" />
     <Compile Include="Strings.fs" />
     <Compile Include="Regexs.fs" />
+    <Compile Include="DateTimes.fs" />
     <Compile Include="TypeConversion.fs" />
     <Compile Include="OtherMappings.fs" />
     <Compile Include="Asyncs.fs" />

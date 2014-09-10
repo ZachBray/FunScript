@@ -12,6 +12,7 @@ let private allComponents =
       Lists.components
       Strings.components
       Regexs.components
+      DateTimes.components
       Asyncs.components
       ReflectedDefinitions.components
       Arrays.components
