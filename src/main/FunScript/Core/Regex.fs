@@ -36,7 +36,7 @@ module Match =
 
     let Groups(m: Match): GroupCollection =
         let gs = groupsUnsafe(m)
-        FunScript.Core.ResizeArray.AddGetEnumerator(gs)
+        FunScript.Core.Enumerator.AddArrayEnumerator(gs)
         gs
 
 // TODO: Throw exception if ECMAScript is not set? But this would make Regex creation more verbose...
@@ -94,7 +94,7 @@ let matchesWithOffsetUnsafe(regex: Regex, input: string, offset: int): MatchColl
 
 let MatchesWithOffset(regex: Regex, input: string, offset: int): MatchCollection =
     let ms = matchesWithOffsetUnsafe(regex, input, offset)
-    FunScript.Core.ResizeArray.AddGetEnumerator(ms)
+    FunScript.Core.Enumerator.AddArrayEnumerator(ms)
     ms
 
 let Matches(regex: Regex, input: string) =

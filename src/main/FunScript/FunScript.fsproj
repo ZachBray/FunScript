@@ -55,6 +55,7 @@
     <Compile Include="Core\LanguagePrimitives.fs" />
     <Compile Include="Core\GenericConstants.fs" />
     <Compile Include="Core\Array.fs" />
+    <Compile Include="Core\Enumerator.fs" />
     <Compile Include="Core\ResizeArray.fs" />
     <Compile Include="Core\list.fs" />
     <Compile Include="Core\Option.fs" />
@@ -88,6 +89,7 @@
     <Compile Include="LambdaApplication.fs" />
     <Compile Include="ControlFlow.fs" />
     <Compile Include="Arrays.fs" />
+    <Compile Include="Enumerator.fs" />
     <Compile Include="ResizeArrays.fs" />
     <Compile Include="Dictionaries.fs" />
     <Compile Include="Lists.fs" />

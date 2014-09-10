@@ -4,61 +4,12 @@ module FunScript.Core.ResizeArray
 open FunScript
 open System.Collections.Generic
 
-module Enumerator =
-    [<JSEmitInline("{0}.MoveNext()")>]
-    let NonGenericMoveNext (e: System.Collections.IEnumerator): bool = failwith "never"
-
-    [<JSEmitInline("{0}.get_Current()")>]
-    let NonGenericCurrent (e: System.Collections.IEnumerator): 'a = failwith "never"
-
-    [<JSEmitInline("{0}.MoveNext()")>]
-    let ListMoveNext (e: IEnumerator<'a>): bool = failwith "never"
-
-    [<JSEmitInline("{0}.get_Current()")>]
-    let ListCurrent (e: IEnumerator<'a>): 'a = failwith "never"
-
-    [<JSEmitInline("{0}.MoveNext()")>]
-    let DicMoveNext(e: Dictionary.Enumerator<'k, 'v> ): bool = failwith "never"
-
-    [<JSEmitInline("{0}.get_Current()")>]
-    let DicCurrent(e: Dictionary.Enumerator<'k, 'v> ): KeyValuePair<'k,'v> = failwith "never"
-
-    [<JSEmitInline("{0}.MoveNext()")>]
-    let KeyColMoveNext(e: Dictionary.KeyCollection.Enumerator<'k, 'v> ): bool = failwith "never"
-
-    [<JSEmitInline("{0}.get_Current()")>]
-    let KeyColCurrent(e: Dictionary.KeyCollection.Enumerator<'k, 'v> ): KeyValuePair<'k,'v> = failwith "never"
-
-    [<JSEmitInline("{0}.MoveNext()")>]
-    let ValueColMoveNext(e: Dictionary.ValueCollection.Enumerator<'k, 'v> ): bool = failwith "never"
-
-    [<JSEmitInline("{0}.get_Current()")>]
-    let ValueColCurrent(e: Dictionary.ValueCollection.Enumerator<'k, 'v> ): KeyValuePair<'k,'v> = failwith "never"
-
-
-[<JSEmit("""Object.defineProperty({0}, "GetEnumerator", {
-	    enumerable: false,
-	    value: function () {
-		    var array = this;
-		    var index = -1;
-		    return {
-			    MoveNext: function() {
-				    index++;
-				    return index < array.length;
-			    },
-			    get_Current: function() { return array[index]; },
-			    Dispose:  	 function() { }
-		    }
-	    }
-    })""")>]
-let AddGetEnumerator xs: unit = failwith "never"
-
 [<JSEmitInline("[]")>]
 let private createUnsafe(): ResizeArray<'a> = failwith "never"
 
 let ZeroCreate(): ResizeArray<'a> =
     let ra = createUnsafe()
-    AddGetEnumerator(ra)
+    FunScript.Core.Enumerator.AddArrayEnumerator(ra)
     ra
 
 // NOTE: If we use 'new Array(size)' the array is automatically filled with undefined values which is not

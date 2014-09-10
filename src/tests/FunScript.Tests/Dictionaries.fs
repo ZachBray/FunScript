@@ -21,7 +21,7 @@ let ``Dictionary creation with size works``() =
       @@>
 
 [<Test>]
-let ``IDictionary creation works``() =
+let ``Interface IDictionary creation works``() =
    check 
       <@@ 
          let dic = dict <| seq { for i in 1. .. 10. -> i.ToString(), i*i }
@@ -40,7 +40,7 @@ let ``Dictionary creation from IDictionary works``() =
       @@>
 
 [<Test>]
-let ``IDictionary iteration works``() =
+let ``Interface IDictionary iteration works``() =
    check 
       <@@ 
          let dic = dict <| seq { for i in 1. .. 10. -> i.ToString(), i*i }
@@ -51,7 +51,7 @@ let ``IDictionary iteration works``() =
       @@>
 
 [<Test>]
-let ``IDictionary.IsReadOnly works``() =
+let ``Interface IDictionary.IsReadOnly works``() =
    check 
       <@@ 
          let dic = dict <| seq { for i in 1. .. 10. -> i.ToString(), i*i }
@@ -181,7 +181,7 @@ let ``Dictionary.Remove works``(str:string) =
       @@>
 
 [<Test>]
-let ``IDictionary.Count works``() =
+let ``Interface IDictionary.Count works``() =
    check 
       <@@ 
          let dic = dict <| seq { for i in 1. .. 10. -> i.ToString(), i*i }
@@ -189,7 +189,7 @@ let ``IDictionary.Count works``() =
       @@>
 
 [<Test>]
-let ``IDictionary indexer getter works``() =
+let ``Interface IDictionary indexer getter works``() =
    check 
       <@@
          let dic = dict <| seq { for i in 1. .. 10. -> i.ToString(), i*i }
@@ -197,7 +197,7 @@ let ``IDictionary indexer getter works``() =
       @@>
 
 [<Test>]
-let ``IDictionary.Keys works``() =
+let ``Interface IDictionary.Keys works``() =
    check 
       <@@ 
          let dic = dict <| seq { for i in 1. .. 10. -> i.ToString(), i*i }
@@ -208,7 +208,7 @@ let ``IDictionary.Keys works``() =
       @@>
 
 [<Test>]
-let ``IDictionary.Values works``() =
+let ``Interface IDictionary.Values works``() =
    check 
       <@@ 
          let dic = dict <| seq { for i in 1. .. 10. -> i.ToString(), i*i }
@@ -219,7 +219,7 @@ let ``IDictionary.Values works``() =
       @@>
 
 [<TestCase("A"); TestCase("C")>]
-let ``IDictionary.ContainsKey works``(str:string) =
+let ``Interface IDictionary.ContainsKey works``(str:string) =
    check  
       <@@
          let dic = dict <| [ ("A", 1.); ("B", 2.) ]
