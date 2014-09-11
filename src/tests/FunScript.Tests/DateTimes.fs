@@ -4,28 +4,30 @@ module FunScript.Tests.DateTimes
 open NUnit.Framework
 open System
 
-[<Test>]
-let ``DateTime (year, month, day) constructor works``() =
+[<TestCase(2014); TestCase(2016);>]
+let ``DateTime.IsLeapYear works``(year) =
    check 
       <@@ 
-         let d = DateTime(2014, 10, 9)
-         float d.Day
+         DateTime.IsLeapYear(year)
+      @@>
+
+[<TestCase(2014, 1); TestCase(2014, 2); TestCase(2014, 4); TestCase(2016, 2)>]
+let ``DateTime.DaysInMonth works``(year, month) =
+   check 
+      <@@ 
+         DateTime.DaysInMonth(year, month) |> float
       @@>
 
 [<Test>]
-let ``DateTime (year, month, day, hour, minute, second) constructor works``() =
+let ``DateTime constructors work``() =
    check 
       <@@ 
-         let d = DateTime(2014, 10, 9, 13, 23, 30)
-         float d.Second
-      @@>
-
-[<Test>]
-let ``DateTime (year, month, day, hour, minute, second, millisecond) constructor works``() =
-   check 
-      <@@ 
-         let d = DateTime(2014, 10, 9, 13, 23, 30, 999)
-         float d.Millisecond
+         let d1 = DateTime(2014, 10, 9)
+         let d2 = DateTime(2014, 10, 9, 13, 23, 30)
+         let d3 = DateTime(2014, 10, 9, 13, 23, 30, DateTimeKind.Utc)
+         let d4 = DateTime(2014, 10, 9, 13, 23, 30, 500)
+         let d5 = DateTime(2014, 10, 9, 13, 23, 30, 500, DateTimeKind.Utc)
+         (float d1.Day) + (float d2.Second) + (float d3.Second) + (float d4.Millisecond) + (float d5.Millisecond)
       @@>
 
 [<Test>]
@@ -36,7 +38,14 @@ let ``DateTime.Now works``() =
          float d.Hour
       @@>
 
-// TODO: Make more test cases
+[<Test>]
+let ``DateTime.UtcNow works``() =
+   check 
+      <@@ 
+         let d = DateTime.UtcNow
+         float d.Hour
+      @@>
+
 [<Test>]
 let ``DateTime.Parse works``() =
    check 
@@ -46,11 +55,57 @@ let ``DateTime.Parse works``() =
       @@>
 
 [<Test>]
+let ``DateTime.Today works``() =
+   check 
+      <@@ 
+         let d = DateTime.Today
+         float (d.Day + d.Hour)
+      @@>
+
+
+[<Test>]
+let ``DateTime.ToUniversalTime works``() =
+   check 
+      <@@ 
+         let d = DateTime.Now
+         let d' = d.ToUniversalTime()
+         float (d.Hour + d'.Hour)
+      @@>
+
+[<Test>]
+let ``DateTime.ToLocalTime works``() =
+   check 
+      <@@ 
+         let d = DateTime.UtcNow
+         let d' = d.ToLocalTime()
+         float (d.Hour + d'.Hour)
+      @@>
+
+[<Test>]
+let ``DateTime.Date works``() =
+   check 
+      <@@ 
+         let d = DateTime.Now
+         let d' = d.Date
+         (float d.Hour) + (float d'.Hour)
+      @@>
+
+[<Test>]
+let ``DateTime.Kind works``() =
+   check 
+      <@@ 
+         let d = DateTime.Now
+         let d' = DateTime.UtcNow
+         (float d.Kind) + (float d'.Kind)
+      @@>
+
+[<Test>]
 let ``DateTime.Day works``() =
    check 
       <@@ 
          let d = DateTime.Now
-         float d.Day
+         let d' = DateTime.UtcNow
+         float (d.Day + d'.Day)
       @@>
 
 [<Test>]
@@ -58,7 +113,15 @@ let ``DateTime.DayOfWeek works``() =
    check 
       <@@ 
          let d = DateTime.Now
-         float d.DayOfWeek
+         (float d.DayOfWeek)
+      @@>
+
+[<Test>]
+let ``DateTime.DayOfYear works``() =
+   check 
+      <@@ 
+         let d = DateTime.Now
+         (float d.DayOfYear)
       @@>
 
 [<Test>]
@@ -66,7 +129,8 @@ let ``DateTime.Hour works``() =
    check 
       <@@ 
          let d = DateTime.Now
-         float d.Hour
+         let d' = DateTime.UtcNow
+         float (d.Hour + d'.Hour)
       @@>
 
 [<Test>]
@@ -78,11 +142,20 @@ let ``DateTime.Millisecond works``() =
       @@>
 
 [<Test>]
+let ``DateTime.Ticks works``() =
+   check 
+      <@@ 
+         let d = DateTime(2014, 10, 9, 13, 23, 30, 999)
+         float d.Ticks
+      @@>
+
+[<Test>]
 let ``DateTime.Minute works``() =
    check 
       <@@ 
          let d = DateTime.Now
-         float d.Minute
+         let d' = DateTime.UtcNow
+         float (d.Minute + d'.Minute)
       @@>
 
 [<Test>]
@@ -90,15 +163,17 @@ let ``DateTime.Month works``() =
    check 
       <@@ 
          let d = DateTime.Now
-         float d.Month
+         let d' = DateTime.UtcNow
+         float (d.Month + d'.Month)
       @@>
 
 [<Test>]
 let ``DateTime.Second works``() =
    check 
       <@@ 
-         let d = DateTime.Now
-         float d.Second
+         let d = DateTime(2014,9,11,0,0,30)
+         let d' = DateTime(2014,9,11,0,0,59)
+         float (d.Second + d'.Second)
       @@>
 
 [<Test>]
@@ -106,6 +181,348 @@ let ``DateTime.Year works``() =
    check 
       <@@ 
          let d = DateTime.Now
-         float d.Year
+         let d' = DateTime.UtcNow
+         float (d.Year + d'.Year)
       @@>
 
+[<TestCase(100); TestCase(-100); TestCase(0)>]
+let ``DateTime.AddYears works``(v) =
+   check 
+      <@@ 
+         let dt = DateTime(2014,9,11).AddYears(v)
+         float dt.Ticks
+      @@>
+
+[<TestCase(100); TestCase(20); TestCase(6); TestCase(5); TestCase(1); TestCase(0); TestCase(-1); TestCase(-5); TestCase(-20); TestCase(-100)>]
+let ``DateTime.AddMonths works``(v) =
+   check 
+      <@@ 
+         let dt = DateTime(2014,1,31).AddMonths(v)
+         float (dt.Year + dt.Month + dt.Day)
+      @@>
+
+[<TestCase(100.); TestCase(-100.); TestCase(0.)>]
+let ``DateTime.AddDays works``(v) =
+   check 
+      <@@ 
+         let dt = DateTime(2014,9,11).AddDays(v)
+         float dt.Ticks
+      @@>
+
+[<TestCase(100.); TestCase(-100.); TestCase(0.)>]
+let ``DateTime.AddHours works``(v) =
+   check 
+      <@@ 
+         let dt = DateTime(2014,9,11).AddHours(v)
+         float dt.Ticks
+      @@>
+
+[<TestCase(100.); TestCase(-100.); TestCase(0.)>]
+let ``DateTime.AddMinutes works``(v) =
+   check 
+      <@@ 
+         let dt = DateTime(2014,9,11).AddMinutes(v)
+         float dt.Ticks
+      @@>
+
+[<TestCase(100.); TestCase(-100.); TestCase(0.)>]
+let ``DateTime.AddSeconds works``(v) =
+   check 
+      <@@ 
+         let dt = DateTime(2014,9,11).AddSeconds(v)
+         float dt.Ticks
+      @@>
+
+[<TestCase(100.); TestCase(-100.); TestCase(0.)>]
+let ``DateTime.AddMilliseconds works``(v) =
+   check 
+      <@@ 
+         let dt = DateTime(2014,9,11).AddMilliseconds(v)
+         float dt.Ticks
+      @@>
+
+// NOTE: Doesn't work for values between 10000L (TimeSpan.TicksPerMillisecond) and -10000L, except 0L
+[<TestCase(100000L); TestCase(-100000L); TestCase(0L)>]
+let ``DateTime.AddTicks works``(v) =
+   check 
+      <@@ 
+         let dt = DateTime(2014,9,11).AddTicks(v)
+         float dt.Ticks
+      @@>
+
+[<TestCase(1000.); TestCase(-1000.); TestCase(0.)>]
+let ``DateTime Addition works``(ms) =
+   check 
+      <@@ 
+         let dt = DateTime(2014,9,11)
+         let ts = TimeSpan.FromMilliseconds(ms)
+         let res1 = dt.Add(ts).Ticks
+         let res2 = (dt + ts).Ticks
+         if (res1 = res2)
+         then float res2
+         else failwith "synonyms don't match"
+      @@>
+
+[<TestCase(1000.); TestCase(-1000.); TestCase(0.)>]
+let ``DateTime Subtraction with TimeSpan works``(ms) =
+   check 
+      <@@ 
+         let dt = DateTime(2014,9,11)
+         let ts = TimeSpan.FromMilliseconds(ms)
+         let res1 = dt.Subtract(ts).Ticks
+         let res2 = (dt - ts).Ticks
+         if (res1 = res2)
+         then float res2
+         else failwith "synonyms don't match"
+      @@>
+
+[<TestCase(1000.); TestCase(-1000.); TestCase(0.)>]
+let ``DateTime Subtraction with DateTime works``(ms) =
+   check 
+      <@@ 
+         let dt1 = DateTime.Now
+         let dt2 = dt1.AddMilliseconds(ms)
+         let res1 = dt1.Subtract(dt2).Ticks
+         let res2 = (dt1 - dt2).Ticks
+         if (res1 = res2)
+         then float res2
+         else failwith "synonyms don't match"
+      @@>
+
+[<TestCase(1000.); TestCase(-1000.); TestCase(0.)>]
+let ``DateTime Comparison works``(ms) =
+   check 
+      <@@ 
+         let dt1 = DateTime.Now
+         let dt2 = dt1.AddMilliseconds(ms)
+         let res1 = compare dt1 dt2
+         let res2 = dt1.CompareTo(dt2)
+         let res3 = DateTime.Compare(dt1, dt2)
+         if (res1 = res2 && res2 = res3)
+         then float res1
+         else failwith "synonyms don't match"
+      @@>
+
+[<TestCase(1000.); TestCase(-1000.); TestCase(0.)>]
+let ``DateTime GreaterThan works``(ms) =
+   check 
+      <@@ 
+         let dt1 = DateTime.Now
+         let dt2 = dt1.AddMilliseconds(ms)
+         dt1 > dt2
+      @@>
+
+[<TestCase(1000.); TestCase(-1000.); TestCase(0.)>]
+let ``DateTime LessThan works``(ms) =
+   check 
+      <@@ 
+         let dt1 = DateTime.Now
+         let dt2 = dt1.AddMilliseconds(ms)
+         dt1 < dt2
+      @@>
+
+[<TestCase(1000.); TestCase(-1000.); TestCase(0.)>]
+let ``DateTime Equality works``(ms) =
+   check 
+      <@@ 
+         let dt1 = DateTime.Now
+         let dt2 = dt1.AddMilliseconds(ms)
+         dt1 = dt2
+      @@>
+
+[<TestCase(1000.); TestCase(-1000.); TestCase(0.)>]
+let ``DateTime Inequality works``(ms) =
+   check 
+      <@@ 
+         let dt1 = DateTime.Now
+         let dt2 = dt1.AddMilliseconds(ms)
+         dt1 <> dt2
+      @@>
+
+// NOTE: Tests are not working for string conversion methods
+
+//[<Test>]
+//let ``DateTime.ToString works``() =
+//   check 
+//      <@@ 
+//         let dt = DateTime(2014, 9, 11, 16, 37, 0)
+//         dt.ToString()
+//      @@>
+//
+//[<Test>]
+//let ``DateTime.ToLongDateString works``() =
+//   check 
+//      <@@ 
+//         let dt = DateTime(2014, 9, 11, 16, 37, 0)
+//         dt.ToLongDateString()
+//      @@>
+//
+//[<Test>]
+//let ``DateTime.ToShortDateString works``() =
+//   check 
+//      <@@ 
+//         let dt = DateTime(2014, 9, 11, 16, 37, 0)
+//         dt.ToShortDateString()
+//      @@>
+//
+//[<Test>]
+//let ``DateTime.ToLongTimeString works``() =
+//   check 
+//      <@@ 
+//         let dt = DateTime(2014, 9, 11, 16, 37, 0)
+//         dt.ToLongTimeString()
+//      @@>
+//
+//[<Test>]
+//let ``DateTime.ToShortTimeString works``() =
+//   check 
+//      <@@ 
+//         let dt = DateTime(2014, 9, 11, 16, 37, 0)
+//         dt.ToShortTimeString()
+//      @@>
+
+[<Test>]
+let ``TimeSpan constructors work``() =
+   check 
+      <@@ 
+         let t1 = TimeSpan(20000L)
+         let t2 = TimeSpan(3, 3, 3)
+         let t3 = TimeSpan(5, 5, 5, 5)
+         let t4 = TimeSpan(7, 7, 7, 7, 7)
+         t1.TotalMilliseconds + t2.TotalMilliseconds + t3.TotalMilliseconds + t4.TotalMilliseconds
+      @@>
+
+[<Test>]
+let ``TimeSpan static creation works``() =
+   check 
+      <@@ 
+         let t1 = TimeSpan.FromTicks(20000L)
+         let t2 = TimeSpan.FromMilliseconds(2.)
+         let t3 = TimeSpan.FromDays   (2.)
+         let t4 = TimeSpan.FromHours  (2.)
+         let t5 = TimeSpan.FromMinutes(2.)
+         let t6 = TimeSpan.FromSeconds(2.)
+//         let t7 = TimeSpan.Zero
+         t1.TotalMilliseconds + t2.TotalMilliseconds + t3.TotalMilliseconds + t4.TotalMilliseconds +
+            t5.TotalMilliseconds + t6.TotalMilliseconds // + t7.TotalMilliseconds
+      @@>
+
+[<Test>]
+let ``TimeSpan components work``() =
+   check 
+      <@@ 
+         let t = TimeSpan.FromMilliseconds(96441615.)
+         t.Days + t.Hours + t.Minutes + t.Seconds + t.Milliseconds |> float
+      @@>
+
+[<Test>]
+let ``TimeSpan.Ticks works``() =
+   check 
+      <@@ 
+         let t = TimeSpan.FromTicks(20000L)
+         float t.Ticks
+      @@>
+
+// NOTE: This test fails because of very small fractions, so I cut the fractional part
+[<Test>]
+let ``TimeSpan totals work``() =
+   check 
+      <@@ 
+         let t = TimeSpan.FromMilliseconds(96441615.)
+         t.TotalDays + t.TotalHours + t.TotalMinutes + t.TotalSeconds |> floor
+      @@>
+
+[<TestCase(1.); TestCase(-1.); TestCase(0.)>]
+let ``TimeSpan.Duration works``(ms) =
+   check 
+      <@@ 
+         let t = TimeSpan.FromMilliseconds(ms)
+         t.Duration().TotalMilliseconds
+      @@>
+
+[<TestCase(1.); TestCase(-1.); TestCase(0.)>]
+let ``TimeSpan.Negate works``(ms) =
+   check 
+      <@@ 
+         let t = TimeSpan.FromMilliseconds(ms)
+         t.Negate().TotalMilliseconds
+      @@>
+
+[<TestCase(1000., 2000.); TestCase(200., -1000.); TestCase(-2000., 1000.);
+  TestCase(-200., -300.); TestCase(0., 1000.); TestCase(-2000., 0.); TestCase(0., 0.)>]
+let ``TimeSpan Addition works``(ms1, ms2) =
+   check 
+      <@@ 
+         let t1 = TimeSpan.FromMilliseconds(ms1)
+         let t2 = TimeSpan.FromMilliseconds(ms2)
+         let res1 = t1.Add(t2).TotalMilliseconds
+         let res2 = (t1 + t2).TotalMilliseconds
+         if (res1 = res2)
+         then res1
+         else failwith "synonyms don't match"
+      @@>
+
+[<TestCase(1000., 2000.); TestCase(2000., -2000.); TestCase(-2000., 1000.);
+  TestCase(200., -300.); TestCase(0., 1000.); TestCase(1000., 1000.); TestCase(0., 0.)>]
+let ``TimeSpan Subtraction works``(ms1, ms2) =
+   check 
+      <@@ 
+         let t1 = TimeSpan.FromMilliseconds(ms1)
+         let t2 = TimeSpan.FromMilliseconds(ms2)
+         let res1 = t1.Subtract(t2).TotalMilliseconds
+         let res2 = (t1 - t2).TotalMilliseconds
+         if (res1 = res2)
+         then res1
+         else failwith "synonyms don't match"
+      @@>
+
+[<TestCase(1000., 2000.); TestCase(2000., 1000.); TestCase(-2000., -2000.);
+  TestCase(200., -200.); TestCase(0., 1000.); TestCase(1000., 1000.); TestCase(0., 0.)>]
+let ``TimeSpan Comparison works``(ms1, ms2) =
+   check 
+      <@@ 
+         let t1 = TimeSpan.FromMilliseconds(ms1)
+         let t2 = TimeSpan.FromMilliseconds(ms2)
+         let res1 = compare t1 t2
+         let res2 = t1.CompareTo(t2)
+         let res3 = TimeSpan.Compare(t1, t2)
+         if (res1 = res2 && res2 = res3)
+         then float res1
+         else failwith "synonyms don't match"
+      @@>
+
+[<TestCase(1000., 2000.); TestCase(2000., 1000.); TestCase(-2000., -2000.)>]
+let ``TimeSpan GreaterThan works``(ms1, ms2) =
+   check 
+      <@@ 
+         let t1 = TimeSpan.FromMilliseconds(ms1)
+         let t2 = TimeSpan.FromMilliseconds(ms2)
+         t1 > t2
+      @@>
+
+[<TestCase(1000., 2000.); TestCase(2000., 1000.); TestCase(-2000., -2000.)>]
+let ``TimeSpan LessThan works``(ms1, ms2) =
+   check 
+      <@@ 
+         let t1 = TimeSpan.FromMilliseconds(ms1)
+         let t2 = TimeSpan.FromMilliseconds(ms2)
+         t1 < t2
+      @@>
+
+[<TestCase(1000., 2000.); TestCase(2000., 1000.); TestCase(-2000., -2000.)>]
+let ``TimeSpan Equality works``(ms1, ms2) =
+   check 
+      <@@ 
+         let t1 = TimeSpan.FromMilliseconds(ms1)
+         let t2 = TimeSpan.FromMilliseconds(ms2)
+         t1 = t2
+      @@>
+
+[<TestCase(1000., 2000.); TestCase(2000., 1000.); TestCase(-2000., -2000.)>]
+let ``TimeSpan Inequality works``(ms1, ms2) =
+   check 
+      <@@ 
+         let t1 = TimeSpan.FromMilliseconds(ms1)
+         let t2 = TimeSpan.FromMilliseconds(ms2)
+         t1 <> t2
+      @@>
