@@ -88,9 +88,6 @@ type DateTime =
     [<JSEmitInline("{0}.kind")>]
     static member private getKind(d: DateTime): System.DateTimeKind = failwith "never"
 
-    [<JSEmit("var newDate = new Date({0}.getTime()); newDate.setFullYear({0}.getFullYear() + {1}); newDate.kind = {0}.kind; return newDate")>]
-    static member private addYearsUnsafe(d: DateTime, offset: int): DateTime = failwith "never"
-
     [<JSEmitInline("(({0} % 4 == 0) && ({0} % 100 != 0)) || ({0} % 400 == 0)")>]
     static member isLeapYear(year: int): bool = failwith "never"
 
@@ -103,6 +100,11 @@ type DateTime =
 
     [<JSEmitInline("{0}.toLocaleTimeString().replace(/:\d\d(?!:)/, '')")>]
     static member private toShortTimeStringUnsafe(d: DateTime): string = failwith "never"
+
+    static member private getDaysInMonths(year: int) =
+        if DateTime.IsLeapYear(year)
+        then [|31;29;31;30;31;30;31;31;30;31;30;31|]
+        else [|31;28;31;30;31;30;31;31;30;31;30;31|]
     // -------------------------------------------------------------------------------------------
 
     static member FromTicks(ticks: int64) =
@@ -135,11 +137,7 @@ type DateTime =
         DateTime.isLeapYear(year)
 
     static member DaysInMonth(year: int, month: int) =
-        let daysInMonth =
-            if DateTime.IsLeapYear(year)
-            then [|31;29;31;30;31;30;31;31;30;31;30;31|]
-            else [|31;28;31;30;31;30;31;31;30;31;30;31|]
-        daysInMonth.[month - 1]
+        DateTime.getDaysInMonths(year).[month - 1]
 
     member dt.ToUniversalTime(): DateTime = DateTime.changeKind(dt, System.DateTimeKind.Utc)
     member dt.ToLocalTime    (): DateTime = DateTime.changeKind(dt, System.DateTimeKind.Local)
@@ -157,25 +155,24 @@ type DateTime =
     member dt.Kind          with get() = DateTime.getKind(dt)
     member dt.Ticks         with get() = unbox<int64>((DateTime.getTime(dt) + Literals.millisecondsJSOffset) * (unbox TimeSpan.TicksPerMillisecond))
     member dt.DayOfWeek     with get() = unbox<System.DayOfWeek>(DateTime.getValueUnsafe(dt, "Day", System.DateTimeKind.Utc))
-    member dt.DayOfYear     with get() =
-                                let daysInMonth =
-                                    if DateTime.IsLeapYear(dt.Year)
-                                    then [|31;29;31;30;31;30;31;31;30;31;30;31|]
-                                    else [|31;28;31;30;31;30;31;31;30;31;30;31|]
-                                let prevDays =
-                                    daysInMonth
-                                    |> Seq.take (dt.Month - 1)
-                                    |> Seq.fold (+) 0
-                                prevDays + dt.Day
+    member dt.DayOfYear     with get() = DateTime.getDaysInMonths(dt.Year)
+                                         |> Seq.take (dt.Month - 1)
+                                         |> Seq.fold (+) dt.Day
 
     member dt.Add(t: TimeSpan)          = DateTime.createUnsafe(DateTime.getTime(dt) + t.TotalMilliseconds, dt.Kind)
-    member dt.AddYears(v: int)          = DateTime.addYearsUnsafe(dt, v)
     member dt.AddDays(v: float)         = DateTime.createUnsafe(DateTime.getTime(dt) + v * Literals.millisecondsPerDay, dt.Kind)
     member dt.AddHours(v: float)        = DateTime.createUnsafe(DateTime.getTime(dt) + v * Literals.millisecondsPerHour, dt.Kind)
     member dt.AddMinutes(v: float)      = DateTime.createUnsafe(DateTime.getTime(dt) + v * Literals.millisecondsPerMinute, dt.Kind)
     member dt.AddSeconds(v: float)      = DateTime.createUnsafe(DateTime.getTime(dt) + v * Literals.millisecondsPerSecond, dt.Kind)
     member dt.AddMilliseconds(v: float) = DateTime.createUnsafe(DateTime.getTime(dt) + v, dt.Kind)
     member dt.AddTicks(v: int64)        = DateTime.createUnsafe(DateTime.getTime(dt) + float (v / TimeSpan.TicksPerMillisecond), dt.Kind)
+
+    member dt.AddYears(offset: int) =
+        let newMonth = dt.Month
+        let newYear = dt.Year + (unbox offset)
+        let daysInMonth = DateTime.DaysInMonth(newYear, newMonth)
+        let newDay = min daysInMonth dt.Day
+        DateTime.createUnsafeYMDHMSM(newYear, newMonth, newDay, dt.Hour, dt.Minute, dt.Second, dt.Millisecond, dt.Kind)
 
     member dt.AddMonths(offset: int) =
         let newMonth = dt.Month + offset

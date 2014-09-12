@@ -18,6 +18,8 @@ let ``DateTime.DaysInMonth works``(year, month) =
          DateTime.DaysInMonth(year, month) |> float
       @@>
 
+// TODO: Unfortunately, JS will happily create invalid dates like DateTime(2014,2,29)
+//       But this problem also happens when parsing, so I haven't tried to fix it
 [<Test>]
 let ``DateTime constructors work``() =
    check 
@@ -185,19 +187,19 @@ let ``DateTime.Year works``() =
          float (d.Year + d'.Year)
       @@>
 
-[<TestCase(100); TestCase(-100); TestCase(0)>]
+[<TestCase(100); TestCase(1); TestCase(-1);TestCase(-100); TestCase(0)>]
 let ``DateTime.AddYears works``(v) =
    check 
       <@@ 
-         let dt = DateTime(2014,9,11).AddYears(v)
-         float dt.Ticks
+         let dt = DateTime(2016,2,29).AddYears(v)
+         float (dt.Month + dt.Day)
       @@>
 
 [<TestCase(100); TestCase(20); TestCase(6); TestCase(5); TestCase(1); TestCase(0); TestCase(-1); TestCase(-5); TestCase(-20); TestCase(-100)>]
 let ``DateTime.AddMonths works``(v) =
    check 
       <@@ 
-         let dt = DateTime(2014,1,31).AddMonths(v)
+         let dt = DateTime(2016,1,31).AddMonths(v)
          float (dt.Year + dt.Month + dt.Day)
       @@>
 
