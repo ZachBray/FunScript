@@ -156,6 +156,7 @@ let components =
          CompilerComponent.unary <@ single @> id
          CompilerComponent.unary <@ float32 @> id
          CompilerComponent.unary <@ double @> id
+         CompilerComponent.unary <@ fun x -> string x @> (fun expr -> Apply(PropertyGet(expr, "toString"),[])) 
          CompilerComponent.unary <@ fun x -> x.ToString() @> (fun expr -> Apply(PropertyGet(expr, "toString"),[])) 
          ExpressionReplacer.create <@ char @> <@ FunScript.Core.String.FromCharCode @>
           

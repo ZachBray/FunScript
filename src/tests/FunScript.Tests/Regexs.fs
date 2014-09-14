@@ -287,7 +287,7 @@ let ``Regex.Replace with evaluator and limit works``(count) =
       <@@ 
          let str = "abcabcabcabcabcabcabcabc"
          let r = Regex("c")
-         r.Replace(str, (fun (m: Match) -> m.Index.ToString()), count=count)
+         r.Replace(str, (fun (m: Match) -> string m.Index), count=count)
       @@>
 
 [<TestCase(0); TestCase(10)>]
@@ -296,5 +296,5 @@ let ``Regex.Replace with evaluator, limit and offset works``(startat) =
       <@@ 
          let str = "abcCcabCCabcccabcabcabCCCcabcabc"
          let r = Regex("c+", RegexOptions.IgnoreCase)
-         r.Replace(str, (fun (m: Match) -> string m.Length.ToString()), count=3, startat=startat)
+         r.Replace(str, (fun (m: Match) -> string m.Length), count=3, startat=startat)
       @@>
