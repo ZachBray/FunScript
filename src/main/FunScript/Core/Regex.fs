@@ -27,9 +27,6 @@ module Capture =
     [<JSEmit("return Array.isArray({0}) ? ({0}[0]) : {0}")>]
     let Value(m: Capture): string = failwith "never"
 
-    let ToString(m: Capture) =
-        m.Value
-
 module Group = 
     [<JSEmitInline("({0} === null ? false : true)")>]
     let Success(m: Match): int = failwith "never"
@@ -82,9 +79,6 @@ let GetOptions(r: Regex) =
     let options = if isIgnoreCase(r) then options ||| RegexOptions.IgnoreCase else options
     let options = if isMultiline(r)  then options ||| RegexOptions.Multiline  else options
     options
-
-[<JSEmitInline("{0}.source")>]
-let ToString(r: Regex): string = failwith "never"
 
 // From http://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex
 [<JSEmit(@"return {0}.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')")>]

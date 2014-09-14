@@ -342,15 +342,6 @@ let ``DateTime Inequality works``(ms) =
       @@>
 
 // NOTE: Tests are not working for string conversion methods
-
-//[<Test>]
-//let ``DateTime.ToString works``() =
-//   check 
-//      <@@ 
-//         let dt = DateTime(2014, 9, 11, 16, 37, 0)
-//         dt.ToString()
-//      @@>
-//
 //[<Test>]
 //let ``DateTime.ToLongDateString works``() =
 //   check 

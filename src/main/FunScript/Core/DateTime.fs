@@ -91,10 +91,6 @@ type DateTime =
     [<JSEmitInline("(({0} % 4 == 0) && ({0} % 100 != 0)) || ({0} % 400 == 0)")>]
     static member isLeapYear(year: int): bool = failwith "never"
 
-    // TODO: .NET and JavaScript runtimes won't give always the same formats when printing the DateTime
-    [<JSEmitInline("{0}.kind == {2} ? {0}.toUTCString() : {0}.toLocaleString()")>]
-    static member private toStringUnsafe(d: DateTime, utcKind: System.DateTimeKind): string = failwith "never"
-
     [<JSEmitInline("{0}['to'+{1}+'String']()")>]
     static member private toFormattedStringUnsafe(d: DateTime, format: string): string = failwith "never"
 
@@ -209,7 +205,6 @@ type DateTime =
 
     override dt.GetHashCode() = unbox<int>(DateTime.getTime(dt))
     override dt.Equals(that)  = DateTime.getTime(dt) = DateTime.getTime(unbox that)
-    override dt.ToString()    = DateTime.toStringUnsafe(dt, System.DateTimeKind.Utc)
 
     static member Compare(a: DateTime, b: DateTime) = compare (DateTime.getTime a) (DateTime.getTime b)
     member dt.CompareTo  (that: DateTime)           = DateTime.Compare(dt, that)

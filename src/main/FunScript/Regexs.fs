@@ -10,7 +10,6 @@ let components =
         ExpressionReplacer.createUnsafe <@ fun (r) -> Regex(r) @> <@ Core.Regex.Create @>
         ExpressionReplacer.createUnsafe <@ fun (r, o) -> Regex(r, o) @> <@ Core.Regex.CreateWithOptions @>
         ExpressionReplacer.createUnsafe <@ fun (r: Regex) -> r.Options @> <@ Core.Regex.GetOptions @>
-//        ExpressionReplacer.createUnsafe <@ fun (r: Regex) -> r.ToString() @> <@ Core.Regex.ToString @>
 
         ExpressionReplacer.createUnsafe <@ fun (s) -> Regex.Escape(s) @> <@ Core.Regex.Escape @>
         ExpressionReplacer.createUnsafe <@ fun (s) -> Regex.Unescape(s) @> <@ Core.Regex.Unescape @>
@@ -51,7 +50,6 @@ let components =
         ExpressionReplacer.createUnsafe <@ fun (m: Capture) -> m.Index @>   <@ Core.Regex.Capture.Index @>
         ExpressionReplacer.createUnsafe <@ fun (m: Capture) -> m.Length @>  <@ Core.Regex.Capture.Length @>
         ExpressionReplacer.createUnsafe <@ fun (m: Capture) -> m.Value @>   <@ Core.Regex.Capture.Value @>
-        ExpressionReplacer.createUnsafe <@ fun (m: Capture) -> m.ToString() @>   <@ Core.Regex.Capture.ToString @>
 
         ExpressionReplacer.createUnsafe <@ fun (m: Group) -> m.Success @> <@ Core.Regex.Group.Success @>
 

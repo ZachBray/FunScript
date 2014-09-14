@@ -4,16 +4,8 @@ module FunScript.Tests.Regexs
 open NUnit.Framework
 open System.Text.RegularExpressions
 
-//[<Test>]
-//let ``Regex.ToString works``() =
-//   check 
-//      <@@ 
-//         let r = Regex("[(.*?)]")
-//         r.ToString()
-//      @@>
 
 // NOTE: These three tests are not working, but the methods are fine in actual code
-
 //[<Test>]
 //let ``Regex.Options works``() =
 //   check 
@@ -304,5 +296,5 @@ let ``Regex.Replace with evaluator, limit and offset works``(startat) =
       <@@ 
          let str = "abcCcabCCabcccabcabcabCCCcabcabc"
          let r = Regex("c+", RegexOptions.IgnoreCase)
-         r.Replace(str, (fun (m: Match) -> m.Length.ToString()), count=3, startat=startat)
+         r.Replace(str, (fun (m: Match) -> string m.Length.ToString()), count=3, startat=startat)
       @@>
