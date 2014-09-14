@@ -15,7 +15,7 @@ module Literals =
 		    var index = -1;
 		    var array = this;
 		    return {
-			    Dispose:  	 function() { },
+			    Dispose:     function() { },
 			    MoveNext:    function() { return ++index < array.length },
 			    get_Current: function() { return array[index] }
 		    }
