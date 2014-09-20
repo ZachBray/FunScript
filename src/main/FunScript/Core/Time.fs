@@ -9,20 +9,22 @@ module Literals =
     let [<Literal>] millisecondsPerSecond = 1000.
     let [<Literal>] millisecondsJSOffset  = 6.2135604e+13
 
-[<JS; JSEmitInline("setTimeout({0}, {1})")>]
+[<JS; JSEmitInline("window.setTimeout({0}, {1})")>]
 let setTimeout(handler:unit -> unit, milliseconds:float): int = failwith "never"
 
-[<JS; JSEmitInline("clearTimeout({0})")>]
+[<JS; JSEmitInline("window.clearTimeout({0})")>]
 let clearTimeout(id: int) = failwith "never"
 
-[<JS; JSEmitInline("setInterval({0}, {1})")>]
+[<JS; JSEmitInline("window.setInterval({0}, {1})")>]
 let setInterval(handler:unit -> unit, milliseconds:float): int = failwith "never"
 
 [<JS; JSEmitInline("clearInterval({0})")>]
 let clearInterval(id: int) = failwith "never"
 
-[<JS; JSEmitInline("setTimeout({0}, {1})")>]
-let requestAnimationFrame(handler:unit -> unit, milliseconds:float): unit = failwith "never"
+[<JS; JSEmit("""var reqFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
+                   window.webkitRequestAnimationFrame || window.oRequestAnimationFrame;
+    return reqFrame({0})""")>]
+let requestAnimationFrame(handler:float -> unit): int = failwith "never"
 
 [<JS>]
 type ElapsedEventArgs() =
