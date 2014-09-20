@@ -1,4 +1,4 @@
-﻿module FunScript.Core.DateTime
+﻿module FunScript.Core.Time
 
 open FunScript
 
@@ -8,6 +8,67 @@ module Literals =
     let [<Literal>] millisecondsPerMinute = 60000.
     let [<Literal>] millisecondsPerSecond = 1000.
     let [<Literal>] millisecondsJSOffset  = 6.2135604e+13
+
+[<JS; JSEmitInline("setTimeout({0}, {1})")>]
+let setTimeout(handler:unit -> unit, milliseconds:float): int = failwith "never"
+
+[<JS; JSEmitInline("clearTimeout({0})")>]
+let clearTimeout(id: int) = failwith "never"
+
+[<JS; JSEmitInline("setInterval({0}, {1})")>]
+let setInterval(handler:unit -> unit, milliseconds:float): int = failwith "never"
+
+[<JS; JSEmitInline("clearInterval({0})")>]
+let clearInterval(id: int) = failwith "never"
+
+[<JS; JSEmitInline("setTimeout({0}, {1})")>]
+let requestAnimationFrame(handler:unit -> unit, milliseconds:float): unit = failwith "never"
+
+[<JS>]
+type ElapsedEventArgs() =
+    member val SignalTime = System.DateTime.Now
+
+[<JS>]
+type Timer(interval: float) =
+    let mutable _id: int option = None
+    let mutable _observer: System.IObserver<_> option = None
+
+    member val AutoReset = true     with get, set
+    member val Interval  = interval with get, set
+
+    // TODO: It can only be used as IObservable at the moment
+    member timer.Elapsed
+        with get() = timer :> System.IObservable<_>
+    member timer.Enabled
+        with get() = match _id with Some _ -> true | None -> false
+        and set(v: bool) = if v then timer.Start() else timer.Stop()
+    
+    member timer.Start() =
+        match _id with
+        | Some _ -> ()
+        | None ->
+            let rec handler = fun () ->
+                match _observer with
+                | None   -> ()
+                | Some o -> o.OnNext(ElapsedEventArgs())
+                match timer.AutoReset with
+                | false -> _id <- None
+                | true  -> _id <- Some(setTimeout(handler, timer.Interval))
+            _id <- Some(setTimeout(handler, timer.Interval))
+
+    member timer.Stop() = 
+        match _id with
+        | None -> ()
+        | Some i -> clearTimeout(i); _id <- None
+    
+    member timer.Close() = timer.Stop()
+    interface System.IDisposable with
+        member timer.Dispose() = timer.Close()
+
+    interface System.IObservable<ElapsedEventArgs> with
+        member timer.Subscribe(observer) =
+            _observer <- Some observer
+            new Events.ActionDisposable(fun () -> _observer <- None) :> System.IDisposable
 
 // NOTE: For performance, TimeSpan is just a wrapper around the milliseconds
 [<JS>]
