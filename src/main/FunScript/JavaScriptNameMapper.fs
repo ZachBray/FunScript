@@ -4,6 +4,7 @@ open System.Reflection
 
 let keywords =
    set [
+      "arguments"
       "break"
       "case"
       "catch"
