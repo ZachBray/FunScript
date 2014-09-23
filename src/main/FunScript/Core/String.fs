@@ -1,6 +1,41 @@
 ﻿[<FunScript.JS>]
 module FunScript.Core.String
 
+[<FunScript.JSEmit("""return {0}.replace(/{(\d+)(,-?\d+)?(:[CDEFGNPXTMYdt]\d{0,})?}/g, function(match, number, alignment, format) {
+			var rep = match;
+			if ({1}[number] !== undefined) {
+				var rep = {1}[number];
+				if (format !== undefined && format.length > 1) {
+					var letter = format.substring(1,2);
+					if (letter == "F" && rep.toFixed !== undefined) {
+						var len = format.length > 2 ? format.substring(2) : "2";
+						rep = rep.toFixed(len);
+					}
+					if (letter == "P" && rep.toFixed !== undefined) {
+						var len = format.length > 2 ? format.substring(2) : "2";
+						rep = (rep * 100).toFixed(len) + " %";
+					}
+					if (letter == "E" && rep.toExponential !== undefined) {
+						rep = rep.toExponential(format.substring(2));
+					}		
+					else if (letter == "D" && rep.toDateString !== undefined) {
+						rep = rep.toDateString();
+					}
+					else if (letter == "T" && rep.toLocaleTimeString !== undefined) {
+						rep = rep.toLocaleTimeString();
+					}
+					else if (letter == "d" && rep.toLocaleDateString !== undefined) {
+						rep = rep.toLocaleDateString();
+					}
+					else if (letter == "t" && rep.toLocaleTimeString !== undefined) {
+						rep = rep.toLocaleTimeString().replace(/:\d\d(?!:)/, '')
+					}
+				}
+			}
+			return rep;
+	})""")>]
+let Format(s: string, [<System.ParamArray>] args: obj[]): string = failwith "never"
+
 [<FunScript.JSEmitInline("{0}.split({1})")>]
 let private splitSingle(s:string, delimiter:string) : string[] = failwith "never"
 
@@ -29,12 +64,6 @@ let EndsWith(s: string, search: string) =
     let offset = s.Length - search.Length
     let index = IndexOfWithOffset(s, search, offset)
     index <> -1 && index = offset
-
-// Simple formatting from http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
-[<FunScript.JSEmit("""return {0}.replace(/{(\d+)}/g, function(match, number) {
-        return typeof {1}[number] !== undefined ? {1}[number] : match
-})""")>]
-let Format(s: string, [<System.ParamArray>] args: obj[]): string = failwith "never"
 
 [<FunScript.JSEmitInline("{0}.toLowerCase()")>]
 let ToLowerCase(s:string) : string = failwith "never"

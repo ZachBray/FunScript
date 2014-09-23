@@ -29,7 +29,7 @@ type Async<'T> = Cont of (AsyncParams<'T> -> unit)
 [<FunScript.JSEmitInlineAttribute("window.setTimeout({0}, {1})")>]
 let setTimeout (handler:unit -> unit, milliseconds:float) = failwith "never"
   
-let private protectedCont f = Cont (fun args ->
+let protectedCont f = Cont (fun args ->
    args.Aux.CancellationToken.ThrowIfCancellationRequested()
    incr args.Aux.StackCounter
    if !args.Aux.StackCounter > 1000 then // TODO: Make this a parameter (this is pretty arbitrary)

@@ -55,6 +55,7 @@
     <Compile Include="Core\LanguagePrimitives.fs" />
     <Compile Include="Core\GenericConstants.fs" />
     <Compile Include="Core\Array.fs" />
+    <Compile Include="Core\Enumerator.fs" />
     <Compile Include="Core\ResizeArray.fs" />
     <Compile Include="Core\list.fs" />
     <Compile Include="Core\Option.fs" />
@@ -65,6 +66,7 @@
     <Compile Include="Core\String.fs" />
     <Compile Include="Core\Regex.fs" />
     <Compile Include="Core\Events.fs" />
+    <Compile Include="Core\Time.fs" />
     <Compile Include="Core\Async.fs" />
     <Compile Include="Core\Type.fs" />
     <Compile Include="Core\StringWriter.fs" />
@@ -88,6 +90,7 @@
     <Compile Include="LambdaApplication.fs" />
     <Compile Include="ControlFlow.fs" />
     <Compile Include="Arrays.fs" />
+    <Compile Include="Enumerator.fs" />
     <Compile Include="ResizeArrays.fs" />
     <Compile Include="Dictionaries.fs" />
     <Compile Include="Lists.fs" />
@@ -98,6 +101,7 @@
     <Compile Include="CommonOperators.fs" />
     <Compile Include="Strings.fs" />
     <Compile Include="Regexs.fs" />
+    <Compile Include="Times.fs" />
     <Compile Include="TypeConversion.fs" />
     <Compile Include="OtherMappings.fs" />
     <Compile Include="Asyncs.fs" />

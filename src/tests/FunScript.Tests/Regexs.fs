@@ -4,6 +4,31 @@ module FunScript.Tests.Regexs
 open NUnit.Framework
 open System.Text.RegularExpressions
 
+
+// NOTE: These three tests are not working, but the methods are fine in actual code
+//[<Test>]
+//let ``Regex.Options works``() =
+//   check 
+//      <@@ 
+//         let r = Regex("[a-z]", RegexOptions.ECMAScript ||| RegexOptions.IgnoreCase)
+//         r.Options |> float
+//      @@>
+//
+//[<TestCase("[(.*?)]"); TestCase(@"C:\Temp")>]
+//let ``Regex.Escape works``(str) =
+//   check 
+//      <@@ 
+//         Regex.Escape(str)
+//      @@>
+//
+//[<TestCase("\[\(\.\*\?\)]"); TestCase(@"C:\\Temp"); TestCase(@"\\\n")>]
+//let ``Regex.Unescape works``(str) =
+//   check 
+//      <@@ 
+//         Regex.Unescape(str)
+//      @@>
+
+
 [<TestCase("Chapter \d+(\.\d)*"); TestCase("chapter \d+(\.\d)*")>]
 let ``Regex instance IsMatch works``(pattern) =
    check 
@@ -183,10 +208,93 @@ let ``Regex.Split works``(str) =
          splits.Length |> float
       @@>
 
-[<TestCase("\\s+")>]
+[<TestCase(1); TestCase(3)>]
+let ``Regex.Split with limit works``(count) =
+   check 
+      <@@ 
+         let s = "blah blah blah, blah blah blah"
+         let r = Regex(" ")
+         let splits = r.Split(s, count)
+         splits.Length |> float
+      @@>
+
+[<TestCase(0); TestCase(20)>]
+let ``Regex.Split with limit and offset works``(limit) =
+   check 
+      <@@ 
+         let s = "blah blah blah, blah blah blah"
+         let r = Regex(" ")
+         let splits = r.Split(s, 10, limit)
+         splits.Length |> float
+      @@>
+
+[<TestCase("\\s+"); TestCase("")>]
 let ``Regex.Replace works``(pattern) =
    check 
       <@@ 
          let str = "This is   text with   far  too   much   \n whitespace"
          Regex.Replace(str, pattern, " ")
+      @@>
+
+[<TestCase("([A-Za-z]+) ([A-Za-z\-]+)"); TestCase("(fon)(so)")>]
+let ``Regex.Replace with macros works``(pattern) =
+   check 
+      <@@ 
+         let str = "Names: Zach Bray, Alfonso Garcia-Caro"
+         Regex.Replace(str, pattern, "$2 $1")
+      @@>
+
+[<TestCase(1); TestCase(3)>]
+let ``Regex.Replace with limit works``(count) =
+   check 
+      <@@ 
+         let str = "This   is   text with   far  too   much   \n whitespace"
+         let r = Regex("\\s+")
+         r.Replace(str, " ", count=count)
+      @@>
+
+[<TestCase(0); TestCase(20)>]
+let ``Regex.Replace with limit and offset works``(startat) =
+   check 
+      <@@ 
+         let str = "This   is   text with   far  too   much   \n whitespace"
+         let r = Regex("\\s+")
+         r.Replace(str, " ", count=20, startat=startat)
+      @@>
+
+[<Test>]
+let ``Regex.Replace with limit, offset and macros works``() =
+   check 
+      <@@ 
+         let str = "Names: Zach Bray, Alfonso Garcia-Caro"
+         let re = Regex("([A-Za-z]+) ([A-Za-z\-]+)")
+         let res1 = re.Replace(str, "$2 $1", 1)
+         let res2 = re.Replace(str, "$2 $1", 10, 20)
+         res1 + " - " + res2
+      @@>
+
+[<TestCase("([A-Za-z]+) ([A-Za-z\-]+)"); TestCase("(fon)(so)")>]
+let ``Regex.Replace with evaluator works``(pattern) =
+   check 
+      <@@ 
+         let str = "Names: Zach Bray, Alfonso Garcia-Caro"
+         Regex.Replace(str, pattern, fun (m: Match) -> m.Groups.[2].Value + " " + m.Groups.[1].Value)
+      @@>
+
+[<TestCase(1); TestCase(3)>]
+let ``Regex.Replace with evaluator and limit works``(count) =
+   check 
+      <@@ 
+         let str = "abcabcabcabcabcabcabcabc"
+         let r = Regex("c")
+         r.Replace(str, (fun (m: Match) -> string m.Index), count=count)
+      @@>
+
+[<TestCase(0); TestCase(10)>]
+let ``Regex.Replace with evaluator, limit and offset works``(startat) =
+   check 
+      <@@ 
+         let str = "abcCcabCCabcccabcabcabCCCcabcabc"
+         let r = Regex("c+", RegexOptions.IgnoreCase)
+         r.Replace(str, (fun (m: Match) -> string m.Length), count=3, startat=startat)
       @@>

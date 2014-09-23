@@ -12,9 +12,11 @@ let private allComponents =
       Lists.components
       Strings.components
       Regexs.components
+      Times.components
       Asyncs.components
       ReflectedDefinitions.components
       Arrays.components
+      Enumerator.components
       ResizeArrays.components
       Dictionaries.components
       RecordTypes.components
