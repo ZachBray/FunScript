@@ -3,9 +3,21 @@
 open AST
 open Microsoft.FSharp.Quotations
 
+[<FunScript.JSEmitInline("''")>]
+let private getEmptyString(): string = failwith "never"
+
+let private emptyStringComponent =
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
+      function
+      | Patterns.FieldGet(_, fi) when fi.DeclaringType = typeof<string> && fi.Name = "Empty" ->
+            let mi, _ = Quote.toMethodInfoFromLambdas <@ getEmptyString @>
+            compiler.Compile returnStrategy (ExpressionReplacer.buildCall mi [])
+      | _ -> []
+
 let components = 
    [
       [
+         emptyStringComponent
          ExpressionReplacer.createUnsafe <@ fun (s:string) (chars:char[]) -> s.Split(chars) @> <@ Core.String.SplitWithoutOptions @>
          ExpressionReplacer.createUnsafe 
             <@ fun (s:string) (chars:char[]) (opts:System.StringSplitOptions) -> s.Split(chars,opts) @> 

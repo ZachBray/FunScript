@@ -148,7 +148,25 @@ let ``String.Format works``(arg1, arg2) =
          String.Format("{0} is dead, but {1} is alive! {0}", arg1, arg2)
       @@>
 
-// NOTE: This test doesn't work, but the correct Javascript is generated anyway
+[<Test>]
+let ``String.Empty works``() =
+   check 
+      <@@
+         let s = String.Empty
+         s
+      @@>
+
+
+// NOTE: This tests don't work with Jint, but the correct Javascript is generated anyway
+//[<Test>]
+//let ``String.Format with extra formatting works``() =
+//   check 
+//      <@@
+//         let i = 0.5466788
+//         let dt = DateTime(2014, 9, 26).AddMinutes(19.)
+//         String.Format("{0:F2} {0:P2} {0:E2} {1:t}", i, dt)
+//      @@>
+//
 //[<Test>]
 //let ``Console.WriteLine works``() =
 //   check 
