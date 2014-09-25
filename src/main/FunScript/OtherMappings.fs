@@ -30,6 +30,8 @@ let private debugComponents =
         let compile = fun quote -> let mi, _ = Quote.toMethodInfoFromLambdas quote
                                    compiler.Compile returnStrategy (ExpressionReplacer.buildCall mi args)
         match mi.Name with
+        | "Write" -> compile <@ Extensions.logFormat @> // TODO: This will create a new line anyway. Delete?
+        | "WriteIf" -> compile <@ Extensions.logIf @>   // TODO: This will create a new line anyway. Delete?
         | "WriteLine" -> compile <@ Extensions.logFormat @>
         | "WriteLineIf" -> compile <@ Extensions.logIf @>
         | _ -> []
@@ -92,6 +94,10 @@ let components =
          ExpressionReplacer.createUnsafe
             <@ fun (str: string, args: obj[]) -> System.Console.WriteLine(format=str, arg=args) @>
             <@ Extensions.logFormat @>
+
+         ExpressionReplacer.createUnsafe
+            <@ fun (str: string, args: obj[]) -> System.Console.Write(format=str, arg=args) @>
+            <@ Extensions.logFormat @>      // TODO: This will create a new line anyway. Delete?
 
          debugComponents
       ]
