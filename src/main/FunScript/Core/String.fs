@@ -1,6 +1,27 @@
 ﻿[<FunScript.JS>]
 module FunScript.Core.String
 
+// TODO: This is a bit tricky, it will never return a string but a function with valueOf and toString
+// methods set to return the string. It's working for practical purposes but, should we improve it?
+[<FunScript.JSEmit("""function formatToString(rep) {
+		{0} = {0}.replace(/(?:^|[^%])%[+\-* ]?\d*(.\d+)?(\w)/, function(match, precision, format) {
+			if (format == "f" && rep.toFixed !== undefined) {
+				if (precision !== undefined) {
+					rep = rep.toFixed(precision.substring(1));
+				}
+			}
+			else if ((format == "E" || format == "e") && rep.toExponential !== undefined) {
+				var pr = precision !== undefined ? precision.substring(1) : "";
+				rep = rep.toExponential(pr);
+			}
+			return (match[0] !== '%') ? match[0] + rep : rep;
+		})
+		return formatToString;
+	}
+	formatToString.valueOf = formatToString.toString = function() { return {0}; }
+	return formatToString""")>]
+let PrintFormatToString(s: string): obj = failwith "never"
+
 [<FunScript.JSEmit("""return {0}.replace(/{(\d+)(,-?\d+)?(:[CDEFGNPXTMYdt]\d{0,})?}/g, function(match, number, alignment, format) {
 			var rep = match;
 			if ({1}[number] !== undefined) {
