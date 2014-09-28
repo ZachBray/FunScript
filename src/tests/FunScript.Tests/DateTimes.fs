@@ -4,19 +4,56 @@ module FunScript.Tests.DateTimes
 open NUnit.Framework
 open System
 
-[<TestCase(2014); TestCase(2016);>]
-let ``DateTime.IsLeapYear works``(year) =
-   check 
-      <@@ 
-         DateTime.IsLeapYear(year)
-      @@>
-
-[<TestCase(2014, 1); TestCase(2014, 2); TestCase(2014, 4); TestCase(2016, 2)>]
-let ``DateTime.DaysInMonth works``(year, month) =
-   check 
-      <@@ 
-         DateTime.DaysInMonth(year, month) |> float
-      @@>
+// TODO: These tests don't work with Jint, but the generated JS works fine in the browser
+//[<Test>]
+//let ``DateTime.ToLocalTime works``() =
+//   check 
+//      <@@ 
+//         let d = DateTime(2014, 10, 9, 13, 23, 30, DateTimeKind.Utc)
+//         let d' = d.ToLocalTime()
+//         float (d.Hour + d'.Hour)
+//      @@>
+//
+//[<Test>]
+//let ``DateTime.Hour works``() =
+//   check 
+//      <@@ 
+//         let d = DateTime(2014, 10, 9, 13, 23, 30, DateTimeKind.Local)
+//         let d' = DateTime(2014, 10, 9, 13, 23, 30, DateTimeKind.Utc)
+//         float (d.Hour + d'.Hour)
+//      @@>
+//
+//[<Test>]
+//let ``DateTime.ToLongDateString works``() =
+//   check 
+//      <@@ 
+//         let dt = DateTime(2014, 9, 11, 16, 37, 0)
+//         dt.ToLongDateString()
+//      @@>
+//
+//[<Test>]
+//let ``DateTime.ToShortDateString works``() =
+//   check 
+//      <@@ 
+//         let dt = DateTime(2014, 9, 11, 16, 37, 0)
+//         dt.ToShortDateString()
+//      @@>
+//
+//[<Test>]
+//let ``DateTime.ToLongTimeString works``() =
+//   check 
+//      <@@ 
+//         let dt = DateTime(2014, 9, 11, 16, 37, 0)
+//         dt.ToLongTimeString()
+//      @@>
+//
+//[<Test>]
+//let ``DateTime.ToShortTimeString works``() =
+//   check 
+//      <@@ 
+//         let dt = DateTime(2014, 9, 11, 16, 37, 0)
+//         dt.ToShortTimeString()
+//      @@>
 
 // TODO: Unfortunately, JS will happily create invalid dates like DateTime(2014,2,29)
 //       But this problem also happens when parsing, so I haven't tried to fix it
@@ -30,6 +67,20 @@ let ``DateTime constructors work``() =
          let d4 = DateTime(2014, 10, 9, 13, 23, 30, 500)
          let d5 = DateTime(2014, 10, 9, 13, 23, 30, 500, DateTimeKind.Utc)
          (float d1.Day) + (float d2.Second) + (float d3.Second) + (float d4.Millisecond) + (float d5.Millisecond)
+      @@>
+
+[<TestCase(2014); TestCase(2016);>]
+let ``DateTime.IsLeapYear works``(year) =
+   check 
+      <@@ 
+         DateTime.IsLeapYear(year)
+      @@>
+
+[<TestCase(2014, 1); TestCase(2014, 2); TestCase(2014, 4); TestCase(2016, 2)>]
+let ``DateTime.DaysInMonth works``(year, month) =
+   check 
+      <@@ 
+         DateTime.DaysInMonth(year, month) |> float
       @@>
 
 [<Test>]
@@ -73,25 +124,6 @@ let ``DateTime.ToUniversalTime works``() =
          let d' = d.ToUniversalTime()
          float (d.Hour + d'.Hour)
       @@>
-
-// TODO: These two tests are not working with Jint, but the generated JS works fine in the browser
-//[<Test>]
-//let ``DateTime.ToLocalTime works``() =
-//   check 
-//      <@@ 
-//         let d = DateTime(2014, 10, 9, 13, 23, 30, DateTimeKind.Utc)
-//         let d' = d.ToLocalTime()
-//         float (d.Hour + d'.Hour)
-//      @@>
-//
-//[<Test>]
-//let ``DateTime.Hour works``() =
-//   check 
-//      <@@ 
-//         let d = DateTime(2014, 10, 9, 13, 23, 30, DateTimeKind.Local)
-//         let d' = DateTime(2014, 10, 9, 13, 23, 30, DateTimeKind.Utc)
-//         float (d.Hour + d'.Hour)
-//      @@>
 
 [<Test>]
 let ``DateTime.Date works``() =
@@ -341,39 +373,6 @@ let ``DateTime Inequality works``(ms) =
          let dt2 = dt1.AddMilliseconds(ms)
          dt1 <> dt2
       @@>
-
-// NOTE: Tests are not working for string conversion methods
-//[<Test>]
-//let ``DateTime.ToLongDateString works``() =
-//   check 
-//      <@@ 
-//         let dt = DateTime(2014, 9, 11, 16, 37, 0)
-//         dt.ToLongDateString()
-//      @@>
-//
-//[<Test>]
-//let ``DateTime.ToShortDateString works``() =
-//   check 
-//      <@@ 
-//         let dt = DateTime(2014, 9, 11, 16, 37, 0)
-//         dt.ToShortDateString()
-//      @@>
-//
-//[<Test>]
-//let ``DateTime.ToLongTimeString works``() =
-//   check 
-//      <@@ 
-//         let dt = DateTime(2014, 9, 11, 16, 37, 0)
-//         dt.ToLongTimeString()
-//      @@>
-//
-//[<Test>]
-//let ``DateTime.ToShortTimeString works``() =
-//   check 
-//      <@@ 
-//         let dt = DateTime(2014, 9, 11, 16, 37, 0)
-//         dt.ToShortTimeString()
-//      @@>
 
 [<Test>]
 let ``TimeSpan constructors work``() =

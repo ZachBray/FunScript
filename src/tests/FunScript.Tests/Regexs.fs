@@ -4,8 +4,7 @@ module FunScript.Tests.Regexs
 open NUnit.Framework
 open System.Text.RegularExpressions
 
-
-// NOTE: These three tests are not working, but the methods are fine in actual code
+// TODO: These tests don't work with Jint, but the generated JS works fine in the browser
 //[<Test>]
 //let ``Regex.Options works``() =
 //   check 
@@ -27,7 +26,14 @@ open System.Text.RegularExpressions
 //      <@@ 
 //         Regex.Unescape(str)
 //      @@>
-
+//
+//[<TestCase("^ab");TestCase("^cd");TestCase("^AB");TestCase("^CD")>]
+//let ``Regex.IsMatch with IgnoreCase and Multiline works``(pattern) =
+//   check 
+//      <@@ 
+//         let str = "ab\ncd"
+//         Regex.IsMatch(str, pattern, RegexOptions.IgnoreCase ||| RegexOptions.Multiline)
+//      @@>
 
 [<TestCase("Chapter \d+(\.\d)*"); TestCase("chapter \d+(\.\d)*")>]
 let ``Regex instance IsMatch works``(pattern) =
@@ -92,16 +98,6 @@ let ``Regex.IsMatch with Multiline works``(pattern) =
          let str = "ab\ncd"
          Regex.IsMatch(str, pattern, RegexOptions.Multiline)
       @@>
-
-
-// NOTE: Tests for setting both flags at the same time are failing, but it works in actual code.
-//[<TestCase("^ab");TestCase("^cd");TestCase("^AB");TestCase("^CD")>]
-//let ``Regex.IsMatch with IgnoreCase and Multiline works``(pattern) =
-//   check 
-//      <@@ 
-//         let str = "ab\ncd"
-//         Regex.IsMatch(str, pattern, RegexOptions.IgnoreCase ||| RegexOptions.Multiline)
-//      @@>
 
 [<TestCase("Chapter \d+(\.\d)*"); TestCase("chapter \d+(\.\d)*")>]
 let ``Regex.Match works``(pattern) =
