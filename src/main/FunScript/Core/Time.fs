@@ -148,11 +148,11 @@ type DateTime =
     return date""")>]
     static member private createUnsafe(value: obj, kind: System.DateTimeKind): DateTime = failwith "never"
 
-    [<JSEmit("""var date = new Date({0}, {1} - 1, {2}, {3}, {4}, {5}, {6});
+    [<JSEmit("""var date = {7} === {8} ? new Date(Date.UTC({0}, {1} - 1, {2}, {3}, {4}, {5}, {6})) : new Date({0}, {1} - 1, {2}, {3}, {4}, {5}, {6});
     if (isNaN(date)) { throw "The parameters describe an un-representable DateTime." }
     date.kind = {7};
     return date""")>]
-    static member private createUnsafeYMDHMSM(year: int, month: int, day: int, h: int, min: int, s: int, ms: int, kind: System.DateTimeKind): DateTime = failwith "never"
+    static member private createUnsafeYMDHMSM(year: int, month: int, day: int, h: int, min: int, s: int, ms: int, kind: System.DateTimeKind, utcKind: System.DateTimeKind): DateTime = failwith "never"
 
     [<JSEmit("if ({0}.kind == {1}) { return {0} } else { var newDate = new Date({0}.getTime()); newDate.kind = {1}; return newDate }")>]
     static member private changeKind(d: DateTime, kind: System.DateTimeKind): DateTime = failwith "never"
@@ -181,29 +181,23 @@ type DateTime =
         else [|31;28;31;30;31;30;31;31;30;31;30;31|]
     // -------------------------------------------------------------------------------------------
 
-    static member FromTicks(ticks: int64) =
-        DateTime.createUnsafe(ticks / TimeSpan.TicksPerMillisecond, System.DateTimeKind.Local)
-
-    static member FromTicksWithKind(ticks: int64, kind: System.DateTimeKind) =
-        DateTime.createUnsafe(ticks / TimeSpan.TicksPerMillisecond, kind)
-
     static member FromYMDHMSMwithKind(year: int, month: int, day: int, h: int, min: int, s: int, ms: int, kind: System.DateTimeKind) =
-        DateTime.createUnsafeYMDHMSM(year, month, day, h, min, s, ms, kind)
+        DateTime.createUnsafeYMDHMSM(year, month, day, h, min, s, ms, kind, System.DateTimeKind.Utc)
 
     static member FromYMDHMSM(year: int, month: int, day: int, h: int, min: int, s: int, ms: int) =
-        DateTime.createUnsafeYMDHMSM(year, month, day, h, min, s, ms, System.DateTimeKind.Local)
+        DateTime.createUnsafeYMDHMSM(year, month, day, h, min, s, ms, System.DateTimeKind.Local, System.DateTimeKind.Utc)
 
     static member FromYMDHMSwithKind(year: int, month: int, day: int, h: int, min: int, s: int, kind: System.DateTimeKind) =
-        DateTime.createUnsafeYMDHMSM(year, month, day, h, min, s, 0, kind)
+        DateTime.createUnsafeYMDHMSM(year, month, day, h, min, s, 0, kind, System.DateTimeKind.Utc)
 
     static member FromYMDHMS(year: int, month: int, day: int, h: int, min: int, s: int) =
-        DateTime.createUnsafeYMDHMSM(year, month, day, h, min, s, 0, System.DateTimeKind.Local)
+        DateTime.createUnsafeYMDHMSM(year, month, day, h, min, s, 0, System.DateTimeKind.Local, System.DateTimeKind.Utc)
 
     static member FromYMD(year: int, month: int, day: int): DateTime =
-        DateTime.createUnsafeYMDHMSM(year, month, day, 0, 0, 0, 0, System.DateTimeKind.Local)
+        DateTime.createUnsafeYMDHMSM(year, month, day, 0, 0, 0, 0, System.DateTimeKind.Local, System.DateTimeKind.Utc)
 
-    static member MinValue with get() = DateTime.createUnsafe(-Literals.millisecondsMAX, System.DateTimeKind.Local)
-    static member MaxValue with get() = DateTime.createUnsafe(Literals.millisecondsMAX, System.DateTimeKind.Local)
+    static member MinValue with get() = DateTime.createUnsafe(-Literals.millisecondsMAX, System.DateTimeKind.Utc)
+    static member MaxValue with get() = DateTime.createUnsafe(Literals.millisecondsMAX, System.DateTimeKind.Utc)
 
     static member Now    with get() = DateTime.createUnsafe(null, System.DateTimeKind.Local)
     static member UtcNow with get() = DateTime.createUnsafe(null, System.DateTimeKind.Utc)
@@ -216,11 +210,11 @@ type DateTime =
     static member DaysInMonth(year: int, month: int) =
         DateTime.getDaysInMonths(year).[month - 1]
 
-    member dt.ToUniversalTime(): DateTime = DateTime.changeKind(dt, System.DateTimeKind.Utc)
-    member dt.ToLocalTime    (): DateTime = DateTime.changeKind(dt, System.DateTimeKind.Local)
+    member dt.ToUniversalTime() = DateTime.changeKind(dt, System.DateTimeKind.Utc)
+    member dt.ToLocalTime    () = DateTime.changeKind(dt, System.DateTimeKind.Local)
 
     member dt.TimeOfDay with get() = TimeSpan.FromHMS(dt.Hour, dt.Minute, dt.Second)
-    member dt.Date      with get() = DateTime.createUnsafeYMDHMSM(dt.Year, dt.Month, dt.Day, 0, 0, 0, 0, dt.Kind)
+    member dt.Date      with get() = DateTime.createUnsafeYMDHMSM(dt.Year, dt.Month, dt.Day, 0, 0, 0, 0, dt.Kind, System.DateTimeKind.Utc)
 
     member dt.Day           with get() = DateTime.getValueUnsafe(dt, "Date",         System.DateTimeKind.Utc)
     member dt.Hour          with get() = DateTime.getValueUnsafe(dt, "Hours",        System.DateTimeKind.Utc)
@@ -249,7 +243,7 @@ type DateTime =
         let newYear = dt.Year + (unbox offset)
         let daysInMonth = DateTime.DaysInMonth(newYear, newMonth)
         let newDay = min daysInMonth dt.Day
-        DateTime.createUnsafeYMDHMSM(newYear, newMonth, newDay, dt.Hour, dt.Minute, dt.Second, dt.Millisecond, dt.Kind)
+        DateTime.createUnsafeYMDHMSM(newYear, newMonth, newDay, dt.Hour, dt.Minute, dt.Second, dt.Millisecond, dt.Kind, System.DateTimeKind.Utc)
 
     member dt.AddMonths(offset: int) =
         let newMonth = dt.Month + offset
@@ -267,7 +261,7 @@ type DateTime =
         let newYear = dt.Year + (unbox yearOffset)
         let daysInMonth = DateTime.DaysInMonth(newYear, newMonth)
         let newDay = min daysInMonth dt.Day
-        DateTime.createUnsafeYMDHMSM(newYear, newMonth, newDay, dt.Hour, dt.Minute, dt.Second, dt.Millisecond, dt.Kind)
+        DateTime.createUnsafeYMDHMSM(newYear, newMonth, newDay, dt.Hour, dt.Minute, dt.Second, dt.Millisecond, dt.Kind, System.DateTimeKind.Utc)
 
     member dt.Subtract(t: TimeSpan)    = DateTime.createUnsafe(DateTime.getTime(dt) - t.TotalMilliseconds, dt.Kind)
     member dt.Subtract(that): TimeSpan = TimeSpan.FromMilliseconds((DateTime.getTime dt) - (DateTime.getTime that))
@@ -283,30 +277,6 @@ type DateTime =
     member dt.ToShortDateString()   = DateTime.toFormattedStringUnsafe(dt, "LocaleDate")
     member dt.ToLongTimeString()    = DateTime.toFormattedStringUnsafe(dt, "LocaleTime")
     member dt.ToShortTimeString()   = DateTime.toShortTimeStringUnsafe(dt)
-
-    [<JSEmit("""if ({1}.length === 1) {
-		switch ({1}) {
-			case "D": return {0}.toDateString();
-			case "T": return {0}.toLocaleTimeString();
-			case "d": return {0}.toLocaleDateString();
-			case "t": return {0}.toLocaleTimeString().replace(/:\d\d(?!:)/, '');
-		}		
-	}
-	return {1}.replace(/(\w)\1*/g, function (match) {
-		var rep = match;
-		switch (match.substring(0,1)) {
-			case "y": rep = match.length < 4 ? {0}.getFullYear() % 100 : {0}.getFullYear(); break;
-			case "h": rep = {0}.getHours() > 12 ? {0}.getHours() % 12 : {0}.getHours();    break;
-			case "M": rep = {0}.getMonth() + 1; break;
-			case "d": rep = {0}.getDate(); 	    break;
-			case "H": rep = {0}.getHours(); 	break;
-			case "m": rep = {0}.getMinutes();   break;
-			case "s": rep = {0}.getSeconds();	break;
-		}
-		if (rep !== match && rep < 10 && match.length > 1) { rep = "0" + rep; }
-		return rep;
-	})""")>]
-    member dt.toString(format: string) = failwith "never"
 
     override dt.GetHashCode() = unbox<int>(DateTime.getTime(dt))
     override dt.Equals(that)  = DateTime.getTime(dt) = DateTime.getTime(unbox that)
