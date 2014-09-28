@@ -8,6 +8,7 @@ module Literals =
     let [<Literal>] millisecondsPerMinute = 60000.
     let [<Literal>] millisecondsPerSecond = 1000.
     let [<Literal>] millisecondsJSOffset  = 6.2135604e+13
+    let [<Literal>] millisecondsMAX       = 8640000000000000.
 
 [<JS; JSEmitInline("window.setTimeout({0}, {1})")>]
 let setTimeout(handler:unit -> unit, milliseconds:float): int = failwith "never"
@@ -34,6 +35,7 @@ type ElapsedEventArgs() =
 type Timer(interval: float) =
     let mutable _id: int option = None
     let mutable _observer: System.IObserver<_> option = None
+    let mutable _handlers = ResizeArray<System.Func<obj, ElapsedEventArgs, unit>>()
 
     member val AutoReset = true     with get, set
     member val Interval  = interval with get, set
@@ -50,12 +52,15 @@ type Timer(interval: float) =
         | Some _ -> ()
         | None ->
             let rec handler = fun () ->
+                let args = ElapsedEventArgs()
+                for h in _handlers do
+                    h.Invoke(timer, args)
                 match _observer with
-                | None   -> ()
-                | Some o -> o.OnNext(ElapsedEventArgs())
+                    | Some o -> o.OnNext(args)
+                    | None -> ()
                 match timer.AutoReset with
-                | false -> _id <- None
-                | true  -> _id <- Some(setTimeout(handler, timer.Interval))
+                    | false -> _id <- None
+                    | true  -> _id <- Some(setTimeout(handler, timer.Interval))
             _id <- Some(setTimeout(handler, timer.Interval))
 
     member timer.Stop() = 
@@ -67,7 +72,11 @@ type Timer(interval: float) =
     interface System.IDisposable with
         member timer.Dispose() = timer.Close()
 
-    interface System.IObservable<ElapsedEventArgs> with
+    interface Control.IEvent<System.Func<obj, ElapsedEventArgs, unit>,ElapsedEventArgs> with
+        member timer.AddHandler(handler) =
+            _handlers.Add(handler)
+        member timer.RemoveHandler(handler) =
+            _handlers.Remove(handler) |> ignore
         member timer.Subscribe(observer) =
             _observer <- Some observer
             new Events.ActionDisposable(fun () -> _observer <- None) :> System.IDisposable
@@ -133,10 +142,16 @@ type TimeSpan =
 [<JS>]
 type DateTime =
     // HELPER FUNCTIONS --------------------------------------------------------------------------
-    [<JSEmit("var date = {0} == null ? new Date() : new Date({0}); date.kind = {1}; return date")>]
+    [<JSEmit("""var date = {0} == null ? new Date() : new Date({0});
+    if (isNaN(date)) { throw "The string was not recognized as a valid DateTime." }
+    date.kind = {1};
+    return date""")>]
     static member private createUnsafe(value: obj, kind: System.DateTimeKind): DateTime = failwith "never"
 
-    [<JSEmit("var date = new Date({0}, {1} - 1, {2}, {3}, {4}, {5}, {6}); date.kind = {7}; return date")>]
+    [<JSEmit("""var date = new Date({0}, {1} - 1, {2}, {3}, {4}, {5}, {6});
+    if (isNaN(date)) { throw "The parameters describe an un-representable DateTime." }
+    date.kind = {7};
+    return date""")>]
     static member private createUnsafeYMDHMSM(year: int, month: int, day: int, h: int, min: int, s: int, ms: int, kind: System.DateTimeKind): DateTime = failwith "never"
 
     [<JSEmit("if ({0}.kind == {1}) { return {0} } else { var newDate = new Date({0}.getTime()); newDate.kind = {1}; return newDate }")>]
@@ -186,6 +201,9 @@ type DateTime =
 
     static member FromYMD(year: int, month: int, day: int): DateTime =
         DateTime.createUnsafeYMDHMSM(year, month, day, 0, 0, 0, 0, System.DateTimeKind.Local)
+
+    static member MinValue with get() = DateTime.createUnsafe(-Literals.millisecondsMAX, System.DateTimeKind.Local)
+    static member MaxValue with get() = DateTime.createUnsafe(Literals.millisecondsMAX, System.DateTimeKind.Local)
 
     static member Now    with get() = DateTime.createUnsafe(null, System.DateTimeKind.Local)
     static member UtcNow with get() = DateTime.createUnsafe(null, System.DateTimeKind.Utc)
@@ -265,6 +283,30 @@ type DateTime =
     member dt.ToShortDateString()   = DateTime.toFormattedStringUnsafe(dt, "LocaleDate")
     member dt.ToLongTimeString()    = DateTime.toFormattedStringUnsafe(dt, "LocaleTime")
     member dt.ToShortTimeString()   = DateTime.toShortTimeStringUnsafe(dt)
+
+    [<JSEmit("""if ({1}.length === 1) {
+		switch ({1}) {
+			case "D": return {0}.toDateString();
+			case "T": return {0}.toLocaleTimeString();
+			case "d": return {0}.toLocaleDateString();
+			case "t": return {0}.toLocaleTimeString().replace(/:\d\d(?!:)/, '');
+		}		
+	}
+	return {1}.replace(/(\w)\1*/g, function (match) {
+		var rep = match;
+		switch (match.substring(0,1)) {
+			case "y": rep = match.length < 4 ? {0}.getFullYear() % 100 : {0}.getFullYear(); break;
+			case "h": rep = {0}.getHours() > 12 ? {0}.getHours() % 12 : {0}.getHours();    break;
+			case "M": rep = {0}.getMonth() + 1; break;
+			case "d": rep = {0}.getDate(); 	    break;
+			case "H": rep = {0}.getHours(); 	break;
+			case "m": rep = {0}.getMinutes();   break;
+			case "s": rep = {0}.getSeconds();	break;
+		}
+		if (rep !== match && rep < 10 && match.length > 1) { rep = "0" + rep; }
+		return rep;
+	})""")>]
+    member dt.toString(format: string) = failwith "never"
 
     override dt.GetHashCode() = unbox<int>(DateTime.getTime(dt))
     override dt.Equals(that)  = DateTime.getTime(dt) = DateTime.getTime(unbox that)
