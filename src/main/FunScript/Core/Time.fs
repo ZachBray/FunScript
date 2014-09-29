@@ -10,66 +10,6 @@ module Literals =
     let [<Literal>] millisecondsJSOffset  = 6.2135604e+13
     let [<Literal>] millisecondsMAX       = 8640000000000000.
 
-[<JS; JSEmitInline("window.setTimeout({0}, {1})")>]
-let setTimeout(handler:unit -> unit, milliseconds:float): int = failwith "never"
-
-[<JS; JSEmitInline("window.clearTimeout({0})")>]
-let clearTimeout(id: int) = failwith "never"
-
-[<JS>]
-type ElapsedEventArgs() =
-    member val SignalTime = System.DateTime.Now
-
-[<JS>]
-type Timer(interval: float) =
-    let mutable _id: int option = None
-    let mutable _observer: System.IObserver<_> option = None
-    let mutable _handlers = ResizeArray<System.Func<obj, ElapsedEventArgs, unit>>()
-
-    member val AutoReset = true     with get, set
-    member val Interval  = interval with get, set
-
-    // TODO: It can only be used as IObservable at the moment
-    member timer.Elapsed
-        with get() = timer :> System.IObservable<_>
-    member timer.Enabled
-        with get() = match _id with Some _ -> true | None -> false
-        and set(v: bool) = if v then timer.Start() else timer.Stop()
-    
-    member timer.Start() =
-        match _id with
-        | Some _ -> ()
-        | None ->
-            let rec handler = fun () ->
-                let args = ElapsedEventArgs()
-                for h in _handlers do
-                    h.Invoke(timer, args)
-                match _observer with
-                    | Some o -> o.OnNext(args)
-                    | None -> ()
-                match timer.AutoReset with
-                    | false -> _id <- None
-                    | true  -> _id <- Some(setTimeout(handler, timer.Interval))
-            _id <- Some(setTimeout(handler, timer.Interval))
-
-    member timer.Stop() = 
-        match _id with
-        | None -> ()
-        | Some i -> clearTimeout(i); _id <- None
-    
-    member timer.Close() = timer.Stop()
-    interface System.IDisposable with
-        member timer.Dispose() = timer.Close()
-
-    interface Control.IEvent<System.Func<obj, ElapsedEventArgs, unit>,ElapsedEventArgs> with
-        member timer.AddHandler(handler) =
-            _handlers.Add(handler)
-        member timer.RemoveHandler(handler) =
-            _handlers.Remove(handler) |> ignore
-        member timer.Subscribe(observer) =
-            _observer <- Some observer
-            new Events.ActionDisposable(fun () -> _observer <- None) :> System.IDisposable
-
 // NOTE: For performance, TimeSpan is just a wrapper around the milliseconds
 [<JS>]
 type TimeSpan =
