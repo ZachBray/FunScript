@@ -16,17 +16,6 @@ let setTimeout(handler:unit -> unit, milliseconds:float): int = failwith "never"
 [<JS; JSEmitInline("window.clearTimeout({0})")>]
 let clearTimeout(id: int) = failwith "never"
 
-[<JS; JSEmitInline("window.setInterval({0}, {1})")>]
-let setInterval(handler:unit -> unit, milliseconds:float): int = failwith "never"
-
-[<JS; JSEmitInline("clearInterval({0})")>]
-let clearInterval(id: int) = failwith "never"
-
-[<JS; JSEmit("""var reqFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
-                   window.webkitRequestAnimationFrame || window.oRequestAnimationFrame;
-    return reqFrame({0})""")>]
-let requestAnimationFrame(handler:float -> unit): int = failwith "never"
-
 [<JS>]
 type ElapsedEventArgs() =
     member val SignalTime = System.DateTime.Now
