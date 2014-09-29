@@ -16,7 +16,6 @@ let private allComponents =
       Asyncs.components
       ReflectedDefinitions.components
       Arrays.components
-      Enumerator.components
       ResizeArrays.components
       Dictionaries.components
       RecordTypes.components

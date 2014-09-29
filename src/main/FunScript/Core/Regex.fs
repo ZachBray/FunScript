@@ -5,27 +5,23 @@ open FunScript
 open System.Collections
 open System.Text.RegularExpressions
 
-type Enumerator(xs: obj[]) =
-    let mutable index = -1
-    let mutable Dispose     = fun () -> ()
-    let mutable get_Current = fun () -> xs.[index]
-    let mutable MoveNext    = fun () -> index <- index + 1; index < xs.Length
+let GroupCollectionToSeq(xs: GroupCollection) =
+    Seq.unfold (fun i -> if i < xs.Count then Some(xs.[i], i+1) else None) 0
+
+let MatchCollectionToSeq(xs: MatchCollection) =
+    Seq.unfold (fun i -> if i < xs.Count then Some(xs.[i], i+1) else None) 0
 
 type GroupCollection =
     [<JSEmitInline("{0}")>]
     static member getArray(x: GroupCollection): Group[] = failwith "never"
-
     member xs.Item with get(i) = GroupCollection.getArray(xs).[i]
     member xs.Count with get() = GroupCollection.getArray(xs).Length
-    member xs.GetEnumerator() = Enumerator(unbox (GroupCollection.getArray xs))
 
 type MatchCollection =
     [<JSEmitInline("{0}")>]
     static member getArray(x: MatchCollection): Match[] = failwith "never"
-
     member xs.Item with get(i) = MatchCollection.getArray(xs).[i]
     member xs.Count with get() = MatchCollection.getArray(xs).Length
-    member xs.GetEnumerator() = Enumerator(unbox (MatchCollection.getArray xs))
 
 type Capture =
     [<JSEmit("return {0}.index !== undefined ? {0}.index : 0")>]
@@ -34,7 +30,6 @@ type Capture =
     static member private getValue(x: Capture): string = failwith "never"
     [<JSEmit("return Array.isArray({0}) ? ({0}[0]).length : {0}.length")>]
     static member private getLength(x: Capture): string = failwith "never"
-
     member x.Index with get() = Capture.getIndex(x)
     member x.Value with get() = Capture.getValue(x)
     member x.Length with get() = Capture.getLength(x)
@@ -42,13 +37,11 @@ type Capture =
 type Group =
     [<JSEmitInline("({0} !== null)")>]
     static member getSucess(x: Group): bool = failwith "never"
-
     member x.Success with get() = Group.getSucess(x)
 
 type Match =
     [<JSEmitInline("{0}")>]
     static member getGroups(x: Match): GroupCollection = failwith "never"
-
     member x.Groups with get() = Match.getGroups(x)
 
 [<JSEmitInline("(new RegExp({0}, 'g' + {1}))")>]

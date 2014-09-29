@@ -2,15 +2,7 @@
 module FunScript.Core.ResizeArray
 
 open FunScript
-
-type Enumerator<'T>(xs: 'T[]) =
-    let mutable index = -1
-    let mutable Dispose = fun()->()
-    member x.Current with get() = xs.[index]
-    member x.Reset() = index <- -1
-    member x.MoveNext() =
-        index <- index + 1
-        index < xs.Length
+open System.Collections.Generic
 
 let ToSeq(xs: ResizeArray<'T>) =
     Seq.unfold (fun i -> if i < xs.Count then Some(xs.[i], i+1) else None) 0
@@ -77,4 +69,5 @@ type ResizeArray<'T> =
     [<JSEmitInline("{0}.sort({1})")>]
     member xs.SortInPlaceWith(comparison: System.Comparison<'T>): unit = failwith "never"
 
-    member xs.GetEnumerator() = Enumerator<'T>(unbox xs)
+//    member xs.GetEnumerator(): System.Collections.Generic.IEnumerator<'T> =
+//        upcast new Seq.UnfoldEnumerator<_,_>(-1, fun i -> if i < xs.Count then Some(xs.[i], i+1) else None)

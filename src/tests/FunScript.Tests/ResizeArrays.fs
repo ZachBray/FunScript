@@ -31,7 +31,8 @@ let ``ResizeArray creation with seq works``() =
 let ``ResizeArray iteration works``() =
    check 
       <@@ 
-         let li = ResizeArray<_>(seq{1. .. 5.})
+         let li = ResizeArray<_>()
+         li.Add(1.); li.Add(2.); li.Add(3.); li.Add(4.); li.Add(5.) 
          let acc = ref 0.
          for i in li do
             acc := !acc + i
@@ -56,15 +57,17 @@ let ``ResizeArray iteration with index works``() =
 let ``ResizeArray folding works``() =
    check 
       <@@ 
-         ResizeArray<_>(seq{1. .. 5.})
-         |> Seq.fold (fun acc item -> acc + item) 0.
+         let li = ResizeArray<_>()
+         li.Add(1.); li.Add(2.); li.Add(3.); li.Add(4.); li.Add(5.) 
+         li |> Seq.fold (fun acc item -> acc + item) 0.
       @@>
 
 [<Test>]
 let ``ResizeArray.Count works``() =
    check 
       <@@ 
-         let li = ResizeArray<_>(seq{1. .. 5.})
+         let li = ResizeArray<_>()
+         li.Add(1.); li.Add(2.); li.Add(3.); li.Add(4.); li.Add(5.) 
          li.Count |> float
       @@>
 
@@ -72,7 +75,8 @@ let ``ResizeArray.Count works``() =
 let ``ResizeArray indexer getter works``() =
    check 
       <@@ 
-         let li = ResizeArray<_>(seq{1. .. 5.})
+         let li = ResizeArray<_>()
+         li.Add(1.); li.Add(2.); li.Add(3.); li.Add(4.); li.Add(5.) 
          li.[1]
       @@>
 
@@ -80,7 +84,8 @@ let ``ResizeArray indexer getter works``() =
 let ``ResizeArray indexer setter works``() =
    check 
       <@@ 
-         let li = ResizeArray<_>(seq{1. .. 5.})
+         let li = ResizeArray<_>()
+         li.Add(1.); li.Add(2.); li.Add(3.); li.Add(4.); li.Add(5.) 
          li.[3] <- 10.
          li.[3]
       @@>
@@ -89,7 +94,8 @@ let ``ResizeArray indexer setter works``() =
 let ``ResizeArray.Clear works``() =
    check 
       <@@ 
-         let li = ResizeArray<_>(seq{1. .. 5.})
+         let li = ResizeArray<_>()
+         li.Add(1.); li.Add(2.); li.Add(3.); li.Add(4.); li.Add(5.) 
          li.Clear()
          li.Count |> float
       @@>
@@ -98,16 +104,18 @@ let ``ResizeArray.Clear works``() =
 let ``ResizeArray.Add works``() =
    check 
       <@@ 
-         let li = ResizeArray<_>(seq{1. .. 5.})
+         let li = ResizeArray<_>()
+         li.Add(1.); li.Add(2.); li.Add(3.); li.Add(4.); li.Add(5.) 
          li.Add(6.)
          li.Count |> float
       @@>
 
 [<Test>]
 let ``ResizeArray.AddRange works``() =
-   check 
+   check
       <@@ 
-         let li = ResizeArray<_>(seq{1. .. 5.})
+         let li = ResizeArray<_>()
+         li.AddRange [1;2;3]
          li.Count |> float
       @@>
 
@@ -145,7 +153,8 @@ let ``ResizeArray.Remove works``(str:string) =
 let ``ResizeArray.RemoveAt works``() =
    check 
       <@@ 
-         let li = ResizeArray<_>(seq{1. .. 5.})
+         let li = ResizeArray<_>()
+         li.Add(1.); li.Add(2.); li.Add(3.); li.Add(4.); li.Add(5.) 
          li.RemoveAt(2)
          li.[2]
       @@>
@@ -154,7 +163,8 @@ let ``ResizeArray.RemoveAt works``() =
 let ``ResizeArray.Insert works``() =
    check 
       <@@ 
-         let li = ResizeArray<_>(seq{1. .. 5.})
+         let li = ResizeArray<_>()
+         li.Add(1.); li.Add(2.); li.Add(3.); li.Add(4.); li.Add(5.)
          li.Insert(2, 8.)
          li.[2]
       @@>
@@ -163,7 +173,8 @@ let ``ResizeArray.Insert works``() =
 let ``ResizeArray.ReverseInPlace works``() =
    check 
       <@@ 
-         let li = ResizeArray<_>(seq{1. .. 5.})
+         let li = ResizeArray<_>()
+         li.Add(1.); li.Add(2.); li.Add(3.); li.Add(4.); li.Add(5.) 
          li.Reverse()
          li.[2]
       @@>
@@ -172,7 +183,8 @@ let ``ResizeArray.ReverseInPlace works``() =
 let ``ResizeArray.SortInPlace works``() =
    check 
       <@@ 
-         let li = ResizeArray<_>(["Ana";"Pedro";"Lucía";"Paco"])
+         let li = ResizeArray<_>()
+         li.Add("Ana"); li.Add("Pedro"); li.Add("Lucía"); li.Add("Paco")
          li.Sort()
          li.[2]
       @@>
@@ -181,7 +193,8 @@ let ``ResizeArray.SortInPlace works``() =
 let ``ResizeArray.SortInPlaceWith works``() =
    check 
       <@@ 
-         let li = ResizeArray<_>([|3.;6.;5.;4.;8.|])
+         let li = ResizeArray<_>()
+         li.Add(3.); li.Add(6.); li.Add(5.); li.Add(4.); li.Add(8.) 
          li.Sort(fun x y -> if x > y then -1 elif x < y then 1 else 0)
          li.Sort()
          li.[3]
