@@ -5,16 +5,19 @@ open FunScript
 open System.Collections
 open System.Text.RegularExpressions
 
+type Enumerator(xs: obj[]) =
+    let mutable index = -1
+    let mutable Dispose     = fun () -> ()
+    let mutable get_Current = fun () -> xs.[index]
+    let mutable MoveNext    = fun () -> index <- index + 1; index < xs.Length
+
 type GroupCollection =
     [<JSEmitInline("{0}")>]
     static member getArray(x: GroupCollection): Group[] = failwith "never"
 
     member xs.Item with get(i) = GroupCollection.getArray(xs).[i]
     member xs.Count with get() = GroupCollection.getArray(xs).Length
-    member xs.GetEnumerator(): IEnumerator = upcast new ResizeArray.Enumerator<_>(GroupCollection.getArray(xs))
-    static member ToSeq (xs: GroupCollection) =
-        let xs = GroupCollection.getArray(xs)
-        Seq.unfold (fun i -> if i < xs.Length then Some(xs.[i], i+1) else None) 0
+    member xs.GetEnumerator() = Enumerator(unbox (GroupCollection.getArray xs))
 
 type MatchCollection =
     [<JSEmitInline("{0}")>]
@@ -22,10 +25,7 @@ type MatchCollection =
 
     member xs.Item with get(i) = MatchCollection.getArray(xs).[i]
     member xs.Count with get() = MatchCollection.getArray(xs).Length
-    member xs.GetEnumerator(): IEnumerator = upcast new ResizeArray.Enumerator<_>(MatchCollection.getArray(xs))
-    static member ToSeq (xs: MatchCollection) =
-        let xs = MatchCollection.getArray(xs)
-        Seq.unfold (fun i -> if i < xs.Length then Some(xs.[i], i+1) else None) 0
+    member xs.GetEnumerator() = Enumerator(unbox (MatchCollection.getArray xs))
 
 type Capture =
     [<JSEmit("return {0}.index !== undefined ? {0}.index : 0")>]

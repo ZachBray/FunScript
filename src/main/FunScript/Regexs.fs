@@ -4,25 +4,9 @@ open AST
 open Microsoft.FSharp.Quotations
 open System.Text.RegularExpressions
 
-let private toSeq =
-    CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
-        function
-        | Patterns.Coerce(expr, t) 
-            when t.Name = typeof<seq<obj>>.Name || t.Name = typeof<System.Collections.IEnumerable>.Name ->
-            match expr with
-            | expr when expr.Type.Name = typeof<GroupCollection>.Name ->
-                let mi, _ = Quote.toMethodInfoFromLambdas <@@ Core.Regex.GroupCollection.ToSeq @@>
-                compiler.Compile returnStrategy (ExpressionReplacer.buildCall mi [expr])
-            | expr when expr.Type.Name = typeof<MatchCollection>.Name ->
-                let mi, _ = Quote.toMethodInfoFromLambdas <@@ Core.Regex.MatchCollection.ToSeq @@>
-                compiler.Compile returnStrategy (ExpressionReplacer.buildCall mi [expr])
-            | _ -> [] 
-        | _ -> []
-
 let components = 
   [
     [
-        toSeq
         ExpressionReplacer.createUnsafe <@ fun (r) -> Regex(r) @> <@ fun r -> Core.Regex.Create(r) @>
         ExpressionReplacer.createUnsafe <@ fun (r, o) -> Regex(r, o) @> <@ Core.Regex.CreateWithOptions @>
         ExpressionReplacer.createUnsafe <@ fun (r: Regex) -> r.Options @> <@ Core.Regex.GetOptions @>

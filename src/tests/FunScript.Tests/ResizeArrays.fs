@@ -39,6 +39,20 @@ let ``ResizeArray iteration works``() =
       @@>
 
 [<Test>]
+let ``ResizeArray iteration with index works``() =
+   checkAreEqual
+      10. 
+      <@@
+         let li = ResizeArray<_>()
+         for i = 1 to 4 do
+            li.Add(float i)
+         let mutable x = 0.
+         for i = 0 to li.Count - 1 do
+            x <- x + li.[i]
+         x
+      @@>
+
+[<Test>]
 let ``ResizeArray folding works``() =
    check 
       <@@ 
