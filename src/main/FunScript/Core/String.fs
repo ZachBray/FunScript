@@ -1,39 +1,65 @@
 ﻿[<FunScript.JS>]
 module FunScript.Core.String
 
-[<FunScript.JSEmit("""return {0}.replace(/{(\d+)(,-?\d+)?(:[CDEFGNPXTMYdt]\d{0,})?}/g, function(match, number, alignment, format) {
-			var rep = match;
-			if ({1}[number] !== undefined) {
-				var rep = {1}[number];
-				if (format !== undefined && format.length > 1) {
-					var letter = format.substring(1,2);
-					if (letter == "F" && rep.toFixed !== undefined) {
-						var len = format.length > 2 ? format.substring(2) : "2";
-						rep = rep.toFixed(len);
-					}
-					if (letter == "P" && rep.toFixed !== undefined) {
-						var len = format.length > 2 ? format.substring(2) : "2";
-						rep = (rep * 100).toFixed(len) + " %";
-					}
-					if (letter == "E" && rep.toExponential !== undefined) {
-						rep = rep.toExponential(format.substring(2));
-					}		
-					else if (letter == "D" && rep.toDateString !== undefined) {
-						rep = rep.toDateString();
-					}
-					else if (letter == "T" && rep.toLocaleTimeString !== undefined) {
-						rep = rep.toLocaleTimeString();
-					}
-					else if (letter == "d" && rep.toLocaleDateString !== undefined) {
-						rep = rep.toLocaleDateString();
-					}
-					else if (letter == "t" && rep.toLocaleTimeString !== undefined) {
-						rep = rep.toLocaleTimeString().replace(/:\d\d(?!:)/, '')
-					}
-				}
+// TODO: This is a bit tricky, it will never return a string but a function with valueOf and toString
+// methods set to return the string. It's working for practical purposes but, should we improve it?
+[<FunScript.JSEmit("""function formatToString(rep) {
+		{0} = {0}.replace(/%[+\-* ]?\d*(?:\.(\d+))?(\w)/, function(match, precision, format) {
+            switch (format) {
+                case "f": case "F": return precision ? rep.toFixed(precision) : rep.toFixed(6);
+                case "g": case "G": return rep.toPrecision(precision);
+                case "e": case "E": return rep.toExponential(precision);
+                case "A": return JSON.stringify(rep);
+                default:  return rep;
 			}
-			return rep;
-	})""")>]
+		});
+		return formatToString;
+	}
+	formatToString.valueOf = formatToString.toString = function() { return {0}; }
+	return formatToString""")>]
+let PrintFormatToString(s: string): obj = failwith "never"
+
+[<FunScript.JSEmit("""return {0}.replace(/\{(\d+)(,-?\d+)?(?:\:(.+?))?\}/g, function(match, number, alignment, format) {
+        var rep = match;
+        if ({1}[number] !== undefined) {
+            rep = {1}[number];
+            if (format !== undefined) {
+                if (typeof rep === 'number') {            
+                    switch (format.substring(0,1)) {
+                        case "f": case "F": return format.length > 1 ? rep.toFixed(format.substring(1)) : rep.toFixed(2);
+                        case "g": case "G": return format.length > 1 ? rep.toPrecision(format.substring(1)) : rep.toPrecision();
+                        case "e": case "E": return format.length > 1 ? rep.toExponential(format.substring(1)) : rep.toExponential();
+                        case "p": case "P": return (format.length > 1 ? (rep * 100).toFixed(format.substring(1)) : (rep * 100).toFixed(2)) + " %";
+                    }                
+                }
+                else if (rep instanceof Date) {
+                    if (format.length === 1) {
+                        switch (format) {
+                            case "D": return rep.toDateString();
+                            case "T": return rep.toLocaleTimeString();
+                            case "d": return rep.toLocaleDateString();
+                            case "t": return rep.toLocaleTimeString().replace(/:\d\d(?!:)/, '');
+                        }        
+                    }
+                    return format.replace(/(\w)\1*/g, function (match2) {
+                        var rep2 = match2;
+                        switch (match2.substring(0,1)) {
+                            case "y": rep2 = match2.length < 4 ? rep.getFullYear() % 100 : rep.getFullYear(); break;
+                            case "h": rep2 = rep.getHours() > 12 ? rep.getHours() % 12 : rep.getHours();      break;
+                            case "M": rep2 = rep.getMonth() + 1; break;
+                            case "d": rep2 = rep.getDate();      break;
+                            case "H": rep2 = rep.getHours();     break;
+                            case "m": rep2 = rep.getMinutes();   break;
+                            case "s": rep2 = rep.getSeconds();   break;
+                        }
+                        if (rep2 !== match2 && rep2 < 10 && match2.length > 1) { rep2 = "0" + rep2; }
+                        return rep2;
+                    })                
+                }
+            }
+        }
+        return rep;
+    })""")>]
 let Format(s: string, [<System.ParamArray>] args: obj[]): string = failwith "never"
 
 [<FunScript.JSEmitInline("{0}.split({1})")>]

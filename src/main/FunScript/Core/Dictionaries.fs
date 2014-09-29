@@ -5,53 +5,68 @@ open System
 open FunScript
 open System.Collections.Generic
 
+
+[<JSEmitInline("{0}[{1}]")>]
+let private getValue(dic: obj) (key: obj): obj = failwith "never"
+
+[<JSEmitInline("Object.keys({0})")>]
+let private getKeys(dic: obj): obj[] = failwith "never"
+
 module MutableDic =
-    [<JSEmitInline("{}")>]
-    let private createUnsafe(): Dictionary<'k,'v> = failwith "never"
+    let CollToSeq(coll: ICollection<'a>) =
+        let array = unbox coll: 'a[]
+        Seq.unfold (fun i -> if i < array.Length then Some(array.[i], i + 1) else None) 0
 
-    let Create(): Dictionary<'k,'v> =
-        let dic = createUnsafe()
-        FunScript.Core.Enumerator.AddDicEnumerator(dic)
-        dic
+    let KeysToSeq(_keys: Dictionary<'k,'v>.KeyCollection) =
+        let keys = unbox _keys: string[]
+        Seq.unfold (fun i -> if i < keys.Length then Some(keys.[i], i + 1) else None) 0
 
-    // NOTE: Just ignore the initial capacity
-    let CreateWithSize(size: int) =
-        Create()
+    let ValuesToSeq(_values: Dictionary<'k,'v>.ValueCollection) =
+        let values = unbox _values: 'v[]
+        Seq.unfold (fun i -> if i < values.Length then Some(values.[i], i + 1) else None) 0
 
-    [<JSEmitInline("Object.keys({0}).length")>]
+    let DicToSeq(dic: IDictionary<'k,'v>) =
+        let keys = getKeys(dic)
+        0 |> Seq.unfold (fun i ->
+            if i < keys.Length
+            then let k = keys.[i] in Some(LanguagePrimitives.KeyValuePair(k, getValue dic k), i + 1)
+            else None)
+
+    [<JSEmitInline("Object.keys({0}).length")>]    
     let DicCount(dic: Dictionary<'k,'v>): int = failwith "never"
 
     [<JSEmitInline("Object.keys({0}).length")>]
     let EnumCount(dic: seq<_>): int = failwith "never"
 
-    // NOTE: This property is only exposed by the IDictionary interface
-    //       It's safe to return always true
+    [<JSEmitInline("{0}.length")>]
+    let KeysCount(keys: Dictionary<'k,'v>.KeyCollection): int = failwith "never"
+    
+    [<JSEmitInline("{0}.length")>]
+    let ValuesCount(values: Dictionary<'k,'v>.ValueCollection): int = failwith "never"
+
+    [<JSEmitInline("{}")>]
+    let Create(): Dictionary<'k,'v> = failwith "never"
+
+    // NOTE: Just ignore the initial capacity
+    let CreateWithSize(size: int) = Create()
+
+    // NOTE: This property is only exposed by the IDictionary interface so it's safe to return always true
     [<JSEmitInline("true")>]
     let IsReadOnly(dic: seq<_>): bool = failwith "never"
 
     [<JSEmitInline("{0}[{1}]")>]
     let GetItem(dic: Dictionary<'k,'v>, key: 'k): 'v = failwith "never"
 
-    [<JSEmit("if ({0}[{1}] !== undefined) { {0}[{1}] = {2} } else { throw 'KeyNotFound' }")>]
+    [<JSEmit("if ({0}[{1}] !== undefined) { {0}[{1}] = {2} } else { throw 'Key not found' }")>]
     let SetItem(dic: Dictionary<'k,'v>, key: 'k, value: 'v): unit = failwith "never"
 
     [<JSEmitInline("Object.keys({0})")>]
-    let private keysUnsafe(dic: Dictionary<'k,'v>): seq<'k> = failwith "never"
+    let Keys(dic: Dictionary<'k,'v>): Dictionary<'k,'v>.KeyCollection = failwith "never"
 
-    let Keys(dic: Dictionary<'k,'v>) =
-        let ks = keysUnsafe(dic)
-        FunScript.Core.Enumerator.AddArrayEnumerator(ks)
-        ks
+    [<JSEmit("var values = []; for (var k in {0}) { values.push({0}[k]) } return values")>]
+    let Values(dic: Dictionary<'k,'v>): Dictionary<'k,'v>.ValueCollection = failwith "never"
 
-    [<JSEmit("var keys = Object.keys({0}); var array = new Array(keys.length); for (var i = 0; i < keys.length; i++) { array[i] = {0}[keys[i]] } return array")>]
-    let private valuesUnsafe(dic: Dictionary<'k,'v>): seq<'v> = failwith "never"
-
-    let Values(dic: Dictionary<'k,'v>) =
-        let vs = valuesUnsafe(dic)
-        FunScript.Core.Enumerator.AddArrayEnumerator(vs)
-        vs
-
-    [<JSEmit("if ({0}[{1}] === undefined) { {0}[{1}] = {2} } else { throw 'KeyExists' }")>]
+    [<JSEmit("if ({0}[{1}] === undefined) { {0}[{1}] = {2} } else { throw 'Key already exists' }")>]
     let Add(dic: Dictionary<'k,'v>, key: 'k, value: 'v): unit = failwith "never"
 
     let OfSeq(keyValuePairs: seq<'k*'v>) =
@@ -64,7 +79,7 @@ module MutableDic =
     [<JSEmitInline("{0}")>]
     let OfIDictionary(dic: IDictionary<'k,'v>): Dictionary<'k,'v> = failwith "never"
 
-    [<JSEmitInline("for (var key in {0}) { delete {0}[key] }")>]
+    [<JSEmitInline("({0} = {})")>]
     let Clear(dic: Dictionary<'k,'v>): unit = failwith "never"
 
     [<JSEmitInline("({0}[{1}] !== undefined)")>]
@@ -75,10 +90,6 @@ module MutableDic =
 
     [<JSEmit("if ({0}[{1}] !== undefined) { delete {0}[{1}]; return true; } else { return false; }")>]
     let Remove(dic: Dictionary<'k,'v>, key: 'k): bool = failwith "never"
-
-    [<JSEmitInline("{0}.GetEnumerator()")>]
-    let GetEnumerator(dic: Dictionary<'k,'v>): Dictionary.Enumerator<'k, 'v> = failwith "never" 
-
 
 
 [<JSEmit("return {0}[{1}] !== undefined;")>]

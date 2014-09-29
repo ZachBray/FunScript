@@ -8,69 +8,7 @@ module Literals =
     let [<Literal>] millisecondsPerMinute = 60000.
     let [<Literal>] millisecondsPerSecond = 1000.
     let [<Literal>] millisecondsJSOffset  = 6.2135604e+13
-
-[<JS; JSEmitInline("window.setTimeout({0}, {1})")>]
-let setTimeout(handler:unit -> unit, milliseconds:float): int = failwith "never"
-
-[<JS; JSEmitInline("window.clearTimeout({0})")>]
-let clearTimeout(id: int) = failwith "never"
-
-[<JS; JSEmitInline("window.setInterval({0}, {1})")>]
-let setInterval(handler:unit -> unit, milliseconds:float): int = failwith "never"
-
-[<JS; JSEmitInline("clearInterval({0})")>]
-let clearInterval(id: int) = failwith "never"
-
-[<JS; JSEmit("""var reqFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
-                   window.webkitRequestAnimationFrame || window.oRequestAnimationFrame;
-    return reqFrame({0})""")>]
-let requestAnimationFrame(handler:float -> unit): int = failwith "never"
-
-[<JS>]
-type ElapsedEventArgs() =
-    member val SignalTime = System.DateTime.Now
-
-[<JS>]
-type Timer(interval: float) =
-    let mutable _id: int option = None
-    let mutable _observer: System.IObserver<_> option = None
-
-    member val AutoReset = true     with get, set
-    member val Interval  = interval with get, set
-
-    // TODO: It can only be used as IObservable at the moment
-    member timer.Elapsed
-        with get() = timer :> System.IObservable<_>
-    member timer.Enabled
-        with get() = match _id with Some _ -> true | None -> false
-        and set(v: bool) = if v then timer.Start() else timer.Stop()
-    
-    member timer.Start() =
-        match _id with
-        | Some _ -> ()
-        | None ->
-            let rec handler = fun () ->
-                match _observer with
-                | None   -> ()
-                | Some o -> o.OnNext(ElapsedEventArgs())
-                match timer.AutoReset with
-                | false -> _id <- None
-                | true  -> _id <- Some(setTimeout(handler, timer.Interval))
-            _id <- Some(setTimeout(handler, timer.Interval))
-
-    member timer.Stop() = 
-        match _id with
-        | None -> ()
-        | Some i -> clearTimeout(i); _id <- None
-    
-    member timer.Close() = timer.Stop()
-    interface System.IDisposable with
-        member timer.Dispose() = timer.Close()
-
-    interface System.IObservable<ElapsedEventArgs> with
-        member timer.Subscribe(observer) =
-            _observer <- Some observer
-            new Events.ActionDisposable(fun () -> _observer <- None) :> System.IDisposable
+    let [<Literal>] millisecondsMAX       = 8640000000000000.
 
 // NOTE: For performance, TimeSpan is just a wrapper around the milliseconds
 [<JS>]
@@ -133,11 +71,17 @@ type TimeSpan =
 [<JS>]
 type DateTime =
     // HELPER FUNCTIONS --------------------------------------------------------------------------
-    [<JSEmit("var date = {0} == null ? new Date() : new Date({0}); date.kind = {1}; return date")>]
+    [<JSEmit("""var date = {0} == null ? new Date() : new Date({0});
+    if (isNaN(date)) { throw "The string was not recognized as a valid DateTime." }
+    date.kind = {1};
+    return date""")>]
     static member private createUnsafe(value: obj, kind: System.DateTimeKind): DateTime = failwith "never"
 
-    [<JSEmit("var date = new Date({0}, {1} - 1, {2}, {3}, {4}, {5}, {6}); date.kind = {7}; return date")>]
-    static member private createUnsafeYMDHMSM(year: int, month: int, day: int, h: int, min: int, s: int, ms: int, kind: System.DateTimeKind): DateTime = failwith "never"
+    [<JSEmit("""var date = {7} === {8} ? new Date(Date.UTC({0}, {1} - 1, {2}, {3}, {4}, {5}, {6})) : new Date({0}, {1} - 1, {2}, {3}, {4}, {5}, {6});
+    if (isNaN(date)) { throw "The parameters describe an un-representable DateTime." }
+    date.kind = {7};
+    return date""")>]
+    static member private createUnsafeYMDHMSM(year: int, month: int, day: int, h: int, min: int, s: int, ms: int, kind: System.DateTimeKind, utcKind: System.DateTimeKind): DateTime = failwith "never"
 
     [<JSEmit("if ({0}.kind == {1}) { return {0} } else { var newDate = new Date({0}.getTime()); newDate.kind = {1}; return newDate }")>]
     static member private changeKind(d: DateTime, kind: System.DateTimeKind): DateTime = failwith "never"
@@ -166,26 +110,23 @@ type DateTime =
         else [|31;28;31;30;31;30;31;31;30;31;30;31|]
     // -------------------------------------------------------------------------------------------
 
-    static member FromTicks(ticks: int64) =
-        DateTime.createUnsafe(ticks / TimeSpan.TicksPerMillisecond, System.DateTimeKind.Local)
-
-    static member FromTicksWithKind(ticks: int64, kind: System.DateTimeKind) =
-        DateTime.createUnsafe(ticks / TimeSpan.TicksPerMillisecond, kind)
-
     static member FromYMDHMSMwithKind(year: int, month: int, day: int, h: int, min: int, s: int, ms: int, kind: System.DateTimeKind) =
-        DateTime.createUnsafeYMDHMSM(year, month, day, h, min, s, ms, kind)
+        DateTime.createUnsafeYMDHMSM(year, month, day, h, min, s, ms, kind, System.DateTimeKind.Utc)
 
     static member FromYMDHMSM(year: int, month: int, day: int, h: int, min: int, s: int, ms: int) =
-        DateTime.createUnsafeYMDHMSM(year, month, day, h, min, s, ms, System.DateTimeKind.Local)
+        DateTime.createUnsafeYMDHMSM(year, month, day, h, min, s, ms, System.DateTimeKind.Local, System.DateTimeKind.Utc)
 
     static member FromYMDHMSwithKind(year: int, month: int, day: int, h: int, min: int, s: int, kind: System.DateTimeKind) =
-        DateTime.createUnsafeYMDHMSM(year, month, day, h, min, s, 0, kind)
+        DateTime.createUnsafeYMDHMSM(year, month, day, h, min, s, 0, kind, System.DateTimeKind.Utc)
 
     static member FromYMDHMS(year: int, month: int, day: int, h: int, min: int, s: int) =
-        DateTime.createUnsafeYMDHMSM(year, month, day, h, min, s, 0, System.DateTimeKind.Local)
+        DateTime.createUnsafeYMDHMSM(year, month, day, h, min, s, 0, System.DateTimeKind.Local, System.DateTimeKind.Utc)
 
     static member FromYMD(year: int, month: int, day: int): DateTime =
-        DateTime.createUnsafeYMDHMSM(year, month, day, 0, 0, 0, 0, System.DateTimeKind.Local)
+        DateTime.createUnsafeYMDHMSM(year, month, day, 0, 0, 0, 0, System.DateTimeKind.Local, System.DateTimeKind.Utc)
+
+    static member MinValue with get() = DateTime.createUnsafe(-Literals.millisecondsMAX, System.DateTimeKind.Utc)
+    static member MaxValue with get() = DateTime.createUnsafe(Literals.millisecondsMAX, System.DateTimeKind.Utc)
 
     static member Now    with get() = DateTime.createUnsafe(null, System.DateTimeKind.Local)
     static member UtcNow with get() = DateTime.createUnsafe(null, System.DateTimeKind.Utc)
@@ -198,11 +139,11 @@ type DateTime =
     static member DaysInMonth(year: int, month: int) =
         DateTime.getDaysInMonths(year).[month - 1]
 
-    member dt.ToUniversalTime(): DateTime = DateTime.changeKind(dt, System.DateTimeKind.Utc)
-    member dt.ToLocalTime    (): DateTime = DateTime.changeKind(dt, System.DateTimeKind.Local)
+    member dt.ToUniversalTime() = DateTime.changeKind(dt, System.DateTimeKind.Utc)
+    member dt.ToLocalTime    () = DateTime.changeKind(dt, System.DateTimeKind.Local)
 
     member dt.TimeOfDay with get() = TimeSpan.FromHMS(dt.Hour, dt.Minute, dt.Second)
-    member dt.Date      with get() = DateTime.createUnsafeYMDHMSM(dt.Year, dt.Month, dt.Day, 0, 0, 0, 0, dt.Kind)
+    member dt.Date      with get() = DateTime.createUnsafeYMDHMSM(dt.Year, dt.Month, dt.Day, 0, 0, 0, 0, dt.Kind, System.DateTimeKind.Utc)
 
     member dt.Day           with get() = DateTime.getValueUnsafe(dt, "Date",         System.DateTimeKind.Utc)
     member dt.Hour          with get() = DateTime.getValueUnsafe(dt, "Hours",        System.DateTimeKind.Utc)
@@ -231,7 +172,7 @@ type DateTime =
         let newYear = dt.Year + (unbox offset)
         let daysInMonth = DateTime.DaysInMonth(newYear, newMonth)
         let newDay = min daysInMonth dt.Day
-        DateTime.createUnsafeYMDHMSM(newYear, newMonth, newDay, dt.Hour, dt.Minute, dt.Second, dt.Millisecond, dt.Kind)
+        DateTime.createUnsafeYMDHMSM(newYear, newMonth, newDay, dt.Hour, dt.Minute, dt.Second, dt.Millisecond, dt.Kind, System.DateTimeKind.Utc)
 
     member dt.AddMonths(offset: int) =
         let newMonth = dt.Month + offset
@@ -249,7 +190,7 @@ type DateTime =
         let newYear = dt.Year + (unbox yearOffset)
         let daysInMonth = DateTime.DaysInMonth(newYear, newMonth)
         let newDay = min daysInMonth dt.Day
-        DateTime.createUnsafeYMDHMSM(newYear, newMonth, newDay, dt.Hour, dt.Minute, dt.Second, dt.Millisecond, dt.Kind)
+        DateTime.createUnsafeYMDHMSM(newYear, newMonth, newDay, dt.Hour, dt.Minute, dt.Second, dt.Millisecond, dt.Kind, System.DateTimeKind.Utc)
 
     member dt.Subtract(t: TimeSpan)    = DateTime.createUnsafe(DateTime.getTime(dt) - t.TotalMilliseconds, dt.Kind)
     member dt.Subtract(that): TimeSpan = TimeSpan.FromMilliseconds((DateTime.getTime dt) - (DateTime.getTime that))

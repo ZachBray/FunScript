@@ -18,7 +18,6 @@ let components =
             ExpressionReplacer.createUnsafe <@ fun (d,h,m,s) -> TimeSpan(d,h,m,s) @> <@ Core.Time.TimeSpan.FromDHMS @>
             ExpressionReplacer.createUnsafe <@ fun (d,h,m,s,ms) -> TimeSpan(d,h,m,s,ms) @> <@ Core.Time.TimeSpan.FromDHMSM @>
         ]
-
         ExpressionReplacer.createTypeMethodMappings
             typeof<System.TimeSpan>
             typeof<Core.Time.TimeSpan>
@@ -26,13 +25,4 @@ let components =
         ExpressionReplacer.createTypeMethodMappings
             typeof<System.DateTime>
             typeof<Core.Time.DateTime>
-
-        ExpressionReplacer.createTypeMethodMappings
-            typeof<System.Timers.ElapsedEventArgs>
-            typeof<Core.Time.ElapsedEventArgs>
-
-        ExpressionReplacer.createTypeMethodMappings
-            typeof<System.Timers.Timer>
-            typeof<Core.Time.Timer>
-
     ] |> List.concat

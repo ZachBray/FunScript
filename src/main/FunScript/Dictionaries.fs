@@ -6,15 +6,13 @@ open System.Collections.Generic
 
 let components = 
     [
-        ExpressionReplacer.createUnsafe <@ fun (xs: Dictionary<_,_>) -> xs.GetEnumerator() @> <@ Core.Dictionaries.MutableDic.GetEnumerator @>
-        ExpressionReplacer.createUnsafe <@ fun (xs: Dictionary<_,_>.KeyCollection) -> xs.GetEnumerator() @> <@ Core.Dictionaries.MutableDic.GetEnumerator @>
-        ExpressionReplacer.createUnsafe <@ fun (xs: Dictionary<_,_>.ValueCollection) -> xs.GetEnumerator() @> <@ Core.Dictionaries.MutableDic.GetEnumerator @>
-
         ExpressionReplacer.createUnsafe <@ fun () -> Dictionary<_,_>() @> <@ Core.Dictionaries.MutableDic.Create @>
         ExpressionReplacer.createUnsafe <@ fun (size: int) -> Dictionary<_,_>(size) @> <@ Core.Dictionaries.MutableDic.CreateWithSize @>
-
         ExpressionReplacer.createUnsafe <@ fun (xs: seq<_*_>) -> dict xs @> <@ Core.Dictionaries.MutableDic.OfSeq @>
         ExpressionReplacer.createUnsafe <@ fun (xs: IDictionary<_,_>) -> Dictionary<_,_>(xs) @> <@ Core.Dictionaries.MutableDic.OfIDictionary @>
+
+        ExpressionReplacer.createUnsafe <@ fun (xs: Dictionary<_,_>.KeyCollection) -> xs.Count @> <@ Core.Dictionaries.MutableDic.KeysCount @>
+        ExpressionReplacer.createUnsafe <@ fun (xs: Dictionary<_,_>.ValueCollection) -> xs.Count @> <@ Core.Dictionaries.MutableDic.ValuesCount @>
 
         // Interface members
         ExpressionReplacer.createUnsafe <@ fun (xs: IDictionary<_,_>) -> xs.Count @> <@ Core.Dictionaries.MutableDic.EnumCount @>

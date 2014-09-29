@@ -353,7 +353,7 @@ let Initialize n f =
       else None)
 
 let Cast<'a> (xs:IEnumerable) =
-   unbox<'a seq> xs
+   xs :?> 'a seq
 
 let CompareWith f (xs:'a seq) (ys:'a seq) =
    let nonZero =

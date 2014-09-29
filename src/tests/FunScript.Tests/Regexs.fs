@@ -4,30 +4,43 @@ module FunScript.Tests.Regexs
 open NUnit.Framework
 open System.Text.RegularExpressions
 
+// NOTE: In Jint we cannot use the ||| operator with RegexOptions
+// but it works fine in the browser
+[<Test>]
+let ``Regex.Options works``() =
+   check 
+      <@@
+         let option1 = int RegexOptions.IgnoreCase
+         let option2 = int RegexOptions.ECMAScript
+         let options = option1 ||| option2
+         let r = Regex("[a-z]", unbox options)
+         r.Options |> float
+      @@>
 
-// NOTE: These three tests are not working, but the methods are fine in actual code
-//[<Test>]
-//let ``Regex.Options works``() =
-//   check 
-//      <@@ 
-//         let r = Regex("[a-z]", RegexOptions.ECMAScript ||| RegexOptions.IgnoreCase)
-//         r.Options |> float
-//      @@>
-//
-//[<TestCase("[(.*?)]"); TestCase(@"C:\Temp")>]
-//let ``Regex.Escape works``(str) =
-//   check 
-//      <@@ 
-//         Regex.Escape(str)
-//      @@>
-//
-//[<TestCase("\[\(\.\*\?\)]"); TestCase(@"C:\\Temp"); TestCase(@"\\\n")>]
-//let ``Regex.Unescape works``(str) =
-//   check 
-//      <@@ 
-//         Regex.Unescape(str)
-//      @@>
+[<TestCase("^ab");TestCase("^cd");TestCase("^AB");TestCase("^CD")>]
+let ``Regex.IsMatch with IgnoreCase and Multiline works``(pattern) =
+   check 
+      <@@ 
+         let str = "ab\ncd"
+         let option1 = int RegexOptions.IgnoreCase
+         let option2 = int RegexOptions.Multiline
+         let options = option1 ||| option2
+         Regex.IsMatch(str, pattern, unbox options)
+      @@>
 
+[<TestCase("[(.*?)]"); TestCase(@"C:\Temp")>]
+let ``Regex.Escape works``(str) =
+   check 
+      <@@ 
+         Regex.Escape(str)
+      @@>
+
+[<TestCase("\[\(\.\*\?\)]"); TestCase(@"C:\\Temp")>]
+let ``Regex.Unescape works``(str) =
+   check 
+      <@@ 
+         Regex.Unescape(str)
+      @@>
 
 [<TestCase("Chapter \d+(\.\d)*"); TestCase("chapter \d+(\.\d)*")>]
 let ``Regex instance IsMatch works``(pattern) =
@@ -93,16 +106,6 @@ let ``Regex.IsMatch with Multiline works``(pattern) =
          Regex.IsMatch(str, pattern, RegexOptions.Multiline)
       @@>
 
-
-// NOTE: Tests for setting both flags at the same time are failing, but it works in actual code.
-//[<TestCase("^ab");TestCase("^cd");TestCase("^AB");TestCase("^CD")>]
-//let ``Regex.IsMatch with IgnoreCase and Multiline works``(pattern) =
-//   check 
-//      <@@ 
-//         let str = "ab\ncd"
-//         Regex.IsMatch(str, pattern, RegexOptions.IgnoreCase ||| RegexOptions.Multiline)
-//      @@>
-
 [<TestCase("Chapter \d+(\.\d)*"); TestCase("chapter \d+(\.\d)*")>]
 let ``Regex.Match works``(pattern) =
    check 
@@ -157,7 +160,7 @@ let ``Match.Length works``(pattern) =
    check 
       <@@ 
          let str = "For more information, see Chapter 3.4.5.1"
-         let m = Regex.Match(str, pattern)
+         let m = Regex.Match(str, "Chapter \d+(\.\d)*")
          m.Length |> float
       @@>
 
@@ -188,6 +191,17 @@ let ``Regex.Matches iteration works``(pattern) =
          let count = ref 0
          for m in ms do count := !count + m.Value.Length
          float !count
+      @@>
+
+[<TestCase("[A-E]")>]
+let ``Regex.Matches iteration with casting works``(pattern) =
+   check 
+      <@@ 
+         let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+         let ms = Regex.Matches(str, pattern, RegexOptions.IgnoreCase)
+         let count =
+            ms |> Seq.cast<Match> |> Seq.fold(fun acc m -> acc + m.Value.Length) 0
+         float count
       @@>
 
 [<TestCase("[A-E]"); TestCase("(ZZ)+")>]

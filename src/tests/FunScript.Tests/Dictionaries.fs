@@ -51,6 +51,14 @@ let ``Interface IDictionary iteration works``() =
       @@>
 
 [<Test>]
+let ``Interface IDictionary folding works``() =
+   check 
+      <@@ 
+         let dic = dict [ ("A", 1.); ("B", 2.); ("C", 3.) ]
+         dic |> Seq.fold (fun acc item -> acc + item.Value) 0.
+      @@>
+
+[<Test>]
 let ``Interface IDictionary.IsReadOnly works``() =
    check 
       <@@ 
@@ -60,7 +68,7 @@ let ``Interface IDictionary.IsReadOnly works``() =
 
 [<Test>]
 let ``Dictionary iteration works``() =
-   check 
+   check
       <@@ 
          let dic = Dictionary<_,_>()
          for i in 1. .. 10. do dic.Add(i, i*i)
@@ -105,10 +113,7 @@ let ``Dictionary.Keys works``() =
          let dic = Dictionary<_,_>()
          dic.Add("A", 1)
          dic.Add("B", 2)
-         let i = ref ""
-         for key in dic.Keys do
-            i := key + !i
-         !i
+         dic.Keys |> Seq.fold (fun acc k -> acc + dic.[k]) 0 |> float
       @@>
 
 [<Test>]
@@ -132,10 +137,7 @@ let ``Dictionary.Clear works``() =
          dic.Add("A", 1)
          dic.Add("B", 2)
          dic.Clear()
-         let i = ref 0
-         for kv in dic do
-            i := kv.Value + !i
-         !i |> float
+         dic.Count |> float
       @@>
 
 [<Test>]
