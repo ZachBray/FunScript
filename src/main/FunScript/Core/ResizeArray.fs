@@ -4,6 +4,17 @@ module FunScript.Core.ResizeArray
 open FunScript
 open System.Collections.Generic
 
+type Enumerator<'T>(xs: 'T[]) =
+    let mutable index = -1
+    interface IEnumerator<'T> with
+        member x.Current with get() = xs.[index]
+        member x.Current with get() = xs.[index] :> obj
+        member x.Dispose() = ()
+        member x.Reset() = index <- -1
+        member x.MoveNext() =
+            index <- index + 1
+            index < xs.Length
+
 [<JSEmitInline("[]")>]
 let private createUnsafe(): ResizeArray<'a> = failwith "never"
 

@@ -4,10 +4,26 @@ open AST
 open Microsoft.FSharp.Quotations
 open System.Text.RegularExpressions
 
+let private toSeq =
+    CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
+        function
+        | Patterns.Coerce(expr, t) 
+            when t.Name = typeof<seq<obj>>.Name || t.Name = typeof<System.Collections.IEnumerable>.Name ->
+            match expr with
+            | expr when expr.Type.Name = typeof<GroupCollection>.Name ->
+                let mi, _ = Quote.toMethodInfoFromLambdas <@@ Core.Regex.GroupCollection.ToSeq @@>
+                compiler.Compile returnStrategy (ExpressionReplacer.buildCall mi [expr])
+            | expr when expr.Type.Name = typeof<MatchCollection>.Name ->
+                let mi, _ = Quote.toMethodInfoFromLambdas <@@ Core.Regex.MatchCollection.ToSeq @@>
+                compiler.Compile returnStrategy (ExpressionReplacer.buildCall mi [expr])
+            | _ -> [] 
+        | _ -> []
 
 let components = 
+  [
     [
-        ExpressionReplacer.createUnsafe <@ fun (r) -> Regex(r) @> <@ Core.Regex.Create @>
+        toSeq
+        ExpressionReplacer.createUnsafe <@ fun (r) -> Regex(r) @> <@ fun r -> Core.Regex.Create(r) @>
         ExpressionReplacer.createUnsafe <@ fun (r, o) -> Regex(r, o) @> <@ Core.Regex.CreateWithOptions @>
         ExpressionReplacer.createUnsafe <@ fun (r: Regex) -> r.Options @> <@ Core.Regex.GetOptions @>
 
@@ -46,21 +62,11 @@ let components =
         ExpressionReplacer.createUnsafe <@ fun (s, r, rep, o) -> Regex.Replace(s, r, replacement=rep, options=o) @> <@ Core.Regex.ReplaceStaticWithOptions @>
         ExpressionReplacer.createUnsafe <@ fun (s, r, ev) -> Regex.Replace(s, r, evaluator=ev) @> <@ Core.Regex.ReplaceStaticWithEvaluator @>
         ExpressionReplacer.createUnsafe <@ fun (s, r, ev, o) -> Regex.Replace(s, r, evaluator=ev, options=o) @> <@ Core.Regex.ReplaceStaticWithEvaluatorAndOptions @>
-
-        ExpressionReplacer.createUnsafe <@ fun (m: Capture) -> m.Index @>   <@ Core.Regex.Capture.Index @>
-        ExpressionReplacer.createUnsafe <@ fun (m: Capture) -> m.Length @>  <@ Core.Regex.Capture.Length @>
-        ExpressionReplacer.createUnsafe <@ fun (m: Capture) -> m.Value @>   <@ Core.Regex.Capture.Value @>
-
-        ExpressionReplacer.createUnsafe <@ fun (m: Group) -> m.Success @> <@ Core.Regex.Group.Success @>
-
-        ExpressionReplacer.createUnsafe <@ fun (m: Match) -> m.Groups @>  <@ Core.Regex.Match.Groups @>
-
-        ExpressionReplacer.createUnsafe <@ fun (ms: MatchCollection) -> ms.Count @> <@ Core.Regex.Collection.Count @>
-        ExpressionReplacer.createUnsafe <@ fun (ms: MatchCollection) -> ms.GetEnumerator() @> <@ Core.Regex.Collection.GetEnumerator @>
-        ExpressionReplacer.createUnsafe <@ fun (ms: MatchCollection, index: int) -> ms.Item(index) @> <@ Core.Regex.Collection.Item @>
-
-        ExpressionReplacer.createUnsafe <@ fun (ms: GroupCollection) -> ms.Count @> <@ Core.Regex.Collection.Count @>
-        ExpressionReplacer.createUnsafe <@ fun (ms: GroupCollection) -> ms.GetEnumerator() @> <@ Core.Regex.Collection.GetEnumerator @>
-        ExpressionReplacer.createUnsafe <@ fun (ms: GroupCollection, index: int) -> ms.Item(index) @> <@ Core.Regex.Collection.Item @>
     ]
+    ExpressionReplacer.createTypeMethodMappings typeof<System.Text.RegularExpressions.Capture> typeof<Core.Regex.Capture>
+    ExpressionReplacer.createTypeMethodMappings typeof<System.Text.RegularExpressions.Group> typeof<Core.Regex.Group>
+    ExpressionReplacer.createTypeMethodMappings typeof<System.Text.RegularExpressions.Match> typeof<Core.Regex.Match>
+    ExpressionReplacer.createTypeMethodMappings typeof<System.Text.RegularExpressions.GroupCollection> typeof<Core.Regex.GroupCollection>
+    ExpressionReplacer.createTypeMethodMappings typeof<System.Text.RegularExpressions.MatchCollection> typeof<Core.Regex.MatchCollection>
+  ] |> List.concat
 

@@ -13,20 +13,6 @@ open System.Text.RegularExpressions
 //         r.Options |> float
 //      @@>
 //
-//[<TestCase("[(.*?)]"); TestCase(@"C:\Temp")>]
-//let ``Regex.Escape works``(str) =
-//   check 
-//      <@@ 
-//         Regex.Escape(str)
-//      @@>
-//
-//[<TestCase("\[\(\.\*\?\)]"); TestCase(@"C:\\Temp"); TestCase(@"\\\n")>]
-//let ``Regex.Unescape works``(str) =
-//   check 
-//      <@@ 
-//         Regex.Unescape(str)
-//      @@>
-//
 //[<TestCase("^ab");TestCase("^cd");TestCase("^AB");TestCase("^CD")>]
 //let ``Regex.IsMatch with IgnoreCase and Multiline works``(pattern) =
 //   check 
@@ -34,6 +20,20 @@ open System.Text.RegularExpressions
 //         let str = "ab\ncd"
 //         Regex.IsMatch(str, pattern, RegexOptions.IgnoreCase ||| RegexOptions.Multiline)
 //      @@>
+
+[<TestCase("[(.*?)]"); TestCase(@"C:\Temp")>]
+let ``Regex.Escape works``(str) =
+   check 
+      <@@ 
+         Regex.Escape(str)
+      @@>
+
+[<TestCase("\[\(\.\*\?\)]"); TestCase(@"C:\\Temp")>]
+let ``Regex.Unescape works``(str) =
+   check 
+      <@@ 
+         Regex.Unescape(str)
+      @@>
 
 [<TestCase("Chapter \d+(\.\d)*"); TestCase("chapter \d+(\.\d)*")>]
 let ``Regex instance IsMatch works``(pattern) =
@@ -153,7 +153,7 @@ let ``Match.Length works``(pattern) =
    check 
       <@@ 
          let str = "For more information, see Chapter 3.4.5.1"
-         let m = Regex.Match(str, pattern)
+         let m = Regex.Match(str, "Chapter \d+(\.\d)*")
          m.Length |> float
       @@>
 
@@ -184,6 +184,17 @@ let ``Regex.Matches iteration works``(pattern) =
          let count = ref 0
          for m in ms do count := !count + m.Value.Length
          float !count
+      @@>
+
+[<TestCase("[A-E]")>]
+let ``Regex.Matches iteration with casting works``(pattern) =
+   check 
+      <@@ 
+         let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+         let ms = Regex.Matches(str, pattern, RegexOptions.IgnoreCase)
+         let count =
+            ms |> Seq.cast<Match> |> Seq.fold(fun acc m -> acc + m.Value.Length) 0
+         float count
       @@>
 
 [<TestCase("[A-E]"); TestCase("(ZZ)+")>]
