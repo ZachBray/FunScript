@@ -4,22 +4,29 @@ module FunScript.Tests.Regexs
 open NUnit.Framework
 open System.Text.RegularExpressions
 
-// TODO: These tests don't work with Jint, but the generated JS works fine in the browser
-//[<Test>]
-//let ``Regex.Options works``() =
-//   check 
-//      <@@ 
-//         let r = Regex("[a-z]", RegexOptions.ECMAScript ||| RegexOptions.IgnoreCase)
-//         r.Options |> float
-//      @@>
-//
-//[<TestCase("^ab");TestCase("^cd");TestCase("^AB");TestCase("^CD")>]
-//let ``Regex.IsMatch with IgnoreCase and Multiline works``(pattern) =
-//   check 
-//      <@@ 
-//         let str = "ab\ncd"
-//         Regex.IsMatch(str, pattern, RegexOptions.IgnoreCase ||| RegexOptions.Multiline)
-//      @@>
+// NOTE: In Jint we cannot use the ||| operator with RegexOptions
+// but it works fine in the browser
+[<Test>]
+let ``Regex.Options works``() =
+   check 
+      <@@
+         let option1 = int RegexOptions.IgnoreCase
+         let option2 = int RegexOptions.ECMAScript
+         let options = option1 ||| option2
+         let r = Regex("[a-z]", unbox options)
+         r.Options |> float
+      @@>
+
+[<TestCase("^ab");TestCase("^cd");TestCase("^AB");TestCase("^CD")>]
+let ``Regex.IsMatch with IgnoreCase and Multiline works``(pattern) =
+   check 
+      <@@ 
+         let str = "ab\ncd"
+         let option1 = int RegexOptions.IgnoreCase
+         let option2 = int RegexOptions.Multiline
+         let options = option1 ||| option2
+         Regex.IsMatch(str, pattern, unbox options)
+      @@>
 
 [<TestCase("[(.*?)]"); TestCase(@"C:\Temp")>]
 let ``Regex.Escape works``(str) =
