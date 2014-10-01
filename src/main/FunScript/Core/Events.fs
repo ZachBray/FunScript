@@ -112,7 +112,11 @@ module Observable =
                 let lastArgs = ref None
                 let newObserver =
                     ActionObserver<_>(
-                        onNext =        (fun args2 -> match !lastArgs with None->()|Some args1->observer.OnNext(args1,args2); lastArgs:=Some args2),
+                        onNext = (fun args2 ->
+                            match !lastArgs with
+                            | None -> ()
+                            | Some args1 -> observer.OnNext(args1,args2)
+                            lastArgs := Some args2),
                         onError =       (fun e -> observer.OnError(e)),
                         onCompleted =   (fun () -> observer.OnCompleted())
                     )
