@@ -69,9 +69,29 @@ let compile outputAssembly references (source : string) =
 let generateAssemblies tempDir postBuildStep inputs  =
     if not(Directory.Exists tempDir) then
         Directory.CreateDirectory tempDir |> ignore
+
+    let filterAndLogParsingErrors s = 
+        let split (successes , errors) (path, name, parserResult) = 
+            match parserResult with
+            | Success(def) -> (successes |> Seq.append [(path, name, def)], errors)
+            | Failure(msg) -> (successes , errors |> Seq.append [(path, name, msg)])
+        let outputError i (_,name,_) =
+            if i = 0 then printfn "Parsing failed for the following definition files (see failed-parsing.txt for details):" else ()
+            printfn "%s" name
+        let successes, errors = s |> Seq.fold (split) (Seq.empty, Seq.empty)
+        errors |> Seq.iteri outputError
+        errors 
+        |> Seq.map (fun (_,_,msg) -> msg)
+        |> Seq.toArray
+        |> fun xs -> File.WriteAllLines("failed-parsing.txt", xs)
+        |> ignore
+
+        successes
+
     let outputFiles =
         inputs
         |> Seq.map (fun (path, name, contents) -> path, name, Parser.parseDeclarationsFile contents)
+        |> filterAndLogParsingErrors
         |> Seq.toList
         |> TypeGenerator.Compiler.generateTypes
     let assemblyLocation moduleName =
