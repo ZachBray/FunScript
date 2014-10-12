@@ -517,10 +517,14 @@ let declarationsFile : Parser<_, unit> =
     ws >>. many declarationElement .>> eof
     |>> DeclarationsFile
 
+type TypescriptParserResult = 
+    |Success of DeclarationsFile
+    |Failure of string
+
 let parseDeclarationsFile str = 
     match run declarationsFile str with
-    | Success(r,_,_) -> r
-    | Failure(msg,err,_) -> failwithf "%s" msg
+    | ParserResult.Success(r,_,_) -> Success r
+    | ParserResult.Failure(msg,err,_) -> Failure msg
 
 //let lib = System.IO.File.ReadAllText(__SOURCE_DIRECTORY__ + @"\..\Examples\Typings\lib.d.ts")
 //let lib = System.IO.File.ReadAllText(__SOURCE_DIRECTORY__ + @"\..\Examples\Typings\jquery.d.ts")
