@@ -41,7 +41,23 @@ let stringLiteralBetween braceChar =
             |> char |> string
         )
 
-    let escapedCharSnippet = str "\\" >>. (escape <|> unicodeEscape)
+    let hexEscape =
+        str "x" >>. manyMinMaxSatisfy 2 2 isHex 
+        |>> ( fun s -> System.Convert.ToInt32(s, 16) |> char |> string)        
+
+    let octalEscape =
+        manyMinMaxSatisfy 1 3 isOctal
+        |>> ( fun s -> System.Convert.ToInt32(s, 8) |> char |> string)       
+    
+    let escapeAux = 
+        choice [
+            escape 
+            unicodeEscape 
+            hexEscape
+            octalEscape
+        ]
+
+    let escapedCharSnippet = str "\\" >>. escapeAux
     let normalCharSnippet  = manySatisfy (fun c -> c <> braceChar && c <> '\\')
 
 
@@ -86,12 +102,28 @@ let str_ws s = pstring s .>> ws
 let stringReturn_ws s x = stringReturn s x .>> ws
 let stringReturn_ws1 s x = attempt(stringReturn s x .>> ws1)
 
+let isIdentifierChar c = isLetter c || isDigit c || c = '_' || c = '$'
+
+let identifier =
+    let isIdentifierFirstChar c = isLetter c || c = '_' || c = '$'
+    many1Satisfy2L isIdentifierFirstChar isIdentifierChar "identifier" 
+    .>> ws
+
+let keyword_ws s = 
+    pstring s .>> nextCharSatisfiesNot isIdentifierChar .>> ws
+
+let keywordReturn_ws s x = 
+    stringReturn s x .>> nextCharSatisfiesNot isIdentifierChar .>> ws
+
+let keywordReturn_ws1 s x = 
+    attempt(stringReturn s x .>> nextCharSatisfiesNot isIdentifierChar .>> ws1)
+
 let stringLiteral = stringLiteralAux .>> ws
 
 let pbool_ws =
     choice [
-        stringReturn_ws "true" true
-        stringReturn_ws "false" false
+        keywordReturn_ws "true" true
+        keywordReturn_ws "false" false
     ] .>> ws
 
 let pfloat_ws = 
@@ -99,13 +131,6 @@ let pfloat_ws =
 
 let pint32_ws =
     pint32 .>> ws
-
-let identifier =
-    let isIdentifierFirstChar c = isLetter c || c = '_' || c = '$'
-    let isIdentifierChar c = isLetter c || isDigit c || c = '_' || c = '$'
-
-    many1Satisfy2L isIdentifierFirstChar isIdentifierChar "identifier" 
-    .>> ws
 
 let listBetweenStrings sOpen sClose sSep pElement =
     between (str_ws sOpen) (str_ws sClose)
@@ -125,13 +150,13 @@ let typeSpec, typeSpecRef = createParserForwardedToRef()
 
 let extendsClause =
     choice [
-        str_ws "extends" >>. typeSpec |>> Some
+        keyword_ws "extends" >>. typeSpec |>> Some
         preturn None
     ]
 
 let extendsReferenceClause =
     choice [
-        str_ws "extends" >>. typeReference |>> Some
+        keyword_ws "extends" >>. typeReference |>> Some
         preturn None
     ]
 
@@ -158,7 +183,7 @@ do  typeReferenceRef := entityName .>>. typeArgs |>> TypeReference
 
 let interfaceExtendsClause =
     choice [
-        str_ws "extends" >>. sepBy typeReference (str_ws ",")
+        keyword_ws "extends" >>. sepBy typeReference (str_ws ",")
         preturn []
     ] |>> InterfaceExtendsClause
 
@@ -177,11 +202,11 @@ let optionality =
 
 let predefinedType =
     choice [
-        stringReturn_ws "any" Any
-        stringReturn_ws "number" Number
-        stringReturn_ws "boolean" Boolean
-        stringReturn_ws "string" String
-        stringReturn_ws "void" Void
+        keywordReturn_ws "any" Any
+        keywordReturn_ws "number" Number
+        keywordReturn_ws "boolean" Boolean
+        keywordReturn_ws "string" String
+        keywordReturn_ws "void" Void
     ]
 
 let typeAnnotation =
@@ -189,8 +214,8 @@ let typeAnnotation =
 
 let publicOrPrivate =
     choice [
-        stringReturn_ws1 "public" Public
-        stringReturn_ws1 "private" Private
+        keywordReturn_ws1 "public" Public
+        keywordReturn_ws1 "private" Private
     ]
 
 let requiredParameter =
@@ -207,8 +232,8 @@ let literalValue =
         pbool_ws |>> BooleanValue
         pfloat_ws |>> NumberValue
         stringLiteral |>> StringValue
-        stringReturn_ws "null" NullValue
-        stringReturn_ws "undefined" NullValue
+        keywordReturn_ws "null" NullValue
+        keywordReturn_ws "undefined" NullValue
         identifier |>> UnknownValue
     ]
 
@@ -271,7 +296,7 @@ let paramList =
 let objectLiteral = objectType |>> LiteralObjectType
 
 let constructorLiteral = 
-    str_ws "new" >>. typeParams .>>. paramList .>>. (str_ws "=>" >>. typeSpec)
+    keyword_ws "new" >>. typeParams .>>. paramList .>>. (str_ws "=>" >>. typeSpec)
     |>> (fun ((tps, ps), rt) -> LiteralConstructorType(tps, ps, rt))
 
 let functionLiteral =
@@ -282,7 +307,7 @@ let followedByArraySig pSpec =
     pSpec .>> str_ws "[" .>> str_ws "]" |>> LiteralArrayType
 
 let typeQuery =
-    str_ws "typeof" >>. entityName |>> TypeQuery
+    keyword_ws "typeof" >>. entityName |>> TypeQuery
 
 let typeLiteralPrime, typeLiteralPrimeRef = createParserForwardedToRef()
 
@@ -314,8 +339,6 @@ do  typeSpecRef :=
             typeReference |>> Reference
         ]
 
-
-
 let propertySignature =
     propertyName .>>. optionality .>>. opt typeAnnotation
     |>> (fun ((n, o), t) -> PropertySignature(n, o, t))
@@ -325,16 +348,16 @@ let callSignature =
     |>> (fun ((n, ps), t) -> CallSignature(n, ps, t))
 
 let constructSignature =
-    str_ws "new" >>. typeParams .>>. paramList .>>. opt typeAnnotation
+    keyword_ws "new" >>. typeParams .>>. paramList .>>. opt typeAnnotation
     |>> (fun ((n, ps), t) -> ConstructSignature(n, ps, t))
 
 let indexSignature =
     choice_attempt [
-        str_ws "[" >>. identifier .>> str_ws ":" .>> str_ws "string" 
+        str_ws "[" >>. identifier .>> str_ws ":" .>> keyword_ws "string" 
         .>> str_ws "]" .>>. typeAnnotation
         |>> IndexSignatureString
 
-        str_ws "[" >>. identifier .>> str_ws ":" .>> str_ws "number" 
+        str_ws "[" >>. identifier .>> str_ws ":" .>> keyword_ws "number" 
         .>> str_ws "]" .>>. typeAnnotation
         |>> IndexSignatureNumber
     ]
@@ -362,28 +385,28 @@ let exportAssignment =
     |>> ExportAssignment
 
 let interfaceDeclaration =
-    str_ws "interface" >>. identifier .>>. typeParams 
+    keyword_ws "interface" >>. identifier .>>. typeParams 
     .>>. interfaceExtendsClause .>>. objectType 
     |>> (fun (((id, tps), ex), t) -> InterfaceDeclaration(id, tps, ex, t))
 
 let importDeclaration =
-    str_ws "import" >>. identifier .>>. entityName
+    keyword_ws "import" >>. identifier .>>. (str_ws "=" >>. notFollowedBy(skipString "require") >>. entityName)
     |>> ImportDeclaration
 
 let externalModuleReference =
-    str_ws "require" >>. choice [
+    keyword_ws "require" >>. choice [
         str_ws "(" >>. stringLiteral .>> str_ws ")"
         stringLiteral 
     ]
     |>> ExternalModuleReference
 
 let externalImportDeclaration =
-    str_ws "import" >>. identifier .>>. (str_ws "=" >>. externalModuleReference)
+    keyword_ws "import" >>. identifier .>>. (str_ws "=" >>. externalModuleReference)
     |>> ExternalImportDeclaration
 
 let implementsClause =
     choice [
-        str_ws "implements" >>. sepBy typeReference (str_ws ",")
+        keyword_ws "implements" >>. sepBy typeReference (str_ws ",")
         preturn []
     ]
 
@@ -393,7 +416,7 @@ let classHeritage =
     
 let staticness =
     choice [
-        stringReturn_ws "static" true
+        keywordReturn_ws "static" true
         preturn false
     ]
 
@@ -405,13 +428,13 @@ let ambientMemberDeclaration =
         opt publicOrPrivate .>>. staticness .>>. propertyName .>>. opt typeAnnotation
         |>> (fun (((pp, s), n), t) -> AmbientPropertyDeclaration(pp, s, n, t))
 
-        opt publicOrPrivate .>> stringReturn_ws "static" true .>>. callSignature
+        opt publicOrPrivate .>> keywordReturn_ws "static" true .>>. callSignature
         |>> (fun (pp, c) -> AmbientMethodDeclaration(pp, false, NameIdentifier "static", c))
     ]
 
 let ambientClassBodyElement =
     choice [
-        str_ws "constructor" >>. paramList
+        keyword_ws "constructor" >>. paramList
         |>> AmbientConstructorDeclaration
 
         ambientMemberDeclaration |>> AmbientMemberDeclaration
@@ -428,17 +451,17 @@ let ambientEnumMember =
 
 let commonAmbientElementDeclaration =
     choice [
-        str_ws "var" >>. identifier .>>. opt typeAnnotation .>> opt (str_ws ";")
+        keyword_ws "var" >>. identifier .>>. opt typeAnnotation .>> opt (str_ws ";")
         |>> AmbientVariableDeclaration
 
-        str_ws "function" >>. identifier .>>. callSignature .>> opt (str_ws ";")
+        keyword_ws "function" >>. identifier .>>. callSignature .>> opt (str_ws ";")
         |>> AmbientFunctionDeclaration
 
-        str_ws "class" >>. identifier .>>. typeParams .>>. classHeritage
+        keyword_ws "class" >>. identifier .>>. typeParams .>>. classHeritage
         .>>. (between (str_ws "{") (str_ws "}") (many (ambientClassBodyElement .>> opt (str_ws ";")))) .>> opt (str_ws ";")
         |>> (fun (((id, tps), ch), els) -> AmbientClassDeclaration(id, tps, ch, els))
 
-        str_ws "enum" >>. identifier
+        keyword_ws "enum" >>. identifier
         .>>. listBetweenStrings "{" "}" "," ambientEnumMember .>> opt (str_ws ";")
         |>> AmbientEnumDeclaration
     ]
@@ -446,14 +469,14 @@ let commonAmbientElementDeclaration =
 
 let exportedness =
     choice [
-        stringReturn_ws "export" true
+        keywordReturn_ws "export" true
         preturn false
     ]
 
 let ambientModuleElement, ambientModuleElementRef = createParserForwardedToRef()
 
 let ambientModuleDeclaration =
-    str_ws "module" >>. entityName 
+    keyword_ws "module" >>. entityName 
     .>>. between (str_ws "{") (str_ws "}") (many ambientModuleElement)
     
 
@@ -483,23 +506,22 @@ let ambientExternalModuleElement =
 let ambientDeclaration =
     choice_attempt [
 
-        str_ws "declare" >>. commonAmbientElementDeclaration
+        keyword_ws "declare" >>. commonAmbientElementDeclaration
         |>> CommonAmbientElementDeclaration
         
-        str_ws "declare" >>. ambientModuleDeclaration |>> AmbientModuleDeclaration
+        keyword_ws "declare" >>. ambientModuleDeclaration |>> AmbientModuleDeclaration
 
-        str_ws "declare" >>. str_ws "module" >>. stringLiteral
+        keyword_ws "declare" >>. keyword_ws "module" >>. stringLiteral
         .>>. between (str_ws "{") (str_ws "}") (many ambientExternalModuleElement)
         |>> AmbientExternalModuleDeclaration
     ]
 
-
 let rootReference =
     choice_attempt [
-        str_ws "///" >>. str_ws "<reference" >>. str_ws "path=" >>. stringLiteral 
+        str_ws "///" >>. str_ws "<" >>. keyword_ws "reference" >>. keyword_ws "path" >>. str_ws "=" >>. stringLiteral 
         .>> str_ws "/>" |>> File
 
-        str_ws "///" >>. str_ws "<reference" >>. str_ws "no-default-lib=\"" >>. pbool_ws 
+        str_ws "///" >>. str_ws "<" >>. keyword_ws "reference" >>. keyword_ws "no-default-lib" >>.str_ws"=" >>. str_ws "\"" >>. pbool_ws 
         .>> str_ws "\"" .>> str_ws "/>" |>> NoDefaultLib
     ]
 
