@@ -36,14 +36,13 @@ let private allComponents =
    ] |> List.concat
 
 type Compiler =
-   static member Compile(expression, ?components, ?noReturn, ?shouldFlattenGenericsForReflection, ?shouldCompress) = 
+   static member Compile(expression, ?components, ?noReturn, ?shouldCompress) = 
       let components = defaultArg components []
-      let shouldFlattenGenericsForReflection = defaultArg shouldFlattenGenericsForReflection true
       let shouldCompress = defaultArg shouldCompress false
       let returnStrat = 
          if defaultArg noReturn false then ReturnStrategies.inplace
          else ReturnStrategies.returnFrom
-      let compiler = InternalCompiler.Compiler(allComponents @ components, shouldFlattenGenericsForReflection)
+      let compiler = InternalCompiler.Compiler(allComponents @ components)
       let program = compiler.Compile returnStrat expression
       let reflectedDefs = compiler.Globals
       let block = List.append reflectedDefs program
