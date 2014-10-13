@@ -18,7 +18,6 @@ type ICompiler =
    abstract DefineGlobal: string -> (Var -> JSStatement list) -> Var
    abstract DefineGlobalInitialization: JSStatement list -> unit
    abstract Globals: JSStatement list
-   abstract ShouldFlattenGenericsForReflection: bool
 
 type ICompilerComponent =
    abstract TryCompile: compiler:ICompiler -> returnStategy:IReturnStrategy -> expr:Expr -> JSStatement list
@@ -33,7 +32,7 @@ type CompilerComponent =
    | CallReplacer of CallReplacer
    | CompilerComponent of ICompilerComponent
 
-type Compiler(components, shouldFlattenGenericsForReflection) as this = 
+type Compiler(components) as this = 
    let parameterKey (mb : MethodBase) =
       mb.GetParameters() |> Array.map (fun pi ->
          pi.ParameterType.Name)
@@ -210,6 +209,4 @@ type Compiler(components, shouldFlattenGenericsForReflection) as this =
          initialization <- List.append initialization stmts
 
       member __.Globals = getGlobals()
-
-      member __.ShouldFlattenGenericsForReflection = shouldFlattenGenericsForReflection
          

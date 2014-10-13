@@ -50,8 +50,7 @@ let getSpecializationString (compiler : InternalCompiler.ICompiler) ts =
       //TODO: Name isn't safe. We really need to keep a dictionary around
       // to make this safer. Using only the short names if there are no collisions.
       if isPrimitive t then t.Name
-      elif compiler.ShouldFlattenGenericsForReflection then JavaScriptNameMapper.mapType t
-      else "obj"
+      else JavaScriptNameMapper.mapType t
    ) 
    |> String.concat "_"
    |> JavaScriptNameMapper.sanitizeAux
