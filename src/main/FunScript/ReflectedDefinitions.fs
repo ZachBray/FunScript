@@ -303,6 +303,10 @@ let private constructingInstances =
             declaringType.FullName = objectName 
          then [ Scope <| Block [] ]
          else createConstruction split returnStategy compiler [exprs] ci
+      | Patterns.Call(None, mi, []) when mi.Name = "CreateInstance" && mi.IsGenericMethod ->
+         let t = mi.GetGenericArguments().[0]
+         let ci = t.GetConstructor([||])
+         createConstruction split returnStategy compiler [] ci
       | _ -> []
 
 let components = [ 
