@@ -1160,7 +1160,7 @@ module Compiler =
                     xs |> Seq.choose (function
                         // TODO: For now we are assuming everything is exported...
                         //       ...but really we should filter and treat them differently.
-                        | Import(_, x, y) -> Some(x, y)
+                        | Import(_, x, y) when x <> y -> Some(x, y)
                         | _ -> None)
                     |> Map.ofSeq
                 let allTypeImports =
