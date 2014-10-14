@@ -69,7 +69,7 @@ let compile outputAssembly references (source : string) =
                 printf "\t\t%s  %s " (if err.IsWarning then "WARNING" else "ERROR") err.ErrorNumber 
                 printfn "at line %d, column %d in %s" err.Line err.Column (err.FileName.Trim())
                 printfn "\t\t\t %s" err.ErrorText)
-            hasErrors
+            not hasErrors
 
 let generateAssemblies tempDir postBuildStep inputs  =
     if not(Directory.Exists tempDir) then
