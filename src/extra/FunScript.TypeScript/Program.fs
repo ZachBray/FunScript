@@ -63,8 +63,13 @@ let compile outputAssembly references (source : string) =
         match [| for err in results.Errors -> err |] with
         | [||] -> true
         | errors ->
-            printf "Failed to compile. \n%A" (errors |> Array.map (fun err -> err.ErrorText))
-            false
+            let hasErrors = results.Errors.HasErrors
+            printfn (if hasErrors then  "\tFailed to compile:" else "\tCompiled with warnings:")
+            errors |> Array.iter ( fun err -> 
+                printf "\t\t%s  %s " (if err.IsWarning then "WARNING" else "ERROR") err.ErrorNumber 
+                printfn "at line %d, column %d in %s" err.Line err.Column (err.FileName.Trim())
+                printfn "\t\t\t %s" err.ErrorText)
+            hasErrors
 
 let generateAssemblies tempDir postBuildStep inputs  =
     if not(Directory.Exists tempDir) then
