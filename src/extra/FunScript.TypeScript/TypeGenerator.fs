@@ -417,7 +417,7 @@ module Identifier =
     let toLowerCamelCase(str : string) =
         str.[0..0].ToLower() + str.[1..]
 
-    let sanitiseLowerCamelCase = toLowerCamelCase >> sanitise
+    let sanitiseLowerCamelCase = sanitise >> toLowerCamelCase
 
     let sanitiseLiteral str =
         let almostSane =
