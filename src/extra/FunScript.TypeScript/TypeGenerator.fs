@@ -480,36 +480,82 @@ module private Generate =
     let predefinedNs =
         predefinedTypeKeys |> Set.map fst
 
-    let nameCode ns =
+    type NormalisedName = 
+    | NormalisedName of string list
+    | Empty
+
+    let funscriptNamespace = ["TypeScript";"FunScript" ]
+
+    let normalise ns =
         match ns with
-        | [] -> None
-        | ["Array"] -> Some "array"
+        | [] -> Empty
+        | ["Array"] -> NormalisedName ["array"]
         | [genericParam] when genericParam.StartsWith("'") ->
-            Some(Identifier.sanitise genericParam)
+            NormalisedName [Identifier.sanitise genericParam]
         | _ -> 
             let isPredefined = predefinedNs.Contains ns
             let sanitise =
                 if isPredefined then id
                 else Identifier.sanitise
-            let subTypeSpace = ns |> List.rev |> List.map sanitise |> String.concat "." 
-            if isPredefined then Some subTypeSpace
-            else
-                let fullTypeSpace = sprintf "FunScript.TypeScript.%s" subTypeSpace
-                Some fullTypeSpace
+            let subTypeSpace = ns |> List.map sanitise
+            if isPredefined 
+            then NormalisedName subTypeSpace 
+            else NormalisedName (List.concat [subTypeSpace; funscriptNamespace]) 
 
-    let namespaceCode ns =
-        match nameCode ns with
+    let code = function
+        |NormalisedName n -> Some (n |> List.rev |> String.concat ".")
+        |Empty -> None
+
+    let nameCode = normalise >> code
+
+    let extractNamespace (TypeRef(n, _)) = 
+        match normalise n with 
+        | Empty | NormalisedName([]) -> failwith "Expected a valid TypeRef"
+        | NormalisedName(_::ns) -> NormalisedName (if ns = [] then funscriptNamespace else ns)
+
+    let namespaceComponentCode n =
+        match n |> extractNamespace |> code with
         | None -> "FunScript.TypeScript"
         | Some namespaceCode -> namespaceCode
 
-    let extractNamespaceCode = function
-        | TypeRef([], _) -> failwith "Expected a valid TypeRef"
-        | TypeRef(_::ns, _) -> namespaceCode ns
+    let stripNamespace ns nc =
+        match ns, nc with
+        | (Empty,_) -> nc 
+        | (NormalisedName ns, NormalisedName nc) when List.length ns < List.length nc ->
+            let _, ln, nspc = List.foldBack 
+                                (fun e (n, tn, ns) -> if n > 0 then (n-1, tn, e::ns) else (n, e::tn, ns))
+                                nc ( List.length ns, [], [])
+            NormalisedName(if ns = nspc then ln else nc )
+        | (_,_) -> nc 
+
+    let localNameCode ns tn = tn |> normalise |> stripNamespace ns |> code 
+
+    /// Returns the F# string representing the type ref, relative the the cns namespace.
+    /// Adresses issues with the F# compiler not resolving generic and delegate
+    /// parameters supplied as full type names when they reference the type being declared
+    /// It assumes that the generic parameters have been mapped into F# friendly
+    /// back-ticked type refs and that all types have been resolved.
+    let rec localTypeReferenceCode cns (TypeRef(ns, gps)) =
+        let nameCode = localNameCode cns ns 
+        match nameCode, gps with
+        | None, _ -> failwith "[ERROR] Cannot emit empty TypeRef reference."
+        //| Some "array", [] -> "array<obj>"
+        | Some nc, [] -> nc
+        | Some nc, gps -> 
+                let parameters = gps |> Seq.map (localTypeReferenceCode cns) |> String.concat ", "
+                sprintf "%s<%s>" nc parameters
+
+    /// Returns the F# string representing the type ref. It assumes that the generic
+    /// parameters have been mapped into F# friendly back-ticked type refs and that
+    /// all types have been resolved.
+    let typeReferenceCode = localTypeReferenceCode Empty 
+
 
     /// Tries to return a (name * namespace * parameter list) tuple for declaring
     /// types. This doesn't search the type space to resolve the type.
-    let (|TypeDeclarationId|_|) = function
-        | TypeRef(n::ns, gps) -> Some(Identifier.sanitise n, namespaceCode ns, gps)
+    let (|TypeDeclarationId|_|) tr =
+        match tr with
+        | TypeRef(n::_, gps) -> Some(Identifier.sanitise n, namespaceComponentCode tr, gps)
         | _ -> None
 
     let enumCode t ms =
@@ -584,40 +630,6 @@ type %s ="""               namespaceId nameId
                     | Some r -> TypeRef(r, ps)
                     | None -> failwithf "[ERROR] Unable to resolve TypeRef: %A (from TypeRef: %A)" t baseT)
 
-    let stripNamespace ns nc =
-        match ns, nc with
-        | (None,_) -> nc 
-        | (Some nspc, Some name) when String.length nspc > 0 ->
-                let nsl = String.length nspc + 1 
-                if nsl < String.length name && name.StartsWith nspc
-                then Some (name.Substring nsl)
-                else nc
-        | (_,_) -> nc 
-
-    let localNameCode ns = nameCode >> stripNamespace ns
-
-    let rec recLocalTypeReferenceCode cns (TypeRef(ns, gps)) =
-        let nameCode = localNameCode cns ns 
-        match nameCode, gps with
-        | None, _ -> failwith "[ERROR] Cannot emit empty TypeRef reference."
-        //| Some "array", [] -> "array<obj>"
-        | Some nc, [] -> nc
-        | Some nc, gps -> 
-                let parameters = gps |> Seq.map (recLocalTypeReferenceCode cns) |> String.concat ", "
-                sprintf "%s<%s>" nc parameters
-
-    /// Returns the F# string representing the type ref. It assumes that the generic
-    /// parameters have been mapped into F# friendly back-ticked type refs and that
-    /// all types have been resolved.
-    let typeReferenceCode = recLocalTypeReferenceCode None 
-    
-    /// Returns the F# string representing the type ref, relative the the ns namespace.
-    /// Adresses issues with the F# compiler not resolving generic and delegate
-    /// parameters supplied as full type names when they reference the type being declared
-    /// It assumes that the generic parameters have been mapped into F# friendly
-    /// back-ticked type refs and that all types have been resolved.
-    let localTypeReferenceCode ns = recLocalTypeReferenceCode (Some ns)
-    
     /// This is to work around the restriction where you cannot have a type parameter
     /// that `a :> `b[]
     let replaceArrayWithIList x =
@@ -691,19 +703,17 @@ type %s ="""               namespaceId nameId
                 (expandedDeps - gpsKeys) |> Set.remove (typeRefToTypeKey t)
             let delegateSignature, localSignature =
                 constrainedTypeReferenceCode (TypeRef(ns, fixedGps)) []
-            let currentNamespace = extractNamespaceCode t
+            let localTypeCode = extractNamespace t |> localTypeReferenceCode
             let parameterCode = 
                 match fixedPs with
                 | [] -> "unit"
-                | _ -> fixedPs 
-                       |> Seq.map (localTypeReferenceCode currentNamespace)
-                       |> String.concat " * "
-            let returnCode = localTypeReferenceCode currentNamespace fixedR
+                | _ -> fixedPs |> Seq.map localTypeCode |> String.concat " * "
+            let returnCode = localTypeCode fixedR
             let delegateDeclaration =
                 sprintf """
 namespace %s
 type %s = delegate of %s -> %s
-"""                 currentNamespace localSignature parameterCode returnCode
+"""                 (namespaceComponentCode t) localSignature parameterCode returnCode
             Some(delegateDeclaration,
                  dependencies,
                  typeRefToTypeKey t, 
@@ -727,13 +737,13 @@ type %s = delegate of %s -> %s
             let interfaceSignature, localSignature =
                 constrainedTypeReferenceCode (TypeRef(ns, fixedGps)) fixedGcs
             //TypeRef(ns, fixedGps), fixedGcs, fixedSts, interfaceSignature
-            let currentNamespace = extractNamespaceCode t
+
             let interfaceDeclaration =
                 sprintf """
 namespace %s
-type %s ="""        currentNamespace localSignature
+type %s ="""        (namespaceComponentCode t) localSignature
             let interfaceBodyEls =
-                fixedSts |> List.map (localTypeReferenceCode currentNamespace)
+                fixedSts |> List.map (extractNamespace t |> localTypeReferenceCode)
                 |> List.map (fun typeRef ->
                     sprintf """
         inherit %s""" typeRef)
