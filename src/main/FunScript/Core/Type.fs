@@ -2,11 +2,11 @@
 module FunScript.Core.Type
 open FunScript
 
-[<JSEmit("return {0}.Tag;")>]
+[<JSEmitInline("{0}.Tag")>]
 let getTag (x : obj) : int = failwith "never"
 
-[<JSEmit("return {0}[{1}];")>]
-let getProp (x : obj) (propName:string) : obj = failwith "never"
+[<JSEmitInline("{0}.Items[{1}]")>]
+let getTupleItem (x : obj) (i:int) : obj = failwith "never"
 
 type PropertyInfo(name, f, getPropType) =
    member __.Name : string = name
@@ -126,5 +126,4 @@ type FSharpValue() =
     static member PreComputeTupleReader t =
         fun (args : obj) -> 
             FSharpType.GetTupleElements t 
-            |> Array.mapi (fun i _ ->
-                getProp args ("Item" + i.ToString()))
+            |> Array.mapi (fun i _ -> getTupleItem args i)
