@@ -67,31 +67,51 @@ let ``String.Split with strings & remove empties works``() =
          "abc" = array.[0] + array.[1] + array.[2]
       @@>
 
-//TODO: Move to another file.
+////TODO: Move to another file.
+//[<Test>]
+//let ``System.Net.WebUtility.UrlEncode works``() =
+//   if typeof<System.Type>.GetType().Name = "MonoType" then Assert.Ignore("Mono/MS.NET compatibility bug") else
+//   check 
+//      <@@ 
+//         System.Net.WebUtility.UrlEncode "<abc>foo </abc>"
+//      @@>
+//
+////TODO: Move to another file.
+//[<Test>]
+//let ``System.Net.WebUtility.UrlDecode works``() =
+//   check 
+//      <@@ 
+//         System.Net.WebUtility.UrlDecode "%3cabc%3efoo+%3c%2fabc%3e"
+//      @@>
+//
+////TODO: Move to another file.
+//[<Test>]
+//let ``UrlEncode >> UrlDecode works``() =
+//   check 
+//      <@@ 
+//         System.Net.WebUtility.UrlDecode(System.Net.WebUtility.UrlEncode " a + b + c <br> ")
+//      @@>
+
 [<Test>]
-let ``System.Net.WebUtility.UrlEncode works``() =
-   if typeof<System.Type>.GetType().Name = "MonoType" then Assert.Ignore("Mono/MS.NET compatibility bug") else
+let ``System.Uri.EscapeDataString works``() =
    check 
       <@@ 
-         System.Net.WebUtility.UrlEncode "<abc>foo </abc>"
+         System.Uri.EscapeDataString "<abc>abc.foo+xyz%2B</abc>"
       @@>
 
 //TODO: Move to another file.
 [<Test>]
-let ``System.Net.WebUtility.UrlDecode works``() =
+let ``System.Uri.UnescapeDataString  works``() =
    check 
       <@@ 
-         System.Net.WebUtility.UrlDecode "%3cabc%3efoo+%3c%2fabc%3e"
+         System.Uri.UnescapeDataString "%3Cabc%3Eabc.foo%2Bxyz%252B%3C%2Fabc%3E"
       @@>
 
-
-
-//TODO: Move to another file.
 [<Test>]
 let ``UrlEncode >> UrlDecode works``() =
    check 
       <@@ 
-         System.Net.WebUtility.UrlDecode(System.Net.WebUtility.UrlEncode " a + b + c <br> ")
+         System.Uri.UnescapeDataString(System.Uri.EscapeDataString " <<< ! ==== a + b + c <abc>?=abc.foo+xyz%2B</abc>?; ")
       @@>
 
 [<Test>]
