@@ -80,6 +80,7 @@
     <Compile Include="AsyncTests.fs" />
     <Compile Include="ReflectionTests.fs" />
     <Compile Include="StringWriterTests.fs" />
+    <Compile Include="EventTests.fs" />
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
