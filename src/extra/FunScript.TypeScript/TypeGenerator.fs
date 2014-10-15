@@ -584,19 +584,40 @@ type %s ="""               namespaceId nameId
                     | Some r -> TypeRef(r, ps)
                     | None -> failwithf "[ERROR] Unable to resolve TypeRef: %A (from TypeRef: %A)" t baseT)
 
-    /// Returns the F# string representing the type ref. It assumes that the generic
-    /// parameters have been mapped into F# friendly back-ticked type refs and that
-    /// all types have been resolved.
-    let rec typeReferenceCode (TypeRef(ns, gps)) =
-        let nameCode = nameCode ns
+    let stripNamespace ns nc =
+        match ns, nc with
+        | (None,_) -> nc 
+        | (Some nspc, Some name) when String.length nspc > 0 ->
+                let nsl = String.length nspc + 1 
+                if nsl < String.length name && name.StartsWith nspc
+                then Some (name.Substring nsl)
+                else nc
+        | (_,_) -> nc 
+
+    let localNameCode ns = nameCode >> stripNamespace ns
+
+    let rec recLocalTypeReferenceCode cns (TypeRef(ns, gps)) =
+        let nameCode = localNameCode cns ns 
         match nameCode, gps with
         | None, _ -> failwith "[ERROR] Cannot emit empty TypeRef reference."
         //| Some "array", [] -> "array<obj>"
         | Some nc, [] -> nc
         | Some nc, gps -> 
-                let parameters = gps |> Seq.map typeReferenceCode |> String.concat ", "
+                let parameters = gps |> Seq.map (recLocalTypeReferenceCode cns) |> String.concat ", "
                 sprintf "%s<%s>" nc parameters
 
+    /// Returns the F# string representing the type ref. It assumes that the generic
+    /// parameters have been mapped into F# friendly back-ticked type refs and that
+    /// all types have been resolved.
+    let typeReferenceCode = recLocalTypeReferenceCode None 
+    
+    /// Returns the F# string representing the type ref, relative the the ns namespace.
+    /// Adresses issues with the F# compiler not resolving generic and delegate
+    /// parameters supplied as full type names when they reference the type being declared
+    /// It assumes that the generic parameters have been mapped into F# friendly
+    /// back-ticked type refs and that all types have been resolved.
+    let localTypeReferenceCode ns = recLocalTypeReferenceCode (Some ns)
+    
     /// This is to work around the restriction where you cannot have a type parameter
     /// that `a :> `b[]
     let replaceArrayWithIList x =
@@ -670,16 +691,19 @@ type %s ="""               namespaceId nameId
                 (expandedDeps - gpsKeys) |> Set.remove (typeRefToTypeKey t)
             let delegateSignature, localSignature =
                 constrainedTypeReferenceCode (TypeRef(ns, fixedGps)) []
+            let currentNamespace = extractNamespaceCode t
             let parameterCode = 
                 match fixedPs with
                 | [] -> "unit"
-                | _ -> fixedPs |> Seq.map typeReferenceCode |> String.concat " * "
-            let returnCode = typeReferenceCode fixedR
+                | _ -> fixedPs 
+                       |> Seq.map (localTypeReferenceCode currentNamespace)
+                       |> String.concat " * "
+            let returnCode = localTypeReferenceCode currentNamespace fixedR
             let delegateDeclaration =
                 sprintf """
 namespace %s
 type %s = delegate of %s -> %s
-"""                 (extractNamespaceCode t) localSignature parameterCode returnCode
+"""                 currentNamespace localSignature parameterCode returnCode
             Some(delegateDeclaration,
                  dependencies,
                  typeRefToTypeKey t, 
@@ -703,13 +727,13 @@ type %s = delegate of %s -> %s
             let interfaceSignature, localSignature =
                 constrainedTypeReferenceCode (TypeRef(ns, fixedGps)) fixedGcs
             //TypeRef(ns, fixedGps), fixedGcs, fixedSts, interfaceSignature
-
+            let currentNamespace = extractNamespaceCode t
             let interfaceDeclaration =
                 sprintf """
 namespace %s
-type %s ="""        (extractNamespaceCode t) localSignature
+type %s ="""        currentNamespace localSignature
             let interfaceBodyEls =
-                fixedSts |> List.map typeReferenceCode
+                fixedSts |> List.map (localTypeReferenceCode currentNamespace)
                 |> List.map (fun typeRef ->
                     sprintf """
         inherit %s""" typeRef)
