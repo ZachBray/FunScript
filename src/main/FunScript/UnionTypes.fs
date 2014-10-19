@@ -23,10 +23,12 @@ let private ignoredUnions =
 
 let private createConstructor uci compiler =
    let vars = getCaseVars uci |> List.map fst
-   vars, Block [
-      yield Assign(PropertyGet(This, "Tag"), Number(float uci.Tag))
-      yield Assign(PropertyGet(This, "_CaseName"), String uci.Name)
-      for var in vars do yield Assign(PropertyGet(This, var.Name), Reference var)
+   let this = Var("__this", typeof<obj>)
+   vars, Block [  
+      yield CopyThisToVar(this)
+      yield Assign(PropertyGet(Reference this, "Tag"), Number(float uci.Tag))
+      yield Assign(PropertyGet(Reference this, "_CaseName"), String uci.Name)
+      for var in vars do yield Assign(PropertyGet(Reference this, var.Name), Reference var)
    ]
 
 let private creation =
