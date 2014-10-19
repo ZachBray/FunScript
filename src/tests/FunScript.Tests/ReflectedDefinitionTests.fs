@@ -328,3 +328,20 @@ let ``multiple constructors work``() =
          let a = ValueWrapper()
          let b = ValueWrapper(10.)
          a.Value + b.Value + ValueWrapperCompanion.secondaryCount @@>
+
+
+[<FunScript.JS>]
+type TestClass() =
+    let f = ref (fun x -> x * 2.)
+
+    let g y = !f y
+
+    member val G = g
+
+[<Test>]
+let ``references to fields inside exported lambdas produce the same result``() =
+    check
+        <@@
+            let z = TestClass()
+            z.G 10.
+        @@>
