@@ -85,7 +85,6 @@ type JSExpr =
    | Integer of int
    | String of string
    | Reference of Var
-   | This
    | Object of (JSRef * JSExpr) list
    | PropertyGet of JSExpr * JSRef
    | IndexGet of JSExpr * JSExpr
@@ -105,7 +104,6 @@ type JSExpr =
       | Number f -> sprintf "%f" f
       | String str -> sprintf @"""%s""" (System.Web.HttpUtility.JavaScriptStringEncode(str))
       | Reference ref -> (!scope).ObtainNameScope ref FromReference |> fst
-      | This -> "this"
       | Object propExprs ->
          let filling =
             propExprs |> List.map (fun (name, expr) ->
@@ -165,6 +163,7 @@ and JSStatement =
    | Declare of Var list
    | Assign of JSExpr * JSExpr
    | DeclareAndAssign of Var * JSExpr
+   | CopyThisToVar of Var
    | Throw of JSExpr
    | IfThenElse of JSExpr * JSBlock * JSBlock
    | WhileLoop of JSExpr * JSBlock
@@ -190,6 +189,10 @@ and JSStatement =
          let name, newScope = (!scope).ObtainNameScope var FromDeclaration
          scope := newScope
          sprintf "var %s = %s" name (valExpr.Print(padding, scope))
+      | CopyThisToVar var ->
+         let name, newScope = (!scope).ObtainNameScope var FromDeclaration
+         scope := newScope
+         sprintf "var %s = this" name
       | Assign(varExpr, valExpr) ->
          sprintf "%s = %s" (varExpr.Print(padding, scope)) (valExpr.Print(padding, scope))
       | Throw valExpr ->

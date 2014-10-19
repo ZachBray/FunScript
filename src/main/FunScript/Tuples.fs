@@ -13,9 +13,11 @@ let getTupleVars n =
 let private createConstructor n compiler =
    let vars = getTupleVars n
    let refs = vars |> List.map Reference
-   vars, Block [
+   let this = Var("__this", typeof<obj>)
+   vars, Block [  
+      yield CopyThisToVar(this)
       for var in vars do 
-          yield Assign(PropertyGet(This, itemsPropName), Array refs)
+          yield Assign(PropertyGet(Reference this, itemsPropName), Array refs)
    ]
 
 let private creation =
