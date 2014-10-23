@@ -192,15 +192,15 @@ type DateTime =
         let newDay = min daysInMonth dt.Day
         DateTime.createUnsafeYMDHMSM(newYear, newMonth, newDay, dt.Hour, dt.Minute, dt.Second, dt.Millisecond, dt.Kind, System.DateTimeKind.Utc)
 
-    member dt.Subtract(t: TimeSpan)    = DateTime.createUnsafe(DateTime.getTime(dt) - t.TotalMilliseconds, dt.Kind)
-    member dt.Subtract(that): TimeSpan = TimeSpan.FromMilliseconds((DateTime.getTime dt) - (DateTime.getTime that))
+    static member SubtractTimeSpan(dt: DateTime, t: TimeSpan)    = DateTime.createUnsafe(DateTime.getTime(dt) - t.TotalMilliseconds, dt.Kind)
+    static member SubtractDateTime(dt: DateTime, that: DateTime): TimeSpan = TimeSpan.FromMilliseconds((DateTime.getTime dt) - (DateTime.getTime that))
 
-    [<System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2225:OperatorOverloadsHaveNamedAlternates")>]
-    static member (+) (a: DateTime, b: TimeSpan) = a.Add(b)
-    [<System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2225:OperatorOverloadsHaveNamedAlternates")>]
-    static member (-) (a: DateTime, b: TimeSpan) = a.Subtract(b)
-    [<System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2225:OperatorOverloadsHaveNamedAlternates")>]
-    static member (-) (a: DateTime, b: DateTime) = a.Subtract(b)
+//    [<System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2225:OperatorOverloadsHaveNamedAlternates")>]
+//    static member (+) (a: DateTime, b: TimeSpan) = a.Add(b)
+//    [<System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2225:OperatorOverloadsHaveNamedAlternates")>]
+//    static member (-) (a: DateTime, b: TimeSpan) = DateTime.SubtractTimeSpan(a, b)
+//    [<System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2225:OperatorOverloadsHaveNamedAlternates")>]
+//    static member (-) (a: DateTime, b: DateTime) = DateTime.SubtractDateTime(a, b)
 
     member dt.ToLongDateString()    = DateTime.toFormattedStringUnsafe(dt, "Date")
     member dt.ToShortDateString()   = DateTime.toFormattedStringUnsafe(dt, "LocaleDate")
