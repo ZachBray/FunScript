@@ -858,14 +858,13 @@ type %s ="""        (namespaceComponentCode t) localSignature
         let allowableGps = fixedMethodGps
         fix, allowableGps, allowableGcs
 
-    let usedNames = ref Set.empty
-    let rec compiledName name i =
-        let compName = if i = 0 then name else sprintf "%s%i" name i 
-        if !usedNames |> Set.contains compName then
-            compiledName name (i+1)
-        else 
-            usedNames := !usedNames |> Set.add compName
-            compName
+    /// Fast compiled name generation using mutable Dictionary:
+    let usedNamesMap = new Dictionary<string, int>()
+    let compiledName name = 
+        let i = ref -1
+        let found = usedNamesMap.TryGetValue(name, i)
+        usedNamesMap.[name] <- !i + 1
+        if found then sprintf "%s_%i" name !i else name
 
     let typeExtensionCode typeImports isMemberDefined typesByKey ns signature fixedGps members =
         let fixedGpsSet = set fixedGps
@@ -887,7 +886,7 @@ type %s ="""        (namespaceComponentCode t) localSignature
                         | Name pn -> 
                             let n, a = Identifier.fromPropertyName pn
                             n, a, ""
-                    let compiledName = compiledName name 0
+                    let compiledName = compiledName name
                     let baseAccess, seedI =
                         match s with
                         | Static -> javaScriptTypeCode t, 0
