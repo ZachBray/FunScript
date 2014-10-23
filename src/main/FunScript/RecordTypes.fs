@@ -13,8 +13,10 @@ let private getRecordVars recType =
 
 let private createConstructor recType compiler =
    let vars = getRecordVars recType
+   let this = Var("__this", typeof<obj>)
    vars, Block [  
-      for var in vars do yield Assign(PropertyGet(This, var.Name), Reference var)
+      yield CopyThisToVar(this)
+      for var in vars do yield Assign(PropertyGet(Reference this, var.Name), Reference var)
    ]
 
 let private creation =

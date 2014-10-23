@@ -19,6 +19,23 @@ let private (|ReflectedDefinition|_|) (mi:MethodBase) =
       | Some _ -> Some(JavaScriptNameMapper.mapMethod mi)
       | _ -> None
 
+let private replaceThisInExpr (expr : Expr) =
+    let var = ref None
+    let fixedExpr = expr.Substitute(fun v ->
+        if v.Name = "this" then
+            let thisVar = 
+                match !var with
+                | None -> 
+                    let thisVar = Var("__this", v.Type) 
+                    var := Some (v, thisVar)
+                    thisVar
+                | Some(_, v) -> v
+            Some(Expr.Var thisVar)
+        else None)
+    match !var with
+    | None -> expr
+    | Some (originalThis, newThis) -> Expr.Let(newThis, Expr.Var originalThis, fixedExpr)
+
 let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list) bodyExpr var (compiler:InternalCompiler.ICompiler) =
    match replacementMi.GetCustomAttribute<JSEmitAttribute>() with
    | meth when meth <> Unchecked.defaultof<_> ->
@@ -30,8 +47,10 @@ let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list)
             ) meth.Emit
       [ Assign(Reference var, Lambda(vars, Block[EmitStatement(fun (padding, scope) -> code padding scope)])) ]
    | _ when mb.IsConstructor ->
+      
+      let fixedBodyExpr = replaceThisInExpr bodyExpr
       [
-         yield Assign(Reference var, Lambda(vars, Block(compiler.Compile ReturnStrategies.returnFrom bodyExpr)))
+         Assign(Reference var, Lambda(vars, Block(compiler.Compile ReturnStrategies.returnFrom fixedBodyExpr)))
       ]
    | _ -> 
       [ Assign(

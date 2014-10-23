@@ -105,6 +105,16 @@ let components =
             <@ fun (evt : Event<_>) -> evt.Publish @> 
             <@ fun (evt : Core.Events.Event<_>) -> evt.Publish @>
 
+         // TODO: We should make sure the encoding mappings are equivalent to the
+         //       JS versions. WebUtility is not equivalent at the moment.
+         ExpressionReplacer.create
+            <@ fun str -> System.Uri.EscapeDataString str @>
+            <@ fun str -> Core.Web.WebUtility.UrlEncode str @>  
+
+         ExpressionReplacer.create
+            <@ fun str -> System.Uri.UnescapeDataString str @>
+            <@ fun str -> Core.Web.WebUtility.UrlDecode str @>  
+
          debugComponents
       ]
 
