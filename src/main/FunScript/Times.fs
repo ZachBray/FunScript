@@ -17,6 +17,9 @@ let components =
             ExpressionReplacer.createUnsafe <@ fun (h,m,s) -> TimeSpan(h,m,s) @> <@ Core.Time.TimeSpan.FromHMS @>
             ExpressionReplacer.createUnsafe <@ fun (d,h,m,s) -> TimeSpan(d,h,m,s) @> <@ Core.Time.TimeSpan.FromDHMS @>
             ExpressionReplacer.createUnsafe <@ fun (d,h,m,s,ms) -> TimeSpan(d,h,m,s,ms) @> <@ Core.Time.TimeSpan.FromDHMSM @>
+
+            ExpressionReplacer.createUnsafe <@ fun (a: DateTime, b: DateTime) -> a.Subtract(b) @> <@ Core.Time.DateTime.SubtractDateTime @>
+            ExpressionReplacer.createUnsafe <@ fun (dt: DateTime, ts: TimeSpan) -> dt.Subtract(ts) @> <@ Core.Time.DateTime.SubtractTimeSpan @>
         ]
         ExpressionReplacer.createTypeMethodMappings
             typeof<System.TimeSpan>
