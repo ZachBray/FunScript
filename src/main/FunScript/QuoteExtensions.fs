@@ -64,7 +64,11 @@ let specialOp (mb:MethodBase) =
       let declaringType = mb.GetGenericArguments().[0]
       let flags = BindingFlags.Public ||| BindingFlags.NonPublic ||| BindingFlags.Static
       let methods = declaringType.GetMethods(flags)
-      methods |> Array.tryFind(fun mi -> mi.Name = mb.Name) 
+      let paramTypes = mb.GetParameters() |> Array.map(fun p -> p.ParameterType)
+      methods |> Array.tryFind(fun mi ->
+        if mi.Name = mb.Name
+        then mi.GetParameters() |> Seq.map2 (fun t1 t2 -> t1 = t2.ParameterType) paramTypes |> Seq.reduce (&&)
+        else false) 
    else None
 
 let tryToMethodBase = function
