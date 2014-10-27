@@ -96,3 +96,31 @@ let ``async use statements should dispose of resources when the go out of scope`
          step2ok := !isDisposed
          !step1ok && !step2ok
       @@>
+
+
+[<Test>]
+let ``Try ... with ... expressions inside async expressions work the same``() =
+    checkAsync
+        <@ 
+            let result = ref ""
+            let throw() : unit =
+                raise(exn "Boo!")
+            let append(x) = 
+                result := !result + x
+            let innerAsync() =
+                async {
+                    append "b"
+                    try append "c"
+                        throw()
+                        append "1"
+                    with _ -> append "d"
+                    append "e"
+                }
+            async { 
+                append "a"
+                try do! innerAsync()
+                with _ -> append "2"
+                append "f"
+                return !result
+            }
+      @>

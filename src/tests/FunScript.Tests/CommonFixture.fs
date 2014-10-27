@@ -32,6 +32,20 @@ let check (quote:Quotations.Expr) =
    let expectedResult = quote.EvalUntyped()
    checkAreEqual expectedResult quote
 
+
+let checkAsync (quote:Quotations.Expr<'a Async>) =
+    let expectedResult = <@ Async.RunSynchronously %quote @>.Eval()
+    let immediateQuote = 
+        <@ 
+            let result = ref None
+            async { 
+                let! v = %quote 
+                result := Some v
+            } |> Async.StartImmediate
+            !result |> Option.get 
+        @>
+    checkAreEqual expectedResult immediateQuote
+
 // TODO:
 // Add support for inheritance.
 // Add support for TypeScript inheritance.

@@ -85,7 +85,7 @@ type AsyncBuilder() =
                Aux = 
                {
                   k.Aux with
-                     ExceptionCont = catchFunction
+                     ExceptionCont = fun ex -> k.Cont(catchFunction ex)
                }
          }
 
