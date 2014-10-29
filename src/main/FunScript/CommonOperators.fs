@@ -53,7 +53,10 @@ let private coerce =
    CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
       function
       | Patterns.Coerce(expr, t) -> 
-         if expr.Type = t || t = typeof<obj> || (expr.Type.IsInterface && t.IsAssignableFrom expr.Type) then 
+         if expr.Type = t 
+            || t = typeof<obj> 
+            || (expr.Type.IsInterface && t.IsAssignableFrom expr.Type)
+            || t.GetGenericTypeDefinition() = typedefof<_ System.Collections.Generic.IList> then 
             compiler.Compile returnStrategy expr
          elif t.IsInterface then
             let actualType = expr.Type

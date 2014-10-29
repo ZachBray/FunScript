@@ -1,6 +1,7 @@
 ﻿module internal FunScript.Arrays
 
 open AST
+open System.Collections.Generic
 open Microsoft.FSharp.Quotations
 
 let private creation =
@@ -47,6 +48,9 @@ let components =
          creation
          getIndex
          setIndex
+         ExpressionReplacer.createUnsafe <@ fun (xs:_ IList) i -> xs.[i] @> <@ fun (xs:_[]) i -> xs.[i] @>
+         ExpressionReplacer.createUnsafe <@ fun (xs:_ IList) i v -> xs.[i] <- v @> <@ fun (xs:_[]) i v -> xs.[i] <- v @>
+         ExpressionReplacer.createUnsafe <@ fun (xs:_ IList) -> xs.Count @> <@ fun (xs:_[]) -> xs.Length @>
          ExpressionReplacer.create <@ fun (xs:_ []) -> xs.Length @> <@ Core.Array.BoxedLength @>
          ExpressionReplacer.createUnsafe <@ Array.toList @> <@ Core.List.OfArray @>
          ExpressionReplacer.createUnsafe <@ Array.ofList @> <@ Core.List.ToArray @>

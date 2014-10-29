@@ -37,9 +37,6 @@ let create compile =
    } |> CompilerComponent
 
 let createCallerReplacer methodInfo callType replacement replace =
-   match replacement with
-   | None | Some(DerivedPatterns.MethodWithReflectedDefinition _) -> ()
-   | Some _ -> failwith "Replacement had no reflected definition"
    { Target = methodInfo
      TargetType = callType
      Replacement = replacement

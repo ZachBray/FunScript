@@ -2,6 +2,7 @@
 module FunScript.Tests.Arrays
 
 open NUnit.Framework
+open System.Collections.Generic
 
 
 [<Test>]
@@ -662,3 +663,20 @@ let ``Array.zip3 works``() =
          x + y + z
       @@>
 
+[<Test>]
+let ``Array as IList indexer has same behaviour``() =
+    check 
+        <@@
+            let xs = [|1.; 2.; 3.|]
+            let ys = xs :> _ IList
+            ys.[0] + ys.[2]
+        @@>
+
+[<Test>]
+let ``Array as IList count has same behaviour``() =
+    check 
+        <@@
+            let xs = [|1.; 2.; 3.|]
+            let ys = xs :> _ IList
+            float ys.Count
+        @@>
