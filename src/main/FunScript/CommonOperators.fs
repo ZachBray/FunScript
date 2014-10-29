@@ -56,7 +56,7 @@ let private coerce =
          if expr.Type = t 
             || t = typeof<obj> 
             || (expr.Type.IsInterface && t.IsAssignableFrom expr.Type)
-            || t.GetGenericTypeDefinition() = typedefof<_ System.Collections.Generic.IList> then 
+            || (t.IsGenericType && t.GetGenericTypeDefinition() = typedefof<_ System.Collections.Generic.IList>) then 
             compiler.Compile returnStrategy expr
          elif t.IsInterface then
             let actualType = expr.Type
