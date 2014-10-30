@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2013 for Windows Desktop
-VisualStudioVersion = 12.0.21005.1
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FunScript", "main\FunScript\FunScript.fsproj", "{E0916E67-D3B0-4C3A-AD18-4146882FCEDD}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FunScript.TypeScript", "extra\FunScript.TypeScript\FunScript.TypeScript.fsproj", "{164139CF-07D4-468F-B6A8-9B92504C38E4}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FunScript.Interop", "main\FunScript.Interop\FunScript.Interop.fsproj", "{1397ECEF-2A65-49CE-AFA1-B9884671BBB9}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FunScript.Rx", "extra\FunScript.Rx\FunScript.Rx.fsproj", "{3D25CAB2-83A4-4D3B-9986-AC068FE29307}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{1397ECEF-2A65-49CE-AFA1-B9884671BBB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1397ECEF-2A65-49CE-AFA1-B9884671BBB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1397ECEF-2A65-49CE-AFA1-B9884671BBB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D25CAB2-83A4-4D3B-9986-AC068FE29307}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D25CAB2-83A4-4D3B-9986-AC068FE29307}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D25CAB2-83A4-4D3B-9986-AC068FE29307}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D25CAB2-83A4-4D3B-9986-AC068FE29307}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
