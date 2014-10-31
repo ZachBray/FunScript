@@ -1447,13 +1447,17 @@ let startWith  (values: #seq<'T>)  (source: IObservable<'T>) : IObservable<'T> =
 
 
 /// Subscribes to the Observable with a next fuction.
-[<JSEmitInline("{ Dispose: {1}.subscribe({0}).dispose }")>]
+[<JSEmit("var subscription = {1}.subscribe({0});
+subscription.Dispose = subscription.dispose;
+return subscription;")>]
 let subscribe(onNext: 'T -> unit) (observable: IObservable<'T>) =
       observable.Subscribe(Action<_> onNext)
 
 
 /// Subscribes to the Observable with a next and an error-function.
-[<JSEmitInline("{ Dispose: {2}.subscribe({0}, {1}).dispose }")>]
+[<JSEmit("var subscription = {2}.subscribe({0}, {1});
+subscription.Dispose = subscription.dispose;
+return subscription;")>]
 let subscribeWithError  ( onNext     : 'T   -> unit     ) 
                         ( onError    : exn  -> unit     ) 
                         ( observable : IObservable<'T>  ) =
@@ -1461,19 +1465,25 @@ let subscribeWithError  ( onNext     : 'T   -> unit     )
 
  
 /// Subscribes to the Observable with a next and a completion callback.
-[<JSEmitInline("{ Dispose: {2}.subscribe({0}, {1}).dispose }")>]
+[<JSEmit("var subscription = {2}.subscribe({0}, {1});
+subscription.Dispose = subscription.dispose;
+return subscription;")>]
 let subscribeWithCompletion (onNext: 'T -> unit) (onCompleted: unit -> unit) (observable: IObservable<'T>) =
         observable.Subscribe(Action<_> onNext, Action onCompleted)
 
 
 /// Subscribes to the observable with all three callbacks
-[<JSEmitInline("{ Dispose: {3}.subscribe({0}, {1}, {2}).dispose }")>]
+[<JSEmit("var subscription = {3}.subscribe({0}, {1}, {2});
+subscription.Dispose = subscription.dispose;
+return subscription;")>]
 let subscribeWithCallbacks onNext onError onCompleted (observable: IObservable<'T>) =
     observable.Subscribe(Observer.Create(Action<_> onNext, Action<_> onError, Action onCompleted))
 
 
 /// Subscribes to the observable with the given observer
-[<JSEmitInline("{ Dispose: {1}.subscribe({0}).dispose }")>]
+[<JSEmit("var subscription = {1}.subscribe({0});
+subscription.Dispose = subscription.dispose;
+return subscription;")>]
 let subscribeObserver observer (observable: IObservable<'T>) =
     observable.Subscribe observer
 

@@ -9,6 +9,9 @@ let mainPackageDir = "./build/main/deploy/"
 let dataBuildDir = "./build/data/bin/"
 let dataPackageDir = "./build/data/deploy/"
 
+let rxBuildDir = "./build/rx/bin/"
+let rxPackageDir = "./build/rx/deploy/"
+
 let testBuildDir = "./build/data/bin/"
 
 let dependenciesDir = "./src/packages/"
@@ -24,6 +27,10 @@ Target "Clean-Main" (fun _ ->
 
 Target "Clean-Data" (fun _ ->
     CleanDirs [dataBuildDir; dataPackageDir]
+)
+
+Target "Clean-Rx" (fun _ ->
+    CleanDirs [rxBuildDir; rxPackageDir]
 )
 
 Target "Clean-Test" (fun _ ->
@@ -83,6 +90,27 @@ Target "Build-Data" (fun () ->
 
     MSBuildRelease dataBuildDir "Build" projectFiles
     |> Log "Build-Data-Output: "
+)
+
+Target "Build-Rx" (fun () ->
+    
+    RestorePackages()
+    CopyDir dependenciesDir "./packages/" (fun _ -> true)
+
+    CreateFSharpAssemblyInfo "src/extra/FunScript.Rx/AssemblyInfo.fs" 
+        [
+            yield Attribute.Title "TypeInferred.FunScript.Rx"
+            yield Attribute.Description "Rx Interop Library - FunScript"
+            yield Attribute.Guid "891C8111-4D9D-45CD-8A8D-77EB817FF8E1"
+            yield! baseAttributes
+        ]
+        
+    let projectFiles = !! "src/extra/FunScript.Rx/*.fsproj"
+    
+    Log "Build-Rx-Projects: " projectFiles
+
+    MSBuildRelease rxBuildDir "Build" projectFiles
+    |> Log "Build-Rx-Output: "
 )
 
 Target "Build-Test" (fun () ->
@@ -147,7 +175,31 @@ Target "Create-Package-Data" (fun () ->
                 "FSharp.Data", "[2.0.9]"
                 "ApiaryProvider", "[1.0.2]"
             ]
-        }) "build/template.nuspec"
+        }) "build/data-template.nuspec"
+)
+
+Target "Create-Package-Rx" (fun () ->
+    let hasNugetKey = hasBuildParam "nuget_key"
+    tracefn "Publish-Package-Rx: %b" hasNugetKey
+    
+    NuGet(fun p ->
+        {p with
+            Authors = ["Zach Bray"]
+            Project = "FunScript.Rx"
+            Summary = "Rx interop. for FunScript."
+            Description = "Rx interop. for FunScript."
+            Copyright = "Copyright © 2012-2014 Type Inferred Ltd."
+            WorkingDir = rxBuildDir
+            OutputPath = rxPackageDir
+            Version = versionNumber
+            AccessKey = getBuildParamOrDefault "nuget_key" ""
+            Publish = hasNugetKey
+            Dependencies = 
+            [
+                "FunScript", sprintf "[%s]" versionNumber
+                "FSharp.Control.Reactive", "[2.4.0]"
+            ]
+        }) "build/rx-template.nuspec"
 )
 
 Target "Release" DoNothing
@@ -155,6 +207,9 @@ Target "Release" DoNothing
 "Clean-Main" ==> "Build-Main" ==> "Create-Package-Main" ==> "Release"
 "Build-Main" ==> "Build-Data"
 "Clean-Data" ==> "Build-Data" ==> "Create-Package-Data" ==> "Release"
+"Build-Main" ==> "Build-Rx"
+"Clean-Rx" ==> "Build-Rx" ==> "Create-Package-Rx" ==> "Release"
+"Build-Main" ==> "Build-Rx" ==> "Build-Test"
 "Clean-Test" ==> "Build-Test" ==> "Run-Test"
 "Run-Test" ==> "Create-Package-Main"
 

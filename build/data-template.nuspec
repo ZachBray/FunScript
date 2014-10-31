@@ -16,11 +16,8 @@
     @dependencies@
   </metadata>
   <files>
-    <file src="..\bin\FunScript.Interop.dll" target="lib\net40" />
-    <file src="..\bin\FunScript.dll" target="lib\net40" />
-    <file src="..\bin\FunScript.Interop.xml" target="lib\net40" />
-    <file src="..\bin\FunScript.xml" target="lib\net40" />
-    <file src="..\bin\FunScript.Interop.pdb" target="lib\net40" />
-    <file src="..\bin\FunScript.pdb" target="lib\net40" />
+    <file src="..\bin\FunScript.Data.dll" target="lib\net40" />
+    <file src="..\bin\FunScript.Data.xml" target="lib\net40" />
+    <file src="..\bin\FunScript.Data.pdb" target="lib\net40" />
   </files>
 </package>

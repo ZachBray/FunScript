@@ -68,6 +68,43 @@ let ``should translate count``() =
       @@>
 
 [<Test>]
+let ``should translate map``() =
+   checkRx 
+      <@@
+         let y = ref 0.0
+         let xs = Event<float>()
+         let count = xs.Publish
+                     |> Observable.map (fun x -> x * x * x)
+                     |> Observable.subscribe (fun x -> y := float x)
+         xs.Trigger 1.0
+         xs.Trigger 2.0
+         xs.Trigger 3.0
+         xs.Trigger 4.0
+         !y
+      @@>
+
+[<Test>]
+let ``should translate combineLatestArray``() =
+   checkRx 
+      <@@
+         let y = ref ""
+         let xs = Event<string>()
+         let ys = Event<string>()
+         let count = Observable.combineLatestArray [|xs.Publish; ys.Publish|]
+                     |> Observable.subscribe (fun xs ->
+                        y := !y + "--" + (xs |> String.concat ","))
+         xs.Trigger "A"
+         xs.Trigger "B"
+         ys.Trigger "1"
+         ys.Trigger "2"
+         xs.Trigger "C"
+         xs.Trigger "D"
+         ys.Trigger "3"
+         ys.Trigger "4"
+         !y
+      @@>
+
+[<Test>]
 let ``should translate merge``() =
    checkRx 
       <@@
@@ -85,26 +122,20 @@ let ``should translate merge``() =
          !z
       @@>
 
-//[<Test>]
-//let ``should translate dispose``() =
-//   checkRx 
-//      <@@
-//         let z = ref 0.0
-//         let xs = Event<float>()
-//         let ys = xs.Publish
-//         log "A"
-//         let bs = Observable.map (fun x -> log x; x) ys 
-//         log "B"
-//         let subscription = Observable.subscribe(fun x -> log x; z := !z + x) bs
-//         log "C"
-//         xs.Trigger 1.0
-//         xs.Trigger 2.0
-//         xs.Trigger 3.0
-//         log "D"
-//         subscription.Dispose()
-//         log "E"
-//         xs.Trigger 4.0
-//         xs.Trigger 5.0
-//         log !z
-//         !z
-//      @@>
+[<Test>]
+let ``should translate dispose``() =
+   checkRx 
+      <@@
+         let z = ref 0.0
+         let xs = Event<float>()
+         let ys = xs.Publish
+         let bs = Observable.map (fun x -> x * x) ys 
+         let subscription = Observable.subscribe(fun x -> z := !z + x) bs
+         xs.Trigger 1.0
+         xs.Trigger 2.0
+         xs.Trigger 3.0
+         subscription.Dispose()
+         xs.Trigger 4.0
+         xs.Trigger 5.0
+         !z
+      @@>

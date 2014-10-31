@@ -15,6 +15,7 @@ _ReSharper*/
 :
 nugetpackage/lib
 build/deploy
+src/tests/FunScript.Tests/edge
 packages
 
 # Generated documentation
