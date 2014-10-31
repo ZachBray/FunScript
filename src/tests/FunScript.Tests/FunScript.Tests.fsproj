@@ -81,9 +81,15 @@
     <Compile Include="ReflectionTests.fs" />
     <Compile Include="StringWriterTests.fs" />
     <Compile Include="EventTests.fs" />
+    <Compile Include="RxTests.fs" />
     <None Include="app.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="FSharp.Control.Reactive">
+      <HintPath>..\..\packages\FSharp.Control.Reactive.2.4.0\lib\net40\FSharp.Control.Reactive.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <Private>True</Private>
     </Reference>
@@ -97,9 +103,26 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Reactive.Core">
+      <HintPath>..\..\packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces">
+      <HintPath>..\..\packages\Rx-Interfaces.2.2.5\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Linq">
+      <HintPath>..\..\packages\Rx-Linq.2.2.5\lib\net45\System.Reactive.Linq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\extra\FunScript.Rx\FunScript.Rx.fsproj">
+      <Name>FunScript.Rx</Name>
+      <Project>{3d25cab2-83a4-4d3b-9986-ac068fe29307}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\..\main\FunScript.Interop\FunScript.Interop.fsproj">
       <Name>FunScript.Interop</Name>
       <Project>{1397ecef-2a65-49ce-afa1-b9884671bbb9}</Project>

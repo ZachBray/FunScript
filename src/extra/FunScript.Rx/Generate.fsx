@@ -3,7 +3,7 @@
 #r "../../packages/Rx-Core.2.2.5/lib/net45/System.Reactive.Core.dll"
 #r "../../packages/Rx-Linq.2.2.5/lib/net45/System.Reactive.Linq.dll"
 #r "../../packages/Rx-Interfaces.2.2.5/lib/net45/System.Reactive.Interfaces.dll"
-#load "Data.fs"
+#load "Data.fsx"
 
 open System
 open System.Reflection
@@ -89,7 +89,6 @@ open System
 open System.Collections.Generic
 open System.Reactive
 open System.Reactive.Linq
-open FunScript.Rx.Conversion
 open FunScript
 
 """

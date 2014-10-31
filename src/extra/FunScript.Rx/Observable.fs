@@ -1,11 +1,10 @@
-﻿[<FunScript.JS>]
+﻿[<RequireQualifiedAccess; FunScript.JS>]
 module FunScript.Rx.Observable
 
 open System
 open System.Collections.Generic
 open System.Reactive
 open System.Reactive.Linq
-open FunScript.Rx.Conversion
 open FunScript
 
 
@@ -29,8 +28,8 @@ let amb second first = Observable.Amb(first, second)
 
 
 /// Propagates the observable sequence that reacts first
-[<JSEmitInline("Rx.Observable.amb({0}, )")>]
-let ambSeqImpl (source : array<IObservable<'T>>) = failwith "JavaScript only"
+[<JSEmitInline("Rx.Observable.amb({0})")>]
+let ambSeqImpl (source : array<IObservable<'T>>) = Observable.Amb( source )
 
 let ambSeq (source : IEnumerable<IObservable<'T>>) = ambSeqImpl (Seq.toArray source)
 
@@ -38,7 +37,7 @@ let ambSeq (source : IEnumerable<IObservable<'T>>) = ambSeqImpl (Seq.toArray sou
 //
 //
 /// Propagates the observable sequence that reacts first
-[<JSEmitInline("Rx.Observable.amb({0}, )")>]
+[<JSEmitInline("Rx.Observable.amb({0})")>]
 let ambArray (source:IObservable<'T>[]) = Observable.Amb( source  )
 
 
@@ -96,7 +95,7 @@ let bufferCountSkip (count:int) (skip:int) source =
 /// Projects each element of an observable sequence into 
 /// consequtive non-overlapping buffers produced based on timing information
 [<JSEmitInline("{1}.bufferWithTime({0})")>]
-let bufferSpanImpl (timeSpan : float) (source : IObservable<'a>) = failwith "JavaScript only"
+let bufferSpanImpl (timeSpan : float) (source : IObservable<'a>) = Observable.Buffer(source, TimeSpan.FromMilliseconds timeSpan)
 
 let bufferSpan (timeSpan : TimeSpan) (source : IObservable<'a>) = bufferSpanImpl timeSpan.TotalMilliseconds source
 
@@ -108,7 +107,8 @@ let bufferSpan (timeSpan : TimeSpan) (source : IObservable<'a>) = bufferSpanImpl
 /// sent out when either it's full or a specific amount of time has elapsed
 /// Analogy - A boat that departs when it's full or at its scheduled time to leave
 [<JSEmitInline("{2}.bufferWithTimeOrCount({0}, {1})")>]
-let bufferSpanCountImpl (timeSpan : float) (count : Int32) (source : IObservable<'a>) = failwith "JavaScript only"
+let bufferSpanCountImpl (timeSpan : float) (count : Int32) (source : IObservable<'a>) = 
+    Observable.Buffer(source, TimeSpan.FromMilliseconds timeSpan, count)
 
 let bufferSpanCount (timeSpan : TimeSpan) (count : Int32) (source : IObservable<'a>) = bufferSpanCountImpl timeSpan.TotalMilliseconds count source
 
@@ -130,7 +130,7 @@ let bufferFork  ( bufferOpenings:IObservable<'BufferOpening>)
 /// Projects each element of an observable sequence into 
 /// zero or more buffers produced based on timing information
 [<JSEmitInline("{2}.bufferWithTime({0}, {1})")>]
-let bufferSpanShiftImpl (timeSpan : float) (timeShift : float) (source : IObservable<'a>) = failwith "JavaScript only"
+let bufferSpanShiftImpl (timeSpan : float) (timeShift : float) (source : IObservable<'a>) = Observable.Buffer(source, TimeSpan.FromMilliseconds timeSpan, TimeSpan.FromMilliseconds timeShift)
 
 let bufferSpanShift (timeSpan : TimeSpan) (timeShift : TimeSpan) (source : IObservable<'a>) = bufferSpanShiftImpl timeSpan.TotalMilliseconds timeShift.TotalMilliseconds source
 
@@ -142,13 +142,14 @@ let bufferSpanShift (timeSpan : TimeSpan) (timeShift : TimeSpan) (source : IObse
 //
 //
 /// Converts the elements of the sequence to the specified type
-//let cast<'CastType> (source) =
-//    Observable.Cast<'CastType>(source)
-//
-//
+[<JSEmitInline("{0}")>]
+let cast<'CastType> (source) =
+    Observable.Cast<'CastType>(source)
+
+
 /// Uses selector to determine which source in sources to return,
 /// choosing an empty sequence if no match is found
-[<JSEmitInline("Rx.Observable.no-reordering({1}, {0})")>]
+[<JSEmitInline("Rx.Observable.case({0}, {1})")>]
 let case selector sources =
     Observable.Case( Func<_> selector, sources )
 
@@ -174,8 +175,8 @@ let catchWith handler source =
 
 
 /// Continues an observable sequence that is terminated by an exception with the next observable sequence.
-[<JSEmitInline("Rx.Observable.catch({0}, )")>]
-let catchSeqImpl (sources : array<IObservable<'T>>) = failwith "JavaScript only"
+[<JSEmitInline("Rx.Observable.catch({0})")>]
+let catchSeqImpl (sources : array<IObservable<'T>>) = Observable.Catch(sources)
 
 let catchSeq (sources : IEnumerable<IObservable<'T>>) = catchSeqImpl (Seq.toArray sources)
 
@@ -184,7 +185,7 @@ let catchSeq (sources : IEnumerable<IObservable<'T>>) = catchSeqImpl (Seq.toArra
 //
 //
 /// Continues an observable sequence that is terminated by an exception with the next observable sequence.
-[<JSEmitInline("Rx.Observable.catch({0}, )")>]
+[<JSEmitInline("Rx.Observable.catch({0})")>]
 let catchArray (sources:IObservable<'T>[]) =
     Observable.Catch(sources)
 
@@ -196,7 +197,7 @@ let catchArray (sources:IObservable<'T>[]) =
 //
 /// Concatenates the observable sequences obtained by applying the map for each element in the given enumerable 
 [<JSEmitInline("{1}.selectMany({0})")>]
-let collectImpl (map : 'Source -> IObservable<'Result>) (source : array<'Source>) = failwith "JavaScript only"
+let collectImpl (map : 'Source -> IObservable<'Result>) (source : array<'Source>) = Observable.For( source, Func<'Source, IObservable<'Result>> map )
 
 let collect (map : 'Source -> IObservable<'Result>) (source : IEnumerable<'Source>) = collectImpl map (Seq.toArray source)
 
@@ -226,22 +227,25 @@ let collect (map : 'Source -> IObservable<'Result>) (source : IEnumerable<'Sourc
 /// Merges the specified observable sequences into one observable sequence by 
 /// emmiting a list with the latest source elements of whenever any of the 
 /// observable sequences produces and element.
-//let combineLatest (source :seq<IObservable<'T>> ) : IObservable<IList<'T>> =
-//    Observable.CombineLatest( source )
-//
-//
+[<JSEmitInline("(Rx.Observable.combineLatest({0}, function () { return arguments; }))")>]
+let combineLatest (source :seq<IObservable<'T>> ) : IObservable<IList<'T>> =
+    Observable.CombineLatest( source )
+
+
 /// Merges the specified observable sequences into one observable sequence by  applying the map
 /// whenever any of the observable sequences produces and element.
-//let combineLatestArray (source :IObservable<'T>[] )  =
-//    Observable.CombineLatest( source )        
-//
-//
+[<JSEmitInline("(Rx.Observable.combineLatest({0}, function () { return arguments; }))")>]
+let combineLatestArray (source :IObservable<'T>[] )  =
+    Observable.CombineLatest( source )        
+
+
 /// Merges the specified observable sequences into one observable sequence by  applying the map
 /// whenever any of the observable sequences produces and element.
-//let combineLatestMap ( map : IList<'T>-> 'Result  )(source :seq<IObservable<'T>> )  =
-//    Observable.CombineLatest( source, Func<IList<'T>,'Result> map )
-//
-//
+[<JSEmitInline("(Rx.Observable.combineLatest({1}, function () { return {0}(arguments); }))")>]
+let combineLatestMap ( map : IList<'T>-> 'Result  )(source :seq<IObservable<'T>> )  =
+    Observable.CombineLatest( source, Func<IList<'T>,'Result> map )
+
+
 /// Concatenates the second observable sequence to the first observable sequence
 /// upn the successful termination of the first 
 [<JSEmitInline("{1}.concat({0})")>]
@@ -251,8 +255,8 @@ let concat (second: IObservable<'T>) (first: IObservable<'T>) =
 
 /// Concatenates all observable sequences within the sequence as long as
 /// the previous observable sequence terminated successfully 
-[<JSEmitInline("Rx.Observable.concat({0}, )")>]
-let concatSeqImpl (sources : array<IObservable<'T>>) = failwith "JavaScript only"
+[<JSEmitInline("Rx.Observable.concat({0})")>]
+let concatSeqImpl (sources : array<IObservable<'T>>) = Observable.Concat(sources)
 
 let concatSeq (sources : IEnumerable<IObservable<'T>>) = concatSeqImpl (Seq.toArray sources)
 
@@ -262,7 +266,7 @@ let concatSeq (sources : IEnumerable<IObservable<'T>>) = concatSeqImpl (Seq.toAr
 //
 /// Concatenates all of the specified  observable sequences as long as
 /// the previous observable sequence terminated successfully 
-[<JSEmitInline("Rx.Observable.concat({0}, )")>]
+[<JSEmitInline("Rx.Observable.concat({0})")>]
 let concatArray (sources:IObservable<'T>[]) =
     Observable.Concat(sources)
 
@@ -337,7 +341,7 @@ let defaultIfEmptyIs (defaultValue:'Source )( source:IObservable<'Source> ) : IO
 
 
 /// Returns an observable sequence that invokes the specified factory function whenever a new observer subscribes.    
-[<JSEmitInline("Rx.Observable.defer({0}, )")>]
+[<JSEmitInline("Rx.Observable.defer({0})")>]
 let defer ( observableFactory: unit -> IObservable<'Result> ): IObservable<'Result> =
     Observable.Defer(Func<IObservable<'Result>> observableFactory )
 
@@ -345,7 +349,7 @@ let defer ( observableFactory: unit -> IObservable<'Result> ): IObservable<'Resu
 /// Time shifts the observable sequence by the specified relative time duration.
 /// The relative time intervals between the values are preserved.
 [<JSEmitInline("{1}.delay({0})")>]
-let delayImpl (dueTime : float) (source : IObservable<'Source>) = failwith "JavaScript only"
+let delayImpl (dueTime : float) (source : IObservable<'Source>) = Observable.Delay(source, TimeSpan.FromMilliseconds dueTime)
 
 let delay (dueTime : TimeSpan) (source : IObservable<'Source>) = delayImpl dueTime.TotalMilliseconds source
 
@@ -444,7 +448,7 @@ let elementAtOrDefault ( index:int )( source:IObservable<'Source> ) : IObservabl
 
 
 /// Returns an empty observable
-[<JSEmitInline("Rx.Observable.empty({-1}, ())")>]
+[<JSEmitInline("Rx.Observable.empty()")>]
 let empty<'T> = Observable.Empty<'T>()
 
 
@@ -473,13 +477,8 @@ let empty<'T> = Observable.Empty<'T>()
 //    Observable.SequenceEqual( first, second )
 //
 //
-[<JSEmitInline("Rx.Observable.throw({0}, )")>]
-let error e = failwith "JavaScript only"
-//    { new IObservable<_> with
-//        member this.Subscribe(observer:IObserver<_>) =
-//            observer.OnError e
-//            { new IDisposable with member this.Dispose() = () }
-//    }
+[<JSEmitInline("Rx.Observable.throw({0})")>]
+let error e = Observable.Throw e
 
 
 /// Determines whether an observable sequence contains a specified value
@@ -865,8 +864,8 @@ let generate initialState condition iterator resultMap =
 //
 //
 /// Returns and observable sequence that produces a value after each period
-[<JSEmitInline("Rx.Observable.interval({0}, )")>]
-let intervalImpl (period : float) = failwith "JavaScript only"
+[<JSEmitInline("Rx.Observable.interval({0})")>]
+let intervalImpl (period : float) = Observable.Interval(TimeSpan.FromMilliseconds period )
 
 let interval (period : TimeSpan) = intervalImpl period.TotalMilliseconds
 
@@ -964,18 +963,17 @@ let longCountSatisfy predicate source =
 [<JSEmitInline("{1}.select({0})")>]
 let map f source = Observable.Select(source, Func<_,_>(f))   
 
-
 /// Maps the given observable with the given function and the 
 /// index of the element
-//let mapi (f:int -> 'Source -> 'Result) (source:IObservable<'Source>) =
-//    source 
-//    |> Observable.scan ( fun (i,_) x -> (i+1,Some(x))) (-1,None)
-//    |> Observable.map 
-//        (   function
-//            | i, Some(x) -> f i x
-//            | _, None    -> invalidOp "Invalid state"   )
-//
-//
+let mapi (f:int -> 'Source -> 'Result) (source:IObservable<'Source>) =
+    source 
+    |> Observable.scan ( fun (i,_) x -> (i+1,Some(x))) (-1,None)
+    |> Observable.map 
+        (   function
+            | i, Some(x) -> f i x
+            | _, None    -> invalidOp "Invalid state"   )
+
+
 /// Maps two observables to the specified function.
 //let map2 f a b = apply (apply f a) b
 //
@@ -992,7 +990,7 @@ let merge (second: IObservable<'T>) (first: IObservable<'T>) = Observable.Merge(
 
 
 /// Merges all the observable sequences into a single observable sequence.
-[<JSEmitInline("Rx.Observable.merge({0}, )")>]
+[<JSEmitInline("Rx.Observable.merge({0})")>]
 let mergeArray (sources:IObservable<'T>[]) =
     Observable.Merge(sources)
 
@@ -1012,8 +1010,8 @@ let mergeInner (sources:IObservable<IObservable<'T>>) =
 //
 //
 /// Merges an enumerable sequence of observable sequences into a single observable sequence.
-[<JSEmitInline("Rx.Observable.merge({0}, )")>]
-let mergeSeqImpl (sources : array<IObservable<'T>>) = failwith "JavaScript only"
+[<JSEmitInline("Rx.Observable.merge({0})")>]
+let mergeSeqImpl (sources : array<IObservable<'T>>) = Observable.Merge(sources)
 
 let mergeSeq (sources : IEnumerable<IObservable<'T>>) = mergeSeqImpl (Seq.toArray sources)
 
@@ -1066,7 +1064,7 @@ let multicastMap subjectSelector selector source  =
 
 /// Returns a non-terminating observable sequence, which can 
 /// be used to denote an infinite duration (e.g. when using reactive joins).
-[<JSEmitInline("Rx.Observable.never({-1}, ())")>]
+[<JSEmitInline("Rx.Observable.never()")>]
 let infinite() =
     Observable.Never()
 
@@ -1086,8 +1084,8 @@ let infinite() =
 // 
 //
 /// Returns the sequence as an observable
-[<JSEmitInline("Rx.Observable.fromArray({0}, )")>]
-let ofSeqImpl (items : array<'Item>) = failwith "JavaScript only"
+[<JSEmitInline("Rx.Observable.fromArray({0})")>]
+let ofSeqImpl (items : array<'Item>) = items.ToObservable()
 
 let ofSeq (items : IEnumerable<'Item>) = ofSeqImpl (Seq.toArray items)
 
@@ -1130,15 +1128,15 @@ let onErrorConcat ( second:IObservable<'Source> ) ( first:IObservable<'Source> )
 
 
 /// Concatenates all of the specified observable sequences, even if the previous observable sequence terminated exceptionally.
-[<JSEmitInline("Rx.Observable.onErrorResumeNext({0}, )")>]
+[<JSEmitInline("Rx.Observable.onErrorResumeNext({0})")>]
 let onErrorConcatArray ( sources:IObservable<'Source> [] ) : IObservable<'Source> =
     Observable.OnErrorResumeNext( sources )
 
 
 /// Concatenates all observable sequences in the given enumerable sequence, even if the 
 /// previous observable sequence terminated exceptionally.
-[<JSEmitInline("Rx.Observable.onErrorResumeNext({0}, )")>]
-let onErrorConcatSeqImpl (sources : array<IObservable<'Source>>) = failwith "JavaScript only"
+[<JSEmitInline("Rx.Observable.onErrorResumeNext({0})")>]
+let onErrorConcatSeqImpl (sources : array<IObservable<'Source>>) = Observable.OnErrorResumeNext( sources )
 
 let onErrorConcatSeq (sources : IEnumerable<IObservable<'Source>>) = onErrorConcatSeqImpl (Seq.toArray sources)
 
@@ -1280,7 +1278,8 @@ let replayMap ( map )( source:IObservable<'Source>)  : IObservable<'Result> =
 /// Returns a connectable observable sequence that shares a single subscription to the underlying sequence
 //  replaying notifications subject to a maximum time length and element count for the replay buffer.
 [<JSEmitInline("{2}.replay({0}, {1})")>]
-let replayBufferWindowImpl (bufferSize : Int32) (window : float) (source : IObservable<'Source>) = failwith "JavaScript only"
+let replayBufferWindowImpl (bufferSize : Int32) (window : float) (source : IObservable<'Source>) = 
+    Observable.Replay( source, bufferSize, TimeSpan.FromMilliseconds window )  
 
 let replayBufferWindow (bufferSize : Int32) (window : TimeSpan) (source : IObservable<'Source>) = replayBufferWindowImpl bufferSize window.TotalMilliseconds source
 
@@ -1308,7 +1307,8 @@ let replayMapBuffer ( map ) ( bufferSize:int )( source:IObservable<'Source>) : I
 /// shares a single subscription to the underlying sequence replaying notifications subject to
 /// a maximum time length and element count for the replay buffer.
 [<JSEmitInline("{3}.replay({0}, {1}, {2})")>]
-let replayMapBufferWindowImpl (map : IObservable<'Source> -> IObservable<'Result>) (bufferSize : Int32) (window : float) (source : IObservable<'Source>) = failwith "JavaScript only"
+let replayMapBufferWindowImpl (map : IObservable<'Source> -> IObservable<'Result>) (bufferSize : Int32) (window : float) (source : IObservable<'Source>) =
+    Observable.Replay( source, Func<IObservable<'Source>, IObservable<'Result>> map, bufferSize, TimeSpan.FromMilliseconds window )  
 
 let replayMapBufferWindow (map : IObservable<'Source> -> IObservable<'Result>) (bufferSize : Int32) (window : TimeSpan) (source : IObservable<'Source>) = replayMapBufferWindowImpl map bufferSize window.TotalMilliseconds source
 
@@ -1331,21 +1331,16 @@ let retryCount (count:int) ( source:IObservable<'Source>) : IObservable<'Source>
 
 
 
-[<JSEmitInline("Rx.Observable.return({0}, )")>]
-let result x : IObservable<_> = failwith "JavaScript only"
-//    { new IObservable<_> with
-//        member this.Subscribe(observer:IObserver<_>) =
-//            observer.OnNext x
-//            observer.OnCompleted()
-//            { new IDisposable with member this.Dispose() = () }
-//    }
-
+[<JSEmitInline("Rx.Observable.return({0})")>]
+let result x : IObservable<_> =
+    Observable.Return x
 
 
     
 /// Samples the observable at the given interval
 [<JSEmitInline("{1}.sample({0})")>]
-let sampleImpl (interval : float) (source : IObservable<'a>) = failwith "JavaScript only"
+let sampleImpl (interval : float) (source : IObservable<'a>) =
+    Observable.Sample(source, TimeSpan.FromMilliseconds interval)
 
 let sample (interval : TimeSpan) (source : IObservable<'a>) = sampleImpl interval.TotalMilliseconds source
 
@@ -1386,7 +1381,7 @@ let scanInit (init:'TAccumulate) (accumulator) (source:IObservable<'Source>) : I
 //
 //
 ///  Returns an observable sequence that contains a single element.
-[<JSEmitInline("Rx.Observable.return({0}, )")>]
+[<JSEmitInline("Rx.Observable.return({0})")>]
 let single ( value:'Result) : IObservable<'Result> =
    Observable.Return(value)
 
@@ -1410,7 +1405,8 @@ let skipLast  (count:int ) ( source:IObservable<'Source> ): IObservable<'Source>
 
 /// Skips elements for the specified duration from the end of the observable source sequence.
 [<JSEmitInline("{1}.skipLastWithTime({0})")>]
-let skipLastSpanImpl (duration : float) (source : IObservable<'Source>) = failwith "JavaScript only"
+let skipLastSpanImpl (duration : float) (source : IObservable<'Source>) =
+    Observable.SkipLast ( source, TimeSpan.FromMilliseconds duration)
 
 let skipLastSpan (duration : TimeSpan) (source : IObservable<'Source>) = skipLastSpanImpl duration.TotalMilliseconds source
 
@@ -1451,13 +1447,13 @@ let startWith  (values: #seq<'T>)  (source: IObservable<'T>) : IObservable<'T> =
 
 
 /// Subscribes to the Observable with a next fuction.
-[<JSEmitInline("{1}.subscribe({0})")>]
+[<JSEmitInline("{ Dispose: {1}.subscribe({0}).dispose }")>]
 let subscribe(onNext: 'T -> unit) (observable: IObservable<'T>) =
       observable.Subscribe(Action<_> onNext)
 
 
 /// Subscribes to the Observable with a next and an error-function.
-[<JSEmitInline("{2}.subscribe({0}, {1})")>]
+[<JSEmitInline("{ Dispose: {2}.subscribe({0}, {1}).dispose }")>]
 let subscribeWithError  ( onNext     : 'T   -> unit     ) 
                         ( onError    : exn  -> unit     ) 
                         ( observable : IObservable<'T>  ) =
@@ -1465,19 +1461,19 @@ let subscribeWithError  ( onNext     : 'T   -> unit     )
 
  
 /// Subscribes to the Observable with a next and a completion callback.
-[<JSEmitInline("{2}.subscribe({0}, {1})")>]
+[<JSEmitInline("{ Dispose: {2}.subscribe({0}, {1}).dispose }")>]
 let subscribeWithCompletion (onNext: 'T -> unit) (onCompleted: unit -> unit) (observable: IObservable<'T>) =
         observable.Subscribe(Action<_> onNext, Action onCompleted)
 
 
 /// Subscribes to the observable with all three callbacks
-[<JSEmitInline("{3}.subscribe({0}, {1}, {2})")>]
+[<JSEmitInline("{ Dispose: {3}.subscribe({0}, {1}, {2}).dispose }")>]
 let subscribeWithCallbacks onNext onError onCompleted (observable: IObservable<'T>) =
     observable.Subscribe(Observer.Create(Action<_> onNext, Action<_> onError, Action onCompleted))
 
 
 /// Subscribes to the observable with the given observer
-[<JSEmitInline("{1}.subscribe({0})")>]
+[<JSEmitInline("{ Dispose: {1}.subscribe({0}).dispose }")>]
 let subscribeObserver observer (observable: IObservable<'T>) =
     observable.Subscribe observer
 
@@ -1536,7 +1532,8 @@ let takeLast ( count:int ) source =
 
 /// Returns elements within the specified duration from the end of the observable source sequence.
 [<JSEmitInline("{1}.takeLastWithTime({0})")>]
-let takeLastSpanImpl (duration : float) (source : IObservable<'Source>) = failwith "JavaScript only"
+let takeLastSpanImpl (duration : float) (source : IObservable<'Source>) = 
+    Observable.TakeLast( source, TimeSpan.FromMilliseconds duration)
 
 let takeLastSpan (duration : TimeSpan) (source : IObservable<'Source>) = takeLastSpanImpl duration.TotalMilliseconds source
 
@@ -1546,7 +1543,8 @@ let takeLastSpan (duration : TimeSpan) (source : IObservable<'Source>) = takeLas
 //
 /// Returns a list with the elements within the specified duration from the end of the observable source sequence.
 [<JSEmitInline("{1}.takeLastBufferWithTime({0})")>]
-let takeLastBufferImpl (duration : float) (source : IObservable<'Source>) = failwith "JavaScript only"
+let takeLastBufferImpl (duration : float) (source : IObservable<'Source>) =
+    Observable.TakeLastBuffer( source, TimeSpan.FromMilliseconds duration )
 
 let takeLastBuffer (duration : TimeSpan) (source : IObservable<'Source>) = takeLastBufferImpl duration.TotalMilliseconds source
 
@@ -1585,7 +1583,8 @@ let takeWhile  (predicate) ( source:IObservable<'Source>): IObservable<'Source> 
 //
 /// Ignores elements from an observable sequence which are followed by another element within a specified relative time duration.
 [<JSEmitInline("{1}.throttle({0})")>]
-let throttleImpl (dueTime : float) (source : IObservable<'Source>) = failwith "JavaScript only"
+let throttleImpl (dueTime : float) (source : IObservable<'Source>) =
+    Observable.Throttle( source, TimeSpan.FromMilliseconds dueTime )
 
 let throttle (dueTime : TimeSpan) (source : IObservable<'Source>) = throttleImpl dueTime.TotalMilliseconds source
 
@@ -1600,7 +1599,7 @@ let throttleComputed ( source:IObservable<'Source>) (throttleDurationSelector) :
 
 
 /// Returns an observable sequence that terminates with an exception.
-[<JSEmitInline("Rx.Observable.throw({0}, )")>]
+[<JSEmitInline("Rx.Observable.throw({0})")>]
 let throw ( except:exn ) : IObservable<'Result> =
     Observable.Throw( except )
 
@@ -1774,8 +1773,8 @@ let timeoutDuration ( durationSelector )( source:IObservable<'Source> ) : IObser
 //
 //
 /// Converts a seq into an observable
-[<JSEmitInline("Rx.Observable.fromArray({0}, )")>]
-let toObservableImpl (source : array<'T>) = failwith "JavaScript only"
+[<JSEmitInline("Rx.Observable.fromArray({0})")>]
+let toObservableImpl (source : array<'T>) = source.ToObservable()
 
 let toObservable (source : IEnumerable<'T>) = toObservableImpl (Seq.toArray source)
 
@@ -1813,7 +1812,8 @@ let window ( windowClosingSelector ) ( source:IObservable<'Source> ) : IObservab
 /// Projects each element of an observable sequence into consecutive non-overlapping windows 
 /// which are produced based on timing information.
 [<JSEmitInline("{1}.windowWithTime({0})")>]
-let windowTimeSpanImpl (timeSpan : float) (source : IObservable<'Source>) = failwith "JavaScript only"
+let windowTimeSpanImpl (timeSpan : float) (source : IObservable<'Source>) =
+    Observable.Window( source, TimeSpan.FromMilliseconds timeSpan )
 
 let windowTimeSpan (timeSpan : TimeSpan) (source : IObservable<'Source>) = windowTimeSpanImpl timeSpan.TotalMilliseconds source
 
@@ -1834,7 +1834,8 @@ let windowOpenClose ( windowOpenings        : IObservable<'WinOpen>             
 /// Projects each element of an observable sequence into consecutive non-overlapping windows.
 /// windowBoundaries - Sequence of window boundary markers. The current window is closed and a new window is opened upon receiving a boundary marker.
 [<JSEmitInline("{2}.windowWithTime({0}, {1})")>]
-let windowTimeShiftImpl (timeSpan : float) (timeShift : float) (source : IObservable<'Source>) = failwith "JavaScript only"
+let windowTimeShiftImpl (timeSpan : float) (timeShift : float) (source : IObservable<'Source>) = 
+    Observable.Window( source, TimeSpan.FromMilliseconds timeSpan, TimeSpan.FromMilliseconds timeShift )
 
 let windowTimeShift (timeSpan : TimeSpan) (timeShift : TimeSpan) (source : IObservable<'Source>) = windowTimeShiftImpl timeSpan.TotalMilliseconds timeShift.TotalMilliseconds source
 
@@ -1868,7 +1869,8 @@ let windowCount ( count:int )( source:IObservable<'Source> ) : IObservable<IObse
 /// A useful real-world analogy of this overload is the behavior of a ferry leaving the dock when all seats are 
 /// taken, or at the scheduled time of departure, whichever event occurs first
 [<JSEmitInline("{2}.windowWithTimeOrCount({0}, {1})")>]
-let windowTimeCountImpl (timeSpan : float) (count : Int32) (source : IObservable<'Source>) = failwith "JavaScript only"
+let windowTimeCountImpl (timeSpan : float) (count : Int32) (source : IObservable<'Source>) = 
+    Observable.Window( source, TimeSpan.FromMilliseconds timeSpan, count )
 
 let windowTimeCount (timeSpan : TimeSpan) (count : Int32) (source : IObservable<'Source>) = windowTimeCountImpl timeSpan.TotalMilliseconds count source
 
@@ -1883,8 +1885,8 @@ let windowTimeCount (timeSpan : TimeSpan) (count : Int32) (source : IObservable<
 //
 /// Merges the specified observable sequences into one observable sequence by emitting a
 ///  list with the elements of the observable sequences at corresponding indexes.
-[<JSEmitInline("Rx.Observable.zip({0}, )")>]
-let zipSeqImpl (sources : array<IObservable<'Source>>) = failwith "JavaScript only"
+[<JSEmitInline("Rx.Observable.zip({0})")>]
+let zipSeqImpl (sources : array<IObservable<'Source>>) = Observable.Zip( sources )
 
 let zipSeq (sources : IEnumerable<IObservable<'Source>>) = zipSeqImpl (Seq.toArray sources)
 
@@ -1894,7 +1896,7 @@ let zipSeq (sources : IEnumerable<IObservable<'Source>>) = zipSeqImpl (Seq.toArr
 //
 /// Merges the specified observable sequences into one observable sequence by emitting 
 /// a list with the elements of the observable sequences at corresponding indexe
-[<JSEmitInline("Rx.Observable.zip({0}, )")>]
+[<JSEmitInline("Rx.Observable.zip({0})")>]
 let zipArray ( sources:IObservable<'Source> []) : IObservable<IList<'Source>> =
     Observable.Zip( sources )
  

@@ -1,4 +1,4 @@
-﻿module internal FunScript.Rx.Data
+﻿module FunScript.Rx.Data
 
 let supportedInstanceMethods = 
     set [

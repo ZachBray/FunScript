@@ -49,10 +49,11 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
-    <Compile Include="Data.fs" />
-    <Compile Include="Conversion.fs" />
     <Compile Include="Observable.fs" />
+    <Compile Include="Events.fs" />
+    <Compile Include="Interop.fs" />
     <None Include="packages.config" />
+    <None Include="Data.fsx" />
     <None Include="Generate.fsx" />
   </ItemGroup>
   <ItemGroup>

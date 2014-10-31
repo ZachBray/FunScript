@@ -6,14 +6,30 @@ open Jint
 open NUnit.Framework
 open Microsoft.FSharp.Linq.QuotationEvaluation
 
+
 [<JSEmit("test_log({0}.toString());")>]
 let log (msg : obj) : unit = failwith "never"
 
-let checkAreEqualWithComponents components expectedResult quote =
-   let code = Compiler.Compiler.Compile(quote, components = components, noReturn = true(*, shouldCompress = true*))
+let defaultCompile quote =
+    Compiler.Compiler.Compile(quote, noReturn = true(*, shouldCompress = true*))
+
+let compileWithComponents components quote =
+    Compiler.Compiler.Compile(quote, components = components, noReturn = true(*, shouldCompress = true*))
+
+let compileWithRx quote =
+      Compiler.Compiler.Compile(quote, components = Rx.Interop.components(), noReturn = true, isEventMappingEnabled = false(*, shouldCompress = true*))
+
+let checkAreEqualWith prerequisiteJS compile expectedResult quote =
+   let code : string = compile quote
    try
-      let engine = Engine().SetValue("test_log", System.Action<string>(printfn "//[LOG] %s"))
-      let result = engine.Execute(code).GetCompletionValue().ToObject()
+      let engine = 
+        Engine()
+            .SetValue("test_log", System.Action<string>(printfn "//[LOG] %s"))
+            .SetValue("setTimeout", System.Func<System.Action, double, int>(fun f _ -> f.Invoke(); 0))
+            .SetValue("setInterval", System.Func<System.Action, double, int>(fun f _ -> f.Invoke(); 0))
+            .SetValue("clearTimeout", System.Action<int>(fun _ -> ()))
+            .SetValue("clearInterval", System.Action<int>(fun _ -> ()))
+      let result = engine.Execute(prerequisiteJS + System.Environment.NewLine + code).GetCompletionValue().ToObject()
       let message (ex: 'a) (re: 'b) = sprintf "%sExpected: %A%sBut was: %A" System.Environment.NewLine ex System.Environment.NewLine re
       Assert.That((result = expectedResult), (message expectedResult result))
    // Wrap xUnit exceptions to stop pauses.
@@ -22,6 +38,9 @@ let checkAreEqualWithComponents components expectedResult quote =
       if ex.GetType().Namespace.StartsWith "FunScript" then raise ex
       else failwithf "Message: %s\n" ex.Message
 
+let checkAreEqualWithComponents components expectedResult quote = 
+    checkAreEqualWith "" (compileWithComponents components) expectedResult quote
+    
 let checkAreEqual expectedResult quote =
     checkAreEqualWithComponents [] expectedResult quote
 
@@ -32,6 +51,12 @@ let check (quote:Quotations.Expr) =
    let expectedResult = quote.EvalUntyped()
    checkAreEqual expectedResult quote
 
+let rxLib =
+    lazy System.IO.File.ReadAllText(__SOURCE_DIRECTORY__ + "../../../../lib/RxJs/rx.all.compat.js")
+
+let checkRx (quote:Quotations.Expr) =
+   let expectedResult = quote.EvalUntyped()
+   checkAreEqualWith rxLib.Value compileWithRx expectedResult quote
 
 let checkAsync (quote:Quotations.Expr<'a Async>) =
     let expectedResult = <@ Async.RunSynchronously %quote @>.Eval()
@@ -45,19 +70,3 @@ let checkAsync (quote:Quotations.Expr<'a Async>) =
             !result |> Option.get 
         @>
     checkAreEqual expectedResult immediateQuote
-
-// TODO:
-// Add support for inheritance.
-// Add support for TypeScript inheritance.
-// Add support for TypeScript param arrays.
-// Add support for TypeScript optional members/params.
-// Add tests for union/array/list/seq/map/set equality/comparison.
-// Add support for multiple constructors.
-// Add support for method name overloading. DefineGlobal to take MethodBase? What about instances?
-// Add support for type checks. How would you differentiate between ints and floats though?
-// Add support for renaming reserved words.
-// Add support for exceptions.
-// Add support for events/observables.
-// Add support for computation expressions.
-// Add support for custom operators.
-// Add support for tail recursive transformations into while loops.
