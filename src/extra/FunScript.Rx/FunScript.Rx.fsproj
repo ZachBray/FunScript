@@ -1,19 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>eac15526-7544-4ec5-ae50-32e5cdd05044</ProjectGuid>
+    <ProjectGuid>3d25cab2-83a4-4d3b-9986-ac068fe29307</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>FunScript.Tests</RootNamespace>
-    <AssemblyName>FunScript.Tests</AssemblyName>
-    <Name>FunScript.Tests</Name>
-    <ProductVersion>10.0.0</ProductVersion>
+    <RootNamespace>FunScript.Rx</RootNamespace>
+    <AssemblyName>FunScript.Rx</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile />
     <TargetFSharpCoreVersion>4.3.1.0</TargetFSharpCoreVersion>
+    <Name>FunScript.Rx</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,7 +21,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>bin\Debug\FunScript.Tests.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\FunScript.Rx.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,92 +30,41 @@
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>bin\Release\FunScript.Tests.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\FunScript.Rx.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
   </PropertyGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '11.0'">
-      <PropertyGroup>
+      <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets')">
         <FSharpTargetsPath>$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets</FSharpTargetsPath>
       </PropertyGroup>
     </When>
     <Otherwise>
-      <PropertyGroup>
+      <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets')">
         <FSharpTargetsPath>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets</FSharpTargetsPath>
       </PropertyGroup>
     </Otherwise>
   </Choose>
-  <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
+  <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
-    <Compile Include="PowerPack/Linq.fs" />
-    <Compile Include="CommonFixture.fs" />
-    <Compile Include="PrimitiveTypeTests.fs" />
-    <Compile Include="ComparisonTests.fs" />
-    <Compile Include="ArithmeticTests.fs" />
-    <Compile Include="LogicTests.fs" />
-    <Compile Include="LetBindingTests.fs" />
-    <Compile Include="LambdaApplicationTests.fs" />
-    <Compile Include="ControlFlowTests.fs" />
-    <Compile Include="TupleTypeTests.fs" />
-    <Compile Include="UnionTypeTests.fs" />
-    <Compile Include="RecordTypeTests.fs" />
-    <Compile Include="ReflectedDefinitionTests.fs" />
-    <Compile Include="CommonOperatorTests.fs" />
-    <Compile Include="ArrayTests.fs" />
-    <Compile Include="ResizeArrayTests.fs" />
-    <Compile Include="DictionaryTests.fs" />
-    <Compile Include="OptionTests.fs" />
-    <Compile Include="ListTests.fs" />
-    <Compile Include="SeqTests.fs" />
-    <Compile Include="SeqExpressionTests.fs" />
-    <Compile Include="SetTests.fs" />
-    <Compile Include="MapTests.fs" />
-    <Compile Include="StringTests.fs" />
-    <Compile Include="RegexTests.fs" />
-    <Compile Include="DateTimeTests.fs" />
-    <Compile Include="AsyncTests.fs" />
-    <Compile Include="ReflectionTests.fs" />
-    <Compile Include="StringWriterTests.fs" />
-    <Compile Include="EventTests.fs" />
-    <Compile Include="RxTests.fs" />
-    <None Include="app.config" />
+    <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="Observable.fs" />
+    <Compile Include="Events.fs" />
+    <Compile Include="Interop.fs" />
     <None Include="packages.config" />
-    <None Include="edge\x86\node.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="edge\x86\edge.node">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="edge\x64\node.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="edge\x64\edge.node">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <Content Include="edge\edge.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="edge\double_edge.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <None Include="Data.fsx" />
+    <None Include="Generate.fsx" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="EdgeJs">
-      <HintPath>..\..\packages\Edge.js.0.9.2\lib\EdgeJs.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="FSharp.Control.Reactive">
       <HintPath>..\..\packages\FSharp.Control.Reactive.2.4.0\lib\net40\FSharp.Control.Reactive.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <Private>True</Private>
-    </Reference>
-    <Reference Include="mscorlib" />
-    <Reference Include="nunit.framework">
-      <HintPath>..\..\..\lib\NUnit\framework\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -134,12 +81,8 @@
       <HintPath>..\..\packages\Rx-Linq.2.2.5\lib\net45\System.Reactive.Linq.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Web" />
-    <ProjectReference Include="..\..\extra\FunScript.Rx\FunScript.Rx.fsproj">
-      <Name>FunScript.Rx</Name>
-      <Project>{3d25cab2-83a4-4d3b-9986-ac068fe29307}</Project>
-      <Private>True</Private>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\main\FunScript.Interop\FunScript.Interop.fsproj">
       <Name>FunScript.Interop</Name>
       <Project>{1397ecef-2a65-49ce-afa1-b9884671bbb9}</Project>

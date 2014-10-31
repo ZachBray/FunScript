@@ -680,3 +680,12 @@ let ``Array as IList count has same behaviour``() =
             let ys = xs :> _ IList
             float ys.Count
         @@>
+
+[<Test>]
+let ``Array as IList Seq.length has same behaviour``() =
+    check 
+        <@@
+            let xs = [|1.; 2.; 3.|]
+            let ys = xs :> _ IList
+            float (ys |> Seq.length)
+        @@>

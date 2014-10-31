@@ -93,18 +93,6 @@ let components =
             <@ fun (str: string, args: obj[]) -> System.Console.WriteLine(format=str, arg=args) @>
             <@ Extensions.logFormat @>
 
-         ExpressionReplacer.createUnsafe 
-            <@ fun () -> Event<_>() @> 
-            <@ fun () -> Core.Events.Event.Create() @>
-
-         ExpressionReplacer.createUnsafe 
-            <@ fun (evt : Event<_>, arg) -> evt.Trigger arg @> 
-            <@ fun (evt : Core.Events.Event<_>, arg) -> evt.Trigger arg @>
-
-         ExpressionReplacer.createUnsafe 
-            <@ fun (evt : Event<_>) -> evt.Publish @> 
-            <@ fun (evt : Core.Events.Event<_>) -> evt.Publish @>
-
          // TODO: We should make sure the encoding mappings are equivalent to the
          //       JS versions. WebUtility is not equivalent at the moment.
          ExpressionReplacer.create
@@ -159,8 +147,27 @@ let components =
       ExpressionReplacer.createTypeMethodMappings
          typeof<System.Net.WebUtility>
          typeof<Core.Web.WebUtility>
-
-      ExpressionReplacer.createModuleMapping 
-         "FSharp.Core" "Microsoft.FSharp.Control.ObservableModule"
-         "FunScript" "FunScript.Core.Events.Observable"
    ] |> List.concat
+
+
+let eventComponents =
+    [
+        [
+         ExpressionReplacer.createUnsafe 
+            <@ fun () -> Event<_>() @> 
+            <@ fun () -> Core.Events.Event.Create() @>
+
+         ExpressionReplacer.createUnsafe 
+            <@ fun (evt : Event<_>, arg) -> evt.Trigger arg @> 
+            <@ fun (evt : Core.Events.Event<_>, arg) -> evt.Trigger arg @>
+
+         ExpressionReplacer.createUnsafe 
+            <@ fun (evt : Event<_>) -> evt.Publish @> 
+            <@ fun (evt : Core.Events.Event<_>) -> evt.Publish @>
+        ]
+
+        ExpressionReplacer.createModuleMapping 
+            "FSharp.Core" "Microsoft.FSharp.Control.ObservableModule"
+            "FunScript" "FunScript.Core.Events.Observable"
+    
+    ] |> List.concat

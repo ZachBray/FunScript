@@ -49,11 +49,23 @@ let private defaultValue =
       | Patterns.DefaultValue _ -> [ returnStategy.Return Null ]
       | _ -> []
 
+// TODO: Refactor!!!
 let private coerce =
    CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
       function
-      | Patterns.Coerce(expr, t) -> 
-         if expr.Type = t 
+      | Patterns.Coerce(expr, t) ->
+         if expr.Type.IsGenericType && expr.Type.GetGenericTypeDefinition() = typedefof<_ System.Collections.Generic.IList> then
+            let elementT = expr.Type.GetGenericArguments().[0]
+            if t.IsGenericType && t.GetGenericTypeDefinition() = typedefof<_ seq> then
+                let mi, _ = Quote.toMethodInfoFromLambdas <@ Array.toSeq @>
+                let mi = mi.GetGenericMethodDefinition().MakeGenericMethod [|elementT|]
+                let unboxedExpr = Expr.Coerce(expr, mi.GetParameters().[0].ParameterType)
+                let fixedExpr = Expr.Call(mi, [unboxedExpr])
+                compiler.Compile returnStrategy fixedExpr
+            elif (t.IsArray && t.GetElementType() = elementT) || t = typeof<obj> then
+                compiler.Compile returnStrategy expr
+            else []
+         elif expr.Type = t 
             || t = typeof<obj> 
             || (expr.Type.IsInterface && t.IsAssignableFrom expr.Type)
             || (t.IsGenericType && t.GetGenericTypeDefinition() = typedefof<_ System.Collections.Generic.IList>) then 
