@@ -84,3 +84,27 @@ let ``should translate merge``() =
          ys.Trigger "Y"
          !z
       @@>
+
+//[<Test>]
+//let ``should translate dispose``() =
+//   checkRx 
+//      <@@
+//         let z = ref 0.0
+//         let xs = Event<float>()
+//         let ys = xs.Publish
+//         log "A"
+//         let bs = Observable.map (fun x -> log x; x) ys 
+//         log "B"
+//         let subscription = Observable.subscribe(fun x -> log x; z := !z + x) bs
+//         log "C"
+//         xs.Trigger 1.0
+//         xs.Trigger 2.0
+//         xs.Trigger 3.0
+//         log "D"
+//         subscription.Dispose()
+//         log "E"
+//         xs.Trigger 4.0
+//         xs.Trigger 5.0
+//         log !z
+//         !z
+//      @@>
