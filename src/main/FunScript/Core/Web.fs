@@ -102,9 +102,7 @@ type WebHeaderCollection() =
     let mutable headers = []
 
     member __.Add(key : string, value) = 
-        // Browsers deal with this:
-        if not(key.StartsWith "Accept") then
-            headers <- (key, value)::headers
+        headers <- (key, value)::headers
     member __.Keys = headers |> List.map fst |> List.toArray
     member __.Values = headers |> List.map snd |> List.toArray
 
