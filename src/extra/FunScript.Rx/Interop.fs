@@ -39,6 +39,15 @@ module Replacements =
             
     [<JSEmitInline("{ Dispose: {0}.subscribe({1}).dispose }")>]
     let subscribe (evt : IEvent<_>) callback : IDisposable = failwith "JavaScript only"
+            
+    [<JSEmitInline("{0}.onNext({1})")>]
+    let onNext (observer : IObserver<'a>) (x : 'a) : unit = failwith "JavaScript only"
+            
+    [<JSEmitInline("{0}.onError({1})")>]
+    let onError (observer : IObserver<_>) (ex : exn) : unit = failwith "JavaScript only"
+            
+    [<JSEmitInline("{0}.onCompleted()")>]
+    let onCompleted (observer : IObserver<_>) : unit = failwith "JavaScript only"
 
 
 let reactiveAssemblyName() =
@@ -110,5 +119,17 @@ let components() =
             ExpressionReplacer.create
                 <@ fun (evt : IEvent<_>) callback -> evt.Subscribe callback @>
                 <@ Replacements.subscribe @>
+                
+            ExpressionReplacer.create
+                <@ fun (observer : IObserver<_>) x -> observer.OnNext x @>
+                <@ Replacements.onNext @>
+
+            ExpressionReplacer.create
+                <@ fun (observer : IObserver<_>) ex -> observer.OnError ex @>
+                <@ Replacements.onError @>
+
+            ExpressionReplacer.create
+                <@ fun (observer : IObserver<_>) -> observer.OnCompleted() @>
+                <@ Replacements.onCompleted @>
         ]
     ] |> List.concat

@@ -139,3 +139,120 @@ let ``should translate dispose``() =
          xs.Trigger 5.0
          !z
       @@>
+
+type Action = System.Action
+
+[<Test>]
+let ``should translate create``() =
+   checkRx 
+      <@@
+            let z = ref ""
+            let append str =
+                z := !z + "." + str
+
+            let rs =
+                Observable.create(fun observer ->
+                    observer.OnNext "R"
+                    Action(fun () -> 
+                       append "R Disposed"))
+
+            let xs =
+                Observable.create(fun observer ->
+                    observer.OnNext "X"
+                    Action(fun () -> 
+                       append "X Disposed"))
+
+            let ys =
+                Observable.create(fun observer ->
+                    observer.OnNext "Y1"
+                    observer.OnNext "Y2"
+                    observer.OnCompleted()
+                    Action(fun () -> 
+                       append "Y Disposed"))
+
+            let zs =
+                Observable.create(fun observer ->
+                    observer.OnNext "Z1"
+                    observer.OnNext "Z2"
+                    observer.OnError(exn "Z ERROR")
+                    Action(fun () -> 
+                       append "Z Disposed"))
+
+            let xsSubscription = 
+                xs |> Observable.subscribeWithCallbacks
+                    append (fun ex -> append ex.Message) (fun () -> append "X Complete")
+
+            let ysSubscription = 
+                ys |> Observable.subscribeWithCallbacks
+                    append (fun ex -> append ex.Message) (fun () -> append "Y Complete")
+
+            let zsSubscription =
+                zs |> Observable.subscribeWithCallbacks
+                    append (fun ex -> append ex.Message) (fun () -> append "Z Complete") 
+
+            xsSubscription.Dispose()
+            ysSubscription.Dispose()
+            zsSubscription.Dispose()
+
+            !z
+      @@>
+
+[<FunScript.JS>]
+type ActionDisposable(f) =
+    interface System.IDisposable with
+        member __.Dispose() = f()
+
+[<Test>]
+let ``should translate createWithDisposable``() =
+   checkRx 
+      <@@
+            let z = ref ""
+            let append str =
+                z := !z + "." + str
+
+            let rs =
+                Observable.createWithDisposable(fun observer ->
+                    observer.OnNext "R"
+                    upcast new ActionDisposable(fun () -> 
+                       append "R Disposed"))
+
+            let xs =
+                Observable.createWithDisposable(fun observer ->
+                    observer.OnNext "X"
+                    upcast new ActionDisposable(fun () -> 
+                       append "X Disposed"))
+
+            let ys =
+                Observable.createWithDisposable(fun observer ->
+                    observer.OnNext "Y1"
+                    observer.OnNext "Y2"
+                    observer.OnCompleted()
+                    upcast new ActionDisposable(fun () -> 
+                       append "Y Disposed"))
+
+            let zs =
+                Observable.createWithDisposable(fun observer ->
+                    observer.OnNext "Z1"
+                    observer.OnNext "Z2"
+                    observer.OnError(exn "Z ERROR")
+                    upcast new ActionDisposable(fun () -> 
+                       append "Z Disposed"))
+
+            let xsSubscription = 
+                xs |> Observable.subscribeWithCallbacks
+                    append (fun ex -> append ex.Message) (fun () -> append "X Complete")
+
+            let ysSubscription = 
+                ys |> Observable.subscribeWithCallbacks
+                    append (fun ex -> append ex.Message) (fun () -> append "Y Complete")
+
+            let zsSubscription =
+                zs |> Observable.subscribeWithCallbacks
+                    append (fun ex -> append ex.Message) (fun () -> append "Z Complete") 
+
+            xsSubscription.Dispose()
+            ysSubscription.Dispose()
+            zsSubscription.Dispose()
+
+            !z
+      @@>

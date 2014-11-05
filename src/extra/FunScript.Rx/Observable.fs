@@ -318,15 +318,20 @@ let countSatisfy predicate source =
     Observable.Count( source, predicate )
 
 ///  Creates an observable sequence from a specified Subscribe method implementation.
-//let create subscribe =
-//    Observable.Create(Func<IObserver<'Result>,Action> subscribe)
-//
-//
+[<JSEmitInline("Rx.Observable.create({0})")>]
+let create subscribe =
+    Observable.Create(Func<IObserver<'Result>,Action> subscribe)
+
+
 /// Creates an observable sequence from a specified Subscribe method implementation.
-//let createWithDisposable subscribe =
-//    Observable.Create(Func<IObserver<'Result>,IDisposable> subscribe)
-//
-//
+[<JSEmit("return Rx.Observable.create(function (observer) {
+    var resource = {0}(observer);
+    return resource.Dispose;
+});")>]
+let createWithDisposable subscribe =
+    Observable.Create(Func<IObserver<'Result>,IDisposable> subscribe)
+
+
 /// Returns the elements of the specified sequence or the type parameter's default value 
 /// in a singleton sequence if the sequence is empty.
 [<JSEmitInline("{0}.defaultIfEmpty()")>]
