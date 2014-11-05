@@ -82,6 +82,7 @@
     <Compile Include="StringWriterTests.fs" />
     <Compile Include="EventTests.fs" />
     <Compile Include="RxTests.fs" />
+    <Compile Include="GuidTests.fs" />
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="edge\x86\node.dll">

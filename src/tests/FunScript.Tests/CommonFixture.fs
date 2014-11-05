@@ -14,7 +14,7 @@ let compileWithComponents components quote =
 let compileWithRx quote =
       Compiler.Compiler.Compile(quote, components = Rx.Interop.components(), noReturn = false, isEventMappingEnabled = false(*, shouldCompress = true*))
 
-let checkAreEqualWith prerequisiteJS compile expectedResult quote =
+let checkAreEqualWith prerequisiteJS compile (expectedResult : obj) quote =
    let code : string = compile quote
    try
       let result =
@@ -31,9 +31,12 @@ let checkAreEqualWith prerequisiteJS compile expectedResult quote =
           Async.AwaitTask(EdgeJs.Edge.Func(code).Invoke(""))
           |> Async.RunSynchronously
       let result =
-          match result with
-          | :? int as x -> box(float x)
-          | x -> x
+          match expectedResult with
+          | :? float ->
+              match result with
+              | :? int as x -> box(float x)
+              | x -> x
+          | _ -> result
       let message (ex: 'a) (re: 'b) = sprintf "%sExpected: %A%sBut was: %A" System.Environment.NewLine ex System.Environment.NewLine re
       Assert.That((result = expectedResult), (message expectedResult result))
    // Wrap xUnit exceptions to stop pauses.

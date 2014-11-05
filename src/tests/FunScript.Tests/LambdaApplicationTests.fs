@@ -133,3 +133,14 @@ let ``Invoking tupled delegates works``() =
          let diff = TupledMapDelegate(fun x y -> x - y)
          diff.Invoke(4.,2.)
       @@>
+
+[<FunScript.JSEmitInline("arguments.length")>]
+let getArgCount() = failwith "JavaScript only"
+
+// TODO:
+//[<Test>]
+//let ``unit is erased from lambdas``() =
+//    checkAreEqual 0.0
+//        <@
+//            (fun () -> getArgCount())()
+//        @>

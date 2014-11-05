@@ -40,6 +40,21 @@ module internal Replacements =
         | None -> failwith ("Not a valid boolean value: " + x)
         | Some y -> y
 
+    [<JSEmitInline("/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test({0})")>]
+    let isGuid x = failwith "JavaScript only"
+
+    [<JSEmitInline("{0}")>]
+    let toGuid x : Guid = failwith "JavaScript only"
+
+    let tryParseGuid x =
+        if isGuid x then Some(toGuid x)
+        else None
+
+    let parseGuid x =
+        match tryParseGuid x with
+        | None -> failwith ("Not a valid guid: " + x)
+        | Some y -> y
+
 [<JS; AutoOpen>]
 module JSConversionExtensions =
 
@@ -59,6 +74,8 @@ module JSConversionExtensions =
 
     type Single with static member TryParseJS x = tryParseFloat x |> Option.map float32
     type Double with static member TryParseJS x = tryParseFloat x
+
+    type Guid with static member TryParseJS x = tryParseGuid x
 
 
 module internal TypeConversions = 
@@ -81,4 +98,6 @@ module internal TypeConversions =
 
             //TODO: Consider whether we should support this... We might need our own decimal type. 
             ExpressionReplacer.createUnsafe <@ Decimal.Parse @> <@ parseFloat @>
+
+            ExpressionReplacer.create <@ Guid.Parse @> <@ parseGuid @>
         ]

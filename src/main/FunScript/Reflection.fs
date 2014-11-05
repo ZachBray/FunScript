@@ -24,6 +24,8 @@ let primitiveTypes =
       typeof<string>.FullName
       typeof<char>.FullName
       typeof<bool>.FullName
+
+      typeof<Guid>.FullName // Treated as string
    ]
 
 let isGenericParameter (t : System.Type) =
