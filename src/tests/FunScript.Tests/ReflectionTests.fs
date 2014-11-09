@@ -4,10 +4,10 @@ module FunScript.Tests.Reflection
 
 open FunScript
 open NUnit.Framework
+open Microsoft.FSharp.Reflection
 
 [<JS>]
 module X =
-   open Microsoft.FSharp.Reflection
 
    let printName<'a>() = 
       typeof<'a>.FullName
@@ -223,12 +223,12 @@ type Occupation =
    | Unemployed
    | Employed of Company
 
-type Person = { Name : string * string; Occupation : Occupation; Age : int }
+type Person = { Name : (string * string) * string; Occupation : Occupation; Age : int }
 
 
 let createPerson() =
    {
-      Name = "Bob", "Diamonte"
+      Name = ("Bob", "A"), "Diamonte"
       Age = 1000000
       Occupation = Employed { Name = "Big Bank"; Address = "Centre of the Universe" }
    }
@@ -255,5 +255,33 @@ let ``Deserialization works using reflection API``() =
       @@>
 
 
+[<JS>]
+module TestDomain =
+    type UserId = UserId of System.Guid
+    type AccessToken = AccessToken of System.Guid
+    type User = { Id : UserId }
 
-// TODO: Test recursive types serialization
+[<Test>]
+let ``GetTupleElements is translated``() =
+    check
+        <@@
+            let t = typeof<TestDomain.User * TestDomain.AccessToken>
+            let ets = FSharpType.GetTupleElements t
+            ets.[0].FullName + ets.[1].FullName
+        @@>
+
+[<JS>]
+type 'a RecursiveType =
+    | Leaf
+    | Node of 'a * 'a RecursiveType * 'a RecursiveType
+
+[<Test>]
+let ``Recursive types should be translated``() =
+    check 
+        <@@
+            let t = typeof<RecursiveType<int>>
+            let ucis = FSharpType.GetUnionCases(t)
+            let nodeCase = ucis.[1]
+            let nodeFields = nodeCase.GetFields() |> Array.map (fun fi -> fi.PropertyType.FullName)
+            t.FullName + ";" + nodeFields.[0] + ";" + nodeFields.[1]
+        @@>

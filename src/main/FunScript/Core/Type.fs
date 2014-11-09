@@ -29,18 +29,20 @@ and TypeKind =
     | ArrayType of Type
     
 and Type(name, fullName, typeArgs, kind) =
+   let typeArgs = lazy typeArgs()
+   let kind = lazy kind()
    member __.Name : string = name
    member __.FullName : string = fullName
-   member __.GetGenericArguments() : Type[] = typeArgs
+   member __.GetGenericArguments() : Type[] = typeArgs.Value
    member __.IsArray =
-      match kind with
+      match kind.Value with
       | ArrayType _ -> true
       | _ -> false
    member __.GetElementType() =
-      match kind with
+      match kind.Value with
       | ArrayType t -> t
       | _ -> failwith "Not an array type."
-   member __.Kind : TypeKind = kind
+   member __.Kind : TypeKind = kind.Value
 //   member __.IsGenericType = isGenericType
 //   member __.IsGenericTypeDefinition = isGenericTypeDefinition
          

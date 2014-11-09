@@ -141,9 +141,16 @@ and private netTypeExpr compiler getTypeVar (t : Type) =
       if isGeneric then t.GetGenericArguments()
       else [||]
    let typeArgExprs = typeArgs |> Array.toList |> List.map (netTypeExpr compiler getTypeVar)
-   let typeArgsArrayExpr = Expr.NewArray(typeof<Core.Type.Type>, typeArgExprs)
-   let kindExpr = getKind compiler getTypeVar t
-   <@@ Core.Type.Type(name, fullName, %%typeArgsArrayExpr, %kindExpr) @@>
+   
+   let typeArgsArrayExpr = 
+      let unit = Var("unit", typeof<unit>)
+      let body = Expr.NewArray(typeof<Core.Type.Type>, typeArgExprs)
+      Expr.Lambda(unit, body)
+   let kindExpr = 
+      let unit = Var("unit", typeof<unit>)
+      let body = getKind compiler getTypeVar t
+      Expr.Lambda(unit, body)
+   <@@ Core.Type.Type(name, fullName, %%typeArgsArrayExpr, %%kindExpr) @@>
 
 let rec buildRuntimeType (compiler : InternalCompiler.ICompiler) (t : System.Type) =
    let typeName = sprintf "t_%s" (JavaScriptNameMapper.mapType t)
