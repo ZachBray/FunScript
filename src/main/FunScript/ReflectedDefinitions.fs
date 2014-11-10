@@ -3,6 +3,7 @@
 open AST
 open Quote
 open Microsoft.FSharp.Quotations
+open System
 open System.Reflection
 open Microsoft.FSharp.Reflection
 
@@ -36,15 +37,38 @@ let private replaceThisInExpr (expr : Expr) =
     | None -> expr
     | Some (originalThis, newThis) -> Expr.Let(newThis, Expr.Var originalThis, fixedExpr)
 
+let private getJavaScriptVarsInEmitBlock(emitBlock : string) =
+    emitBlock.Split [|';';'{';'}';'(';')'|] 
+    |> Array.map (fun stmt -> stmt.Trim())
+    |> Array.collect (fun stmt ->
+        let parts = stmt.Split([|' '; ',';'\n';'\r';'\t'|], StringSplitOptions.RemoveEmptyEntries)
+        if parts.Length > 1 && parts.[0] = "var" then parts.[1..]
+        else [||])
+    |> set
+
 let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list) bodyExpr var (compiler:InternalCompiler.ICompiler) =
    match replacementMi.GetCustomAttribute<JSEmitAttribute>() with
    | meth when meth <> Unchecked.defaultof<_> ->
       let code padding (scope : VariableScope ref) =
-         vars 
-         |> List.mapi (fun i v -> i,v)
-         |> List.fold (fun (acc:string) (i,v) ->
-            acc.Replace(sprintf "{%i}" i, (Reference v).Print(padding, scope))
-            ) meth.Emit
+         let _, assignedNames = !scope |> addVarsToScope vars
+         let jsBodyVars = 
+            if assignedNames <> [] then getJavaScriptVarsInEmitBlock meth.Emit
+            else Set.empty
+         let conflicts = Set.intersect (set assignedNames) jsBodyVars
+         let conflictResolution = 
+             conflicts |> Seq.map (fun name -> sprintf "var $_%s = %s;" name name)
+             |> String.concat ""
+         let body =
+             vars
+             |> List.zip assignedNames
+             |> List.mapi (fun i v -> i,v)
+             |> List.fold (fun (acc:string) (i,(name, v)) ->
+                let replacement =
+                    if conflicts.Contains name then sprintf "$_%s" name
+                    else (Reference v).Print(padding, scope)
+                acc.Replace(sprintf "{%i}" i, replacement)
+                ) meth.Emit
+         conflictResolution + body
       [ Assign(Reference var, Lambda(vars, Block[EmitStatement(fun (padding, scope) -> code padding scope)])) ]
    | _ when mb.IsConstructor ->
       

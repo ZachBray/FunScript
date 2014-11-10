@@ -6,13 +6,13 @@ open NUnit.Framework
 open Microsoft.FSharp.Linq.QuotationEvaluation
 
 let defaultCompile quote =
-    Compiler.Compiler.Compile(quote, noReturn = false(*, shouldCompress = true*))
+    Compiler.Compiler.Compile(quote, noReturn = false, shouldCompress = true)
 
 let compileWithComponents components quote =
-    Compiler.Compiler.Compile(quote, components = components, noReturn = false(*, shouldCompress = true*))
+    Compiler.Compiler.Compile(quote, components = components, noReturn = false, shouldCompress = true)
 
 let compileWithRx quote =
-      Compiler.Compiler.Compile(quote, components = Rx.Interop.components(), noReturn = false, isEventMappingEnabled = false(*, shouldCompress = true*))
+      Compiler.Compiler.Compile(quote, components = Rx.Interop.components(), noReturn = false, isEventMappingEnabled = false, shouldCompress = true)
 
 let checkAreEqualWith prerequisiteJS compile (expectedResult : obj) quote =
    let code : string = compile quote

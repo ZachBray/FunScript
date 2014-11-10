@@ -3,12 +3,6 @@
 open System.Text
 open Microsoft.FSharp.Quotations
 
-let indent n = String.init n (fun _ -> "  ")
-
-let (|Newline|) padding =
-   System.Environment.NewLine +
-   indent padding
-
 type Site =
    | FromDeclaration
    | FromReference
@@ -76,6 +70,19 @@ type VariableScope =
                      ShouldCompressNames = scope.ShouldCompressNames }
                finalName, newScope
 
+let indent n = String.init n (fun _ -> "  ")
+
+let getNewlineAndOffset (padding, scope : VariableScope ref) =
+   if (!scope).ShouldCompressNames then ""
+   else System.Environment.NewLine + indent padding
+
+let addVarsToScope vars oldScope =
+    let newScope, names =
+        vars |> Seq.fold (fun (scope : VariableScope, acc) v -> 
+            let name, scope = scope.ObtainNameScope v FromDeclaration
+            scope, name::acc) (oldScope, [])
+    newScope, names |> List.rev
+
 type JSRef = string
 
 type JSExpr =
@@ -96,7 +103,8 @@ type JSExpr =
    | BinaryOp of JSExpr * string * JSExpr
    | TernaryOp of JSExpr * string * JSExpr * string * JSExpr
    | EmitExpr of (int * VariableScope ref -> string)
-   member value.Print((Newline newL) as padding, scope:VariableScope ref) =
+   member value.Print(padding, scope:VariableScope ref) =
+      let newL = getNewlineAndOffset(padding, scope)
       match value with
       | Null -> "null"
       | Boolean b -> b.ToString().ToLower()
@@ -134,15 +142,11 @@ type JSExpr =
          sprintf "(new %s(%s))" ((!scope).ObtainNameScope ref FromReference |> fst) filling
       | Lambda(vars, block) ->
          let oldScope = !scope
-         let newScope, names = 
-            vars 
-            |> Seq.fold (fun (scope : VariableScope, acc) v -> 
-               let name, scope = scope.ObtainNameScope v FromDeclaration
-               scope, name::acc) (oldScope, [])
-         let filling = names |> List.rev |> String.concat ", "
+         let newScope, names = oldScope |> addVarsToScope vars
+         let filling = names |> String.concat ","
          scope := newScope
          let result =
-            sprintf "(function (%s)" filling
+            sprintf "(function(%s)" filling
             + newL
             + block.Print(padding, scope)
             + ")"
@@ -175,7 +179,8 @@ and JSStatement =
    | Do of JSExpr
    | EmitStatement of (int * VariableScope ref -> string)
    | Empty
-   member statement.Print((Newline newL) as padding, scope) =
+   member statement.Print(padding, scope) =
+      let newL =  getNewlineAndOffset(padding, scope)
       match statement with
       | Declare vars ->
          let newScope, names = 
@@ -238,8 +243,9 @@ and JSStatement =
 
 and JSBlock = 
    | Block of JSStatement list
-   member block.Print((Newline newL) as padding, scope) =
-      let (Newline paddedNewL) = padding + 1
+   member block.Print(padding, scope) =
+      let newL =  getNewlineAndOffset(padding, scope)
+      let paddedNewL = getNewlineAndOffset(padding + 1, scope)
       match block with
       | Block statements ->
          if statements |> List.isEmpty then ""
