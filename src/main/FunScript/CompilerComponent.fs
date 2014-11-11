@@ -16,13 +16,15 @@ let private splitDeclarationFromUsageIfNeeded (compiler:ICompiler) expr =
 //      [], valExpr
 //   | multipleStatements ->
     let var = compiler.NextTempVar()
-    match compiler.Compile (ReturnStrategies.assignVar var) expr with
-    | [Assign(Reference v, expr)] -> [], expr
-    | assignmentSteps ->
-        [  
-            yield Declare [var]
-            yield! assignmentSteps
-        ], Reference var
+    let statements = compiler.Compile (ReturnStrategies.assignVar var) expr 
+    let statementsArray = statements |> List.toArray
+    match statementsArray.[statementsArray.Length - 1] with
+    | Assign(Reference v, expr) when v = var ->
+        statementsArray.[0..statementsArray.Length - 2] |> Array.toList, 
+        expr
+    | _ -> 
+        [yield Declare[var]
+         yield! statements], Reference var
 
 let makeFriendly transform compiler =
    let split = splitDeclarationFromUsageIfNeeded compiler
