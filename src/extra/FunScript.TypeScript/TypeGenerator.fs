@@ -142,16 +142,45 @@ module private FFIMapping =
             // TODO: constraints from type parameters
             let rs : _ list = parameterListToTypeRefs k parentType xs
             let s = typeToTypeRef k parentType y
-            if rs.Length < 9 then
+            let isRest = match xs with ParameterList(_, _, Some _) -> true | _ -> false
+            if isRest then
+                functionTypeWithRestToTypeRef k parentType rs s
+            else if rs.Length < 9 then
                 TypeRef(["Func"; "System"], [yield! rs; yield s])
             else predefinedTypeToTypeRef Any
 
-    and objectTypeToTypeRef k (TypeRef(tns, classGps), (isInterface, methodGps)) (ObjectType xs as z) =
-        let ns = 
-            match isInterface, tns with 
+    and getNs isInterface tns = 
+        match isInterface, tns with 
             | _, [] -> []
             | false, ns -> ns
             | true, _::ns -> ns
+
+    and functionTypeWithRestToTypeRef k (TypeRef(tns, classGps), (isInterface, methodGps)) rs s =
+        let ns = getNs isInterface tns
+        let name = sprintf "RestFuncType%i" (getIndex())
+        let paramCount = List.length rs
+        let tparams = Seq.init (paramCount + 1) (fun i -> "T" + string i) 
+                        |> Seq.map (fun x -> TypeRef([x], [])) 
+                        |> List.ofSeq
+        let y = TypeRef(name :: ns, tparams)
+        Interface(y, [], []) |> k
+        let nonRest = 
+            tparams 
+            |> Seq.take (paramCount - 1) 
+            |> Seq.mapi (fun i t -> Variable("x" + string i, t, Required)) 
+            |> List.ofSeq
+        
+        let meth = Method([], [], nonRest @ [ InlineArray("rest", TypeRef(["Array"], [ List.nth tparams (paramCount - 1) ])) ], List.nth tparams paramCount )
+        Member(y, Invoker, NonStatic, meth) |> k
+
+        let restTy = match Seq.last rs with 
+                        | TypeRef(["Array"], [t]) -> t
+                        | t -> failwith "Expected array type"
+        
+        TypeRef(name :: ns, ((Seq.take (paramCount - 1) rs) |> List.ofSeq) @ [restTy; s] )
+
+    and objectTypeToTypeRef k (TypeRef(tns, classGps), (isInterface, methodGps)) (ObjectType xs as z) =
+        let ns = getNs isInterface tns
         let name = sprintf "AnonymousType%i" (getIndex())
         let y = TypeRef(name :: ns, classGps @ methodGps)
         Interface(y, [], []) |> k
