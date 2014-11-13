@@ -11,11 +11,18 @@ type Helpers =
 type IReturnStrategy =
    abstract Return: JSExpr -> JSStatement
 
+type ArgumentFilterer(?usedVars : bool list) =
+    member __.Filter xs = 
+        match usedVars with
+        | None -> xs
+        | Some usedVars ->
+            xs |> Seq.zip usedVars |> Seq.filter fst |> Seq.map snd |> Seq.toList
+
 type ICompiler = 
    abstract Compile: returnStategy:IReturnStrategy -> expr:Expr -> JSStatement list
    abstract ReplacementFor: MethodBase -> Quote.CallType -> MethodInfo option
    abstract NextTempVar: unit -> Var
-   abstract DefineGlobal: string -> (Var -> JSStatement list) -> Var
+   abstract DefineGlobal: string -> (Var -> Var option list * JSStatement list) -> ArgumentFilterer * Var
    abstract DefineGlobalInitialization: JSStatement list -> unit
    abstract Globals: JSStatement list
 
@@ -133,16 +140,19 @@ type Compiler(components) as this =
 
    let mutable globals = Map.empty
 
+   let nullFilterer = ArgumentFilterer()
+
    let define name cons =
       match globals |> Map.tryFind name with
-      | Some (var, _) -> var
+      | Some (var, argFilterer, _) -> argFilterer, var
       | None -> 
          // Define upfront to avoid problems with mutually recursive methods
          let var = Var.Global(name, typeof<obj>)
-         globals <- globals |> Map.add name (var, [])
-         let assignment = cons var
-         globals <- globals |> Map.add name (var, assignment)
-         var
+         globals <- globals |> Map.add name (var, nullFilterer, [])
+         let callPattern, assignment = cons var
+         let argFilterer = ArgumentFilterer(callPattern |> List.map Option.isSome)
+         globals <- globals |> Map.add name (var, argFilterer, assignment)
+         argFilterer, var
 
    let mutable initialization = List.empty
 
@@ -152,9 +162,9 @@ type Compiler(components) as this =
       let declarations = 
          match globals with
          | [] -> []
-         | _ -> [Declare (globals |> List.map (fun (var, _) -> var))]
+         | _ -> [Declare (globals |> List.map (fun (var, _, _) -> var))]
 
-      let assignments = globals |> List.collect snd
+      let assignments = globals |> List.collect (fun (_, _, statements) -> statements)
 
       List.append
          (List.append declarations assignments)

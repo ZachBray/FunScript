@@ -6,7 +6,7 @@ open Microsoft.FSharp.Quotations
 
 /// This is to cope with nested stuff that is supported in F#
 /// but not JS. For example, f(if x then y else z)
-let private splitDeclarationFromUsageIfNeeded (compiler:ICompiler) expr =
+let private splitDeclarationFromUsageIfNeeded (compiler:ICompiler) (expr : Expr) =
 // Need to push this optimization into the return strategy to improve compilation PERF.
 // At the moment we are generating horrible JS because we've removed this.
 //   let firstAttempt = compiler.Compile ReturnStrategies.inplace expr
@@ -15,16 +15,19 @@ let private splitDeclarationFromUsageIfNeeded (compiler:ICompiler) expr =
 //   | DeclareAndAssign(var, valExpr)::Do(Reference(var2) as refExpr)::[] when var = var2 ->
 //      [], valExpr
 //   | multipleStatements ->
-    let var = compiler.NextTempVar()
-    let statements = compiler.Compile (ReturnStrategies.assignVar var) expr 
-    let statementsArray = statements |> List.toArray
-    match statementsArray.[statementsArray.Length - 1] with
-    | Assign(Reference v, expr) when v = var ->
-        statementsArray.[0..statementsArray.Length - 2] |> Array.toList, 
-        expr
-    | _ -> 
-        [yield Declare[var]
-         yield! statements], Reference var
+    if expr.Type = typeof<unit> then
+        compiler.Compile ReturnStrategies.inplace expr, JSExpr.Null
+    else
+        let var = compiler.NextTempVar()
+        let statements = compiler.Compile (ReturnStrategies.assignVar var) expr 
+        let statementsArray = statements |> List.toArray
+        match statementsArray.[statementsArray.Length - 1] with
+        | Assign(Reference v, expr) when v = var ->
+            statementsArray.[0..statementsArray.Length - 2] |> Array.toList, 
+            expr
+        | _ -> 
+            [yield Declare[var]
+             yield! statements], Reference var
 
 let makeFriendly transform compiler =
    let split = splitDeclarationFromUsageIfNeeded compiler

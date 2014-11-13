@@ -117,10 +117,26 @@ let extractVars (mb : MethodBase) (argCounts : CompilationArgumentCountsAttribut
                         Expr.Let(tupleVar, tupleConstructionExpr, restExpr), elementVars @ freeVars
                     else
                         failwith "Unexpected argument format") (bodyExpr, [])
+        
+        let noneIfUnit (v : Var) = if v.Type = typeof<unit> then None else Some v
+        
+        let freeArgVars =
+            match mb.GetCustomAttribute<JSEmitAttribute>() with
+            | x when x = Unchecked.defaultof<_> ->
+                match mb.GetCustomAttribute<JSEmitInlineAttribute>() with
+                | x when x = Unchecked.defaultof<_> ->
+                freeArgVars |> List.map (fun v -> 
+                    if bodyExpr |> Expr.exists(function | Patterns.Var v' -> v = v' | _ -> false) then
+                        Some v
+                    else None)
+                | _ -> freeArgVars |> List.map noneIfUnit
+            | _ -> freeArgVars |> List.map noneIfUnit
+        
         let freeVars =
             match instanceVar with
             | None -> freeArgVars
-            | Some ivar -> ivar :: freeArgVars
+            | Some ivar -> Some ivar :: freeArgVars
+        
         freeVars, bodyExpr
     | expr -> [], expr
 

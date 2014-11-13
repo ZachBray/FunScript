@@ -71,7 +71,6 @@ let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list)
          conflictResolution + body
       [ Assign(Reference var, Lambda(vars, Block[EmitStatement(fun (padding, scope) -> code padding scope)])) ]
    | _ when mb.IsConstructor ->
-      
       let fixedBodyExpr = replaceThisInExpr bodyExpr
       [
          Assign(Reference var, Lambda(vars, Block(compiler.Compile ReturnStrategies.returnFrom fixedBodyExpr)))
@@ -84,6 +83,8 @@ let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list)
 
 let private (|CallPattern|_|) = Objects.methodCallPattern
 
+
+
 let tryCreateGlobalMethod name compiler mb callType =
    match Objects.replaceIfAvailable compiler mb callType with
    | CallPattern getVarsExpr as replacementMi ->
@@ -92,7 +93,8 @@ let tryCreateGlobalMethod name compiler mb callType =
       Some(
          compiler.DefineGlobal (name + specialization) (fun var ->
             let vars, bodyExpr = getVarsExpr()
-            genMethod mb replacementMi vars bodyExpr var compiler))
+            let usedVars = vars |> List.choose id
+            vars, genMethod mb replacementMi usedVars bodyExpr var compiler))
    | _ -> None
 
 let createGlobalMethod name compiler mb callType =
@@ -108,14 +110,15 @@ let private createConstruction
    let exprs = exprs |> List.concat
    let decls, refs = 
       exprs 
-      |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
+      |> List.map (fun (Split(valDecl, valRef)) -> 
+            valDecl, valRef)
       |> List.unzip
    match ci with
    | ReflectedDefinition name ->
       //TODO: Generic types will have typeArgs we need to deal with here.
-      let consRef = createGlobalMethod name compiler ci Quote.ConstructorCall
+      let argFilterer, consRef = createGlobalMethod name compiler ci Quote.ConstructorCall
       [ yield! decls |> List.concat
-        yield returnStategy.Return <| New(consRef, refs) ]
+        yield returnStategy.Return <| New(consRef, argFilterer.Filter refs) ]
    | _ -> []
 
 
@@ -236,11 +239,13 @@ let private createCall
    let exprs = exprs |> List.concat
    let decls, refs = 
       exprs 
-      |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
+      |> List.map (fun (Split(valDecl, valRef) as e : Expr) -> 
+         valDecl, valRef)
       |> List.unzip
    match mi with
    | SpecialOp((ReflectedDefinition name) as mi)
    | (ReflectedDefinition name as mi) when mi.DeclaringType.IsInterface ->
+      // TODO: Fix interfaces with unit filtering
       match refs with
       | [] -> []
       | objRef::argRefs ->
@@ -249,9 +254,9 @@ let private createCall
    | SpecialOp((ReflectedDefinition name) as mi)
    | (ReflectedDefinition name as mi) ->
       // TODO: What about interfaces!
-      let methRef = createGlobalMethod name compiler mi Quote.MethodCall
+      let argFilterer, methRef = createGlobalMethod name compiler mi Quote.MethodCall
       [  yield! decls |> List.concat
-         yield returnStategy.Return <| Apply(Reference methRef, refs) ]
+         yield returnStategy.Return <| Apply(Reference methRef, argFilterer.Filter refs) ]
    | _ -> []
 
 let private methodCalling =
@@ -270,7 +275,7 @@ let private getPropertyField split (compiler:InternalCompiler.ICompiler) (pi:Pro
       // TODO: wrap in function scope?
       compiler.DefineGlobalInitialization <|
          createCall split (ReturnStrategies.assignVar var) compiler [objExpr; exprs] (pi.GetGetMethod(true))
-      []
+      [], []
    )
 
 let private propertyGetting =
@@ -288,7 +293,7 @@ let private propertyGetting =
             mapping.SourceConstructFlags = SourceConstructFlags.Module
          match isField || isModuleLetBound, objExpr, exprs with
          | true, [], [] ->
-            let property = getPropertyField split compiler pi objExpr exprs
+            let _, property = getPropertyField split compiler pi objExpr exprs
             [ returnStategy.Return <| Reference property ]
          | _ -> createCall split returnStategy compiler [objExpr; exprs] (pi.GetGetMethod(true))
       | _ -> []
@@ -303,7 +308,7 @@ let private propertySetting =
             mapping.SourceConstructFlags = SourceConstructFlags.Value
          match isField, objExpr, exprs, valExpr with
          | true, [], [], Split(valDecl, valRef) ->
-            let property = getPropertyField (|Split|) compiler pi objExpr exprs
+            let _, property = getPropertyField (|Split|) compiler pi objExpr exprs
             [  yield! valDecl
                yield Assign(Reference property, valRef) 
             ]

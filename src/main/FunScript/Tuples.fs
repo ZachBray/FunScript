@@ -32,9 +32,10 @@ let private creation =
          let typeArgs = exprs |> List.map (fun expr -> expr.Type)
          let specialization = Reflection.getSpecializationString compiler typeArgs
          let name = sprintf "Tuple%s" specialization
-         let cons = 
+         let _, cons = 
             compiler.DefineGlobal name (fun var -> 
-               [Assign(Reference var, Lambda <| createConstructor n compiler)])
+               let vars, expr = createConstructor n compiler
+               vars |> List.map Some, [Assign(Reference var, Lambda(vars, expr))])
          [  yield! decls |> Seq.concat 
             yield returnStategy.Return <| New(cons, refs)
          ]

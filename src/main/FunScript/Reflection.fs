@@ -156,8 +156,8 @@ let rec buildRuntimeType (compiler : InternalCompiler.ICompiler) (t : System.Typ
    let typeName = sprintf "t_%s" (JavaScriptNameMapper.mapType t)
    compiler.DefineGlobal typeName (fun var ->
       let expr = netTypeExpr compiler (buildRuntimeType compiler) t
-      compiler.Compile (ReturnStrategies.assignVar var) expr
-   )
+      [None], compiler.Compile (ReturnStrategies.assignVar var) expr
+   ) |> snd
 
 let components = 
    [

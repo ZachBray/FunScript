@@ -26,7 +26,7 @@ let private createConstructor uci compiler =
    let this = Var("__this", typeof<obj>)
    vars, Block [  
       yield CopyThisToVar(this)
-      yield Assign(PropertyGet(Reference this, "Tag"), Number(float uci.Tag))
+      yield Assign(PropertyGet(Reference this, "Tag"), Integer uci.Tag)
       yield Assign(PropertyGet(Reference this, "_CaseName"), String uci.Name)
       for var in vars do yield Assign(PropertyGet(Reference this, var.Name), Reference var)
    ]
@@ -41,7 +41,7 @@ let private creation =
             |> List.unzip
          let propNames = getCaseVars uci |> List.map (fun (var,_) -> var.Name)
          let fields = 
-            ("Tag", Number(float uci.Tag)) ::
+            ("Tag", Integer  uci.Tag) ::
             (List.zip propNames refs)
          // TODO: What about comparison?
          [ yield! decls |> Seq.concat 
@@ -53,9 +53,10 @@ let private creation =
             |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
             |> List.unzip
          let name = Reflection.getUnionCaseConstructorName compiler uci
-         let cons = 
+         let _, cons = 
             compiler.DefineGlobal name (fun var -> 
-               [Assign(Reference var, Lambda <| createConstructor uci compiler)])
+               let vars, jsExpr = createConstructor uci compiler
+               vars |> List.map Some, [Assign(Reference var, Lambda(vars, jsExpr) )])
          [ yield! decls |> Seq.concat 
            yield returnStategy.Return <| New(cons, refs)
          ]
@@ -66,7 +67,7 @@ let private matching =
     function
     | Patterns.UnionCaseTest(Split(objDecl, objRef), uci) ->
         [ yield! objDecl
-          yield returnStategy.Return <| BinaryOp(PropertyGet(objRef, "Tag"), "==", Number(float uci.Tag))
+          yield returnStategy.Return <| BinaryOp(PropertyGet(objRef, "Tag"), "==", Integer uci.Tag)
         ]
     | Patterns.Call(None, mi, [Split(objDecl, objRef)]) when 
             FSharpType.IsUnion mi.DeclaringType && 

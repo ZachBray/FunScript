@@ -96,6 +96,7 @@ let private coerce =
                   |> Array.map (fun (name, expr) -> name, Option.get expr)
                   |> Array.map (fun (name, getVarsExpr) ->
                      let vars, lambdaExpr = getVarsExpr()
+                     let vars = vars |> List.choose id
                      let objVar = List.head vars
                      let vars = List.tail vars
                      name,

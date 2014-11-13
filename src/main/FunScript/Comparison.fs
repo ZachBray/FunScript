@@ -129,7 +129,7 @@ let compareArray elementType comparandA comparandB =
 let createCompareLambda t createComparisonBody =
     let a = Var("a", t)
     let b = Var("b", t)
-    Expr.Lambda(a, Expr.Lambda(b, createComparisonBody (Expr.Var a) (Expr.Var b)))
+    [Some a; Some b], Expr.Lambda(a, Expr.Lambda(b, createComparisonBody (Expr.Var a) (Expr.Var b)))
 
 let tryAutoGenerateCompareToLambda t =
     if FSharpType.IsTuple t then
@@ -167,7 +167,7 @@ let comparableCompareComponent compareQuote =
                 Some(Expr.Call(primitiveCompareMethod, [exprA; exprB]))
             | NonPrimitive, NonPrimitive ->
                 match tryGetCompareToMethod compiler exprA.Type with
-                | Some compareFuncVar ->
+                | Some (_, compareFuncVar) ->
                     let lambda = Expr.Var compareFuncVar
                     let innerLambdaType = typedefof<_ -> _>.MakeGenericType [|exprB.Type; typeof<int>|]
                     let outerLambdaType = typedefof<_ -> _>.MakeGenericType [|exprA.Type; innerLambdaType|]
@@ -181,9 +181,10 @@ let comparableCompareComponent compareQuote =
                     match tryAutoGenerateCompareToLambda exprA.Type with
                     | None -> None
                     | Some createCompareToLambda ->
-                        let compareFuncVar = 
+                        let _, compareFuncVar = 
                             compiler.DefineGlobal (getCompareToName compiler exprA.Type) (fun var ->
-                                compiler.Compile (ReturnStrategies.assignVar var) (createCompareToLambda())
+                                let usedVars, expr = createCompareToLambda()
+                                usedVars, compiler.Compile (ReturnStrategies.assignVar var) expr
                             )
                         let lambda = Expr.Var compareFuncVar
                         let innerLambdaType = typedefof<_ -> _>.MakeGenericType [|exprB.Type; typeof<int>|]

@@ -115,8 +115,8 @@ type JSExpr =
       | Object propExprs ->
          let filling =
             propExprs |> List.map (fun (name, expr) ->
-               sprintf "%s: %s" name (expr.Print(padding, scope)))
-            |> String.concat ", "
+               sprintf "%s:%s" name (expr.Print(padding, scope)))
+            |> String.concat ","
          sprintf "{%s}" filling
       | PropertyGet(objExpr, var) ->
          sprintf "%s.%s" (objExpr.Print(padding, scope)) var
@@ -126,19 +126,19 @@ type JSExpr =
          let filling = 
             exprs |> List.map (fun expr -> 
                expr.Print(padding, scope)) 
-            |> String.concat ", "
+            |> String.concat ","
          sprintf "[%s]" filling
       | Apply(lambdaExpr, argExprs) ->
          let filling =
             argExprs |> List.map (fun argExpr -> 
                argExpr.Print(padding, scope))
-            |> String.concat ", "
+            |> String.concat ","
          sprintf "%s(%s)" (lambdaExpr.Print(padding, scope)) filling
       | New(ref, argExprs) ->
          let filling =
             argExprs |> List.map (fun argExpr -> 
                argExpr.Print(padding, scope))
-            |> String.concat ", "
+            |> String.concat ","
          sprintf "(new %s(%s))" ((!scope).ObtainNameScope ref FromReference |> fst) filling
       | Lambda(vars, block) ->
          let oldScope = !scope
@@ -189,33 +189,33 @@ and JSStatement =
                let name, scope = scope.ObtainNameScope v FromDeclaration
                scope, name::acc) (!scope, [])
          scope := newScope
-         sprintf "var %s" (names |> String.concat ", ")
+         sprintf "var %s" (names |> String.concat ",")
       | DeclareAndAssign(var, valExpr) ->
          let name, newScope = (!scope).ObtainNameScope var FromDeclaration
          scope := newScope
-         sprintf "var %s = %s" name (valExpr.Print(padding, scope))
+         sprintf "var %s=%s" name (valExpr.Print(padding, scope))
       | CopyThisToVar var ->
          let name, newScope = (!scope).ObtainNameScope var FromDeclaration
          scope := newScope
-         sprintf "var %s = this" name
+         sprintf "var %s=this" name
       | Assign(varExpr, valExpr) ->
-         sprintf "%s = %s" (varExpr.Print(padding, scope)) (valExpr.Print(padding, scope))
+         sprintf "%s=%s" (varExpr.Print(padding, scope)) (valExpr.Print(padding, scope))
       | Throw valExpr ->
-         sprintf "throw (%s)" (valExpr.Print(padding, scope))
+         sprintf "throw(%s)" (valExpr.Print(padding, scope))
       | IfThenElse(condExpr, trueBlock, falseBlock) ->
-         sprintf "if (%s) " (condExpr.Print(padding, scope))
+         sprintf "if(%s) " (condExpr.Print(padding, scope))
          + newL
          + trueBlock.Print(padding, scope)
          + newL + "else" + newL
          + falseBlock.Print(padding, scope)
       | WhileLoop(condExpr, block) ->
-         sprintf "while (%s)" (condExpr.Print(padding, scope))
+         sprintf "while(%s)" (condExpr.Print(padding, scope))
          + newL
          + block.Print(padding, scope)
       | ForLoop(var, fromExpr, toExpr, block) ->
          let name, newScope = (!scope).ObtainNameScope var FromDeclaration
          scope := newScope
-         sprintf "for (var %s = %s; %s <= %s; %s++)" name (fromExpr.Print(padding, scope)) name (toExpr.Print(padding, scope)) name
+         sprintf "for(var %s=%s;%s<=%s;%s++)" name (fromExpr.Print(padding, scope)) name (toExpr.Print(padding, scope)) name
          + newL
          + block.Print(padding, scope)
       | TryCatch(tryExpr, var, catchExpr) ->
@@ -237,6 +237,7 @@ and JSStatement =
       | Scope block -> block.Print(padding, scope)
       | Return expr ->
          sprintf "return %s" (expr.Print(padding, scope))
+      | Do Null -> ""
       | Do expr -> expr.Print(padding, scope)
       | Empty -> ""
       | EmitStatement code -> code(padding, scope)
