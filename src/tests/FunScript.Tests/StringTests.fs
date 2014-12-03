@@ -8,23 +8,22 @@ module FunScript.Tests.Strings
 open System
 open NUnit.Framework
 
-// TODO: These tests don't work with Jint, but the generated JS works fine in the browser
-//[<Test>]
-//let ``String.Format with extra formatting works``() =
-//   check 
-//      <@@
-//         let i = 0.5466788
-//         let dt = DateTime(2014, 9, 26).AddMinutes(19.)
-//         String.Format("{0:F2} {0:P2} {0:E2} {1:t} {1:yy/MM/dd HH:mm}", i, dt)
-//      @@>
-//
-//[<Test>]
-//let ``Console.WriteLine works``() =
-//   check 
-//      <@@
-//         Console.WriteLine("Testing, testing...")
-//         true
-//      @@>
+[<Test>]
+let ``String.Format with extra formatting works``() =
+   check 
+      <@@
+         let i = 0.5466788
+         let dt = DateTime(2014, 9, 26).AddMinutes(19.)
+         String.Format("{0:F2} {0:P2} {1:yy/MM/dd HH:mm}", i, dt)
+      @@>
+
+[<Test>]
+let ``Console.WriteLine works``() =
+   check 
+      <@@
+         Console.WriteLine("Testing, testing...")
+         true
+      @@>
 
 // The code that is produced by writing (c:char) = 'x' does not work correctly
 // in Jint, but works fine in web browsers. This function allows us to write
