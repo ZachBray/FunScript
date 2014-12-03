@@ -1,22 +1,20 @@
 ﻿[<FunScript.JS>]
 module FunScript.Core.String
 
-// TODO: This is a bit tricky, it will never return a string but a function with valueOf and toString
-// methods set to return the string. It's working for practical purposes but, should we improve it?
-[<FunScript.JSEmit("""function formatToString(rep) {
-		{0} = {0}.replace(/%[+\-* ]?\d*(?:\.(\d+))?(\w)/, function(match, precision, format) {
+[<FunScript.JSEmit("""var reg = /%[+\-* ]?\d*(?:\.(\d+))?(\w)/;
+    function formatToString(rep) {
+        {0} = {0}.replace(reg, function(match, precision, format) {
             switch (format) {
                 case "f": case "F": return precision ? rep.toFixed(precision) : rep.toFixed(6);
                 case "g": case "G": return rep.toPrecision(precision);
                 case "e": case "E": return rep.toExponential(precision);
                 case "A": return JSON.stringify(rep);
                 default:  return rep;
-			}
-		});
-		return formatToString;
-	}
-	formatToString.valueOf = formatToString.toString = function() { return {0}; }
-	return formatToString""")>]
+            }
+        });
+        return reg.test({0}) ? formatToString : {0};
+    }
+    return formatToString""")>]
 let PrintFormatToString(s: string): obj = failwith "never"
 
 [<FunScript.JSEmit("""return {0}.replace(/\{(\d+)(,-?\d+)?(?:\:(.+?))?\}/g, function(match, number, alignment, format) {
