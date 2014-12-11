@@ -12,7 +12,25 @@ let toSigFigs nSigFigs x =
     let scale = pown 10. digitsToAdjustNumberBy
     round(x / scale) * scale
 
-// TODO: These tests don't work with Jint, but the generated JS works fine in the browser
+// TODO: These two tests give different values for .NET and JS because DateTime
+// becomes as a plain JS Date object, so I'm just checking the fields get translated
+[<Test>]
+let ``DateTime.MaxValue works``() =
+   check 
+      <@@ 
+         let d = DateTime.MaxValue
+         0.
+      @@>
+
+[<Test>]
+let ``DateTime.MinValue works``() =
+   check 
+      <@@ 
+         let d = DateTime.MinValue
+         0.
+      @@>
+
+
 [<Test>]
 let ``DateTime.ToLocalTime works``() =
    check 

@@ -4,9 +4,22 @@ open AST
 open System
 open Microsoft.FSharp.Quotations
 
+let private maxmin =
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
+      function
+      | Patterns.FieldGet(None, fi) when fi.DeclaringType.Name = "DateTime" ->
+        let compile = fun quote -> let mi, _ = Quote.toMethodInfoFromLambdas quote
+                                   compiler.Compile returnStrategy (ExpressionReplacer.buildCall mi [])        
+        match fi.Name with
+        | "MaxValue" -> compile <@ Core.Time.DateTime.MaxValue @>
+        | "MinValue" -> compile <@ Core.Time.DateTime.MinValue @>
+        | _ -> []
+      | _ -> []
+
 let components = 
     [
         [
+            maxmin
             ExpressionReplacer.createUnsafe <@ fun (y, m, d) -> DateTime(y, m, d) @> <@ Core.Time.DateTime.FromYMD @>
             ExpressionReplacer.createUnsafe <@ fun (y, m, d, h, min, s) -> DateTime(y, m, d, h, min, s) @> <@ Core.Time.DateTime.FromYMDHMS @>
             ExpressionReplacer.createUnsafe <@ fun (y, m, d, h, min, s, kind: DateTimeKind) -> DateTime(y, m, d, h, min, s, kind) @> <@ Core.Time.DateTime.FromYMDHMSwithKind @>
