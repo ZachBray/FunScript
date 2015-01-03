@@ -108,8 +108,12 @@ type JSExpr =
       match value with
       | Null -> "null"
       | Boolean b -> b.ToString().ToLower()
-      | Integer i -> sprintf "%d" i
-      | Number f -> sprintf "%f" f
+      | Integer i -> i.ToString()
+      | Number f -> let str = f.ToString(System.Globalization.CultureInfo.InvariantCulture)
+                    if str.IndexOf('.') >= 0 then
+                      str
+                    else
+                      str + "."
       | String str -> sprintf @"""%s""" (System.Web.HttpUtility.JavaScriptStringEncode(str))
       | Reference ref -> (!scope).ObtainNameScope ref FromReference |> fst
       | Object propExprs ->
@@ -237,7 +241,9 @@ and JSStatement =
       | Scope block -> block.Print(padding, scope)
       | Return expr ->
          sprintf "return %s" (expr.Print(padding, scope))
-      | Do expr -> expr.Print(padding, scope)
+      | Do Null -> "" // suppress null; statements
+      | Do expr -> (match expr with 
+                     | _ ->    expr.Print(padding, scope))
       | Empty -> ""
       | EmitStatement code -> code(padding, scope)
 
@@ -250,13 +256,19 @@ and JSBlock =
       | Block statements ->
          if statements |> List.isEmpty then ""
          else
+            let throwing = statements |> List.tryFindIndex(fun smt -> match smt with | Throw _ -> true | _ -> false)
+            let statements2 =
+                match throwing with
+                    | Some i -> statements |> Seq.take(i+1) // truncate list to skip unreachable statements after throw (return null;)
+                    | None -> statements |> List.toSeq
+
             let filling =
-               statements 
-               |> List.map (fun smt -> smt.Print(padding + 1, scope))
-               |> List.filter ((<>) "")
-               |> String.concat (sprintf ";%s" paddedNewL)
+                statements2 
+                    |> Seq.map (fun smt -> smt.Print(padding + 1, scope))
+                    |> Seq.filter ((<>) "")
+                    |> String.concat (sprintf ";%s" paddedNewL)
             if padding = 0 then filling
-            else sprintf "{%s%s;%s}" paddedNewL filling newL
+            else sprintf "{%s%s%s}" paddedNewL filling newL
 
    member block.Print() =
       block.Print(0, ref VariableScope.Empty)

@@ -10,6 +10,7 @@ open NUnit.Framework
 
 [<Test>]
 let ``String.Format with extra formatting works``() =
+   System.Threading.Thread.CurrentThread.CurrentCulture <- System.Globalization.CultureInfo("en-US")
    check 
       <@@
          let i = 0.5466788

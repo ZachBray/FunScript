@@ -15,9 +15,9 @@ let private createConstructor n compiler =
    let refs = vars |> List.map Reference
    let this = Var("__this", typeof<obj>)
    vars, Block [  
-      yield CopyThisToVar(this)
-      for var in vars do 
-          yield Assign(PropertyGet(Reference this, itemsPropName), Array refs)
+      yield CopyThisToVar(this) // TODO remove redundant __this variable created here
+      // REMOVED (created duplicate lines) for var in vars do 
+      yield Assign(PropertyGet(Reference this, itemsPropName), Array refs)
    ]
 
 let private creation =
