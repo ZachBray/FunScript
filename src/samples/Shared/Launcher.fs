@@ -105,11 +105,11 @@ type Runtime private() =
             [ for typ in types do
                 for mi in typ.GetMethods(flags) do
                   if mi.Name = "main" then yield mi ]
-          let main = 
+          let main:MethodInfo = 
             match mains with
             | [it] -> it
             | _ -> failwith "Main function not found!"
-          printfn "Found entry point..."
+          printfn "Found entry point... %A" main
           Expr.Call(main, [])
       | Some e -> e
 
@@ -121,10 +121,13 @@ type Runtime private() =
     let sw = System.Diagnostics.Stopwatch.StartNew()
     let source = FunScript.Compiler.Compiler.Compile(main, components=components)
     let sourceWrapped = sprintf "$(document).ready(function () {\n%s\n});" source
+    let sourcefinal = GoogleClosure.ClosureCompiler.Compile sourceWrapped 
     let filename = Path.Combine(root, "page.js")
-    printfn "Generated JavaScript in %f sec..." (float sw.ElapsedMilliseconds / 1000.0) 
+    printfn "Generated JavaScript %A in %f sec..." filename (float sw.ElapsedMilliseconds / 1000.0) 
+    printfn "Closure Compilation reduced size from %d to %d (%.2f %%)" (sourceWrapped.Length) (sourcefinal.Length) (float(sourcefinal.Length * 100) / float(sourceWrapped.Length))
     System.IO.File.Delete filename
-    System.IO.File.WriteAllText(filename, sourceWrapped)
+    System.IO.File.WriteAllText(Path.Combine(root, "page.orig.js"), sourceWrapped)
+    System.IO.File.WriteAllText(filename, sourcefinal)
 
     let shouldOnlyGenerateCode =
         System.Environment.GetCommandLineArgs() 
