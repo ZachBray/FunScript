@@ -4,13 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>eac15526-7544-4ec5-ae50-32e5cdd05044</ProjectGuid>
+    <ProjectGuid>{EAC15526-7544-4EC5-AE50-32E5CDD05044}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>FunScript.Tests</RootNamespace>
     <AssemblyName>FunScript.Tests</AssemblyName>
     <Name>FunScript.Tests</Name>
-    <ProductVersion>10.0.0</ProductVersion>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
     <TargetFSharpCoreVersion>4.3.1.0</TargetFSharpCoreVersion>

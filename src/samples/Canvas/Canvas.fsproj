@@ -4,13 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>761ce569-eddc-4163-95b4-30ade1f4bd07</ProjectGuid>
+    <ProjectGuid>{761CE569-EDDC-4163-95B4-30ADE1F4BD07}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>Canvas</RootNamespace>
     <AssemblyName>Canvas</AssemblyName>
     <Name>Canvas</Name>
-    <ProductVersion>10.0.0</ProductVersion>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
     <TargetFSharpCoreVersion>4.3.1.0</TargetFSharpCoreVersion>
@@ -26,6 +24,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\Debug\Canvas.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
+    <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>

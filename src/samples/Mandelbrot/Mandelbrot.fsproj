@@ -4,8 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>d5231916-12dd-42ed-a0f3-10c2a8c6a807</ProjectGuid>
+    <ProjectGuid>{D5231916-12DD-42ED-A0F3-10C2A8C6A807}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>Mandelbrot</RootNamespace>
     <AssemblyName>Mandelbrot</AssemblyName>
@@ -24,6 +23,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\Debug\Mandelbrot.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
+    <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>

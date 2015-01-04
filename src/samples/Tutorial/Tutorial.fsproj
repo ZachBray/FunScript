@@ -4,8 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{64d64d70-c665-4a7b-bf83-9635485578e0}</ProjectGuid>
+    <ProjectGuid>{64D64D70-C665-4A7B-BF83-9635485578E0}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>FunJS.Tutorial</RootNamespace>
     <AssemblyName>Tutorial</AssemblyName>
@@ -24,6 +23,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\Debug\Tutorial.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
+    <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -53,8 +53,8 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
   <ItemGroup>
-    <Compile Include="../Shared/Launcher.fs">
-      <Link>Shared/Launcher</Link>
+    <Compile Include="..\Shared\Launcher.fs">
+      <Link>Shared\Launcher</Link>
     </Compile>
     <None Include="index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -4,13 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{1cd63889-d724-46fa-b055-7bdcfedc1541}</ProjectGuid>
+    <ProjectGuid>{1CD63889-D724-46FA-B055-7BDCFEDC1541}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Canvas</RootNamespace>
+    <RootNamespace>PacMan</RootNamespace>
     <AssemblyName>PacMan</AssemblyName>
     <Name>Pacman</Name>
-    <ProductVersion>10.0.0</ProductVersion>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
     <TargetFSharpCoreVersion>4.3.1.0</TargetFSharpCoreVersion>
@@ -26,6 +24,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\Debug\Canvas.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
+    <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>

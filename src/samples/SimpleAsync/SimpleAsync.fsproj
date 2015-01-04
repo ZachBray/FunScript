@@ -4,10 +4,9 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{e1d45250-a24a-4d26-bfbf-bf93ab5f45e5}</ProjectGuid>
+    <ProjectGuid>{E1D45250-A24A-4D26-BFBF-BF93AB5F45E5}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>FunScript.Example</RootNamespace>
+    <RootNamespace>SimpleAsync</RootNamespace>
     <AssemblyName>SimpleAsync</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Name>MovieDatabase</Name>
@@ -24,6 +23,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\Debug\FunScript.Example.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
+    <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -53,8 +53,8 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
   <ItemGroup>
-    <Compile Include="../Shared/Launcher.fs">
-      <Link>Shared/Launcher</Link>
+    <Compile Include="..\Shared\Launcher.fs">
+      <Link>Shared\Launcher</Link>
     </Compile>
     <None Include="index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
