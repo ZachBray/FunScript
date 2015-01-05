@@ -64,18 +64,6 @@
       <HintPath>..\..\packages\ApiaryProvider.1.0.2\lib\net40\ApiaryProvider.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="FunScript">
-      <HintPath>..\..\main\FunScript\bin\Debug\FunScript.dll</HintPath>
-    </Reference>
-    <Reference Include="FunScript.Interop">
-      <HintPath>..\..\main\FunScript\bin\Debug\FunScript.Interop.dll</HintPath>
-    </Reference>
-    <Reference Include="FunScript">
-      <HintPath>..\..\..\build\main\bin\FunScript.dll</HintPath>
-    </Reference>
-    <Reference Include="FunScript.Interop">
-      <HintPath>..\..\..\build\main\bin\FunScript.Interop.dll</HintPath>
-    </Reference>
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <Private>True</Private>
     </Reference>
@@ -88,6 +76,18 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\main\FunScript.Interop\FunScript.Interop.fsproj">
+      <Name>FunScript.Interop</Name>
+      <Project>{1397ecef-2a65-49ce-afa1-b9884671bbb9}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\main\FunScript\FunScript.fsproj">
+      <Name>FunScript</Name>
+      <Project>{e0916e67-d3b0-4c3a-ad18-4146882fcedd}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
