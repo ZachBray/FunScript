@@ -5,54 +5,53 @@ open FunScript
 open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Core;
 open Microsoft.FSharp.Text;
+//
+//let compile assemblyPath filename components =
+//
+//    // loading the assembly from a file maybe problematic if 
+//    // the assembly as dependcies on non-BCL stuff, consider
+//    // otherways of doing this
+//    let asm = Assembly.LoadFile(assemblyPath)
+//
+//    // Find the main method in this assembly
+//    // Could offer lot more flexiblity here ...
+//    let mainCompileExpr =
+//        printfn "Searching for main function..."
+//        let types = asm.GetTypes()
+//        let flags = BindingFlags.NonPublic ||| BindingFlags.Public ||| BindingFlags.Static
+//        let mains = 
+//            [ for typ in types do
+//                for mi in typ.GetMethods(flags) do
+//                    if mi.Name = "main" then yield mi ]
+//        let main = 
+//            match mains with
+//            | [it] -> it
+//            | _ -> failwith "Main function not found!"
+//        printfn "Found entry point..."
+//        Expr.Call(main, [])
+//
+//    // Compile the main function into a script
+//    let sw = System.Diagnostics.Stopwatch.StartNew()
+//    let source = FunScript.Compiler.Compiler.Compile(mainCompileExpr, components=components)
+//    let sourceWrapped = sprintf "$(document).ready(function () {\n%s\n});" source
+//    printfn "Generated JavaScript in %f sec..." (float sw.ElapsedMilliseconds / 1000.0) 
+//    File.Delete filename
+//    File.WriteAllText(filename, sourceWrapped)
 
-let compile assemblyPath filename components =
 
-    // loading the assembly from a file maybe problematic if 
-    // the assembly as dependcies on non-BCL stuff, consider
-    // otherways of doing this
-    let asm = Assembly.LoadFile(assemblyPath)
-
-    // Find the main method in this assembly
-    // Could offer lot more flexiblity here ...
-    let mainCompileExpr =
-        printfn "Searching for main function..."
-        let types = asm.GetTypes()
-        let flags = BindingFlags.NonPublic ||| BindingFlags.Public ||| BindingFlags.Static
-        let mains = 
-            [ for typ in types do
-                for mi in typ.GetMethods(flags) do
-                    if mi.Name = "main" then yield mi ]
-        let main = 
-            match mains with
-            | [it] -> it
-            | _ -> failwith "Main function not found!"
-        printfn "Found entry point..."
-        Expr.Call(main, [])
-
-
-    // Compile the main function into a script
-    let sw = System.Diagnostics.Stopwatch.StartNew()
-    let source = FunScript.Compiler.Compiler.Compile(mainCompileExpr, components=components)
-    let sourceWrapped = sprintf "$(document).ready(function () {\n%s\n});" source
-    printfn "Generated JavaScript in %f sec..." (float sw.ElapsedMilliseconds / 1000.0) 
-    File.Delete filename
-    File.WriteAllText(filename, sourceWrapped)
-
-
-let assemPath = ref ""
-let projectPath = ref ""
-let outPath = ref ""
-let stdOut = ref false
+let assemPathRef = ref ""
+let projectPathRef = ref ""
+let outPathRef = ref ""
+let stdOutRef = ref false
 
 let args =
-    [ ArgInfo("--assembly-path", ArgType.String(fun x -> assemPath := x), 
+    [ ArgInfo("--assembly-path", ArgType.String(fun x -> assemPathRef := x), 
               "Path to the assembly you want fun script to compile")
-      ArgInfo("--project-path", ArgType.String(fun x -> projectPath := x), 
+      ArgInfo("--project-path", ArgType.String(fun x -> projectPathRef := x), 
               "Path to the project you want fun script to compile")
-      ArgInfo("--out-path", ArgType.String(fun x -> outPath := x), 
+      ArgInfo("--out-path", ArgType.String(fun x -> outPathRef := x), 
               "Path of the resulting javascript file")
-      ArgInfo("--std-out", ArgType.SetArg(stdOut), 
+      ArgInfo("--std-out", ArgType.SetArg(stdOutRef), 
               "Write the results to standard out instead") ]
 
 let usageText = "FunScript Compiler - usage: funsc <args>"
@@ -62,41 +61,71 @@ let emptyStr = String.IsNullOrWhiteSpace
 let (|EmptyString|NonEmptyString|) 
     input = if System.String.IsNullOrWhiteSpace input then EmptyString else NonEmptyString
 
-type ParseResult = {Success : bool; Message : string}
-
 [<EntryPoint>]
 let main argv = 
     ArgParser.Parse(args, usageText = usageText)
+
+    let assemPath = !assemPathRef
+    let projectPath = !projectPathRef
+    let outPath = !outPathRef
+    let stdOut = !stdOutRef
     
-    let sourceParseResult : ParseResult = 
-        match !assemPath, !projectPath with
+    let sourceParseResult = 
+        match assemPath, projectPath with
         | (EmptyString, EmptyString) -> 
-            {Success=false; Message="error: either --assembly-path or --project-path is required"}
+            Some "error: either --assembly-path or --project-path is required"
         | (NonEmptyString, NonEmptyString) -> 
-            {Success=false; Message="error: both --assembly-path and --project-path specified. one or the other required"}
+            Some "error: both --assembly-path and --project-path specified. one or the other required"
         | (_, _) -> 
-            {Success=true; Message=""}
+            None
 
-    let outParseResult : ParseResult = 
-        match !outPath, !stdOut with
+    let sourceExist = 
+        match assemPath, projectPath with
+        | (NonEmptyString, EmptyString) when (not (File.Exists assemPath)) -> 
+            Some(sprintf "error: assembly file not found at %s" assemPath)
+        | (EmptyString, NonEmptyString) when (not (File.Exists projectPath)) -> 
+            Some(sprintf "error: project file not found at %s" projectPath)
+        | (_, _) -> 
+            None
+
+    let outParseResult = 
+        match outPath, stdOut with
         | (EmptyString, false) -> 
-            {Success=false; Message="error: either --out-path or --std-out is required"}
+            Some "error: either --out-path or --std-out is required"
         | (NonEmptyString, true) -> 
-            {Success=false; Message="error: both --out-path and --std-out specified. one or the other is required"}
+            Some "error: both --out-path and --std-out specified. one or the other is required"
         | (_, _) -> 
-            {Success=true; Message=""}
+            None
 
-    let parseResults = [sourceParseResult; outParseResult]
-    let parseFailMessages = seq { for r in parseResults do if not(r.Success) then yield r.Message}
+    let validationChecks = [sourceParseResult; outParseResult; sourceExist]
+    let failureMessages = seq { for m in validationChecks do if m.IsSome then yield m.Value}
 
     let mutable exitCode = 0
 
-    if not(Seq.isEmpty(parseFailMessages)) then
-        for m in parseFailMessages do   
+    if not(Seq.isEmpty(failureMessages)) then
+        for m in failureMessages do   
             printf "%s\n" m
         ArgParser.Usage(args, usage = usageText)
         exitCode <- 1
     else 
-        compile !assemPath !outPath []//Interop.Components.all
+        let compileResult = 
+            match assemPath, projectPath with 
+            | (NonEmptyString, EmptyString) ->
+                Compile.AssemblyToFunScript(Reflection.Assembly.LoadFile(assemPath))
+            | (EmptyString, NonEmptyString) ->
+                Compile.ProjectToFunScript(projectPath)
+            | (_, _) ->
+                failwithf "shouldnt ever get here"
         
+        if compileResult.Success then
+            if(stdOut) then
+                printf "%s" compileResult.CompiledFunScript
+            else
+                let outFile = FileInfo(outPath)
+                outFile.Directory.Create()
+                File.WriteAllText(outPath, compileResult.CompiledFunScript)
+        else
+            exitCode <- 1
+            for err in compileResult.Errors do
+                printf "%s" err.Message
     exitCode
