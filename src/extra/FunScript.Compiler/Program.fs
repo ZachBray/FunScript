@@ -41,22 +41,62 @@ let compile assemblyPath filename components =
 
 
 let assemPath = ref ""
+let projectPath = ref ""
 let outPath = ref ""
+let stdOut = ref false
+
 let args =
     [ ArgInfo("--assembly-path", ArgType.String(fun x -> assemPath := x), 
               "Path to the assembly you want fun script to compile")
+      ArgInfo("--project-path", ArgType.String(fun x -> projectPath := x), 
+              "Path to the project you want fun script to compile")
       ArgInfo("--out-path", ArgType.String(fun x -> outPath := x), 
-              "Path of the resulting javascript file") ]
+              "Path of the resulting javascript file")
+      ArgInfo("--std-out", ArgType.SetArg(stdOut), 
+              "Write the results to standard out instead") ]
 
 let usageText = "FunScript Compiler - usage: funsc <args>"
+
+let emptyStr = String.IsNullOrWhiteSpace
+
+let (|EmptyString|NonEmptyString|) 
+    input = if System.String.IsNullOrWhiteSpace input then EmptyString else NonEmptyString
+
+type ParseResult = {Success : bool; Message : string}
 
 [<EntryPoint>]
 let main argv = 
     ArgParser.Parse(args, usageText = usageText)
-    if String.IsNullOrWhiteSpace(!assemPath) || String.IsNullOrWhiteSpace(!outPath) then
-        printfn "error: both --assembly-path and --out-path are required"
+    
+    let sourceParseResult : ParseResult = 
+        match !assemPath, !projectPath with
+        | (EmptyString, EmptyString) -> 
+            {Success=false; Message="error: either --assembly-path or --project-path is required"}
+        | (NonEmptyString, NonEmptyString) -> 
+            {Success=false; Message="error: both --assembly-path and --project-path specified. one or the other required"}
+        | (_, _) -> 
+            {Success=true; Message=""}
+
+    let outParseResult : ParseResult = 
+        match !outPath, !stdOut with
+        | (EmptyString, false) -> 
+            {Success=false; Message="error: either --out-path or --std-out is required"}
+        | (NonEmptyString, true) -> 
+            {Success=false; Message="error: both --out-path and --std-out specified. one or the other is required"}
+        | (_, _) -> 
+            {Success=true; Message=""}
+
+    let parseResults = [sourceParseResult; outParseResult]
+    let parseFailMessages = seq { for r in parseResults do if not(r.Success) then yield r.Message}
+
+    let mutable exitCode = 0
+
+    if not(Seq.isEmpty(parseFailMessages)) then
+        for m in parseFailMessages do   
+            printf "%s\n" m
         ArgParser.Usage(args, usage = usageText)
-    else
-        // need to give more control of the components?
+        exitCode <- 1
+    else 
         compile !assemPath !outPath []//Interop.Components.all
-    0
+        
+    exitCode
