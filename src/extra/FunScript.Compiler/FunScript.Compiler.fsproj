@@ -67,9 +67,12 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
-    <ProjectReference Include="..\FunScript\FunScript.fsproj">
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\main\FunScript\FunScript.fsproj">
       <Name>FunScript</Name>
-      <Project>E0916E67-D3B0-4C3A-AD18-4146882FCEDD</Project>
+      <Project>{e0916e67-d3b0-4c3a-ad18-4146882fcedd}</Project>
+      <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
