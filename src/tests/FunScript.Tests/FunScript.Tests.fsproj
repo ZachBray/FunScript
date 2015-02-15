@@ -83,6 +83,7 @@
     <Compile Include="EventTests.fs" />
     <Compile Include="RxTests.fs" />
     <Compile Include="GuidTests.fs" />
+    <Compile Include="AssemblyCompileTests.fs" />
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="edge\x86\node.dll">
@@ -136,6 +137,21 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Web" />
+    <ProjectReference Include="..\..\compileTestData\simple\Simple.fsproj">
+      <Name>Simple</Name>
+      <Project>{e8eda6fd-20d3-4849-95da-ed2b0ae0a869}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\compileTestData\WithBindings\WithBindings.fsproj">
+      <Name>WithBindings</Name>
+      <Project>{5bb88a86-e7de-43ba-b809-a0dddad7f21c}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\extra\FunScript.Compiler\FunScript.Compiler.fsproj">
+      <Name>FunScript.Compiler</Name>
+      <Project>{4aad0f56-af0f-46bd-811e-fec88ebed669}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\..\extra\FunScript.Rx\FunScript.Rx.fsproj">
       <Name>FunScript.Rx</Name>
       <Project>{3d25cab2-83a4-4d3b-9986-ac068fe29307}</Project>

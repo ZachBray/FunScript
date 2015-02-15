@@ -49,6 +49,7 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\AssemblyMain.fs" />
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="AttributeHelpers.fs" />
     <Compile Include="ExprExtensions.fs" />
