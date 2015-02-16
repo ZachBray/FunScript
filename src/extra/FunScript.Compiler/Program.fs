@@ -1,7 +1,6 @@
 ﻿open System
 open System.IO
 open System.Reflection
-open FunScript
 open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Core;
 open Microsoft.FSharp.Text;
@@ -108,10 +107,11 @@ let main argv =
         ArgParser.Usage(args, usage = usageText)
         exitCode <- 1
     else 
-        let compileResult = 
+        let compileResult : Compile.CompileResult = 
             match assemPath, projectPath with 
             | (NonEmptyString, EmptyString) ->
-                Compile.AssemblyToFunScript(Reflection.Assembly.LoadFile(assemPath))
+//                Compile.AssemblyToFunScript Reflection.Assembly.LoadFile(assemPath) Reflection.Assembly.LoadFile(funScriptPath)
+                failwith "not implemented"
             | (EmptyString, NonEmptyString) ->
                 Compile.ProjectToFunScript(projectPath)
             | (_, _) ->

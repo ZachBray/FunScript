@@ -11,58 +11,63 @@
         Success: bool
         Errors: seq<CompileError>
         CompiledFunScript: string
-    }
+    } with
+        static member MakeSingleError message =
+            {Success=false;Errors=[{Message=message}];CompiledFunScript=""}
+        static member MakeSuccess source = 
+            {Success=true;Errors=Seq.empty<CompileError>;CompiledFunScript=source}
 
     [<ReflectedDefinition>]
     let compileMethod() = 
         let x = true
         x
 
-    let AssemblyToFunScript (assembly : Assembly) =
-        // Find the main method in this assembly
-        // Could offer lot more flexiblity here ...
-        let mainCompileExpr =
-            printfn "Searching for main function..."
-//            let types = Assembly.GetExecutingAssembly().GetTypes()
-//            let flags = BindingFlags.NonPublic ||| BindingFlags.Public ||| BindingFlags.Static
-//            let mains = 
-//                [ for typ in types do
-//                    for mi in typ.GetMethods(flags) do
-//                        if mi.Name = "compileMethod" then yield mi ]
-            let types = assembly.GetTypes()
-            let flags = BindingFlags.NonPublic ||| BindingFlags.Public ||| BindingFlags.Static
-            let mains = 
-                [ for typ in types do
-                    for mi in typ.GetMethods(flags) do
-                        if mi.Name = "main" then yield mi ]
-            let mainExpr = 
-                match mains with
-                | [it] -> Some(Expr.Call(it, []))
-                //| [it] -> Expr.TryGetReflectedDefinition(it)
-                | _ -> None
-            mainExpr
+    type ExceptionOrT<'t> =
+    | Exception of System.Exception
+    | T of 't
 
-//        let testExpr =  
-//            <@@
-//                let x = true
-//                x
-//            @@>
+    let AssemblyToFunScript (assembly : Assembly) (funScriptAssembly: Assembly) : CompileResult  =
+        //let funScriptAssembly = Assembly.Load("FunScript")
+        let compilerTypeName = "FunScript.Compiler+Compiler"
+        let compileMethodName = "CompileAssembly"//"Compile"
 
-        match mainCompileExpr with
-        | None -> 
-            {Success=false;Errors=[{Message="Could not find main function in any module."}];CompiledFunScript=""}
-        | _ ->
-            let sw = System.Diagnostics.Stopwatch.StartNew()
-            let source = FunScript.Compiler.Compiler.Compile(mainCompileExpr.Value, [])
-            printfn "Generated JavaScript in %f sec..." (float sw.ElapsedMilliseconds / 1000.0) 
-            {Success=true;Errors=Seq.empty<CompileError>;CompiledFunScript=source}
+        let getFunScriptType fullName = 
+            funScriptAssembly.GetTypes() 
+            |> Seq.tryFind(fun x -> x.FullName = fullName)
+
+        let funScriptCompiler = getFunScriptType compilerTypeName
+
+        match funScriptCompiler with
+        | None ->
+            CompileResult.MakeSingleError(sprintf "Could not find type \"%s\" in FunScript assembly" compilerTypeName)
+        | Some funScriptCompiler ->
+            let compileMethod = 
+                funScriptCompiler.GetMethods(BindingFlags.Public ||| BindingFlags.Static)
+                |> Seq.tryFind(fun x -> x.Name = compileMethodName)
+            match compileMethod with
+            | None ->
+                CompileResult.MakeSingleError(sprintf "Could not find method \"%s\" on type \"%s\" in FunScript assembly" compileMethodName compilerTypeName)
+            | Some compileMethod ->
+                let sw = System.Diagnostics.Stopwatch.StartNew()
+             
+                let invokeParams : array<obj> = [| assembly; None; None; None |]
+
+                let source : ExceptionOrT<string> = 
+                    try
+                        T(compileMethod.Invoke(null, invokeParams) :?> string)
+                    with ex ->
+                        Exception(ex)
+
+                match source with
+                | Exception ex ->
+                    CompileResult.MakeSingleError(sprintf "Exception during compile:\n%s" "" )//ex.ToString()
+                | T source ->
+                    CompileResult.MakeSuccess(source)
 
     let FSharpErrorInfoPrettyMessage (error : Microsoft.FSharp.Compiler.FSharpErrorInfo) =
         sprintf "%s %i:%i\n error: %s" error.FileName error.StartLineAlternate error.EndLineAlternate error.Message
 
     type AssemblyRefernce = {Path:string;ReflectedAssembly:AssemblyDefinition;AssemblyName:AssemblyName}
-
-    type ExceptionOrAssembly= E of System.Exception | A of Assembly
 
     let LoadDependencies (dependencyPaths : seq<string>) = 
        
@@ -110,18 +115,18 @@
         compileDomain.add_AssemblyResolve(handler)
         *)
 
-        let results : seq<ExceptionOrAssembly> = 
+        let results : seq<ExceptionOrT<Assembly>> = 
             TopSort(unorderedDependencies, pred, comparer)
             |> Seq.map(fun d -> 
                 try
-                    A(Assembly.LoadFrom(d.Path))
+                    T(Assembly.LoadFrom(d.Path))
                 with
                 | ex ->
-                    E(ex))
+                    Exception(ex))
         
         results
 
-    let ProjectToFunScript (projectPath: string) =
+    let ProjectToFunScript (projectPath: string) : CompileResult =
         let checker = FSharpChecker.Create()
         let projectOpts = checker.GetProjectOptionsFromProjectFile(projectPath)
 
@@ -133,12 +138,12 @@
         let dependencyResults = LoadDependencies(dependencyPaths)
         let loadErrors =  dependencyResults |> Seq.choose(fun x ->
             match x with
-                | A _ -> None
-                | E e -> Some e)
+                | T _ -> None
+                | Exception e -> Some e)
         let dependencies = dependencyResults |> Seq.choose(fun x ->
             match x with
-                | E _ -> None
-                | A a -> Some a)
+                | Exception _ -> None
+                | T a -> Some a)
 
         match loadErrors with
             |errors when Seq.length(errors) > 0 ->
@@ -149,10 +154,17 @@
                 let requiredOptions = Seq.ofList [ "--validate-type-providers" ]
 
                 let baseOptions = Seq.ofArray projectOpts.OtherOptions
+                
+                let outParam = "--out:"
+                let outAssemblyPath = 
+                    baseOptions 
+                    |> Seq.find(fun x -> x.StartsWith outParam)
+
+                let outAssemblyPath = outAssemblyPath.Substring(outParam.Length)
 
                 let options = Seq.concat [baseOptions; requiredOptions] |> Seq.distinct
 
-                let errors, exitCode, assembly = scs.CompileToDynamicAssembly(Seq.toArray options, Some(stdout, stderr))
+                //let errors, exitCode, assembly = scs.CompileToDynamicAssembly(Seq.toArray options, Some(stdout, stderr))
                 let errors, exitCode = scs.Compile(Seq.toArray options)
                 
                 let handler = System.ResolveEventHandler(fun sender ->
@@ -162,15 +174,17 @@
                 )
 
                 System.AppDomain.CurrentDomain.add_AssemblyResolve(handler)
-//                let errors = []
-//                let exitCode = 0
-                let assembly = 
-                    Assembly.LoadFrom("C:\\Projects\\FunScript.CommandLine\\FunScript.CommandLine.Example\\bin\\debug\\FunScript.CommandLine.Example.dll")
+                let outAssembly = 
+                    Assembly.LoadFrom(outAssemblyPath)
                     |> Some
 
                 match exitCode with
                     | i when (i < 1) ->
-                        AssemblyToFunScript(assembly.Value)
+                        match dependencies |> Seq.tryFind(fun x -> x.GetName().Name = "FunScript") with 
+                        | None -> 
+                            {Success=false;Errors=[{Message="Project must reference FunScript"}];CompiledFunScript=""}
+                        | Some funScriptAssembly ->
+                            AssemblyToFunScript outAssembly.Value funScriptAssembly
                     | _ ->
                         let compileErrors = 
                             match errors with
