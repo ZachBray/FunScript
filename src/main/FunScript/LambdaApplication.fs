@@ -4,13 +4,24 @@ open AST
 open Microsoft.FSharp.Quotations
 
 let private application =
-   CompilerComponent.create <| fun (|Split|) _ returnStategy ->
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
       function
+      | Patterns.Application(Patterns.Lambda(var, (Patterns.Call _ as call)), lambdaArg) ->
+        compiler.Compile returnStrategy <| call.Substitute(fun v ->
+            if v.Name = var.Name then Some lambdaArg else None)
+
+      | Patterns.Application(Patterns.Let(letVar, letVarValue, Patterns.Lambda(lambdaVar, (Patterns.Call _ as call))), lambdaArg) ->
+        compiler.Compile returnStrategy <| call.Substitute(fun v ->
+            if v.Name = letVar.Name then Some letVarValue
+            elif v.Name = lambdaVar.Name then Some lambdaArg
+            else None)
+
       | Patterns.Application(Split(lambdaDecl, lambdaRef), Split(argDecl, argRef)) ->
          [ yield! lambdaDecl
            yield! argDecl
-           yield returnStategy.Return <| Apply(lambdaRef, [argRef])
+           yield returnStrategy.Return <| Apply(lambdaRef, [argRef])
          ]
+
       | Patterns.Call(Some (Split(delDecl, delRef)), mi, argExprs) 
         when typeof<System.Delegate>.IsAssignableFrom mi.DeclaringType ->
          let argDecls, argRefs = 
@@ -19,7 +30,7 @@ let private application =
             |> List.unzip
          [ yield! delDecl
            yield! argDecls |> List.concat
-           yield returnStategy.Return <| Apply(delRef, argRefs)
+           yield returnStrategy.Return <| Apply(delRef, argRefs)
          ]
       | _ -> []
 
