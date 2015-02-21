@@ -7,7 +7,7 @@ open System.Reflection
 open System.Collections.Generic
 open Microsoft.FSharp.Reflection
 
-let primitiveTypes =
+let jsNumberTypes =
    set [
       typeof<sbyte>.FullName
       typeof<byte>.FullName
@@ -19,21 +19,29 @@ let primitiveTypes =
       typeof<uint64>.FullName
       typeof<float32>.FullName
       typeof<float>.FullName
-//      typeof<decimal>.FullName
 
+      typeof<DateTime>.FullName // Number in JS
+      typeof<TimeSpan>.FullName // Number in JS
+   ]
+
+let jsStringTypes =
+   set [
       typeof<string>.FullName
       typeof<char>.FullName
-      typeof<bool>.FullName
-
       typeof<Guid>.FullName // Treated as string
    ]
 
 let isGenericParameter (t : System.Type) =
    t.IsGenericParameter
 
-/// For generic specialization. 
+/// For generic specialization
 let isPrimitive (t : Type) =
-   primitiveTypes.Contains t.FullName || t.IsEnum
+   jsNumberTypes.Contains t.FullName || t.IsEnum ||
+   jsStringTypes.Contains t.FullName ||
+   t = typeof<bool>
+
+let isPrimaryConstructor (ci: MethodBase) =
+    JavaScriptNameMapper.getConstructorIndex ci = 0
 
 let getGenericTypeArgs (t : Type) =
    let isGeneric = t.IsGenericType || t.IsGenericTypeDefinition

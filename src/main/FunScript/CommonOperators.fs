@@ -123,12 +123,43 @@ let private coerce =
          // else []
       | _ -> []
 
+open Reflection
+let private getPrimaryConstructorName (t: System.Type): string =
+    let cons = t.GetConstructors(BindingFlags.Public ||| BindingFlags.NonPublic ||| BindingFlags.Instance).[0]
+    JavaScriptNameMapper.mapMethod cons
+
 // TODO: Implement this properly. Through type property?
 let private typeTest =
-   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
    function
-   | Patterns.TypeTest(_, _) ->
-      [ returnStategy.Return <| Boolean false ]
+   | Patterns.TypeTest(expr, t) ->
+      match expr with
+      | Patterns.Var var ->
+          let returnTypeTest operator jsTarget =
+            [ returnStrategy.Return <| BinaryOp(Reference var, operator, jsTarget) ]
+          
+          // Primitives
+          if jsNumberTypes.Contains t.FullName || t.IsEnum then
+            returnTypeTest "typeof" (String "number")
+          elif jsStringTypes.Contains t.FullName then
+            returnTypeTest "typeof" (String "string")
+          elif t = typeof<bool> then
+            returnTypeTest "typeof" (String "boolean")
+          
+          // Interfaces
+          elif t.IsInterface then
+            // TODO: Implement
+            // TODO: Check if interface comes from JS library
+            []
+          
+          // Objects
+          else
+            // TODO: Check if there's reflected definition of constructor
+            // TODO: Support inheritance (recursively check for type of "base" JS property)
+
+            let cons = getPrimaryConstructorName t
+            returnTypeTest "instanceof" (EmitExpr (fun _ -> cons))
+       | _ -> []
    | _ -> []
 
 let components = 

@@ -114,8 +114,12 @@ let private createConstruction
    | ReflectedDefinition name ->
       //TODO: Generic types will have typeArgs we need to deal with here.
       let consRef = createGlobalMethod name compiler ci Quote.ConstructorCall
+      // Secondary constructors don't need the new keyword
+      let call = if Reflection.isPrimaryConstructor ci
+                 then New(consRef, refs)
+                 else Apply(Reference consRef, refs)
       [ yield! decls |> List.concat
-        yield returnStategy.Return <| New(consRef, refs) ]
+        yield returnStategy.Return call ]
    | _ -> []
 
 

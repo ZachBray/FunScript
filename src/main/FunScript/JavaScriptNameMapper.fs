@@ -121,12 +121,21 @@ let rec private getBestTypeName (t : System.Type) =
 let (*internal*) mapType (t : System.Type) =
    sanitize t.FullName (getBestTypeName t)
 
+let getConstructorIndex (mb: MethodBase) =
+    mb.DeclaringType.GetConstructors (BindingFlags.Public ||| BindingFlags.NonPublic ||| BindingFlags.Instance)
+    |> Array.findIndex (fun ci -> ci.Equals(mb))
+
 let getBestMethodName (mb : MethodBase) =
+   // Make sure constructors are always numbered the same way
+   let suffix =
+      if mb.IsConstructor then
+        let i = getConstructorIndex mb in if i > 0 then string i else ""
+      else ""
    let args =
       if mb.IsGenericMethod || mb.IsGenericMethodDefinition then
          mb.GetGenericArguments()
       else [||]
-   (mapType mb.DeclaringType) + "_" + mb.Name + "$" + (args |> Seq.map mapType |> String.concat "_")
+   (mapType mb.DeclaringType) + "_" + mb.Name + "$" + suffix + (args |> Seq.map mapType |> String.concat "_")
 
 let (*internal*) mapMethod mb =
    let suggestedName = getBestMethodName mb
