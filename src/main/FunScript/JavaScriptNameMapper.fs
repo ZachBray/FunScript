@@ -126,14 +126,14 @@ let getConstructorIndex (mb: MethodBase) =
     |> Array.findIndex (fun ci -> ci.Equals(mb))
 
 let getBestMethodName (mb : MethodBase) =
-   // Make sure constructors are always numbered the same way
+   // Make sure constructors have same index so primary is always 0 (omitted)
    let suffix =
-      if mb.IsConstructor then
-        let i = getConstructorIndex mb in if i > 0 then string i else ""
+      if mb.IsConstructor
+      then let i = getConstructorIndex mb in if i > 0 then string i else ""
       else ""
    let args =
-      if mb.IsGenericMethod || mb.IsGenericMethodDefinition then
-         mb.GetGenericArguments()
+      if mb.IsGenericMethod || mb.IsGenericMethodDefinition
+      then mb.GetGenericArguments()
       else [||]
    (mapType mb.DeclaringType) + "_" + mb.Name + "$" + suffix + (args |> Seq.map mapType |> String.concat "_")
 

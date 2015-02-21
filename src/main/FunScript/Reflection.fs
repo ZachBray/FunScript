@@ -19,9 +19,7 @@ let jsNumberTypes =
       typeof<uint64>.FullName
       typeof<float32>.FullName
       typeof<float>.FullName
-
-      typeof<DateTime>.FullName // Number in JS
-      typeof<TimeSpan>.FullName // Number in JS
+      typeof<TimeSpan>.FullName // Treated as number
    ]
 
 let jsStringTypes =

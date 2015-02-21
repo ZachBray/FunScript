@@ -124,11 +124,11 @@ let private coerce =
       | _ -> []
 
 open Reflection
-let private getPrimaryConstructorName (t: System.Type): string =
+let private getPrimaryConstructorName compiler (t: System.Type): string =
     let cons = t.GetConstructors(BindingFlags.Public ||| BindingFlags.NonPublic ||| BindingFlags.Instance).[0]
-    JavaScriptNameMapper.mapMethod cons
+    JavaScriptNameMapper.mapMethod cons + (Reflection.getSpecializationString compiler <| Reflection.getGenericMethodArgs cons)
 
-// TODO: Implement this properly. Through type property?
+// TODO: Add tests
 let private typeTest =
    CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
    function
@@ -138,13 +138,20 @@ let private typeTest =
           let returnTypeTest operator jsTarget =
             [ returnStrategy.Return <| BinaryOp(Reference var, operator, jsTarget) ]
           
+          // F# compiler won't allow anything not boxed to be tested against obj
+          // so if this test has been allowed it will always hold true
+          if t = typeof<obj> then
+            [ returnStrategy.Return <| Boolean true ]
+
           // Primitives
-          if jsNumberTypes.Contains t.FullName || t.IsEnum then
+          elif jsNumberTypes.Contains t.FullName || t.IsEnum then
             returnTypeTest "typeof" (String "number")
           elif jsStringTypes.Contains t.FullName then
             returnTypeTest "typeof" (String "string")
           elif t = typeof<bool> then
             returnTypeTest "typeof" (String "boolean")
+          elif t = typeof<System.DateTime> then
+            returnTypeTest "instanceof" (String "Date")
           
           // Interfaces
           elif t.IsInterface then
@@ -154,13 +161,17 @@ let private typeTest =
           
           // Objects
           else
+            // TODO: Check if the constructor has already been defined in JS
             // TODO: Check if there's reflected definition of constructor
             // TODO: Support inheritance (recursively check for type of "base" JS property)
 
-            let cons = getPrimaryConstructorName t
+            let cons = getPrimaryConstructorName compiler t
             returnTypeTest "instanceof" (EmitExpr (fun _ -> cons))
-       | _ -> []
-   | _ -> []
+
+            // TODO: Do sth with Array and ResizeArray?
+
+       | _ -> [ returnStrategy.Return <| Boolean false ]
+   | _ -> [ returnStrategy.Return <| Boolean false ]
 
 let components = 
    [
