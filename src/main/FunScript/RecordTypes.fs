@@ -15,22 +15,19 @@ let private createConstructor recType compiler =
    ]
 
 let private creation =
-   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
       function
       | Patterns.NewRecord(recType, exprs) ->
-         let decls, refs = 
-            exprs 
-            |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
-            |> List.unzip
+         let decls, refs = Reflection.getDeclarationAndReferences (|Split|) exprs
          if recType.Name = typeof<Ref<obj>>.Name then
             let propNames = Reflection.getRecordVars recType |> List.map (fun v -> v.Name)
             let fields = List.zip propNames refs
             [ yield! decls |> Seq.concat 
-              yield returnStategy.Return <| Object fields ]
+              yield returnStrategy.Return <| Object fields ]
          else
             let cons = Reflection.getRecordConstructorVar compiler recType
             [ yield! decls |> Seq.concat 
-              yield returnStategy.Return <| New(cons, refs) ]
+              yield returnStrategy.Return <| New(cons, refs) ]
       | _ -> []
 
 let components = [ creation ]

@@ -47,9 +47,9 @@ module private Replacements =
 
 // TODO: Specialize for ints/floats etc. to give 0. as in .NET
 let private defaultValue =
-   CompilerComponent.create <| fun (|Split|) _ returnStategy ->
+   CompilerComponent.create <| fun (|Split|) _ returnStrategy ->
       function
-      | Patterns.DefaultValue _ -> [ returnStategy.Return Null ]
+      | Patterns.DefaultValue _ -> [ returnStrategy.Return Null ]
       | _ -> []
 
 let private localized (name:string) =
@@ -61,6 +61,7 @@ let private coerce =
    CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
       function
       | Patterns.Coerce(expr, t) ->
+         // Casting array to seq
          if expr.Type.IsGenericType && expr.Type.GetGenericTypeDefinition() = typedefof<_ System.Collections.Generic.IList> then
             let elementT = expr.Type.GetGenericArguments().[0]
             if t.IsGenericType && t.GetGenericTypeDefinition() = typedefof<_ seq> then
@@ -72,11 +73,13 @@ let private coerce =
             elif (t.IsArray && t.GetElementType() = elementT) || t = typeof<obj> then
                 compiler.Compile returnStrategy expr
             else []
+         // Cases to be ignored
          elif expr.Type = t 
             || t = typeof<obj> 
             || (expr.Type.IsInterface && t.IsAssignableFrom expr.Type)
             || (t.IsGenericType && t.GetGenericTypeDefinition() = typedefof<_ System.Collections.Generic.IList>) then 
             compiler.Compile returnStrategy expr
+         // Interfaces // TODO: Generate global methods instead of new object
          elif t.IsInterface then
             let actualType = expr.Type
             let targetMethods =
@@ -124,10 +127,6 @@ let private coerce =
                ]
             else compiler.Compile returnStrategy expr
          else compiler.Compile returnStrategy expr
-
-         // For strictness when testing:
-         //   else []
-         // else []
       | _ -> []
 
 let private getPrimaryConstructorVar compiler (t: System.Type) =
@@ -141,6 +140,8 @@ let private getPrimaryConstructorVar compiler (t: System.Type) =
         |> Reflection.getTupleConstructorVar compiler
     elif FSharpType.IsRecord t then
         Reflection.getRecordConstructorVar compiler t
+    elif FSharpType.IsExceptionRepresentation t then
+        Reflection.getCustomExceptionConstructorVar compiler cons
     else
         getObjectConstructorVar compiler cons
 
@@ -178,13 +179,27 @@ let private typeTest =
           elif t = typeof<System.DateTime> then
             returnTypeTest "instanceof" (String "Date")
 
-          // TODO: Union types: Check against all the union case constructors
-          elif FSharpType.IsUnion t then
-            [ returnStrategy.Return <| Boolean false ]
-          
           // Interfaces // TODO: Implement
           elif t.IsInterface then
-            []
+            [ returnStrategy.Return <| Boolean false ]
+
+          // Union types: Test all union case constructors // TODO: Make this a global function?
+          elif FSharpType.IsUnion t then
+            let varRef = Reference var
+            let getCaseConsRef uci =
+                Reflection.getUnionCaseConstructorVar compiler uci
+                |> JSExpr.Reference
+                |> (fun caseConsRef -> BinaryOp(varRef, "instanceof", caseConsRef))
+            let cases = FSharpType.GetUnionCases t
+            let firstCaseTest = getCaseConsRef cases.[0]
+            if cases.Length = 1
+            then [ returnStrategy.Return firstCaseTest ]
+            else
+                cases
+                |> Seq.skip 1
+                |> Seq.fold (fun (acc: JSExpr) uci ->
+                    BinaryOp(getCaseConsRef uci, "||", acc)) firstCaseTest
+                |> fun allCasesTest -> [ returnStrategy.Return allCasesTest ]
           
           // Objects // TODO: Inheritance (recursively check for type of "base" JS property)
           else

@@ -3,14 +3,14 @@
 open AST
 open InternalCompiler
 
-let private returnStategy f =
+let private returnStrategy f =
    {  new IReturnStrategy with
          member __.Return expr = f expr }
 
-let returnFrom = returnStategy Return
+let returnFrom = returnStrategy Return
 
-let inplace = returnStategy Do
+let inplace = returnStrategy Do
 
-let assignVar varName = returnStategy (fun expr -> Assign(Reference varName, expr))
+let assignVar varName = returnStrategy (fun expr -> Assign(Reference varName, expr))
 
-let assignTo expr = returnStategy (fun valExpr -> Assign(expr, valExpr))
+let assignTo expr = returnStrategy (fun valExpr -> Assign(expr, valExpr))

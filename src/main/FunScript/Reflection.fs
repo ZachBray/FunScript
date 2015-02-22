@@ -63,6 +63,11 @@ let getSpecializationString (compiler : InternalCompiler.ICompiler) ts =
    |> String.concat "_"
    |> JavaScriptNameMapper.sanitizeAux
 
+let getDeclarationAndReferences (|Split|) exprs =
+    exprs 
+    |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
+    |> List.unzip
+
 let getFields (t:Type) =
    t.GetProperties(BindingFlags.NonPublic ||| BindingFlags.Public ||| BindingFlags.Instance)
    |> Seq.map (fun p -> p, p.GetCustomAttribute<CompilationMappingAttribute>())
@@ -72,22 +77,34 @@ let getFields (t:Type) =
    |> Seq.map (fun (p, attr) -> JavaScriptNameMapper.sanitizeAux p.Name, p.PropertyType)
    |> Seq.toList
 
-let getTupleVars n =
-    [ 0 .. n - 1] |> List.map (fun i -> Var(sprintf "Item%i" i, typeof<obj>))
+let getTupleVars preffix n =
+    [ 0 .. n - 1] |> List.map (fun i -> Var(sprintf "%s%i" preffix i, typeof<obj>))
+
+let getCustomExceptionConstructorVar (compiler: InternalCompiler.ICompiler) (ci: MethodBase) =
+    let createConstructor compiler n =
+        let vars = getTupleVars "d" n
+        let this = Var("__this", typeof<obj>)
+        vars, Block
+         [ yield CopyThisToVar(this)
+           yield! vars |> List.mapi (fun i var ->
+            Assign(PropertyGet(Reference this, sprintf "Data%i" i), Reference var)) ]
+    let name = JavaScriptNameMapper.mapMethod ci
+    let argsLength = ci.GetParameters() |> Array.length
+    compiler.DefineGlobal name (fun var -> 
+        [Assign(Reference var, Lambda <| createConstructor compiler argsLength)])
 
 let getTupleConstructorVar compiler (typeArgs: Type list) =
-    let createConstructor n compiler =
-       let vars = getTupleVars n
+    let createConstructor compiler n =
+       let vars = getTupleVars "Item" n
        let refs = vars |> List.map Reference
        let this = Var("__this", typeof<obj>)
        vars, Block
         [ yield CopyThisToVar(this)
-          for var in vars do 
-              yield Assign(PropertyGet(Reference this, "Items"), JSExpr.Array refs) ]
+          yield Assign(PropertyGet(Reference this, "Items"), JSExpr.Array refs) ]
     let specialization = getSpecializationString compiler typeArgs
     let name = sprintf "Tuple%s" specialization
     compiler.DefineGlobal name (fun var -> 
-        [Assign(Reference var, Lambda <| createConstructor typeArgs.Length compiler)])
+        [Assign(Reference var, Lambda <| createConstructor compiler typeArgs.Length)])
 
 let getRecordVars recType =
    getFields recType

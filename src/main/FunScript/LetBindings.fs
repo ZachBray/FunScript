@@ -4,10 +4,10 @@ open AST
 open Microsoft.FSharp.Quotations
 
 let private binding =
-   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
       let (|Return|) = compiler.Compile
       function
-      | Patterns.Let(var, Split(valDecl, valRef), Return returnStategy block) ->
+      | Patterns.Let(var, Split(valDecl, valRef), Return returnStrategy block) ->
          [ yield! valDecl
            yield DeclareAndAssign(var, valRef)
            yield! block
@@ -15,10 +15,10 @@ let private binding =
       | _ -> []
 
 let private recBinding =
-   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
       let (|Return|) = compiler.Compile
       function
-      | Patterns.LetRecursive(bindingExprs, Return returnStategy block) ->
+      | Patterns.LetRecursive(bindingExprs, Return returnStrategy block) ->
          [ yield! bindingExprs |> List.map (fun (var, _) -> Declare [var])
            yield! 
                bindingExprs 
@@ -32,19 +32,19 @@ let private recBinding =
       | _ -> []
 
 let private reference =
-   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
       function
-      | Patterns.Var(var) -> [ yield returnStategy.Return <| Reference var ]
+      | Patterns.Var(var) -> [ yield returnStrategy.Return <| Reference var ]
       | _ -> []
 
 let private mutation =
-   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
       function
       | Patterns.VarSet(var, Split(valDecl, valRef)) -> 
          [  yield! valDecl
             yield Assign(Reference var, valRef)
-            if returnStategy = ReturnStrategies.inplace then
-               yield returnStategy.Return Null 
+            if returnStrategy = ReturnStrategies.inplace then
+               yield returnStrategy.Return Null 
          ]
       | _ -> []
 

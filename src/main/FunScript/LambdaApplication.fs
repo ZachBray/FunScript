@@ -26,10 +26,8 @@ let private application =
 
       | Patterns.Call(Some (Split(delDecl, delRef)), mi, argExprs) 
         when typeof<System.Delegate>.IsAssignableFrom mi.DeclaringType ->
-         let argDecls, argRefs = 
-            argExprs 
-            |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
-            |> List.unzip
+         let argDecls, argRefs =
+            Reflection.getDeclarationAndReferences (|Split|) argExprs
          [ yield! delDecl
            yield! argDecls |> List.concat
            yield returnStrategy.Return <| Apply(delRef, argRefs)
@@ -37,15 +35,15 @@ let private application =
       | _ -> []
 
 let private definition =
-   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
       let (|Return|) = compiler.Compile
       function
       | Patterns.Lambda(var, expr) ->
          let block = compiler.Compile ReturnStrategies.returnFrom expr
-         [ yield returnStategy.Return <| Lambda([var], Block block) ]
+         [ yield returnStrategy.Return <| Lambda([var], Block block) ]
       | Patterns.NewDelegate(_, vars, expr) ->
          let block = compiler.Compile ReturnStrategies.returnFrom expr
-         [ yield returnStategy.Return <| Lambda(vars, Block block) ]
+         [ yield returnStrategy.Return <| Lambda(vars, Block block) ]
       | _ -> []
 
 let components = [ 

@@ -54,9 +54,6 @@ let private enumComponents =
             compiler.Compile returnStrategy (Expr.PropertyGet(Expr.Coerce(expr, enumType), enumType.GetProperty("Current"), []))
       | _ -> []
 
-//TODO: Replace with a lenient expression replacer but first need to come up with
-// a solution for matching expressions as equal when the generic arguments differ slightly.
-// Perhaps a call to a generic method through reflection? (Sloooooow!!)
 let private toSeq =
    CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
       function

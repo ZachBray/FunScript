@@ -8,25 +8,22 @@ let itemsPropName = "Items"
 let getItem i ref = IndexGet(PropertyGet(ref, itemsPropName), Number(float i))
 
 let private creation =
-   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
       function
       | Patterns.NewTuple(exprs) ->
-         let decls, refs = 
-            exprs 
-            |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
-            |> List.unzip
+         let decls, refs = Reflection.getDeclarationAndReferences (|Split|) exprs
          let typeArgs = exprs |> List.map (fun x -> x.Type)
          let cons = Reflection.getTupleConstructorVar compiler typeArgs
          [  yield! decls |> Seq.concat 
-            yield returnStategy.Return <| New(cons, refs) ]
+            yield returnStrategy.Return <| New(cons, refs) ]
       | _ -> []
 
 let private getIndex =
-   CompilerComponent.create <| fun (|Split|) _ returnStategy ->
+   CompilerComponent.create <| fun (|Split|) _ returnStrategy ->
       function
       | Patterns.TupleGet(Split(valDecl, valRef), i) ->
          [ yield! valDecl
-           yield returnStategy.Return (valRef |> getItem i)
+           yield returnStrategy.Return (valRef |> getItem i)
          ]
       | _ -> []
 

@@ -15,18 +15,18 @@ let rec private isAvailable (compiler : InternalCompiler.ICompiler) (mb : Method
          compiler.ReplacementFor mb Quote.CallType.MethodCall |> Option.exists (isAvailable compiler))
 
 let private propertyGetter =
-   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
       function
       | Patterns.PropertyGet(Some(Split(objDecl, objRef)), pi, [])
             when isAvailable compiler (pi.GetGetMethod(true))
             ->
          [ yield! objDecl 
-           yield returnStategy.Return <| PropertyGet(objRef, JavaScriptNameMapper.sanitizeAux pi.Name)
+           yield returnStrategy.Return <| PropertyGet(objRef, JavaScriptNameMapper.sanitizeAux pi.Name)
          ]
       | _ -> []
 
 let private propertySetter =
-   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
       function
       | Patterns.PropertySet(Some(Split(objDecl, objRef)), pi, [], Split(valDecl, valRef))
             when isAvailable compiler (pi.GetSetMethod(true))
@@ -34,8 +34,8 @@ let private propertySetter =
          [ yield! objDecl 
            yield! valDecl
            yield Assign(PropertyGet(objRef, JavaScriptNameMapper.sanitizeAux pi.Name), valRef)
-           if returnStategy = ReturnStrategies.inplace then
-               yield returnStategy.Return Null 
+           if returnStrategy = ReturnStrategies.inplace then
+               yield returnStrategy.Return Null 
          ]
       | _ -> []
 

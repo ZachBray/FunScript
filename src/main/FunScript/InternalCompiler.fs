@@ -12,7 +12,7 @@ type IReturnStrategy =
    abstract Return: JSExpr -> JSStatement
 
 type ICompiler = 
-   abstract Compile: returnStategy:IReturnStrategy -> expr:Expr -> JSStatement list
+   abstract Compile: returnStrategy:IReturnStrategy -> expr:Expr -> JSStatement list
    abstract ReplacementFor: MethodBase -> Quote.CallType -> MethodInfo option
    abstract NextTempVar: unit -> Var
    abstract DefineGlobal: string -> (Var -> JSStatement list) -> Var
@@ -20,7 +20,7 @@ type ICompiler =
    abstract Globals: JSStatement list
 
 type ICompilerComponent =
-   abstract TryCompile: compiler:ICompiler -> returnStategy:IReturnStrategy -> expr:Expr -> JSStatement list
+   abstract TryCompile: compiler:ICompiler -> returnStrategy:IReturnStrategy -> expr:Expr -> JSStatement list
 
 type CallReplacer = 
   { Target: MethodBase
@@ -65,14 +65,14 @@ type Compiler(components) as this =
          | CompilerComponent c -> Some c
          | _ -> None) |> Seq.toList
 
-   let tryComponent returnStategy expr (part:ICompilerComponent) =
-      match part.TryCompile this returnStategy expr with
+   let tryComponent returnStrategy expr (part:ICompilerComponent) =
+      match part.TryCompile this returnStrategy expr with
       | [] -> None
       | procCodes -> Some procCodes
 
-   let tryAllComponents returnStategy expr =
+   let tryAllComponents returnStrategy expr =
       let result = 
-         rest |> List.tryPick(tryComponent returnStategy expr)
+         rest |> List.tryPick(tryComponent returnStrategy expr)
       match result with
       | None -> []
       | Some statements -> statements
@@ -110,20 +110,20 @@ type Compiler(components) as this =
          r.TryReplace this returnStrategy (obj, typeArgs, exprs)
       | None -> []
          
-   let compile returnStategy expr =
+   let compile returnStrategy expr =
       let replacementResult =
          match Quote.tryToMethodBase expr with
          | Some (obj, mi, exprs, callType) ->
             match Quote.specialOp mi with
             | Some opMi -> 
-               match tryCompileCall callType returnStategy opMi obj exprs with
-               | [] -> tryCompileCall callType returnStategy mi obj exprs
+               match tryCompileCall callType returnStrategy opMi obj exprs with
+               | [] -> tryCompileCall callType returnStrategy mi obj exprs
                | stmts -> stmts
-            | None -> tryCompileCall callType returnStategy mi obj exprs
+            | None -> tryCompileCall callType returnStrategy mi obj exprs
          | None -> []
       let result =
          match replacementResult with
-         | [] -> tryAllComponents returnStategy expr
+         | [] -> tryAllComponents returnStrategy expr
          | statements -> statements
       match result with
       | [] -> failwithf "Could not compile expression: %A" expr
@@ -178,15 +178,15 @@ type Compiler(components) as this =
                                   && m.IsStatic = replacementMethod.IsStatic // TODO: We may need to make this comparison safer
                                   && m.GetParameters().Length = replacementMethod.GetParameters().Length) 
 
-   member __.Compile returnStategy expr  = 
-      compile returnStategy expr
+   member __.Compile returnStrategy expr  = 
+      compile returnStrategy expr
 
    member __.Globals = getGlobals()
 
    interface ICompiler with
 
-      member __.Compile returnStategy expr = 
-         compile returnStategy expr
+      member __.Compile returnStrategy expr = 
+         compile returnStrategy expr
 
       member __.ReplacementFor (pi:MethodBase) targetType =
          callerReplacements.TryFind (key pi targetType)

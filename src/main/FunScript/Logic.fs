@@ -11,17 +11,17 @@ let private toShortCircuit (|Split|) (compiler : InternalCompiler.ICompiler) rhs
     | rhsBody -> Apply(Lambda([], Block rhsBody), [])
 
 let private operators =
-   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
       function
       | DerivedPatterns.AndAlso(Split(declLHS, refLHS), rhs) -> 
          [  yield! declLHS
             let refRHS = toShortCircuit (|Split|) compiler rhs
-            yield returnStategy.Return <| BinaryOp(refLHS, "&&", refRHS)
+            yield returnStrategy.Return <| BinaryOp(refLHS, "&&", refRHS)
          ]
       | DerivedPatterns.OrElse(Split(declLHS, refLHS), rhs) -> 
          [  yield! declLHS
             let refRHS = toShortCircuit (|Split|) compiler rhs
-            yield returnStategy.Return <| BinaryOp(refLHS, "||", refRHS)
+            yield returnStrategy.Return <| BinaryOp(refLHS, "||", refRHS)
          ]
       | _ -> []
 
