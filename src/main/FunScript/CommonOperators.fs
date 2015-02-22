@@ -201,7 +201,7 @@ let private typeTest =
                     BinaryOp(getCaseConsRef uci, "||", acc)) firstCaseTest
                 |> fun allCasesTest -> [ returnStrategy.Return allCasesTest ]
           
-          // Objects // TODO: Inheritance (recursively check for type of "base" JS property)
+          // Objects
           else
             getPrimaryConstructorVar compiler t
             |> JSExpr.Reference

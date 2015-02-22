@@ -514,3 +514,21 @@ let ``custom IComparable record implementation less than works``() =
 [<Test>]
 let ``custom IComparable record implementation less than or equal works``() =
    forVariousCustomRecordComparablesCheck <@ (<=) @>
+
+[<Test>]
+let ``unit equality works``() =
+    check
+        <@@
+            let a = ()
+            let b = ()
+            a = b
+        @@>
+
+[<Test>]
+let ``unit less than works``() =
+    check
+        <@@
+            let a = ()
+            let b = ()
+            a < b
+        @@>
