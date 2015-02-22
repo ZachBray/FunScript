@@ -15,7 +15,8 @@ type ICompiler =
    abstract Compile: returnStategy:IReturnStrategy -> expr:Expr -> JSStatement list
    abstract ReplacementFor: MethodBase -> Quote.CallType -> MethodInfo option
    abstract NextTempVar: unit -> Var
-   abstract DefineGlobal: string -> (Var -> JSStatement list) -> Var
+   abstract DefineGlobal: Type -> string -> (Var -> JSStatement list) -> Var
+   abstract DefineGlobalExplicit: string -> string -> (Var -> JSStatement list) -> Var
    abstract DefineGlobalInitialization: JSStatement list -> unit
    abstract Globals: JSStatement list
 
@@ -27,12 +28,27 @@ type CallReplacer =
     TargetType: Quote.CallType
     Replacement: MethodInfo option
     TryReplace: ICompiler -> IReturnStrategy -> Expr option * Type [] * Expr list -> JSStatement list }
+      
+type JSModuleMember = 
+  { Name: string;
+    Var: Var;
+    Statements: List<JSStatement> }
+     
+module JSModule =
+   type T = 
+     { Name:string; 
+       Members: Map<string, JSModuleMember> }
+   let create (name : string ) =
+      {Name=name;Members=Map.empty}
+   let addMember (jsModuleMember: JSModuleMember) (jsModule: T) =
+      let members = jsModule.Members |> Map.add jsModuleMember.Name jsModuleMember
+      { jsModule with Members = members }
 
 type CompilerComponent =
    | CallReplacer of CallReplacer
    | CompilerComponent of ICompilerComponent
 
-type Compiler(components) as this = 
+type Compiler(components, outputModules) as this = 
    let parameterKey (mb : MethodBase) =
       mb.GetParameters() |> Array.map (fun pi ->
          pi.ParameterType.Name)
@@ -131,23 +147,59 @@ type Compiler(components) as this =
 
    let nextId = ref 0
 
-   let mutable globals = Map.empty
-
-   let define name cons =
-      match globals |> Map.tryFind name with
-      | Some (var, _) -> var
+   let mutable modules = Map.empty<string, JSModule.T>
+   let updateModule (jsModule : JSModule.T) = 
+      modules <- modules |> Map.add jsModule.Name jsModule
+      
+   let define (moduleName : string) (name : string) (cons : Var -> List<JSStatement>) =
+      let jsModule = match modules |> Map.tryFind moduleName with
+      | Some (jsModule) -> jsModule 
       | None -> 
-         // Define upfront to avoid problems with mutually recursive methods
-         let var = Var.Global(name, typeof<obj>)
-         globals <- globals |> Map.add name (var, [])
-         let assignment = cons var
-         globals <- globals |> Map.add name (var, assignment)
-         var
+         let jsModule = JSModule.create(moduleName)
+         updateModule jsModule
+         jsModule
+
+      match jsModule.Members |> Map.tryFind name with
+      | Some (moduleMember) -> moduleMember.Var
+      | None ->
+             //still have to put the full module name as the path to prevent collions when not compiling 
+             //to modules. to fix this, check whether modules are enabled.
+             let name = moduleName + "_" + name 
+             let var = Var.Global(name, typeof<obj>)
+             let moduleMember = {Name=name; Var=var; Statements=List.empty}
+             let jsModule = jsModule |> JSModule.addMember moduleMember
+             updateModule jsModule
+             let assignment = cons var
+             let jsModule = jsModule |> JSModule.addMember {moduleMember with Var = var; Statements = assignment}
+             updateModule jsModule
+             var
+//      | Some (jsModule) -> 
+//         match jsModule.Members |> Map.tryFind name with
+//         | Some (jsModuleMember) -> jsModuleMember.Var
+//         | None -> Var.Global(name, typeof<obj>) //this needs implemented
+//      | None -> 
+//         Var.Global(name, typeof<obj>)
+
+//         // Define upfront to avoid problems with mutually recursive methods
+//         let var = Var.Global(name, typeof<obj>)
+//         globals <- globals |> Map.add name (var, [])
+//         let assignment = cons var
+//         globals <- globals |> Map.add name (var, assignment)
+//         var
 
    let mutable initialization = List.empty
 
    let getGlobals() =
-      let globals = globals |> Map.toList |> List.map snd
+      //let globals = globals |> Map.toList |> List.map snd
+      let globalMethods = 
+         modules 
+         |> Map.toList 
+         |> List.map snd
+         |> List.collect(fun m -> m.Members |> Map.toList |> List.map snd)
+
+      let globals = 
+         globalMethods
+         |> List.map(fun x -> x.Var, x.Statements)
 
       let declarations = 
          match globals with
@@ -178,7 +230,7 @@ type Compiler(components) as this =
                                   && m.IsStatic = replacementMethod.IsStatic // TODO: We may need to make this comparison safer
                                   && m.GetParameters().Length = replacementMethod.GetParameters().Length) 
 
-   member __.Compile returnStategy expr  = 
+   member __.Compile returnStategy expr = 
       compile returnStategy expr
 
    member __.Globals = getGlobals()
@@ -202,9 +254,13 @@ type Compiler(components) as this =
          incr nextId
          Var(sprintf "_%i" !nextId, typeof<obj>, false) 
          
-      member __.DefineGlobal name cons =
-         define name cons
-
+      member __.DefineGlobal moduleType name cons =
+         let moduleName = JavaScriptNameMapper.mapType moduleType
+         define moduleName name cons
+      
+      member __.DefineGlobalExplicit moduleName name cons =
+         define moduleName name cons
+         
       member __.DefineGlobalInitialization stmts =
          initialization <- List.append initialization stmts
 

@@ -33,7 +33,7 @@ let private creation =
          let specialization = Reflection.getSpecializationString compiler typeArgs
          let name = sprintf "Tuple%s" specialization
          let cons = 
-            compiler.DefineGlobal name (fun var -> 
+            compiler.DefineGlobalExplicit "Tuples" name (fun var -> 
                [Assign(Reference var, Lambda <| createConstructor n compiler)])
          [  yield! decls |> Seq.concat 
             yield returnStategy.Return <| New(cons, refs)

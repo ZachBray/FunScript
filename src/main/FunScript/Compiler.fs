@@ -39,28 +39,32 @@ let createComponents(isEventMappingEnabled) =
     ]
 
 type Compiler =
-   static member private CompileImpl(expression, adjustComponents, noReturn, shouldCompress, isEventMappingEnabled) = 
+   static member private CompileImpl(expression, adjustComponents, noReturn, shouldCompress, isEventMappingEnabled, outputModules) = 
       let shouldCompress = defaultArg shouldCompress false
       let isEventMappingEnabled = defaultArg isEventMappingEnabled true
       let returnStrat = 
          if defaultArg noReturn false then ReturnStrategies.inplace
          else ReturnStrategies.returnFrom
       let components = createComponents isEventMappingEnabled
-      let compiler = InternalCompiler.Compiler(adjustComponents components)
+      let compiler = InternalCompiler.Compiler(adjustComponents components, outputModules)
       let program = compiler.Compile returnStrat expression
-      let reflectedDefs = compiler.Globals
-      let block = List.append reflectedDefs program
+      let globals = compiler.Globals
+      let block = List.append globals program
       if shouldCompress then (AST.Block block).PrintCompressed()
       else (AST.Block block).Print()
 
-   static member Compile(expression, adjustComponents, ?noReturn, ?shouldCompress, ?isEventMappingEnabled) = 
-      Compiler.CompileImpl(expression, adjustComponents, noReturn, shouldCompress, isEventMappingEnabled)
+   static member Compile(expression, adjustComponents, ?noReturn, ?shouldCompress, ?isEventMappingEnabled, ?outputModules ) = 
+      Compiler.CompileImpl(expression, adjustComponents, noReturn, shouldCompress, isEventMappingEnabled, outputModules)
 
-   static member Compile(expression, ?components, ?noReturn, ?shouldCompress, ?isEventMappingEnabled) = 
+   static member Compile(expression, ?components, ?noReturn, ?shouldCompress, ?isEventMappingEnabled, ?outputModules) = 
       let components = defaultArg components []
-      Compiler.CompileImpl(expression, (fun existingComponents -> existingComponents @ components), noReturn, shouldCompress, isEventMappingEnabled)
+      Compiler.CompileImpl(expression, (fun existingComponents -> existingComponents @ components), noReturn, shouldCompress, isEventMappingEnabled, outputModules)
 
-   static member CompileAssembly(assembly : Assembly, ?noReturn: bool, ?shouldCompress : bool, ?isEventMappingEnabled: bool) =
+//    static member CompileModules(modules, ?components, ?noReturn, ?shouldCompress, ?isEventMappingEnabled) = 
+//        let components = defaultArg components []
+//        Compiler.CompileImpl(expression, (fun existingComponents -> existingComponents @ components), noReturn, shouldCompress, isEventMappingEnabled)
+
+   static member CompileAssembly(assembly : Assembly, ?noReturn, ?shouldCompress, ?isEventMappingEnabled, ?outputModules) =
       let assemblyMains =
          let types = assembly.GetTypes()
          let flags = BindingFlags.NonPublic ||| BindingFlags.Public ||| BindingFlags.Static
@@ -77,7 +81,7 @@ type Compiler =
          invalidOp "No method marked with [<FunScript.AssemblyMain>] found."
       | [main] ->
          let mainExpr = Microsoft.FSharp.Quotations.Expr.Call(main, [])
-         Compiler.CompileImpl(mainExpr, (fun existingComponents -> existingComponents), noReturn, shouldCompress, isEventMappingEnabled)
+         Compiler.CompileImpl(mainExpr, (fun existingComponents -> existingComponents), noReturn, shouldCompress, isEventMappingEnabled, outputModules)
       | _ ->
          failwith "never"
             

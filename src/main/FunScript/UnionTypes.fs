@@ -54,7 +54,7 @@ let private creation =
             |> List.unzip
          let name = Reflection.getUnionCaseConstructorName compiler uci
          let cons = 
-            compiler.DefineGlobal name (fun var -> 
+            compiler.DefineGlobal uci.DeclaringType name (fun var -> 
                [Assign(Reference var, Lambda <| createConstructor uci compiler)])
          [ yield! decls |> Seq.concat 
            yield returnStategy.Return <| New(cons, refs)

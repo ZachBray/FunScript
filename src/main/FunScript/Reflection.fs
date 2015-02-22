@@ -70,7 +70,7 @@ let getRecordConstructorName compiler (recType : System.Type) =
 let getUnionCaseConstructorName compiler (uci : UnionCaseInfo) =
    let typeArgs = getGenericTypeArgs uci.DeclaringType
    let specialization = getSpecializationString compiler typeArgs
-   JavaScriptNameMapper.mapType uci.DeclaringType + "_" + uci.Name + specialization
+   uci.Name + specialization
    
 let createLambdaVars(fields : Type[]) =
    let fieldCount = fields.Length
@@ -154,7 +154,7 @@ and private netTypeExpr compiler getTypeVar (t : Type) =
 
 let rec buildRuntimeType (compiler : InternalCompiler.ICompiler) (t : System.Type) =
    let typeName = sprintf "t_%s" (JavaScriptNameMapper.mapType t)
-   compiler.DefineGlobal typeName (fun var ->
+   compiler.DefineGlobalExplicit "FunScript.RunTimeTypes" typeName (fun var ->
       let expr = netTypeExpr compiler (buildRuntimeType compiler) t
       compiler.Compile (ReturnStrategies.assignVar var) expr
    )

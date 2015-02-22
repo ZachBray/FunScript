@@ -84,6 +84,7 @@
     <Compile Include="RxTests.fs" />
     <Compile Include="GuidTests.fs" />
     <Compile Include="AssemblyCompileTests.fs" />
+    <Compile Include="ModuleTests.fs" />
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="edge\x86\node.dll">

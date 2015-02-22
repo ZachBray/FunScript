@@ -49,7 +49,6 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes\AssemblyMain.fs" />
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="AttributeHelpers.fs" />
     <Compile Include="ExprExtensions.fs" />
@@ -72,6 +71,7 @@
     <Compile Include="Core\StringWriter.fs" />
     <Compile Include="Core\Dictionaries.fs" />
     <Compile Include="Core\Web.fs" />
+    <Compile Include="Attributes.fs" />
     <Compile Include="JavaScriptNameMapper.fs" />
     <Compile Include="AST.fs" />
     <Compile Include="QuoteExtensions.fs" />

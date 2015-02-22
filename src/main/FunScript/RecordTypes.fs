@@ -39,7 +39,7 @@ let private creation =
             |> List.unzip
          let name = Reflection.getRecordConstructorName compiler recType
          let cons = 
-            compiler.DefineGlobal name (fun var -> 
+            compiler.DefineGlobal recType name (fun var -> 
                [Assign(Reference var, Lambda <| createConstructor recType compiler)])
          [ yield! decls |> Seq.concat 
            yield returnStategy.Return <| New(cons, refs)

@@ -84,19 +84,29 @@ let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list)
 
 let private (|CallPattern|_|) = Objects.methodCallPattern
 
-let tryCreateGlobalMethod name compiler mb callType =
+let tryCreateModuleMethodBase (compiler:FunScript.InternalCompiler.ICompiler) mb callType callDefine = 
    match Objects.replaceIfAvailable compiler mb callType with
    | CallPattern getVarsExpr as replacementMi ->
       let typeArgs = Reflection.getGenericMethodArgs replacementMi
       let specialization = Reflection.getSpecializationString compiler typeArgs
       Some(
-         compiler.DefineGlobal (name + specialization) (fun var ->
+         callDefine specialization (fun var ->
             let vars, bodyExpr = getVarsExpr()
             genMethod mb replacementMi vars bodyExpr var compiler))
    | _ -> None
 
-let createGlobalMethod name compiler mb callType =
-    match tryCreateGlobalMethod name compiler mb callType with
+let tryCreateModuleMethodExplicit moduleName methodName compiler mb callType =
+   tryCreateModuleMethodBase compiler mb callType (
+      fun (specialization) (cons) -> 
+         compiler.DefineGlobalExplicit moduleName (methodName + specialization) cons)
+
+let tryCreateModuleMethod moduleType methodName compiler mb callType =
+   tryCreateModuleMethodBase compiler mb callType (
+      fun (specialization) (cons) -> 
+         compiler.DefineGlobal moduleType (methodName + specialization) cons)
+
+let createModuleMethod moduleType methodName compiler mb callType =
+    match tryCreateModuleMethod moduleType methodName compiler mb callType with
     | None -> failwithf "No reflected definition for method: %s" mb.Name
     | Some x -> x
 
@@ -113,7 +123,7 @@ let private createConstruction
    match ci with
    | ReflectedDefinition name ->
       //TODO: Generic types will have typeArgs we need to deal with here.
-      let consRef = createGlobalMethod name compiler ci Quote.ConstructorCall
+      let consRef = createModuleMethod ci.DeclaringType name compiler ci Quote.ConstructorCall
       [ yield! decls |> List.concat
         yield returnStategy.Return <| New(consRef, refs) ]
    | _ -> []
@@ -249,7 +259,7 @@ let private createCall
    | SpecialOp((ReflectedDefinition name) as mi)
    | (ReflectedDefinition name as mi) ->
       // TODO: What about interfaces!
-      let methRef = createGlobalMethod name compiler mi Quote.MethodCall
+      let methRef = createModuleMethod mi.DeclaringType name compiler mi Quote.MethodCall
       [  yield! decls |> List.concat
          yield returnStategy.Return <| Apply(Reference methRef, refs) ]
    | _ -> []
@@ -266,7 +276,7 @@ let private getPropertyField split (compiler:InternalCompiler.ICompiler) (pi:Pro
    let name = 
       JavaScriptNameMapper.sanitizeAux
          (JavaScriptNameMapper.mapType pi.DeclaringType + "_" + pi.Name + specialization)
-   compiler.DefineGlobal name (fun var ->
+   compiler.DefineGlobal pi.DeclaringType name (fun var ->
       // TODO: wrap in function scope?
       compiler.DefineGlobalInitialization <|
          createCall split (ReturnStrategies.assignVar var) compiler [objExpr; exprs] (pi.GetGetMethod(true))

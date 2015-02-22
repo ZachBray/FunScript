@@ -62,7 +62,7 @@ let tryGetCompareToMethod compiler t =
     else
         let mapping = t.GetInterfaceMap typeof<IComparable>
         let compareToImplMethod = mapping.TargetMethods |> Seq.head
-        ReflectedDefinitions.tryCreateGlobalMethod "CompareTo" compiler compareToImplMethod Quote.CallType.MethodCall
+        ReflectedDefinitions.tryCreateModuleMethodExplicit "FunScript" "CompareTo" compiler compareToImplMethod Quote.CallType.MethodCall
     
 let compareInOrder valueExtractors comparandA comparandB =
     Array.foldBack (fun extractValue otherwise ->
@@ -155,7 +155,7 @@ let tryAutoGenerateCompareToLambda t =
 let getCompareToName compiler t =
    let typeArgs = Reflection.getGenericTypeArgs t
    let specialization = Reflection.getSpecializationString compiler typeArgs
-   JavaScriptNameMapper.mapType t + "_" + "GeneratedCompareTo" + specialization
+   "GeneratedCompareTo" + specialization
 
 let comparableCompareComponent compareQuote =
     let primitiveCompareMethod, _ = Quote.toMethodInfoFromLambdas <@ EmittedReplacements.compare @>
@@ -182,7 +182,7 @@ let comparableCompareComponent compareQuote =
                     | None -> None
                     | Some createCompareToLambda ->
                         let compareFuncVar = 
-                            compiler.DefineGlobal (getCompareToName compiler exprA.Type) (fun var ->
+                            compiler.DefineGlobal exprA.Type (getCompareToName compiler exprA.Type) (fun var ->
                                 compiler.Compile (ReturnStrategies.assignVar var) (createCompareToLambda())
                             )
                         let lambda = Expr.Var compareFuncVar
