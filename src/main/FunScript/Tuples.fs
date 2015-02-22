@@ -7,19 +7,6 @@ open Microsoft.FSharp.Reflection
 let itemsPropName = "Items"
 let getItem i ref = IndexGet(PropertyGet(ref, itemsPropName), Number(float i))
 
-let getTupleVars n =
-   [ 0 .. n - 1] |> List.map (fun i -> Var(sprintf "Item%i" i, typeof<obj>))
-
-let private createConstructor n compiler =
-   let vars = getTupleVars n
-   let refs = vars |> List.map Reference
-   let this = Var("__this", typeof<obj>)
-   vars, Block [  
-      yield CopyThisToVar(this)
-      for var in vars do 
-          yield Assign(PropertyGet(Reference this, itemsPropName), Array refs)
-   ]
-
 let private creation =
    CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
       function
@@ -28,16 +15,10 @@ let private creation =
             exprs 
             |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
             |> List.unzip
-         let n = exprs.Length
-         let typeArgs = exprs |> List.map (fun expr -> expr.Type)
-         let specialization = Reflection.getSpecializationString compiler typeArgs
-         let name = sprintf "Tuple%s" specialization
-         let cons = 
-            compiler.DefineGlobal name (fun var -> 
-               [Assign(Reference var, Lambda <| createConstructor n compiler)])
+         let typeArgs = exprs |> List.map (fun x -> x.Type)
+         let cons = Reflection.getTupleConstructorVar compiler typeArgs
          [  yield! decls |> Seq.concat 
-            yield returnStategy.Return <| New(cons, refs)
-         ]
+            yield returnStategy.Return <| New(cons, refs) ]
       | _ -> []
 
 let private getIndex =

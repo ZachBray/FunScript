@@ -6,6 +6,8 @@ open Microsoft.FSharp.Quotations
 let private application =
    CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
       function
+
+      // TODO: Implement these two optimizations directly in the pipe operator?
       | Patterns.Application(Patterns.Lambda(var, (Patterns.Call _ as call)), lambdaArg) ->
         compiler.Compile returnStrategy <| call.Substitute(fun v ->
             if v.Name = var.Name then Some lambdaArg else None)

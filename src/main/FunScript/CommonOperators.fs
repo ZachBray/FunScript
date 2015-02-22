@@ -1,7 +1,10 @@
 ﻿module internal FunScript.CommonOperators
 
 open AST
+open ReflectedDefinitions
+
 open System.Reflection
+open Microsoft.FSharp.Reflection
 open Microsoft.FSharp.Quotations
 
 [<Inline; JS>]
@@ -49,6 +52,10 @@ let private defaultValue =
       | Patterns.DefaultValue _ -> [ returnStategy.Return Null ]
       | _ -> []
 
+let private localized (name:string) =
+   let sections = name.Split '-'
+   JavaScriptNameMapper.sanitizeAux sections.[sections.Length - 1]
+
 // TODO: Refactor!!!
 let private coerce =
    CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
@@ -81,11 +88,11 @@ let private coerce =
             let members =
                targetMethods
                |> Seq.map (fun realMi -> 
-                  let replacementMi = Objects.replaceIfAvailable compiler realMi Quote.CallType.MethodCall
-                  Objects.localized replacementMi.Name, replacementMi)
+                  let replacementMi = ReflectedDefinitions.replaceIfAvailable compiler realMi Quote.CallType.MethodCall
+                  localized replacementMi.Name, replacementMi)
                |> Seq.groupBy fst
                |> Seq.map (fun (name, mis) ->
-                  name, mis |> Seq.tryPick (snd >> Objects.methodCallPattern))
+                  name, mis |> Seq.tryPick (snd >> methodCallPattern))
                |> Seq.toArray
             let hasAllMembers =
                members |> Array.forall (snd >> Option.isSome)
@@ -123,10 +130,19 @@ let private coerce =
          // else []
       | _ -> []
 
-open Reflection
-let private getPrimaryConstructorName compiler (t: System.Type): string =
-    let cons = t.GetConstructors(BindingFlags.Public ||| BindingFlags.NonPublic ||| BindingFlags.Instance).[0]
-    JavaScriptNameMapper.mapMethod cons + (Reflection.getSpecializationString compiler <| Reflection.getGenericMethodArgs cons)
+let private getPrimaryConstructorVar compiler (t: System.Type) =
+    let cons = t.GetConstructors(BindingFlags.Public |||
+                                 BindingFlags.NonPublic |||
+                                 BindingFlags.Instance).[0]
+    // Unions must be dealed with in the calling method
+    if FSharpType.IsTuple t then
+        t.GenericTypeArguments
+        |> List.ofArray
+        |> Reflection.getTupleConstructorVar compiler
+    elif FSharpType.IsRecord t then
+        Reflection.getRecordConstructorVar compiler t
+    else
+        getObjectConstructorVar compiler cons
 
 // TODO: Add tests
 let private typeTest =
@@ -143,32 +159,38 @@ let private typeTest =
           if t = typeof<obj> then
             [ returnStrategy.Return <| Boolean true ]
 
+          // Type information about function signature will be lost
+          elif FSharpType.IsFunction t then
+            returnTypeTest "typeof" (String "function")
+
+          // Type information about collection generic will be lost
+          // Collections not based on JS arrays won't match this
+          elif typeof<System.Collections.IEnumerable>.IsAssignableFrom t then
+            returnTypeTest "instanceof" (String "Array")
+
           // Primitives
-          elif jsNumberTypes.Contains t.FullName || t.IsEnum then
+          elif Reflection.jsNumberTypes.Contains t.FullName || t.IsEnum then
             returnTypeTest "typeof" (String "number")
-          elif jsStringTypes.Contains t.FullName then
+          elif Reflection.jsStringTypes.Contains t.FullName then
             returnTypeTest "typeof" (String "string")
           elif t = typeof<bool> then
             returnTypeTest "typeof" (String "boolean")
           elif t = typeof<System.DateTime> then
             returnTypeTest "instanceof" (String "Date")
+
+          // TODO: Union types: Check against all the union case constructors
+          elif FSharpType.IsUnion t then
+            [ returnStrategy.Return <| Boolean false ]
           
-          // Interfaces
+          // Interfaces // TODO: Implement
           elif t.IsInterface then
-            // TODO: Implement
-            // TODO: Check if interface comes from JS library
             []
           
-          // Objects
+          // Objects // TODO: Inheritance (recursively check for type of "base" JS property)
           else
-            // TODO: Check if the constructor has already been defined in JS
-            // TODO: Check if there's reflected definition of constructor
-            // TODO: Support inheritance (recursively check for type of "base" JS property)
-
-            let cons = getPrimaryConstructorName compiler t
-            returnTypeTest "instanceof" (EmitExpr (fun _ -> cons))
-
-            // TODO: Do sth with Array and ResizeArray?
+            getPrimaryConstructorVar compiler t
+            |> JSExpr.Reference
+            |> returnTypeTest "instanceof"
 
        | _ -> [ returnStrategy.Return <| Boolean false ]
    | _ -> [ returnStrategy.Return <| Boolean false ]

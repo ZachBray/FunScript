@@ -7,6 +7,12 @@ open System
 open System.Reflection
 open Microsoft.FSharp.Reflection
 
+type MissingReflectedDefinitionException(mb: MethodBase) =
+    inherit System.Exception(
+        "No replacement for " + mb.Name + ": " +
+        "either ReflectedDefinition attribute is missing or " +
+        "the method is not yet implemented in FunScript.")
+
 let private (|List|) = Option.toList
 
 let private (|NonNull|_|) x = 
@@ -14,7 +20,7 @@ let private (|NonNull|_|) x =
    else Some x
 
 let private (|ReflectedDefinition|_|) (mi:MethodBase) =
-   if mi.DeclaringType.IsInterface then Some mi.Name
+   if mi.DeclaringType.IsInterface then Some mi.Name // TODO: Fix after changing the interface implementation
    else
       match Expr.tryGetReflectedDefinition mi with
       | Some _ -> Some(JavaScriptNameMapper.mapMethod mi)
@@ -80,12 +86,91 @@ let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list)
       [ Assign(
          Reference var, 
          Lambda(vars, 
-            Block(compiler.Compile ReturnStrategies.returnFrom bodyExpr))) ] 
+            Block(compiler.Compile ReturnStrategies.returnFrom bodyExpr))) ]
 
-let private (|CallPattern|_|) = Objects.methodCallPattern
+let private deconstructTuple (tupleVar : Var) =
+    if tupleVar.Type = typeof<unit> then
+        [tupleVar], Expr.Value(())
+    else
+        let elementTypes = FSharpType.GetTupleElements tupleVar.Type
+        let elementVars =
+            elementTypes |> Array.mapi (fun i elementType ->
+                Var(sprintf "%s_%i" tupleVar.Name i, elementType, tupleVar.IsMutable))
+            |> Array.toList
+        let elementExprs = elementVars |> List.map Expr.Var
+        let tupleConstructionExpr =
+            match elementExprs with
+            | [] -> Expr.Value(()) 
+            | _ -> Expr.NewTuple elementExprs
+        elementVars, tupleConstructionExpr
+
+let private extractVars (mb : MethodBase) (argCounts : CompilationArgumentCountsAttribute) = function
+    | DerivedPatterns.Lambdas(vars, bodyExpr) ->
+        let instanceVar, argVars =
+            if mb.IsStatic || mb.IsConstructor then None, vars
+            elif vars.Head.Length <> 1 then failwith "Unexpected argument format"
+            else Some vars.Head.[0], vars.Tail
+        let actualArgCounts =
+            let hasCounts = argCounts <> Unchecked.defaultof<_>
+            if hasCounts then argCounts.Counts |> Seq.toList |> Some
+            else None
+        let expectedArgCount = 
+            let baseParamCount = max 1 (mb.GetParameters().Length)
+            match actualArgCounts with
+            | None -> baseParamCount
+            | Some counts -> max baseParamCount (counts |> Seq.sum)
+        let groupCounts =
+            match actualArgCounts with
+            | None -> argVars |> List.map List.length
+            | Some counts -> counts
+        let bodyExpr, freeArgVars = 
+            List.zip groupCounts argVars
+            |> List.fold (fun (totalCount, groups) (groupCount, varGroup) ->
+                let subTotal = groupCount + totalCount
+                subTotal, (subTotal, groupCount, varGroup) :: groups) (0, [])
+            |> snd
+            |> List.fold (fun (restExpr, freeVars) (subTotal, groupCount, varGroup) ->
+                if subTotal > expectedArgCount && 
+                   subTotal - groupCount >= expectedArgCount then
+                    if varGroup.Length = 1 then 
+                        Expr.Lambda(varGroup.[0], restExpr), freeVars
+                    elif varGroup.Length = groupCount then
+                        failwith "todo"
+                    else failwith "Unexpected argument format"
+                elif subTotal > expectedArgCount then
+                    failwith "Unexpected argument format"
+                else
+                    if varGroup.Length = groupCount then
+                        restExpr, varGroup @ freeVars
+                    elif varGroup.Length = 1 then
+                        let tupleVar = varGroup.[0]
+                        let elementVars, tupleConstructionExpr =
+                            deconstructTuple tupleVar
+                        Expr.Let(tupleVar, tupleConstructionExpr, restExpr), elementVars @ freeVars
+                    else
+                        failwith "Unexpected argument format") (bodyExpr, [])
+        let freeVars =
+            match instanceVar with
+            | None -> freeArgVars
+            | Some ivar -> ivar :: freeArgVars
+        freeVars, bodyExpr
+    | expr -> [], expr
+
+let methodCallPattern (mb:MethodBase) =
+    let argCounts = mb.GetCustomAttribute<CompilationArgumentCountsAttribute>()
+    match Expr.tryGetReflectedDefinition mb with
+    | Some fullExpr -> Some(fun () -> extractVars mb argCounts fullExpr)
+    | None -> None
+
+let (|CallPattern|_|) = methodCallPattern
+
+let replaceIfAvailable (compiler:InternalCompiler.ICompiler) (mb : MethodBase) callType =
+   match compiler.ReplacementFor mb callType with
+   | None -> mb //GetGenericMethod()...
+   | Some mi -> upcast mi
 
 let tryCreateGlobalMethod name compiler mb callType =
-   match Objects.replaceIfAvailable compiler mb callType with
+   match replaceIfAvailable compiler mb callType with
    | CallPattern getVarsExpr as replacementMi ->
       let typeArgs = Reflection.getGenericMethodArgs replacementMi
       let specialization = Reflection.getSpecializationString compiler typeArgs
@@ -97,8 +182,14 @@ let tryCreateGlobalMethod name compiler mb callType =
 
 let createGlobalMethod name compiler mb callType =
     match tryCreateGlobalMethod name compiler mb callType with
-    | None -> failwithf "No reflected definition for method: %s" mb.Name
+    | None -> raise <| MissingReflectedDefinitionException mb
     | Some x -> x
+
+let getObjectConstructorVar compiler ci =
+   match ci with
+   | ReflectedDefinition name ->
+      createGlobalMethod name compiler ci Quote.ConstructorCall
+   | _ -> raise <| MissingReflectedDefinitionException ci
 
 let private createConstruction
       (|Split|) 
@@ -112,7 +203,6 @@ let private createConstruction
       |> List.unzip
    match ci with
    | ReflectedDefinition name ->
-      //TODO: Generic types will have typeArgs we need to deal with here.
       let consRef = createGlobalMethod name compiler ci Quote.ConstructorCall
       // Secondary constructors don't need the new keyword
       let call = if Reflection.isPrimaryConstructor ci
@@ -249,10 +339,9 @@ let private createCall
       | [] -> []
       | objRef::argRefs ->
          [  yield! decls |> List.concat
-            yield returnStategy.Return <| Apply(PropertyGet(objRef, name), argRefs) ]
+            yield returnStategy.Return <| Apply(PropertyGet(objRef, name), argRefs) ] // TODO: Fix after changing the interface implementation
    | SpecialOp((ReflectedDefinition name) as mi)
    | (ReflectedDefinition name as mi) ->
-      // TODO: What about interfaces!
       let methRef = createGlobalMethod name compiler mi Quote.MethodCall
       [  yield! decls |> List.concat
          yield returnStategy.Return <| Apply(Reference methRef, refs) ]
