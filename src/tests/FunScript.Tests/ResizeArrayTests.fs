@@ -28,6 +28,14 @@ let ``ResizeArray creation with seq works``() =
       @@>
 
 [<Test>]
+let ``ResizeArray casting to seq works``() =
+   check 
+      <@@ 
+         let xs = ResizeArray<_>(seq{1. .. 5.}) :> seq<_>
+         Seq.sum xs
+      @@>
+
+[<Test>]
 let ``ResizeArray iteration works``() =
    check 
       <@@ 

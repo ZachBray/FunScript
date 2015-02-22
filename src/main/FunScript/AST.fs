@@ -74,7 +74,7 @@ let indent n = String.init n (fun _ -> "  ")
 
 let getNewlineAndOffset (padding, scope : VariableScope ref) =
    if (!scope).ShouldCompressNames then ""
-   else System.Environment.NewLine + indent padding
+   else System.Environment.NewLine + (if padding > 1 then indent padding else "")
 
 let addVarsToScope vars oldScope =
     let newScope, names =

@@ -1,7 +1,10 @@
 ﻿module internal FunScript.CommonOperators
 
 open AST
+open ReflectedDefinitions
+
 open System.Reflection
+open Microsoft.FSharp.Reflection
 open Microsoft.FSharp.Quotations
 
 [<Inline; JS>]
@@ -44,16 +47,21 @@ module private Replacements =
 
 // TODO: Specialize for ints/floats etc. to give 0. as in .NET
 let private defaultValue =
-   CompilerComponent.create <| fun (|Split|) _ returnStategy ->
+   CompilerComponent.create <| fun (|Split|) _ returnStrategy ->
       function
-      | Patterns.DefaultValue _ -> [ returnStategy.Return Null ]
+      | Patterns.DefaultValue _ -> [ returnStrategy.Return Null ]
       | _ -> []
+
+let private localized (name:string) =
+   let sections = name.Split '-'
+   JavaScriptNameMapper.sanitizeAux sections.[sections.Length - 1]
 
 // TODO: Refactor!!!
 let private coerce =
    CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
       function
       | Patterns.Coerce(expr, t) ->
+         // Casting array to seq
          if expr.Type.IsGenericType && expr.Type.GetGenericTypeDefinition() = typedefof<_ System.Collections.Generic.IList> then
             let elementT = expr.Type.GetGenericArguments().[0]
             if t.IsGenericType && t.GetGenericTypeDefinition() = typedefof<_ seq> then
@@ -65,11 +73,13 @@ let private coerce =
             elif (t.IsArray && t.GetElementType() = elementT) || t = typeof<obj> then
                 compiler.Compile returnStrategy expr
             else []
+         // Cases to be ignored
          elif expr.Type = t 
             || t = typeof<obj> 
             || (expr.Type.IsInterface && t.IsAssignableFrom expr.Type)
             || (t.IsGenericType && t.GetGenericTypeDefinition() = typedefof<_ System.Collections.Generic.IList>) then 
             compiler.Compile returnStrategy expr
+         // Interfaces // TODO: Generate global methods instead of new object
          elif t.IsInterface then
             let actualType = expr.Type
             let targetMethods =
@@ -81,11 +91,11 @@ let private coerce =
             let members =
                targetMethods
                |> Seq.map (fun realMi -> 
-                  let replacementMi = Objects.replaceIfAvailable compiler realMi Quote.CallType.MethodCall
-                  Objects.localized replacementMi.Name, replacementMi)
+                  let replacementMi = ReflectedDefinitions.replaceIfAvailable compiler realMi Quote.CallType.MethodCall
+                  localized replacementMi.Name, replacementMi)
                |> Seq.groupBy fst
                |> Seq.map (fun (name, mis) ->
-                  name, mis |> Seq.tryPick (snd >> Objects.methodCallPattern))
+                  name, mis |> Seq.tryPick (snd >> methodCallPattern))
                |> Seq.toArray
             let hasAllMembers =
                members |> Array.forall (snd >> Option.isSome)
@@ -117,19 +127,88 @@ let private coerce =
                ]
             else compiler.Compile returnStrategy expr
          else compiler.Compile returnStrategy expr
-
-         // For strictness when testing:
-         //   else []
-         // else []
       | _ -> []
 
-// TODO: Implement this properly. Through type property?
+let private getPrimaryConstructorVar compiler (t: System.Type) =
+    let cons = t.GetConstructors(BindingFlags.Public |||
+                                 BindingFlags.NonPublic |||
+                                 BindingFlags.Instance).[0]
+    // Unions must be dealed with in the calling method
+    if FSharpType.IsTuple t then
+        t.GenericTypeArguments
+        |> List.ofArray
+        |> Reflection.getTupleConstructorVar compiler
+    elif FSharpType.IsRecord t then
+        Reflection.getRecordConstructorVar compiler t
+    elif FSharpType.IsExceptionRepresentation t then
+        Reflection.getCustomExceptionConstructorVar compiler cons
+    else
+        getObjectConstructorVar compiler cons
+
+// TODO: Add tests
 let private typeTest =
-   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
    function
-   | Patterns.TypeTest(_, _) ->
-      [ returnStategy.Return <| Boolean false ]
-   | _ -> []
+   | Patterns.TypeTest(expr, t) ->
+      match expr with
+      | Patterns.Var var ->
+          let returnTypeTest operator jsTarget =
+            [ returnStrategy.Return <| BinaryOp(Reference var, operator, jsTarget) ]
+          
+          // F# compiler won't allow anything not boxed to be tested against obj
+          // so if this test has been allowed it will always hold true
+          if t = typeof<obj> then
+            [ returnStrategy.Return <| Boolean true ]
+
+          // Type information about function signature will be lost
+          elif FSharpType.IsFunction t then
+            returnTypeTest "typeof" (String "function")
+
+          // Type information about collection generic will be lost
+          // Collections not based on JS arrays won't match this
+          elif typeof<System.Collections.IEnumerable>.IsAssignableFrom t then
+            returnTypeTest "instanceof" (String "Array")
+
+          // Primitives
+          elif Reflection.jsNumberTypes.Contains t.FullName || t.IsEnum then
+            returnTypeTest "typeof" (String "number")
+          elif Reflection.jsStringTypes.Contains t.FullName then
+            returnTypeTest "typeof" (String "string")
+          elif t = typeof<bool> then
+            returnTypeTest "typeof" (String "boolean")
+          elif t = typeof<System.DateTime> then
+            returnTypeTest "instanceof" (String "Date")
+
+          // Interfaces // TODO: Implement
+          elif t.IsInterface then
+            [ returnStrategy.Return <| Boolean false ]
+
+          // Union types: Test all union case constructors // TODO: Make this a global function?
+          elif FSharpType.IsUnion t then
+            let varRef = Reference var
+            let getCaseConsRef uci =
+                Reflection.getUnionCaseConstructorVar compiler uci
+                |> JSExpr.Reference
+                |> (fun caseConsRef -> BinaryOp(varRef, "instanceof", caseConsRef))
+            let cases = FSharpType.GetUnionCases t
+            let firstCaseTest = getCaseConsRef cases.[0]
+            if cases.Length = 1
+            then [ returnStrategy.Return firstCaseTest ]
+            else
+                cases
+                |> Seq.skip 1
+                |> Seq.fold (fun (acc: JSExpr) uci ->
+                    BinaryOp(getCaseConsRef uci, "||", acc)) firstCaseTest
+                |> fun allCasesTest -> [ returnStrategy.Return allCasesTest ]
+          
+          // Objects
+          else
+            getPrimaryConstructorVar compiler t
+            |> JSExpr.Reference
+            |> returnTypeTest "instanceof"
+
+       | _ -> [ returnStrategy.Return <| Boolean false ]
+   | _ -> [ returnStrategy.Return <| Boolean false ]
 
 let components = 
    [

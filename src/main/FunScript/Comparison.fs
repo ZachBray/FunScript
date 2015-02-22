@@ -42,9 +42,9 @@ type private TypeKind =
    | Primitive
    | NonPrimitive
 
-/// obj will be considered primitive for comparison in Javascript
+/// obj and unit will be considered primitive for comparison in Javascript
 let rec private kindOf (t:System.Type) =
-   if t = typeof<obj> || Reflection.isPrimitive t then Primitive
+   if t = typeof<obj> || t = typeof<unit> || Reflection.isPrimitive t then Primitive
    elif t.IsArray then 
       if t.GetArrayRank() <> 1 then
          failwith "Unsupported array rank."

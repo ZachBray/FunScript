@@ -7,6 +7,12 @@ open System
 open System.Reflection
 open Microsoft.FSharp.Reflection
 
+type MissingReflectedDefinitionException(mb: MethodBase) =
+    inherit System.Exception(
+        "No replacement for " + mb.Name + ": " +
+        "either ReflectedDefinition attribute is missing or " +
+        "the method is not yet implemented in FunScript.")
+
 let private (|List|) = Option.toList
 
 let private (|NonNull|_|) x = 
@@ -14,7 +20,7 @@ let private (|NonNull|_|) x =
    else Some x
 
 let private (|ReflectedDefinition|_|) (mi:MethodBase) =
-   if mi.DeclaringType.IsInterface then Some mi.Name
+   if mi.DeclaringType.IsInterface then Some mi.Name // TODO: Fix after changing the interface implementation
    else
       match Expr.tryGetReflectedDefinition mi with
       | Some _ -> Some(JavaScriptNameMapper.mapMethod mi)
@@ -80,12 +86,91 @@ let private genMethod (mb:MethodBase) (replacementMi:MethodBase) (vars:Var list)
       [ Assign(
          Reference var, 
          Lambda(vars, 
-            Block(compiler.Compile ReturnStrategies.returnFrom bodyExpr))) ] 
+            Block(compiler.Compile ReturnStrategies.returnFrom bodyExpr))) ]
 
-let private (|CallPattern|_|) = Objects.methodCallPattern
+let private deconstructTuple (tupleVar : Var) =
+    if tupleVar.Type = typeof<unit> then
+        [tupleVar], Expr.Value(())
+    else
+        let elementTypes = FSharpType.GetTupleElements tupleVar.Type
+        let elementVars =
+            elementTypes |> Array.mapi (fun i elementType ->
+                Var(sprintf "%s_%i" tupleVar.Name i, elementType, tupleVar.IsMutable))
+            |> Array.toList
+        let elementExprs = elementVars |> List.map Expr.Var
+        let tupleConstructionExpr =
+            match elementExprs with
+            | [] -> Expr.Value(()) 
+            | _ -> Expr.NewTuple elementExprs
+        elementVars, tupleConstructionExpr
+
+let private extractVars (mb : MethodBase) (argCounts : CompilationArgumentCountsAttribute) = function
+    | DerivedPatterns.Lambdas(vars, bodyExpr) ->
+        let instanceVar, argVars =
+            if mb.IsStatic || mb.IsConstructor then None, vars
+            elif vars.Head.Length <> 1 then failwith "Unexpected argument format"
+            else Some vars.Head.[0], vars.Tail
+        let actualArgCounts =
+            let hasCounts = argCounts <> Unchecked.defaultof<_>
+            if hasCounts then argCounts.Counts |> Seq.toList |> Some
+            else None
+        let expectedArgCount = 
+            let baseParamCount = max 1 (mb.GetParameters().Length)
+            match actualArgCounts with
+            | None -> baseParamCount
+            | Some counts -> max baseParamCount (counts |> Seq.sum)
+        let groupCounts =
+            match actualArgCounts with
+            | None -> argVars |> List.map List.length
+            | Some counts -> counts
+        let bodyExpr, freeArgVars = 
+            List.zip groupCounts argVars
+            |> List.fold (fun (totalCount, groups) (groupCount, varGroup) ->
+                let subTotal = groupCount + totalCount
+                subTotal, (subTotal, groupCount, varGroup) :: groups) (0, [])
+            |> snd
+            |> List.fold (fun (restExpr, freeVars) (subTotal, groupCount, varGroup) ->
+                if subTotal > expectedArgCount && 
+                   subTotal - groupCount >= expectedArgCount then
+                    if varGroup.Length = 1 then 
+                        Expr.Lambda(varGroup.[0], restExpr), freeVars
+                    elif varGroup.Length = groupCount then
+                        failwith "todo"
+                    else failwith "Unexpected argument format"
+                elif subTotal > expectedArgCount then
+                    failwith "Unexpected argument format"
+                else
+                    if varGroup.Length = groupCount then
+                        restExpr, varGroup @ freeVars
+                    elif varGroup.Length = 1 then
+                        let tupleVar = varGroup.[0]
+                        let elementVars, tupleConstructionExpr =
+                            deconstructTuple tupleVar
+                        Expr.Let(tupleVar, tupleConstructionExpr, restExpr), elementVars @ freeVars
+                    else
+                        failwith "Unexpected argument format") (bodyExpr, [])
+        let freeVars =
+            match instanceVar with
+            | None -> freeArgVars
+            | Some ivar -> ivar :: freeArgVars
+        freeVars, bodyExpr
+    | expr -> [], expr
+
+let methodCallPattern (mb:MethodBase) =
+    let argCounts = mb.GetCustomAttribute<CompilationArgumentCountsAttribute>()
+    match Expr.tryGetReflectedDefinition mb with
+    | Some fullExpr -> Some(fun () -> extractVars mb argCounts fullExpr)
+    | None -> None
+
+let (|CallPattern|_|) = methodCallPattern
+
+let replaceIfAvailable (compiler:InternalCompiler.ICompiler) (mb : MethodBase) callType =
+   match compiler.ReplacementFor mb callType with
+   | None -> mb //GetGenericMethod()...
+   | Some mi -> upcast mi
 
 let tryCreateGlobalMethod name compiler mb callType =
-   match Objects.replaceIfAvailable compiler mb callType with
+   match replaceIfAvailable compiler mb callType with
    | CallPattern getVarsExpr as replacementMi ->
       let typeArgs = Reflection.getGenericMethodArgs replacementMi
       let specialization = Reflection.getSpecializationString compiler typeArgs
@@ -97,27 +182,34 @@ let tryCreateGlobalMethod name compiler mb callType =
 
 let createGlobalMethod name compiler mb callType =
     match tryCreateGlobalMethod name compiler mb callType with
-    | None -> failwithf "No reflected definition for method: %s" mb.Name
+    | None -> raise <| MissingReflectedDefinitionException mb
     | Some x -> x
+
+let getObjectConstructorVar compiler ci =
+   match ci with
+   | ReflectedDefinition name ->
+      createGlobalMethod name compiler ci Quote.ConstructorCall
+   | _ -> raise <| MissingReflectedDefinitionException ci
 
 let private createConstruction
       (|Split|) 
       (returnStategy:InternalCompiler.IReturnStrategy)
       (compiler:InternalCompiler.ICompiler)
-      exprs ci =
-   let exprs = exprs |> List.concat
-   let decls, refs = 
-      exprs 
-      |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
-      |> List.unzip
-   match ci with
-   | ReflectedDefinition name ->
-      //TODO: Generic types will have typeArgs we need to deal with here.
-      let consRef = createGlobalMethod name compiler ci Quote.ConstructorCall
-      [ yield! decls |> List.concat
-        yield returnStategy.Return <| New(consRef, refs) ]
-   | _ -> []
-
+      (exprs: seq<Expr list>)
+      (ci: MethodBase) =
+    let decls, refs =
+        exprs |> List.concat |> Reflection.getDeclarationAndReferences (|Split|)
+    let call =
+        if FSharpType.IsExceptionRepresentation ci.DeclaringType then
+            let cons = Reflection.getCustomExceptionConstructorVar compiler ci
+            New(cons, refs)
+        else
+            let cons = getObjectConstructorVar compiler ci
+            if Reflection.isPrimaryConstructor ci
+            then New(cons, refs)
+            else Apply(Reference cons, refs) // Secondary constructors don't need new keyword
+    [ yield! decls |> List.concat
+      yield returnStategy.Return call ]
 
 let (|OptionPattern|_|) = function
     | Patterns.NewUnionCase(uci, []) when 
@@ -234,10 +326,7 @@ let private createCall
       (compiler:InternalCompiler.ICompiler)
       exprs mi =
    let exprs = exprs |> List.concat
-   let decls, refs = 
-      exprs 
-      |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
-      |> List.unzip
+   let decls, refs = Reflection.getDeclarationAndReferences (|Split|) exprs
    match mi with
    | SpecialOp((ReflectedDefinition name) as mi)
    | (ReflectedDefinition name as mi) when mi.DeclaringType.IsInterface ->
@@ -245,10 +334,9 @@ let private createCall
       | [] -> []
       | objRef::argRefs ->
          [  yield! decls |> List.concat
-            yield returnStategy.Return <| Apply(PropertyGet(objRef, name), argRefs) ]
+            yield returnStategy.Return <| Apply(PropertyGet(objRef, name), argRefs) ] // TODO: Fix after changing the interface implementation
    | SpecialOp((ReflectedDefinition name) as mi)
    | (ReflectedDefinition name as mi) ->
-      // TODO: What about interfaces!
       let methRef = createGlobalMethod name compiler mi Quote.MethodCall
       [  yield! decls |> List.concat
          yield returnStategy.Return <| Apply(Reference methRef, refs) ]
@@ -274,8 +362,12 @@ let private getPropertyField split (compiler:InternalCompiler.ICompiler) (pi:Pro
    )
 
 let private propertyGetting =
-   CompilerComponent.create <| fun split compiler returnStategy ->
+   CompilerComponent.create <| fun split compiler returnStrategy ->
       function
+      // F# Custom exceptions // TODO: refactor?
+      | Patterns.PropertyGet(Some(Patterns.Coerce(Patterns.Var var, t)), pi, exprs)
+        when FSharpType.IsExceptionRepresentation pi.DeclaringType && pi.Name.StartsWith "Data" ->
+         [ returnStrategy.Return <| PropertyGet(Reference var, pi.Name) ]
       | Patterns.PropertyGet(List objExpr, pi, exprs) ->
          let isField = 
             let mapping = pi.GetCustomAttribute<CompilationMappingAttribute>()
@@ -289,8 +381,8 @@ let private propertyGetting =
          match isField || isModuleLetBound, objExpr, exprs with
          | true, [], [] ->
             let property = getPropertyField split compiler pi objExpr exprs
-            [ returnStategy.Return <| Reference property ]
-         | _ -> createCall split returnStategy compiler [objExpr; exprs] (pi.GetGetMethod(true))
+            [ returnStrategy.Return <| Reference property ]
+         | _ -> createCall split returnStrategy compiler [objExpr; exprs] (pi.GetGetMethod(true))
       | _ -> []
       
 let private propertySetting =
@@ -334,22 +426,19 @@ let private fieldSetting =
            yield Assign(PropertyGet(Reference (Var.Global(name, typeof<obj>)), JavaScriptNameMapper.sanitizeAux fi.Name), valRef) ]
       | _ -> []
 
-let private objectGuid = typeof<obj>.GUID
-let private objectName = typeof<obj>.FullName
-
 let private constructingInstances =
-   CompilerComponent.create <| fun split compiler returnStategy ->
+   CompilerComponent.create <| fun split compiler returnStrategy ->
       function
       | PatternsExt.NewObject(ci, exprs) -> 
-         let declaringType = ci.DeclaringType
-         if declaringType.GUID = objectGuid &&
-            declaringType.FullName = objectName 
-         then [ Scope <| Block [] ]
-         else createConstruction split returnStategy compiler [exprs] ci
+         if ci.DeclaringType.GUID = typeof<obj>.GUID &&
+            ci.DeclaringType.FullName = typeof<obj>.FullName // Empty objects
+         then [ returnStrategy.Return <| JSExpr.Object [] ]
+         else createConstruction split returnStrategy compiler [exprs] ci
+      // Creating instances of generic types with parameterless constructors (e.g. new T'())
       | Patterns.Call(None, mi, []) when mi.Name = "CreateInstance" && mi.IsGenericMethod ->
          let t = mi.GetGenericArguments().[0]
          let ci = t.GetConstructor([||])
-         createConstruction split returnStategy compiler [] ci
+         createConstruction split returnStrategy compiler [] ci
       | _ -> []
 
 let components = [ 

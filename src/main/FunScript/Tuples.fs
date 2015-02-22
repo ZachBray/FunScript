@@ -7,45 +7,23 @@ open Microsoft.FSharp.Reflection
 let itemsPropName = "Items"
 let getItem i ref = IndexGet(PropertyGet(ref, itemsPropName), Number(float i))
 
-let getTupleVars n =
-   [ 0 .. n - 1] |> List.map (fun i -> Var(sprintf "Item%i" i, typeof<obj>))
-
-let private createConstructor n compiler =
-   let vars = getTupleVars n
-   let refs = vars |> List.map Reference
-   let this = Var("__this", typeof<obj>)
-   vars, Block [  
-      yield CopyThisToVar(this)
-      for var in vars do 
-          yield Assign(PropertyGet(Reference this, itemsPropName), Array refs)
-   ]
-
 let private creation =
-   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
       function
       | Patterns.NewTuple(exprs) ->
-         let decls, refs = 
-            exprs 
-            |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
-            |> List.unzip
-         let n = exprs.Length
-         let typeArgs = exprs |> List.map (fun expr -> expr.Type)
-         let specialization = Reflection.getSpecializationString compiler typeArgs
-         let name = sprintf "Tuple%s" specialization
-         let cons = 
-            compiler.DefineGlobal name (fun var -> 
-               [Assign(Reference var, Lambda <| createConstructor n compiler)])
+         let decls, refs = Reflection.getDeclarationAndReferences (|Split|) exprs
+         let typeArgs = exprs |> List.map (fun x -> x.Type)
+         let cons = Reflection.getTupleConstructorVar compiler typeArgs
          [  yield! decls |> Seq.concat 
-            yield returnStategy.Return <| New(cons, refs)
-         ]
+            yield returnStrategy.Return <| New(cons, refs) ]
       | _ -> []
 
 let private getIndex =
-   CompilerComponent.create <| fun (|Split|) _ returnStategy ->
+   CompilerComponent.create <| fun (|Split|) _ returnStrategy ->
       function
       | Patterns.TupleGet(Split(valDecl, valRef), i) ->
          [ yield! valDecl
-           yield returnStategy.Return (valRef |> getItem i)
+           yield returnStrategy.Return (valRef |> getItem i)
          ]
       | _ -> []
 

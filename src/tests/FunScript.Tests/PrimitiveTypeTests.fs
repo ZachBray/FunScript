@@ -26,3 +26,14 @@ let ``Strings are generated as strings``() =
 [<Test>]
 let ``Bools are generated as bools``() =
    check <@@ true @@>
+
+[<Test>]
+let ``Objects are generated as objects``() =
+   check
+    <@@
+        let a = obj()
+        let b = obj()
+        a = b
+    @@>
+
+// TODO: Add exception tests

@@ -4,7 +4,7 @@ open AST
 open Microsoft.FSharp.Quotations
 
 let private forLoop =
-   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
       let (|Return|) = compiler.Compile
       function
       | Patterns.ForIntegerRangeLoop(var, Split(fromDecl, fromRef), Split(toDecl, toRef), (Return ReturnStrategies.inplace block as bodyExpr)) ->
@@ -26,7 +26,7 @@ let private forLoop =
       | _ -> []
 
 let private whileLoop =
-    CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+    CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
         let (|Return|) = compiler.Compile
         function
         | Patterns.WhileLoop(condExpr, Return ReturnStrategies.inplace block) ->
@@ -43,10 +43,10 @@ let private whileLoop =
         | _ -> []
 
 let private ifThenElse =
-   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
       let (|Return|) = compiler.Compile
       function
-      | Patterns.IfThenElse(Split(condDecl, condRef), Return returnStategy trueBlock, Return returnStategy falseBlock) ->
+      | Patterns.IfThenElse(Split(condDecl, condRef), Return returnStrategy trueBlock, Return returnStrategy falseBlock) ->
          [ yield! condDecl
            yield IfThenElse(condRef, Block trueBlock, Block falseBlock)
          ]
@@ -72,10 +72,10 @@ let private tryWith =
       | _ -> []
 
 let private sequential =
-   CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+   CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
       let (|Return|) = compiler.Compile
       function
-      | Patterns.Sequential(Return ReturnStrategies.inplace firstBlock, Return returnStategy secondBlock) ->
+      | Patterns.Sequential(Return ReturnStrategies.inplace firstBlock, Return returnStrategy secondBlock) ->
          [ yield! firstBlock
            yield! secondBlock
          ]

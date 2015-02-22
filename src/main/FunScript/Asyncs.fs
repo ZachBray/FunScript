@@ -17,10 +17,10 @@ let components =
          ExpressionReplacer.createUnsafe <@ fun (a:CancellationTokenSource) -> a.Token @> <@ fun (a:FunCancelSrc) -> a.Token @>
          ExpressionReplacer.createUnsafe <@ async @> <@ Core.Async.async @>
 
-         CompilerComponent.create <| fun (|Split|) compiler returnStategy ->
+         CompilerComponent.create <| fun (|Split|) compiler returnStrategy ->
             function
             | Patterns.NewObject(ci, args) when ci.DeclaringType = typeof<CancellationTokenSource> ->
-               compiler.Compile returnStategy <@ new Core.Async.CancellationTokenSource() @>
+               compiler.Compile returnStrategy <@ new Core.Async.CancellationTokenSource() @>
             | _ -> []
 
       ]

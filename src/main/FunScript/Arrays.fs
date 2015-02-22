@@ -8,10 +8,7 @@ let private creation =
    CompilerComponent.create <| fun (|Split|) _ returnStrategy ->
       function
       | Patterns.NewArray(arrayType, exprs) ->
-         let decls, refs = 
-            exprs 
-            |> List.map (fun (Split(valDecl, valRef)) -> valDecl, valRef)
-            |> List.unzip
+         let decls, refs = Reflection.getDeclarationAndReferences (|Split|) exprs
          [ yield! decls |> Seq.concat 
            yield returnStrategy.Return <| Array refs
          ]
