@@ -152,45 +152,38 @@ type Compiler(components, outputModules) as this =
       modules <- modules |> Map.add jsModule.Name jsModule
       
    let define (moduleName : string) (name : string) (cons : Var -> List<JSStatement>) =
-      let jsModule = match modules |> Map.tryFind moduleName with
-      | Some (jsModule) -> jsModule 
-      | None -> 
-         let jsModule = JSModule.create(moduleName)
-         updateModule jsModule
-         jsModule
+      let jsModule = 
+         match modules |> Map.tryFind moduleName with
+            | Some (jsModule) -> jsModule 
+            |None -> 
+               let jsModule = JSModule.create(moduleName)
+               updateModule jsModule
+               jsModule
+      //still have to put the full module name as the path to prevent collions when not compiling 
+      //to modules. to fix this, check whether modules are enabled.
+      let name = moduleName + "_" + name 
 
       match jsModule.Members |> Map.tryFind name with
       | Some (moduleMember) -> moduleMember.Var
       | None ->
-             //still have to put the full module name as the path to prevent collions when not compiling 
-             //to modules. to fix this, check whether modules are enabled.
-             let name = moduleName + "_" + name 
+             // Define upfront to avoid problems with mutually recursive methods
              let var = Var.Global(name, typeof<obj>)
              let moduleMember = {Name=name; Var=var; Statements=List.empty}
              let jsModule = jsModule |> JSModule.addMember moduleMember
              updateModule jsModule
              let assignment = cons var
-             let jsModule = jsModule |> JSModule.addMember {moduleMember with Var = var; Statements = assignment}
+             // more methods could have been added, need to get the latest module refernce
+             let jsModule = 
+                modules
+                |> Map.find moduleName 
+                |> JSModule.addMember {moduleMember with Var = var; Statements = assignment}
+
              updateModule jsModule
              var
-//      | Some (jsModule) -> 
-//         match jsModule.Members |> Map.tryFind name with
-//         | Some (jsModuleMember) -> jsModuleMember.Var
-//         | None -> Var.Global(name, typeof<obj>) //this needs implemented
-//      | None -> 
-//         Var.Global(name, typeof<obj>)
-
-//         // Define upfront to avoid problems with mutually recursive methods
-//         let var = Var.Global(name, typeof<obj>)
-//         globals <- globals |> Map.add name (var, [])
-//         let assignment = cons var
-//         globals <- globals |> Map.add name (var, assignment)
-//         var
 
    let mutable initialization = List.empty
 
    let getGlobals() =
-      //let globals = globals |> Map.toList |> List.map snd
       let globalMethods = 
          modules 
          |> Map.toList 
