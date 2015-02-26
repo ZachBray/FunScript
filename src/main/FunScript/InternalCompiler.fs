@@ -29,21 +29,31 @@ type CallReplacer =
     Replacement: MethodInfo option
     TryReplace: ICompiler -> IReturnStrategy -> Expr option * Type [] * Expr list -> JSStatement list }
       
-type JSModuleMember = 
-  { Name: string;
-    Var: Var;
-    Statements: List<JSStatement> }
-     
-module JSModule =
-   type T = 
+module JSModules =
+   type JSModule = 
      { Name:string; 
-       Members: Map<string, JSModuleMember> }
-   let create (name : string ) =
+       Members: Map<string, JSModuleMember>}
+
+   and JSModuleMember = 
+     { Container: JSModule;
+       Dependencies: seq<JSModuleMember>;
+       Name: string;
+       FullName: string;
+       Var: Var;
+       Statements: List<JSStatement> }
+
+   let createModule (name : string) =
       {Name=name;Members=Map.empty}
-   let addMember (jsModuleMember: JSModuleMember) (jsModule: T) =
+
+   let createMember (container : JSModule) name var =
+      let fullName = sprintf "%s.%s" container.Name name
+      {Name=name; FullName=fullName; Var=var; Statements=List.empty; Container=container; Dependencies=Seq.empty}
+
+   let addMember (jsModuleMember: JSModuleMember) (jsModule: JSModule) =
       let members = jsModule.Members |> Map.add jsModuleMember.Name jsModuleMember
       { jsModule with Members = members }
 
+type JSModuleMember = JSModules.JSModuleMember
 type CompilerComponent =
    | CallReplacer of CallReplacer
    | CompilerComponent of ICompilerComponent
@@ -147,39 +157,66 @@ type Compiler(components, outputModules) as this =
 
    let nextId = ref 0
 
-   let mutable modules = Map.empty<string, JSModule.T>
-   let updateModule (jsModule : JSModule.T) = 
+   let mutable modules = Map.empty<string, JSModules.JSModule>
+   let updateModule (jsModule : JSModules.JSModule) = 
       modules <- modules |> Map.add jsModule.Name jsModule
       
+   let mutable dependencyCapture = Seq.empty<seq<JSModules.JSModuleMember>>
+
    let define (moduleName : string) (name : string) (cons : Var -> List<JSStatement>) =
       let jsModule = 
          match modules |> Map.tryFind moduleName with
             | Some (jsModule) -> jsModule 
             |None -> 
-               let jsModule = JSModule.create(moduleName)
+               let jsModule = JSModules.createModule(moduleName)
                updateModule jsModule
                jsModule
+
+      dependencyCapture <- Seq.append dependencyCapture [ Seq.empty ]
       //still have to put the full module name as the path to prevent collions when not compiling 
       //to modules. to fix this, check whether modules are enabled.
       let name = moduleName + "_" + name 
 
-      match jsModule.Members |> Map.tryFind name with
-      | Some (moduleMember) -> moduleMember.Var
-      | None ->
-             // Define upfront to avoid problems with mutually recursive methods
-             let var = Var.Global(name, typeof<obj>)
-             let moduleMember = {Name=name; Var=var; Statements=List.empty}
-             let jsModule = jsModule |> JSModule.addMember moduleMember
-             updateModule jsModule
-             let assignment = cons var
-             // more methods could have been added, need to get the latest module refernce
-             let jsModule = 
-                modules
-                |> Map.find moduleName 
-                |> JSModule.addMember {moduleMember with Var = var; Statements = assignment}
+      let moduleMember = 
+         match jsModule.Members |> Map.tryFind name with
+            | Some (moduleMember) -> moduleMember
+            | None ->
+                  // Define upfront to avoid problems with mutually recursive methods
+                  let var = Var.Global(name, typeof<obj>)
+                  let moduleMember = JSModules.createMember jsModule name var 
+                  let jsModule = jsModule |> JSModules.addMember moduleMember
+                  updateModule jsModule
+                  let assignment = cons var
+                  let dependencies = dependencyCapture |> Seq.last
+                  let fullyConstructed = {
+                     moduleMember with 
+                        Var=var; 
+                        Statements=assignment;
+                        Dependencies=dependencies}
+                  // more methods could have been added, need to get the latest module refernce
+                  let jsModule = 
+                     modules
+                     |> Map.find moduleName 
+                     |> JSModules.addMember fullyConstructed
 
-             updateModule jsModule
-             var
+                  updateModule jsModule
+                  fullyConstructed
+
+      let depLength = dependencyCapture |> Seq.length
+      if depLength > 1 then //we are depended on
+         let dependentIndex = depLength - 2
+         let current = dependencyCapture |> Seq.nth(dependentIndex)
+         let dependent = 
+            Seq.append current [moduleMember]
+         dependencyCapture <- 
+            dependencyCapture 
+            |> Seq.mapi(fun i d -> 
+               match i with
+               | _ when i = dependentIndex -> dependent
+               | _ -> d)
+
+      dependencyCapture <- dependencyCapture |> Seq.take(depLength - 1)
+      moduleMember.Var
 
    let mutable initialization = List.empty
 
@@ -190,8 +227,24 @@ type Compiler(components, outputModules) as this =
          |> List.map snd
          |> List.collect(fun m -> m.Members |> Map.toList |> List.map snd)
 
+      
+      let comparer =
+        HashIdentity.FromFunctions<JSModules.JSModuleMember>
+            (fun m -> hash m.FullName)
+            (fun a b -> a.FullName = b.FullName)
+
+      let pred (m: JSModules.JSModuleMember) =
+         m.Dependencies
+         |> Seq.choose (fun a ->
+            match globalMethods |> Seq.tryFind(fun b -> b.FullName = a.FullName) with
+            | None -> None
+            | Some m -> Some m)
+
+      let orderedGlobals = FunScript.Sorting.TopSort(globalMethods, pred, comparer)
+
       let globals = 
-         globalMethods
+         orderedGlobals
+         |> Seq.toList
          |> List.map(fun x -> x.Var, x.Statements)
 
       let declarations = 
@@ -248,8 +301,10 @@ type Compiler(components, outputModules) as this =
          Var(sprintf "_%i" !nextId, typeof<obj>, false) 
          
       member __.DefineGlobal moduleType name cons =
-         let moduleName = JavaScriptNameMapper.mapType moduleType
-         define moduleName name cons
+         let moduleName = (JavaScriptNameMapper.mapType moduleType)
+         let result = define moduleName name cons
+         let moduleNames = modules |> Map.toList |> List.map(fun key -> fst key)
+         result
       
       member __.DefineGlobalExplicit moduleName name cons =
          define moduleName name cons

@@ -52,6 +52,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="AttributeHelpers.fs" />
     <Compile Include="ExprExtensions.fs" />
+    <Compile Include="TopSort.fs" />
     <Compile Include="Core\LanguagePrimitives.fs" />
     <Compile Include="Core\GenericConstants.fs" />
     <Compile Include="Core\Array.fs" />
