@@ -42,6 +42,7 @@ let components =
          ExpressionReplacer.createUnsafe <@ fun (s:string) -> s.[0] @> <@ Core.String.CharAt @>
          ExpressionReplacer.createUnsafe <@ fun (s:string) -> s.Substring : int -> string @> <@ Core.String.SubstringWithoutLength @>
          ExpressionReplacer.createUnsafe <@ fun (s:string) -> s.Substring : int * int -> string @> <@ Core.String.SubstringWithLength @>
+         ExpressionReplacer.createUnsafe <@ fun (s:string) -> s.Contains : string -> bool @> <@ Core.String.Contains @>
       ]
       ExpressionReplacer.createModuleMapping 
          "FSharp.Core" "Microsoft.FSharp.Core.StringModule"

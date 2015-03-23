@@ -135,6 +135,10 @@ let Replace(s:string, search:string, replace:string) : string =
 [<FunScript.JSEmitInline("{0}")>]
 let ToCharArray(str:string) : char[] = failwith "never"
 
+[<FunScript.JSEmitInline("({0}.indexOf({1}) >= 0)")>]
+let Contains(str:string, search:string) : bool = failwith "never"
+
+
 // Re-implementation of functions from Microsoft.FSharp.Core.StringModule
 module FSharpString = 
    [<FunScript.JSEmit("return {0}==null?\"\":{0};")>]

@@ -8,6 +8,13 @@ module FunScript.Tests.Strings
 open System
 open NUnit.Framework
 
+[<TestCase("B"); TestCase("Z")>]
+let ``String.Contains works``(arg) =
+   check 
+      <@@
+         "ABC".Contains(arg)
+      @@>
+
 [<Test>]
 let ``String.Format with extra formatting works``() =
    check 
