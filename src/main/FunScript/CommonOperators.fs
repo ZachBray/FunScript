@@ -218,7 +218,8 @@ let components =
          ExpressionReplacer.create <@ (!) @> <@ Replacements.op_Bang @>
          ExpressionReplacer.create <@ fun (x : _ Ref) -> x.Value @> <@ Replacements.op_Bang @>
          ExpressionReplacer.create <@ (:=) @> <@ Replacements.assign @>
-   
+         ExpressionReplacer.create <@ fun (x : _ Ref) y -> x.Value <- y @> <@ Replacements.assign @>
+
          // Piping
          ExpressionReplacer.create <@ (|>) @> <@ Replacements.pipe @>
          ExpressionReplacer.create <@ (||>) @> <@ Replacements.pipe2 @>
