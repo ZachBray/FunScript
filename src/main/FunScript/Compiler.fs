@@ -1,6 +1,7 @@
 ﻿module FunScript.Compiler
 
 open FunScript
+open System.Reflection
 
 //TODO: Use IoC here. MiniIoC perhaps? 
 let createComponents(isEventMappingEnabled) =
@@ -58,6 +59,27 @@ type Compiler =
    static member Compile(expression, ?components, ?noReturn, ?shouldCompress, ?isEventMappingEnabled) = 
       let components = defaultArg components []
       Compiler.CompileImpl(expression, (fun existingComponents -> existingComponents @ components), noReturn, shouldCompress, isEventMappingEnabled)
-      
+
+   static member CompileAssembly(assembly : Assembly, ?noReturn: bool, ?shouldCompress : bool, ?isEventMappingEnabled: bool) =
+      let assemblyMains =
+         let types = assembly.GetTypes()
+         let flags = BindingFlags.NonPublic ||| BindingFlags.Public ||| BindingFlags.Static
+         let mains = 
+            [ for typ in types do
+               for mi in typ.GetMethods(flags) do
+                  if System.Attribute.IsDefined(mi, typedefof<AssemblyMain>) then yield mi ]
+         mains
+
+      match assemblyMains with
+      | _ when assemblyMains.Length > 1 -> 
+         invalidOp "More than one method marked with [<FunScript.AssemblyMain>] found."
+      | [] -> 
+         invalidOp "No method marked with [<FunScript.AssemblyMain>] found."
+      | [main] ->
+         let mainExpr = Microsoft.FSharp.Quotations.Expr.Call(main, [])
+         Compiler.CompileImpl(mainExpr, (fun existingComponents -> existingComponents), noReturn, shouldCompress, isEventMappingEnabled)
+      | _ ->
+         failwith "never"
+            
 let compile expr = Compiler.Compile(expr)
 let compileWithoutReturn expr = Compiler.Compile(expr, noReturn=true)

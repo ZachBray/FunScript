@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.30324.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FunScript", "main\FunScript\FunScript.fsproj", "{E0916E67-D3B0-4C3A-AD18-4146882FCEDD}"
 EndProject
@@ -12,6 +12,14 @@ EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FunScript.Interop", "main\FunScript.Interop\FunScript.Interop.fsproj", "{1397ECEF-2A65-49CE-AFA1-B9884671BBB9}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FunScript.Rx", "extra\FunScript.Rx\FunScript.Rx.fsproj", "{3D25CAB2-83A4-4D3B-9986-AC068FE29307}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FunScript.Compiler", "extra\FunScript.Compiler\FunScript.Compiler.fsproj", "{4AAD0F56-AF0F-46BD-811E-FEC88EBED669}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CompileTestData", "CompileTestData", "{71F5249A-EDF9-4C57-B3B8-3CEE26F8A9A6}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Simple", "compileTestData\simple\Simple.fsproj", "{E8EDA6FD-20D3-4849-95DA-ED2B0AE0A869}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "WithBindings", "compileTestData\WithBindings\WithBindings.fsproj", "{5BB88A86-E7DE-43BA-B809-A0DDDAD7F21C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,9 +47,25 @@ Global
 		{3D25CAB2-83A4-4D3B-9986-AC068FE29307}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D25CAB2-83A4-4D3B-9986-AC068FE29307}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D25CAB2-83A4-4D3B-9986-AC068FE29307}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AAD0F56-AF0F-46BD-811E-FEC88EBED669}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AAD0F56-AF0F-46BD-811E-FEC88EBED669}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AAD0F56-AF0F-46BD-811E-FEC88EBED669}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AAD0F56-AF0F-46BD-811E-FEC88EBED669}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8EDA6FD-20D3-4849-95DA-ED2B0AE0A869}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8EDA6FD-20D3-4849-95DA-ED2B0AE0A869}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8EDA6FD-20D3-4849-95DA-ED2B0AE0A869}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8EDA6FD-20D3-4849-95DA-ED2B0AE0A869}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BB88A86-E7DE-43BA-B809-A0DDDAD7F21C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BB88A86-E7DE-43BA-B809-A0DDDAD7F21C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BB88A86-E7DE-43BA-B809-A0DDDAD7F21C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BB88A86-E7DE-43BA-B809-A0DDDAD7F21C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E8EDA6FD-20D3-4849-95DA-ED2B0AE0A869} = {71F5249A-EDF9-4C57-B3B8-3CEE26F8A9A6}
+		{5BB88A86-E7DE-43BA-B809-A0DDDAD7F21C} = {71F5249A-EDF9-4C57-B3B8-3CEE26F8A9A6}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		$0.TextStylePolicy = $2
