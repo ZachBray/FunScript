@@ -1,0 +1,18 @@
+source https://nuget.org/api/v2
+
+nuget ApiaryProvider 1.0.2 framework: >= net45
+nuget DotNetZip
+nuget Edge.js 0.9.2 framework: >= net45
+nuget FSharp.Compiler.CodeDom
+nuget FSharp.Control.Reactive 2.4.0 framework: >= net45
+nuget FSharp.Data 2.0.9 framework: >= net45
+nuget FSharp.Formatting
+nuget FunScript.TypeScript.Binding.google_maps 1.1.0.37 framework: >= net45
+nuget FunScript.TypeScript.Binding.highcharts 1.1.0.37 framework: >= net45
+nuget FunScript.TypeScript.Binding.jqueryui 1.1.0.37 framework: >= net45
+nuget NUnit.Runners
+nuget Nuget.CommandLine
+nuget Nunit
+nuget fake
+nuget fparsec
+github Reactive-Extensions/RxJS dist/rx.all.js

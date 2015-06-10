@@ -1,8 +1,8 @@
 ﻿#r "../../main/FunScript/bin/Debug/FunScript.dll"
-#r "../../packages/FSharp.Control.Reactive.2.4.0/lib/net40/FSharp.Control.Reactive.dll"
-#r "../../packages/Rx-Core.2.2.5/lib/net45/System.Reactive.Core.dll"
-#r "../../packages/Rx-Linq.2.2.5/lib/net45/System.Reactive.Linq.dll"
-#r "../../packages/Rx-Interfaces.2.2.5/lib/net45/System.Reactive.Interfaces.dll"
+#r "../../packages/FSharp.Control.Reactive/lib/net40/FSharp.Control.Reactive.dll"
+#r "../../packages/Rx-Core/lib/net45/System.Reactive.Core.dll"
+#r "../../packages/Rx-Linq/lib/net45/System.Reactive.Linq.dll"
+#r "../../packages/Rx-Interfaces/lib/net45/System.Reactive.Interfaces.dll"
 #load "Data.fsx"
 
 open System

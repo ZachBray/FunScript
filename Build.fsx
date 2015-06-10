@@ -1,21 +1,38 @@
-#r @"lib\Fake\FakeLib.dll"
+#r @"packages/FAKE/tools/FakeLib.dll"
 
 open Fake
 open Fake.AssemblyInfoFile
+open System
+open System.IO
 
-let mainBuildDir = "./build/main/bin/"
-let mainPackageDir = "./build/main/deploy/"
+Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
+//printfn "%s" __SOURCE_DIRECTORY__
 
-let dataBuildDir = "./build/data/bin/"
-let dataPackageDir = "./build/data/deploy/"
+//let mainBuildDir = "./build/main/bin/"
+//let mainPackageDir = "./build/main/deploy/"
+//
+//let dataBuildDir = "./build/data/bin/"
+//let dataPackageDir = "./build/data/deploy/"
+//
+//let rxBuildDir = "./build/rx/bin/"
+//let rxPackageDir = "./build/rx/deploy/"
+//
+//let testBuildDir = "./build/data/bin/"
+//
+//let dependenciesDir = "./src/packages/"
 
-let rxBuildDir = "./build/rx/bin/"
-let rxPackageDir = "./build/rx/deploy/"
+let mainBuildDir = "build/main/bin/"
+let mainPackageDir = "build/main/deploy/"
 
-let testBuildDir = "./build/data/bin/"
+let dataBuildDir = "build/data/bin/"
+let dataPackageDir = "build/data/deploy/"
 
-let dependenciesDir = "./src/packages/"
+let rxBuildDir = "build/rx/bin/"
+let rxPackageDir = "build/rx/deploy/"
 
+let testBuildDir = "build/data/bin/"
+
+let dependenciesDir = "src/packages/"
 let versionNumber =
     match buildServer with
     | TeamCity -> buildVersion
@@ -45,7 +62,8 @@ let baseAttributes = [
     Attribute.FileVersion versionNumber
 ]
 
-Target "Build-Main" (fun () ->
+
+Target "Build-Main" (fun _ ->
 
     CreateFSharpAssemblyInfo "src/main/FunScript/AssemblyInfo.fs" 
         [
@@ -64,17 +82,16 @@ Target "Build-Main" (fun () ->
         ]
 
     let projectFiles = !! "src/main/**/*.fsproj"
-    
     Log "Build-Main-Projects: " projectFiles
 
     MSBuildRelease mainBuildDir "Build" projectFiles
     |> Log "Build-Main-Output: "
 )
 
-Target "Build-Data" (fun () ->
+Target "Build-Data" (fun _ ->
     
-    RestorePackages()
-    CopyDir dependenciesDir "./packages/" (fun _ -> true)
+//    RestorePackages()
+//    CopyDir dependenciesDir "./packages/" (fun _ -> true)
 
     CreateFSharpAssemblyInfo "src/data/FunScript.Data/AssemblyInfo.fs" 
         [
@@ -92,10 +109,10 @@ Target "Build-Data" (fun () ->
     |> Log "Build-Data-Output: "
 )
 
-Target "Build-Rx" (fun () ->
+Target "Build-Rx" (fun _ ->
     
-    RestorePackages()
-    CopyDir dependenciesDir "./packages/" (fun _ -> true)
+//    RestorePackages()
+//    CopyDir dependenciesDir "./packages/" (fun _ -> true)
 
     CreateFSharpAssemblyInfo "src/extra/FunScript.Rx/AssemblyInfo.fs" 
         [
@@ -113,9 +130,9 @@ Target "Build-Rx" (fun () ->
     |> Log "Build-Rx-Output: "
 )
 
-Target "Build-Test" (fun () ->
+Target "Build-Test" (fun _ ->
 
-    let projectFiles = !! "src/tests/**/*.fsproj"
+    let projectFiles = !! "tests/**/*.fsproj"
     
     Log "Build-Test-Projects: " projectFiles
 
@@ -123,18 +140,24 @@ Target "Build-Test" (fun () ->
     |> Log "Build-Test-Output: "
 )
 
-Target "Run-Test" (fun () ->
-    let targetDlls = !! (testBuildDir + "/*.Tests.dll")
+Target "Run-Test" (fun _ ->
+    let targetDlls = !! (testBuildDir + "*.Tests.dll")
+    //let projectFiles = !! "tests/**/*.fsproj"
     
+    Log "Run-Test-Dlls: " targetDlls
+   // Log "Run-Test-Dlls: " projectFiles
+
     targetDlls |> NUnit (fun p -> 
+    //projectFiles |> NUnit (fun p -> 
         { p with 
-            DisableShadowCopy = true 
+            Framework = "4.5"
+            //DisableShadowCopy = true 
+           // TimeOut = TimeSpan.FromMinutes 20.
             OutputFile = "TestResult.xml"
-            ToolPath = "lib/NUnit"
         })
 )
 
-Target "Create-Package-Main" (fun () ->
+Target "Create-Package-Main" (fun _ ->
     let hasNugetKey = hasBuildParam "nuget_key"
     tracefn "Publish-Package-Main: %b" hasNugetKey
     
@@ -153,7 +176,7 @@ Target "Create-Package-Main" (fun () ->
         }) "build/template.nuspec"
 )
 
-Target "Create-Package-Data" (fun () ->
+Target "Create-Package-Data" (fun _ ->
     let hasNugetKey = hasBuildParam "nuget_key"
     tracefn "Publish-Package-Main: %b" hasNugetKey
     
@@ -178,7 +201,7 @@ Target "Create-Package-Data" (fun () ->
         }) "build/data-template.nuspec"
 )
 
-Target "Create-Package-Rx" (fun () ->
+Target "Create-Package-Rx" (fun _ ->
     let hasNugetKey = hasBuildParam "nuget_key"
     tracefn "Publish-Package-Rx: %b" hasNugetKey
     
@@ -204,13 +227,36 @@ Target "Create-Package-Rx" (fun () ->
 
 Target "Release" DoNothing
 
-"Clean-Main" ==> "Build-Main" ==> "Create-Package-Main" ==> "Release"
-"Build-Main" ==> "Build-Data"
-"Clean-Data" ==> "Build-Data" ==> "Create-Package-Data" ==> "Release"
-"Build-Main" ==> "Build-Rx"
-"Clean-Rx" ==> "Build-Rx" ==> "Create-Package-Rx" ==> "Release"
-"Build-Main" ==> "Build-Rx" ==> "Build-Test"
-"Clean-Test" ==> "Build-Test" ==> "Run-Test"
-"Run-Test" ==> "Create-Package-Main"
+"Clean-Main" 
+    ==> "Build-Main" 
+    ==> "Create-Package-Main" 
+    ==> "Release"
+
+"Build-Main" 
+    ==> "Build-Data"
+
+"Clean-Data" 
+    ==> "Build-Data" 
+    ==> "Create-Package-Data" 
+    ==> "Release"
+
+"Build-Main" 
+    ==> "Build-Rx"
+
+"Clean-Rx" 
+    ==> "Build-Rx" 
+    ==> "Create-Package-Rx" 
+    ==> "Release"
+
+"Build-Main" 
+    ==> "Build-Rx" 
+    ==> "Build-Test"
+
+"Clean-Test" 
+    ==> "Build-Test" 
+    ==> "Run-Test"
+
+"Run-Test" 
+    ==> "Create-Package-Main"
 
 RunTargetOrDefault "Release"
