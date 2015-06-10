@@ -6,31 +6,17 @@ open System
 open System.IO
 
 Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
-//printfn "%s" __SOURCE_DIRECTORY__
 
-//let mainBuildDir = "./build/main/bin/"
-//let mainPackageDir = "./build/main/deploy/"
-//
-//let dataBuildDir = "./build/data/bin/"
-//let dataPackageDir = "./build/data/deploy/"
-//
-//let rxBuildDir = "./build/rx/bin/"
-//let rxPackageDir = "./build/rx/deploy/"
-//
-//let testBuildDir = "./build/data/bin/"
-//
-//let dependenciesDir = "./src/packages/"
+let mainBuildDir    = "build/main/bin/"
+let mainPackageDir  = "build/main/deploy/"
 
-let mainBuildDir = "build/main/bin/"
-let mainPackageDir = "build/main/deploy/"
+let dataBuildDir    = "build/data/bin/"
+let dataPackageDir  = "build/data/deploy/"
 
-let dataBuildDir = "build/data/bin/"
-let dataPackageDir = "build/data/deploy/"
+let rxBuildDir      = "build/rx/bin/"
+let rxPackageDir    = "build/rx/deploy/"
 
-let rxBuildDir = "build/rx/bin/"
-let rxPackageDir = "build/rx/deploy/"
-
-let testBuildDir = "build/data/bin/"
+let testBuildDir    = "build/data/bin/"
 
 let dependenciesDir = "src/packages/"
 let versionNumber =
