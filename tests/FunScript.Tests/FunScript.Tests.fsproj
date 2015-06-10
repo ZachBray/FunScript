@@ -51,18 +51,6 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
   <ItemGroup>
-    <Content Include="edge\x64\edge.node">
-      <Paket>True</Paket>
-    </Content>
-    <Content Include="edge\x64\node.dll">
-      <Paket>True</Paket>
-    </Content>
-    <Content Include="edge\x86\edge.node">
-      <Paket>True</Paket>
-    </Content>
-    <Content Include="edge\x86\node.dll">
-      <Paket>True</Paket>
-    </Content>
     <None Include="paket.references" />
     <Compile Include="PowerPack/Linq.fs" />
     <Compile Include="CommonFixture.fs" />
