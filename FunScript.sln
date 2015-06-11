@@ -1,0 +1,78 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{191AECDE-459D-404A-9A2A-AEEF4E8E2F38}"
+	ProjectSection(SolutionItems) = preProject
+		paket.dependencies = paket.dependencies
+		paket.lock = paket.lock
+	EndProjectSection
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FunScript.Tests", "tests\FunScript.Tests\FunScript.Tests.fsproj", "{EAC15526-7544-4EC5-AE50-32E5CDD05044}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "project", "project", "{E508DBC2-FC6D-4BE8-84E2-DE5409603E1A}"
+	ProjectSection(SolutionItems) = preProject
+		.travis.yml = .travis.yml
+		build.cmd = build.cmd
+		Build.fsx = Build.fsx
+		build.sh = build.sh
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "paket-files", "paket-files", "{D42B4575-473C-4132-B4E6-59DBED4E4634}"
+	ProjectSection(SolutionItems) = preProject
+		paket-files\Reactive-Extensions\RxJS\dist\rx.all.js = paket-files\Reactive-Extensions\RxJS\dist\rx.all.js
+	EndProjectSection
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FunScript", "src\main\FunScript\FunScript.fsproj", "{E0916E67-D3B0-4C3A-AD18-4146882FCEDD}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FunScript.Interop", "src\main\FunScript.Interop\FunScript.Interop.fsproj", "{1397ECEF-2A65-49CE-AFA1-B9884671BBB9}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FunScript.Rx", "src\extra\FunScript.Rx\FunScript.Rx.fsproj", "{3D25CAB2-83A4-4D3B-9986-AC068FE29307}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FunScript.TypeScript", "src\extra\FunScript.TypeScript\FunScript.TypeScript.fsproj", "{164139CF-07D4-468F-B6A8-9B92504C38E4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EAC15526-7544-4EC5-AE50-32E5CDD05044}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAC15526-7544-4EC5-AE50-32E5CDD05044}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAC15526-7544-4EC5-AE50-32E5CDD05044}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAC15526-7544-4EC5-AE50-32E5CDD05044}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0916E67-D3B0-4C3A-AD18-4146882FCEDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0916E67-D3B0-4C3A-AD18-4146882FCEDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0916E67-D3B0-4C3A-AD18-4146882FCEDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0916E67-D3B0-4C3A-AD18-4146882FCEDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1397ECEF-2A65-49CE-AFA1-B9884671BBB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1397ECEF-2A65-49CE-AFA1-B9884671BBB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1397ECEF-2A65-49CE-AFA1-B9884671BBB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1397ECEF-2A65-49CE-AFA1-B9884671BBB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D25CAB2-83A4-4D3B-9986-AC068FE29307}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D25CAB2-83A4-4D3B-9986-AC068FE29307}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D25CAB2-83A4-4D3B-9986-AC068FE29307}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D25CAB2-83A4-4D3B-9986-AC068FE29307}.Release|Any CPU.Build.0 = Release|Any CPU
+		{164139CF-07D4-468F-B6A8-9B92504C38E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{164139CF-07D4-468F-B6A8-9B92504C38E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{164139CF-07D4-468F-B6A8-9B92504C38E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{164139CF-07D4-468F-B6A8-9B92504C38E4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		$0.TextStylePolicy = $2
+		$1.inheritsSet = null
+		$1.scope = text/x-fsharp
+		$2.FileWidth = 120
+		$2.IndentWidth = 3
+		$2.TabWidth = 3
+		$2.inheritsScope = text/plain
+		$2.inheritsSet = VisualStudio
+		$2.scope = text/plain
+		Policies = $0
+		StartupItem = main\FunScript\FunScript.fsproj
+	EndGlobalSection
+EndGlobal
