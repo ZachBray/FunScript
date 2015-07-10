@@ -41,4 +41,4 @@ NUGET
 GITHUB
   remote: Reactive-Extensions/RxJS
   specs:
-    dist/rx.all.js (c5fd2ca606b406a6251b10a937b4806f0d2cd86d)
+    dist/rx.all.js (7c0b4214cdc429f39693af7407536cc13d791dff)
