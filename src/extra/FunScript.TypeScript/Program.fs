@@ -42,7 +42,7 @@ let compile outputAssembly references (source : string) =
     if File.Exists outputAssembly then
         true
     else
-        use provider = new Microsoft.FSharp.Compiler.CodeDom.FSharpCodeProvider()
+        use provider = new FSharp.Compiler.CodeDom.FSharpCodeProvider()
         let parameters = CompilerParameters(OutputAssembly = outputAssembly)
         let msCorLib = typeof<int>.Assembly.Location
         parameters.ReferencedAssemblies.Add msCorLib |> ignore<int>
