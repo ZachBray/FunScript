@@ -110,10 +110,10 @@ let identifier =
     .>> ws
 
 let keyword_ws s = 
-    pstring s .>> nextCharSatisfiesNot isIdentifierChar .>> ws
+    attempt(pstring s .>> nextCharSatisfiesNot isIdentifierChar .>> ws)
 
 let keywordReturn_ws s x = 
-    stringReturn s x .>> nextCharSatisfiesNot isIdentifierChar .>> ws
+    attempt(stringReturn s x .>> nextCharSatisfiesNot isIdentifierChar .>> ws)
 
 let keywordReturn_ws1 s x = 
     attempt(stringReturn s x .>> nextCharSatisfiesNot isIdentifierChar .>> ws1)
