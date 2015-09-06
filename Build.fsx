@@ -13,10 +13,13 @@ let mainPackageDir  = "build/main/deploy/"
 let dataBuildDir    = "build/data/bin/"
 let dataPackageDir  = "build/data/deploy/"
 
+let typescriptBuildDir = "build/typescript/bin/"
+let typescriptPackageDir = "build/typescript/deploy/"
+
 let rxBuildDir      = "build/rx/bin/"
 let rxPackageDir    = "build/rx/deploy/"
 
-let testBuildDir    = "build/data/bin/"
+let testBuildDir    = "build/tests/"
 
 let dependenciesDir = "src/packages/"
 let versionNumber =
@@ -30,6 +33,10 @@ Target "Clean-Main" (fun _ ->
 
 Target "Clean-Data" (fun _ ->
     CleanDirs [dataBuildDir; dataPackageDir]
+)
+
+Target "Clean-TypeScript" (fun _ ->
+    CleanDirs [typescriptBuildDir; typescriptPackageDir]
 )
 
 Target "Clean-Rx" (fun _ ->
@@ -95,6 +102,27 @@ Target "Build-Data" (fun _ ->
     |> Log "Build-Data-Output: "
 )
 
+Target "Build-TypeScript" (fun _ ->
+    
+//    RestorePackages()
+//    CopyDir dependenciesDir "./packages/" (fun _ -> true)
+
+    CreateFSharpAssemblyInfo "src/extra/FunScript.TypeScript/AssemblyInfo.fs" 
+        [
+            yield Attribute.Title "TypeInferred.FunScript.TypeScript"
+            yield Attribute.Description "TypeScript Interop Library - FunScript"
+            yield Attribute.Guid "891C8111-4D9D-45CD-8A8D-77EB817FF8E1"
+            yield! baseAttributes
+        ]
+        
+    let projectFiles = !! "src/extra/FunScript.TypeScript/*.fsproj"
+    
+    Log "Build-TypeScript-Projects: " projectFiles
+
+    MSBuildRelease typescriptBuildDir "Build" projectFiles
+    |> Log "Build-TypeScript-Output: "
+)
+
 Target "Build-Rx" (fun _ ->
     
 //    RestorePackages()
@@ -122,7 +150,7 @@ Target "Build-Test" (fun _ ->
     
     Log "Build-Test-Projects: " projectFiles
 
-    MSBuildRelease testBuildDir "Build" projectFiles
+    MSBuildDebug testBuildDir "Build" projectFiles
     |> Log "Build-Test-Output: "
 )
 
@@ -220,23 +248,19 @@ Target "Release" DoNothing
 
 "Build-Main" 
     ==> "Build-Data"
+    ==> "Build-TypeScript"
+    ==> "Build-Rx"
+    ==> "Build-Test"
 
 "Clean-Data" 
     ==> "Build-Data" 
     ==> "Create-Package-Data" 
     ==> "Release"
 
-"Build-Main" 
-    ==> "Build-Rx"
-
 "Clean-Rx" 
     ==> "Build-Rx" 
     ==> "Create-Package-Rx" 
     ==> "Release"
-
-"Build-Main" 
-    ==> "Build-Rx" 
-    ==> "Build-Test"
 
 "Clean-Test" 
     ==> "Build-Test" 
