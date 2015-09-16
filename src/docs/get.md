@@ -53,7 +53,7 @@ to avoid loading errors.
 ## Build from source
 
 If you want to get the latest version or if you're considering contributing to FunScript, then
-you can get the [source code from GitHub](https://github.com/ZachBray/). For more information,
+you can get the [source code from GitHub](https://github.com/ZachBray/FunScript). For more information,
 see also [our contributor guide](contribute.html)!
 
 </div>
