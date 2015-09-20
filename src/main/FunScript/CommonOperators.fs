@@ -208,7 +208,7 @@ let private typeTest =
             |> returnTypeTest "instanceof"
 
        | _ -> [ returnStrategy.Return <| Boolean false ]
-   | _ -> [ returnStrategy.Return <| Boolean false ]
+   | _ -> []
 
 let components = 
    [
