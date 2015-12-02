@@ -176,9 +176,9 @@ let Get xs n =
    FindIndexed (fun i _ -> n = i) xs
       
 let Filter f xs =
-   Fold (fun acc x ->
+   FoldBack (fun x acc ->
       if f x then Cons(x,acc)
-      else acc) Nil xs
+      else acc) xs Nil 
 
 let Partition f xs =
    Fold (fun (lacc, racc) x ->
