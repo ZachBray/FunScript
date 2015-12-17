@@ -224,10 +224,10 @@ let rec Exists2 f bs cs =
    | _ -> invalidOp "Lists had different lengths"
 
 let Unzip xs =
-   Fold (fun (lacc, racc) (x, y) -> Cons(x,lacc), Cons(y,racc)) (Nil,Nil) xs
+   FoldBack (fun (x, y) (lacc, racc) -> Cons(x,lacc), Cons(y,racc)) xs (Nil,Nil)
 
 let Unzip3 xs =
-   Fold (fun (lacc, macc, racc) (x, y, z) -> Cons(x,lacc), Cons(y,macc), Cons(z,racc)) (Nil,Nil,Nil) xs
+   FoldBack (fun (x, y, z) (lacc, macc, racc) -> Cons(x,lacc), Cons(y,macc), Cons(z,racc)) xs (Nil,Nil,Nil) 
 
 let Zip xs ys =
    Map2 (fun x y -> x, y) xs ys
