@@ -189,7 +189,7 @@ let Choose f xs =
    Fold (fun acc x ->
       match f x with
       | Some y -> Cons(y, acc)
-      | None -> acc) Nil xs
+      | None -> acc) Nil xs |> Reverse
 
 let Initialize n f =
    let mutable xs = Nil
