@@ -80,13 +80,13 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="FunScript">
-      <HintPath>..\..\main\FunScript\bin\Debug\FunScript.dll</HintPath>
+      <HintPath>..\..\build\main\bin\FunScript.dll</HintPath>
     </Reference>
     <Reference Include="FunScript.Data">
       <HintPath>..\..\data\FunScript.Data\bin\Debug\FunScript.Data.dll</HintPath>
     </Reference>
     <Reference Include="FunScript.Interop">
-      <HintPath>..\..\main\FunScript\bin\Debug\FunScript.Interop.dll</HintPath>
+      <HintPath>..\..\build\main\bin\FunScript.Interop.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
