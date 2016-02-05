@@ -91,7 +91,7 @@ and take a look at our tutorials and samples:
  - [Visualizing World Bank data](samples/worldbank/index.html)
  - [Calling The Movie Database](samples/moviedatabase/index.html)
  - [Mandelbrot with HTML5 canvas](samples/mandelbrot/index.html)
- - [Asynchornous computations](samples/simpleasync/index.html)
+ - [Asynchronous computations](samples/simpleasync/index.html)
 
 </div></div>
 

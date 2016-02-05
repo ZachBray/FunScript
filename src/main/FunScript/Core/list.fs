@@ -176,9 +176,9 @@ let Get xs n =
    FindIndexed (fun i _ -> n = i) xs
       
 let Filter f xs =
-   Fold (fun acc x ->
+   FoldBack (fun x acc ->
       if f x then Cons(x,acc)
-      else acc) Nil xs
+      else acc) xs Nil 
 
 let Partition f xs =
    Fold (fun (lacc, racc) x ->
@@ -189,7 +189,7 @@ let Choose f xs =
    Fold (fun acc x ->
       match f x with
       | Some y -> Cons(y, acc)
-      | None -> acc) Nil xs
+      | None -> acc) Nil xs |> Reverse
 
 let Initialize n f =
    let mutable xs = Nil
@@ -224,10 +224,10 @@ let rec Exists2 f bs cs =
    | _ -> invalidOp "Lists had different lengths"
 
 let Unzip xs =
-   Fold (fun (lacc, racc) (x, y) -> Cons(x,lacc), Cons(y,racc)) (Nil,Nil) xs
+   FoldBack (fun (x, y) (lacc, racc) -> Cons(x,lacc), Cons(y,racc)) xs (Nil,Nil)
 
 let Unzip3 xs =
-   Fold (fun (lacc, macc, racc) (x, y, z) -> Cons(x,lacc), Cons(y,macc), Cons(z,racc)) (Nil,Nil,Nil) xs
+   FoldBack (fun (x, y, z) (lacc, macc, racc) -> Cons(x,lacc), Cons(y,macc), Cons(z,racc)) xs (Nil,Nil,Nil) 
 
 let Zip xs ys =
    Map2 (fun x y -> x, y) xs ys

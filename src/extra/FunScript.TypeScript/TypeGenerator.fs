@@ -92,6 +92,7 @@ module private Domain =
         | Method of GenericParameter list * GenericConstraint list * FFIMemberParameter list * ReturnType
         | Index of ParameterType * ReturnType
         | Property of ReturnType
+        | FunWrapper
 
     type FFIPropertyName =
         | Invoker
@@ -142,16 +143,46 @@ module private FFIMapping =
             // TODO: constraints from type parameters
             let rs : _ list = parameterListToTypeRefs k parentType xs
             let s = typeToTypeRef k parentType y
-            if rs.Length < 9 then
+            let isRest = match xs with ParameterList(_, _, Some _) -> true | _ -> false
+            if isRest then
+                functionTypeWithRestToTypeRef k parentType rs s
+            else if rs.Length < 9 then
                 TypeRef(["Func"; "System"], [yield! rs; yield s])
             else predefinedTypeToTypeRef Any
 
-    and objectTypeToTypeRef k (TypeRef(tns, classGps), (isInterface, methodGps)) (ObjectType xs as z) =
-        let ns = 
-            match isInterface, tns with 
+    and getNs isInterface tns = 
+        match isInterface, tns with 
             | _, [] -> []
             | false, ns -> ns
             | true, _::ns -> ns
+
+    and functionTypeWithRestToTypeRef k (TypeRef(tns, classGps), (isInterface, methodGps)) rs s =
+        let ns = getNs isInterface tns
+        let name = sprintf "RestFuncType%i" (getIndex())
+        let paramCount = List.length rs
+        let tparams = Seq.init (paramCount + 1) (fun i -> "T" + string i) 
+                        |> Seq.map (fun x -> TypeRef([x], [])) 
+                        |> List.ofSeq
+        let y = TypeRef(name :: ns, tparams)
+        Interface(y, [], []) |> k
+        let nonRest = 
+            tparams 
+            |> Seq.take (paramCount - 1) 
+            |> Seq.mapi (fun i t -> Variable("x" + string i, t, Required)) 
+            |> List.ofSeq
+        
+        let meth = Method([], [], nonRest @ [ InlineArray("rest", TypeRef(["Array"], [ List.nth tparams (paramCount - 1) ])) ], List.nth tparams paramCount )
+        Member(y, Invoker, NonStatic, meth) |> k
+        Member(y, Constructor, Static, FunWrapper) |> k
+
+        let restTy = match Seq.last rs with 
+                        | TypeRef(["Array"], [t]) -> t
+                        | t -> failwith "Expected array type"
+        
+        TypeRef(name :: ns, ((Seq.take (paramCount - 1) rs) |> List.ofSeq) @ [restTy; s] )
+
+    and objectTypeToTypeRef k (TypeRef(tns, classGps), (isInterface, methodGps)) (ObjectType xs as z) =
+        let ns = getNs isInterface tns
         let name = sprintf "AnonymousType%i" (getIndex())
         let y = TypeRef(name :: ns, classGps @ methodGps)
         Interface(y, [], []) |> k
@@ -906,10 +937,17 @@ type %s ="""        (namespaceComponentCode t) localSignature
                             sprintf "%s(%s)" fullAccess parameterCode
                         | Index _ ->
                             sprintf "%s[{%i}]" fullAccess seedI
+                        | FunWrapper ->
+                            let n = (List.length gps - 1)
+                            let args = [ for i in 0..n-2 -> sprintf "x%d" i ] 
+                            sprintf "function(%s) { return {0}%s([].slice.call(arguments, %i)); }" 
+                                (args |> String.concat ", ")
+                                (args |> List.map (sprintf "(%s)") |> String.concat "")
+                                (n-1)
                     let getOverloadName specializedName memberElement =
                         let memberElementKey =
                             match memberElement with
-                            | Property _ | Index _ -> memberElement
+                            | Property _ | Index _ | FunWrapper -> memberElement
                             | Method(gps, gcs, ps, r) ->
                                 let requiredParameters =
                                     ps |> List.choose (function
@@ -979,6 +1017,17 @@ type %s ="""        (namespaceComponentCode t) localSignature
                             let rCode = typeReferenceCode fixedR
                             let name = getOverloadName name (Index(fixedP, fixedR))
                             sprintf "%s with get(i : %s) : %s = failwith \"never\" and set (i : %s) (v : %s) : unit = failwith \"never\"" name pCode rCode pCode rCode,
+                            None
+                        | FunWrapper ->
+                            let n = List.length gps
+                            let tpar (TypeRef([s],ts)) = s
+                            let gparams = gps |> List.map (fixGenericParameterName >> tpar)
+                            let args = Seq.take (n-2) gparams |> Seq.map (sprintf "%s -> ") |> String.concat ""
+                            sprintf "Create(f: %s%s array -> %s) : %s = failwith \"never\"" 
+                                args 
+                                (List.nth gparams (n-2)) 
+                                (List.nth gparams (n-1)) 
+                                (Option.get signature),
                             None
                     let root =
                         match s with
