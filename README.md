@@ -1,5 +1,7 @@
 # FunScript
 
+**Please note: this project is not actively maintained anymore. Please look at these alternatives: [Fable](https://github.com/fsprojects/Fable) or [WebSharper](http://websharper.com/).**
+
 **FunScript** consists of a standalone F# to JavaScript compiler library and a [Type Provider](http://msdn.microsoft.com/en-us/library/hh156509.aspx) to [TypeScript](http://typescriptlang.org/).
 **FunScript** lets you connect to client and server APIs with [Intellisense](http://en.wikipedia.org/wiki/IntelliSense) and types [automagically](http://www.urbandictionary.com/define.php?term=automagically) using F# 3's Type Provider mechanism.
 
