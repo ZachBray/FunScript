@@ -11,6 +11,9 @@
     <AssemblyName>NodeJS</AssemblyName>
     <Name>NodeJS</Name>
     <ProductVersion>10.0.0</ProductVersion>
+    <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,29 +38,22 @@
     <DocumentationFile>bin\Release\NodeJS.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="FunScript">
-      <HintPath>..\..\FunScript.TypeScript\bin\Debug\FunScript.dll</HintPath>
-    </Reference>
-    <Reference Include="FunScript.TypeScript">
-      <HintPath>..\..\FunScript.TypeScript\bin\Debug\FunScript.TypeScript.dll</HintPath>
-    </Reference>
-    <Reference Include="FunScript.TypeScript.Interop">
-      <HintPath>..\..\FunScript.TypeScript\bin\Debug\FunScript.TypeScript.Interop.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net" />
-    <Reference Include="System.Web" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Site.fs" />
-  </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
   </PropertyGroup>
-  <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets" Condition=" Exists('$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets')" />
+  <Choose>
+    <When Condition="'$(VisualStudioVersion)' == '11.0'">
+      <PropertyGroup>
+        <FSharpTargetsPath>$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets</FSharpTargetsPath>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <FSharpTargetsPath>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets</FSharpTargetsPath>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+  <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -74,4 +70,34 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
+  <ItemGroup>
+    <Compile Include="Site.fs" />
+    <Content Include="App.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FunScript">
+      <HintPath>..\..\src\main\FunScript\bin\Debug\FunScript.dll</HintPath>
+    </Reference>
+    <Reference Include="FunScript.Interop">
+      <HintPath>..\..\src\main\FunScript.Interop\bin\Debug\FunScript.Interop.dll</HintPath>
+    </Reference>
+    <Reference Include="FunScript.TypeScript.Binding.lib">
+      <HintPath>packages\FunScript.TypeScript.Binding.lib.1.1.0.37\lib\net40\FunScript.TypeScript.Binding.lib.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FunScript.TypeScript.Binding.node">
+      <HintPath>packages\FunScript.TypeScript.Binding.node.1.1.0.37\lib\net40\FunScript.TypeScript.Binding.node.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Net" />
+    <Reference Include="System.Web" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
 </Project>

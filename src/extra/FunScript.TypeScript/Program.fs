@@ -46,7 +46,7 @@ let compile outputAssembly references (source : string) =
         let parameters = CompilerParameters(OutputAssembly = outputAssembly)
         let msCorLib = typeof<int>.Assembly.Location
         parameters.ReferencedAssemblies.Add msCorLib |> ignore<int>
-        let fsCorLib = @"C:\Program Files (x86)\Reference Assemblies\Microsoft\FSharp\.NETFramework\v4.0\4.3.1.0\FSharp.Core.dll"
+        let fsCorLib = @"C:\Program Files (x86)\Reference Assemblies\Microsoft\FSharp\.NETFramework\v4.0\4.4.0.0\FSharp.Core.dll"
         parameters.ReferencedAssemblies.Add fsCorLib |> ignore<int>
         let funScriptInterop = typeof<FunScript.JSEmitInlineAttribute>.Assembly.Location
         parameters.ReferencedAssemblies.Add funScriptInterop |> ignore<int>
@@ -55,7 +55,7 @@ let compile outputAssembly references (source : string) =
         File.WriteAllText(sourceFile, source)
         /// This is to get the code dom to work!
         if System.Environment.GetEnvironmentVariable("FSHARP_BIN") = null then
-            let defaultFSharpBin = @"C:\Program Files (x86)\Microsoft SDKs\F#\3.1\Framework\v4.0"
+            let defaultFSharpBin = @"C:\Program Files (x86)\Microsoft SDKs\F#\4.0\Framework\v4.0"
             if Directory.Exists defaultFSharpBin then
                 Environment.SetEnvironmentVariable("FSHARP_BIN", defaultFSharpBin)
             else failwith "Expected FSHARP_BIN environment variable to be set."

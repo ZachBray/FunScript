@@ -175,6 +175,7 @@ temp/
 
 # Test results produced by build
 TestResults.xml
+TestResult.xml
 
 # Nuget outputs
 nuget/*.nupkg
@@ -187,3 +188,4 @@ paket-files
 docs/content/license.md
 docs/content/release-notes.md
 *.bak
+build/tests

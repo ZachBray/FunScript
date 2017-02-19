@@ -7,6 +7,7 @@ module FunScript.Tests.Strings
 
 open System
 open NUnit.Framework
+open System.Threading
 
 [<TestCase("B"); TestCase("Z")>]
 let ``String.Contains works``(arg) =
@@ -17,12 +18,18 @@ let ``String.Contains works``(arg) =
 
 [<Test>]
 let ``String.Format with extra formatting works``() =
+   let currentCulture = Thread.CurrentThread.CurrentCulture
+   let currentUICulture = Thread.CurrentThread.CurrentUICulture
+   Thread.CurrentThread.CurrentCulture <- System.Globalization.CultureInfo.InvariantCulture
+   Thread.CurrentThread.CurrentUICulture <- System.Globalization.CultureInfo.InvariantCulture
    check 
       <@@
          let i = 0.5466788
          let dt = DateTime(2014, 9, 26).AddMinutes(19.)
          String.Format("{0:F2} {0:P2} {1:yy/MM/dd HH:mm}", i, dt)
       @@>
+   Thread.CurrentThread.CurrentCulture <- currentCulture
+   Thread.CurrentThread.CurrentUICulture <- currentUICulture
 
 [<Test>]
 let ``Console.WriteLine works``() =

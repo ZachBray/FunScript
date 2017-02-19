@@ -4,6 +4,8 @@ module FunScript.Tests.Common
 open FunScript
 open NUnit.Framework
 open Microsoft.FSharp.Linq.QuotationEvaluation
+open System
+open System.IO
 
 let defaultCompile quote =
     Compiler.Compiler.Compile(quote, noReturn = false, shouldCompress = true)
@@ -66,7 +68,10 @@ let check (quote:Quotations.Expr) =
 
 let checkRx (quote:Quotations.Expr) =
    let expectedResult = quote.EvalUntyped()
-   checkAreEqualWith(sprintf "var Rx = require('%s../../paket-files/Reactive-Extensions/RxJS/dist/rx.all.js');" __SOURCE_DIRECTORY__)
+   let universalPath = "/../../paket-files/Reactive-Extensions/RxJS/dist/rx.all.js".Replace('/', Path.DirectorySeparatorChar)
+   let finalPath = Path.GetFullPath( sprintf "%s%s" __SOURCE_DIRECTORY__ universalPath )
+   let rxAllJsPath = "/" + finalPath.Substring(Path.GetPathRoot(finalPath).Length).Replace(Path.DirectorySeparatorChar, '/')
+   checkAreEqualWith(sprintf "var Rx = require('%s');" rxAllJsPath )
         compileWithRx expectedResult quote
 
 let checkAsync (quote:Quotations.Expr<'a Async>) =
